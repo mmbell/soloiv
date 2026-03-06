@@ -3,6 +3,8 @@
 # ifndef INCQdatah
 # define INCQdatah
 
+#include <stdint.h>
+
 struct qparamdata_d {		/* new for 1995 */
 
     char pdata_desc[4];		/* parameter data descriptor identifier: ASCII
@@ -10,7 +12,7 @@ struct qparamdata_d {		/* new for 1995 */
 				 * the data plus some supplemental and
 				 * identifying information */
     
-    long  pdata_length;		/* parameter data descriptor length in bytes.
+    int32_t  pdata_length;		/* parameter data descriptor length in bytes.
 				 * this represents the size of this header
 				 * information plus the data
 				 *
@@ -24,8 +26,8 @@ struct qparamdata_d {		/* new for 1995 */
     
     char  pdata_name[8];	/* name of parameter */
 
-    long  extension_num;
-    long  config_num;		/* facilitates indexing into an array
+    int32_t  extension_num;
+    int32_t  config_num;		/* facilitates indexing into an array
 				 * of radar descriptors where the radar
 				 * characteristics of each ray and each
 				 * parameter might be unique such as phased

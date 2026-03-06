@@ -1,9 +1,12 @@
 /* 	$Id$	 */
+
+#include <stdint.h>
+
 struct correction_d {
     char correction_des[4];	/* Correction descriptor identifier: ASCII */
 				/* characters "CFAC" stand for Volume */
 				/* Descriptor. */
-    long  correction_des_length; /*Correction  descriptor length in bytes. */
+    int32_t  correction_des_length; /*Correction  descriptor length in bytes. */
     float azimuth_corr;          /* Correction added to azimuth[deg]*/
     float elevation_corr;        /* Correction added to elevation[deg]*/
     float range_delay_corr;      /* Correction used for range delay[m]*/

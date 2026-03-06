@@ -1,5 +1,6 @@
 /* 	$Id$	 */
 
+#include <stdint.h>
 
 # ifndef INCsuper_SWIBh
 # define INCsuper_SWIBh
@@ -16,22 +17,22 @@
 # define SWIB_NEW_VOL 0x1
 
 struct key_table_info {
-    long offset;
-    long size;
-    long type;
+    int32_t offset;
+    int32_t size;
+    int32_t type;
 };
 
 struct super_SWIB {
     char name_struct[4];	/* "SSWB" */
-    long sizeof_struct;
+    int32_t sizeof_struct;
     /* parameters from the first version */
-    long last_used;		/* Unix time */
-    long start_time;
-    long stop_time;
-    long sizeof_file;
-    long compression_flag;
-    long volume_time_stamp;	/* to reference current volume */
-    long num_params;		/* number of parameters */
+    int32_t last_used;		/* Unix time */
+    int32_t start_time;
+    int32_t stop_time;
+    int32_t sizeof_file;
+    int32_t compression_flag;
+    int32_t volume_time_stamp;	/* to reference current volume */
+    int32_t num_params;		/* number of parameters */
 
     /* end of first version parameters */
 
@@ -44,10 +45,10 @@ struct super_SWIB {
      * of the last access and
      * 0 implies this sweep should not be aged off
      */
-    long version_num;
-    long num_key_tables;
-    long status;
-    long place_holder[7];
+    int32_t version_num;
+    int32_t num_key_tables;
+    int32_t status;
+    int32_t place_holder[7];
     struct key_table_info key_table[MAX_KEYS];
     /*
      * offset and key info to a table containing key value such as
@@ -60,17 +61,17 @@ struct super_SWIB_v0 {
     char name_struct[4];	/* "SSWB" */
     int sizeof_struct;
 
-    long last_used;		/* Unix time */
+    int32_t last_used;		/* Unix time */
     /*
      * "last_used" is an age off indicator where > 0 implies Unix time
      * of the last access and
      * 0 implies this sweep should not be aged off
      */
-    long start_time;
-    long stop_time;
+    int32_t start_time;
+    int32_t stop_time;
     int sizeof_file;
     int compression_flag;
-    long volume_time_stamp;	/* to reference current volume */
+    int32_t volume_time_stamp;	/* to reference current volume */
     int num_params;		/* number of parameters */
 };
 

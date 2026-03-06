@@ -40,6 +40,8 @@
 #ifndef INCFieldParamh
 #define INCFieldParamh
 
+#include <stdint.h>
+
 #ifdef OK_RPC
 
 #if defined(UNIX) && defined(sun)
@@ -55,9 +57,9 @@
 struct field_parameter_data {
     char  field_param_data[4];	/* Field parameter data identifier */
 				/* (ascii characters FRAD) */
-    long field_param_data_len;	/* Length of the field parameter */
+    int32_t field_param_data_len;	/* Length of the field parameter */
 				/* data block in bytes */
-    long data_sys_status;	/* Status word, bits will be assigned */
+    int32_t data_sys_status;	/* Status word, bits will be assigned */
                                 /*  particular status when needed */
     char  radar_name[8];	/* Name of radar from which this data ray  */
 				/* came from */
@@ -72,7 +74,7 @@ struct field_parameter_data {
 				/* with the test pulse (what mux on */
 				/* timing module is set to) */
     float noise_power;		/* Total estimated noise power in dbm */
-    long  ray_count;		/* Data Ray counter For this */
+    int32_t  ray_count;		/* Data Ray counter For this */
 				/* particular type of data ray */
     short first_rec_gate;	/* First recorded gate number (N) */
     short last_rec_gate;	/* Last recorded gate number (M) */

@@ -29,6 +29,8 @@
 #ifndef INCCellVector_h
 #define INCCellVector_h
 
+#include <stdint.h>
+
 #define MAXCVGATES 8192
 
 # ifndef MAXGATES
@@ -39,8 +41,8 @@ struct cell_d {
     char cell_spacing_des[4];	/* Cell descriptor identifier: ASCII */
 				/* characters "CELV" stand for cell*/
 				/* vector. */
-    long  cell_des_len   ;	/* Comment descriptor length in bytes*/
-    long  number_cells   ;	/*Number of sample volumes*/
+    int32_t  cell_des_len   ;	/* Comment descriptor length in bytes*/
+    int32_t  number_cells   ;	/*Number of sample volumes*/
     float dist_cells[MAXCVGATES]; /*Distance from the radar to cell*/
 				/* n in meters*/
 

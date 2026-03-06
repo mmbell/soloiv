@@ -27,6 +27,8 @@
 #ifndef _LIDARDESC_H
 #define _LIDARDESC_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,7 +37,7 @@ struct lidar_d {
     char lidar_des[4];          /* Identifier  a lidar descriptor */
                                 /* block (four ASCII characters */
                                 /* "LIDR"). */
-    long lidar_des_length;      /* Length of a lidar descriptor block. */
+    int32_t lidar_des_length;      /* Length of a lidar descriptor block. */
     char lidar_name[8];         /* Eight character lidar */
                                 /* name. (Characters SABL) */
     float lidar_const;          /* Lidar constant. */

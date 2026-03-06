@@ -31,6 +31,8 @@
 #ifndef INCRadarDesch
 #define INCRadarDesch
 
+#include <stdint.h>
+
 #ifdef OK_RPC
 
 #if defined(UNIX) && defined(sun)
@@ -47,7 +49,7 @@
 struct radar_d {
     char  radar_des[4];		/* Identifier for a radar descriptor */
 				/* block (ascii characters "RADD"). */
-    long  radar_des_length;	/* Length of a radar descriptor block */
+    int32_t  radar_des_length;	/* Length of a radar descriptor block */
 				/* in bytes. */
     char  radar_name[8];	/* Eight character radar name. */
     float radar_const;		/* Radar/lidar constant in ?? */
@@ -115,10 +117,10 @@ struct radar_d {
     float interpulse_per5;	/* Interpulse period 5. */
 
 				/* 1995 extension #1 */
-    long  extension_num;
+    int32_t  extension_num;
     char  config_name[8];	/* used to identify this set of
 				 * unique radar characteristics */
-    long  config_num;		/* facilitates a quick lookup of radar
+    int32_t  config_num;		/* facilitates a quick lookup of radar
 				 * characteristics for each ray */
     /*
      * extend the radar descriptor to include unique lidar parameters
@@ -137,7 +139,7 @@ struct radar_d {
     float primary_cop_baseln;	/* coplane baselines */
     float secondary_cop_baseln;
     float pc_xmtr_bandwidth;	/* pulse compression transmitter bandwidth */
-    long  pc_waveform_type;	/* pulse compression waveform type */
+    int32_t  pc_waveform_type;	/* pulse compression waveform type */
     char  site_name[20];
 
 }; /* End of Structure */
@@ -156,7 +158,7 @@ bool_t xdr_radar_d(XDR *, RADARDESC *);
 struct radar_d_v01 {
     char  radar_des[4];		/* Identifier for a radar descriptor */
 				/* block (ascii characters "RADD"). */
-    long radar_des_length;	/* Length of a radar descriptor block */
+    int32_t radar_des_length;	/* Length of a radar descriptor block */
 				/* in bytes. */
     char  radar_name[8];	/* Eight character radar name. */
     float radar_const;		/* Radar constant in ?? */
@@ -227,7 +229,7 @@ struct radar_d_v01 {
 struct radar_d_v00 {
     char  radar_des[4];		/* Identifier for a radar descriptor */
 				/* block (ascii characters "RADD"). */
-    long radar_des_length;	/* Length of a radar descriptor block */
+    int32_t radar_des_length;	/* Length of a radar descriptor block */
 				/* in bytes. */
     char  radar_name[8];	/* Eight character radar name. */
     float radar_const;		/* Radar constant in ?? */

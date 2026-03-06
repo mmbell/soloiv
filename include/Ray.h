@@ -35,6 +35,8 @@
 #ifndef INCRayh
 #define INCRayh
 
+#include <stdint.h>
+
 #ifdef OK_RPC
 
 #if defined(UNIX) && defined(sun)
@@ -50,10 +52,10 @@
 struct ray_i {
     char  ray_info[4];		/* Identifier for a data ray info. */
 				/* block (ascii characters "RYIB"). */
-    long ray_info_length;	/* length of a data ray info block in */
+    int32_t ray_info_length;	/* length of a data ray info block in */
 				/* bytes. */
-    long  sweep_num;		/* sweep number for this radar. */
-    long  julian_day;		/* Guess. */
+    int32_t  sweep_num;		/* sweep number for this radar. */
+    int32_t  julian_day;		/* Guess. */
     short hour;			/* Hour in hours. */
     short minute;		/* Minute in minutes. */
     short second;		/* Second in seconds. */
@@ -63,7 +65,7 @@ struct ray_i {
     float peak_power;		/* Last measured peak transmitted */
 				/* power in kw. */
     float true_scan_rate;	/* Actual scan rate in degrees/second. */
-    long  ray_status;		/* 0 = normal, 1 = transition, 2 = bad. */
+    int32_t  ray_status;		/* 0 = normal, 1 = transition, 2 = bad. */
 }; /* End of Structure */
 
 

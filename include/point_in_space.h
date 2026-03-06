@@ -1,5 +1,7 @@
 /* 	$Id$	 */
 
+#include <stdint.h>
+
 # ifndef PISP
 # define PISP
 /* set this bit in state if there is a lat/lon/alt/earthr */
@@ -20,7 +22,7 @@
 
 struct point_in_space {
     char name_struct[4];	/* "PISP" */
-    long sizeof_struct;
+    int32_t sizeof_struct;
 
     double time;		/* unix time */
     double earth_radius;
@@ -41,10 +43,10 @@ struct point_in_space {
     float rotation_angle;
     float tilt;
 
-    long cell_num;
-    long ndx_last;
-    long ndx_next;
-    long state;			/* which bits are set */
+    int32_t cell_num;
+    int32_t ndx_last;
+    int32_t ndx_next;
+    int32_t state;			/* which bits are set */
 
     char id[16];
 };

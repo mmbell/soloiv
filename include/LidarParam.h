@@ -27,6 +27,8 @@
 #ifndef _LIDARPARAM_H
 #define _LIDARPARAM_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,9 +36,9 @@ extern "C" {
 struct lidar_parameter_data {
     char lidar_param_data[4];   /* Lidar parameter data identifier */
                                 /* (four ASCII characters "LDAT"). */
-    long lidar_param_data_len;  /* Length of the lidar parameter data */
+    int32_t lidar_param_data_len;  /* Length of the lidar parameter data */
                                 /* block in bytes. */
-    long data_sys_status;       /* Status word, bits will be assigned */
+    int32_t data_sys_status;       /* Status word, bits will be assigned */
                                 /* particular status when needed. */
     char lidar_name[8];         /* Name of lidar from which this data */
                                 /* ray came from. Directly corresponds */
@@ -44,22 +46,22 @@ struct lidar_parameter_data {
                                 /* descriptors. */
     float pulse_energy[10];     /* Pulse energy for each transmitted */
                                 /* wavelength. */
-    long ray_count;             /* Data ray counter for this */
+    int32_t ray_count;             /* Data ray counter for this */
                                 /* particular type of data ray. */
     float derived_param[10];    /* Parameters derived form the data */
                                 /* set in real time.  The definition */
                                 /* and units of these parameters are */
                                 /* given in the field lidar */
                                 /* descriptor. */
-    long event;                 /* Event counter is incremented */
+    int32_t event;                 /* Event counter is incremented */
                                 /* everytime operator hits event */
                                 /* button */
-    long pmt_voltage;           /* Control voltage to the PMT power */
+    int32_t pmt_voltage;           /* Control voltage to the PMT power */
                                 /* supply */
-    long apd_voltage;           /* Control voltage to the APD power */
+    int32_t apd_voltage;           /* Control voltage to the APD power */
                                 /* supply */
-    long flashlmp_voltage;      /* Flash lamp power supply voltage */
-    long temperatures[10];      /* Value of the monitored temperatures */
+    int32_t flashlmp_voltage;      /* Flash lamp power supply voltage */
+    int32_t temperatures[10];      /* Value of the monitored temperatures */
                                 /* (names in the field lidar info */
                                 /* block) */
     short first_rec_gate;       /* First recorded gate number (N). */

@@ -39,6 +39,8 @@
  * description:
  *        
  */
+#include <stdint.h>
+
 #ifndef INCWaveformh
 #define INCWaveformh
 
@@ -57,7 +59,7 @@
 struct waveform_d {
     char  waveform_des[4];	/* Identifier for the waveform */
 				/* descriptor (ascii characters "WAVE"). */
-    long waveform_des_length;	/* Length of the waveform descriptor */
+    int32_t waveform_des_length;	/* Length of the waveform descriptor */
 				/* in bytes. */
     char  ps_file_name[16];	/* Pulsing scheme file name.*/
     short num_chips[6];		/* Number of chips in a repeat. */

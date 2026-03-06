@@ -35,6 +35,8 @@
 #ifndef INCVolumeh
 #define INCVolumeh
 
+#include <stdint.h>
+
 #ifdef OK_RPC
 
 #if defined(UNIX) && defined(sun)
@@ -51,11 +53,11 @@ struct volume_d {
     char  volume_des[4];	/* Volume descriptor identifier: ASCII */
 				/* characters "VOLD" stand for Volume */
 				/* Descriptor. */
-    long  volume_des_length;	/* Volume descriptor length in bytes. */
+    int32_t  volume_des_length;	/* Volume descriptor length in bytes. */
     short format_version;	/* ELDORA/ASTRAEA field tape format */
 				/* revision number. */
     short volume_num;		/* Volume Number into current tape. */
-    long  maximum_bytes;	/* Maximum number of bytes in any. */
+    int32_t  maximum_bytes;	/* Maximum number of bytes in any. */
 				/* physical record in this volume. */
     char  proj_name[20];		/* Project number or name. */
     short year;			/* Year data taken in years. */

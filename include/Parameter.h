@@ -48,6 +48,8 @@
 #ifndef INCParameterh
 #define INCParameterh
 
+#include <stdint.h>
+
 #ifdef OK_RPC
 
 #if defined(UNIX) && defined(sun)
@@ -63,7 +65,7 @@
 struct parameter_d {
     char  parameter_des[4];	/* Parameter Descriptor identifier */
 				/* (ascii characters "PARM"). */
-    long parameter_des_length;	/* Parameter Descriptor length in */
+    int32_t parameter_des_length;	/* Parameter Descriptor length in */
 				/* bytes.*/
     char  parameter_name[8];	/* Name of parameter being described. */
     char  param_description[40]; /* Detailed description of this parameter. */
@@ -89,27 +91,27 @@ struct parameter_d {
     float threshold_value;	/* Value of threshold in ? */
     float parameter_scale;	/* Scale factor for parameter. */
     float parameter_bias;	/* Bias factor for parameter. */
-    long  bad_data;		/* Bad data flag. */
+    int32_t  bad_data;		/* Bad data flag. */
     
 				/* 1995 extension #1 */
 
-    long extension_num;
+    int32_t extension_num;
     char  config_name[8];	/* used to identify this set of
 				 * unique radar characteristics */
-    long  config_num;
-    long offset_to_data;	/* bytes added to the data struct pointer
+    int32_t  config_num;
+    int32_t offset_to_data;	/* bytes added to the data struct pointer
 				 * to point to the first datum whether it's
 				 * an RDAT or a QDAT
 				 */
     float mks_conversion;
-    long num_qnames;		
+    int32_t num_qnames;		
     char qdata_names[32];	/* each of 4 names occupies 8 characters
 				 * of this space
 				 * and is blank filled. Each name identifies
 				 * some interesting segment of data in a
 				 * particular ray for this parameter.
 				 */
-    long num_criteria;
+    int32_t num_criteria;
     char criteria_names[32];	/* each of 4 names occupies 8 characters
 				 * and is blank filled. These names identify
 				 * a single interesting floating point value
@@ -118,7 +120,7 @@ struct parameter_d {
 				 * be a brightness temperature or
 				 * the percentage of cells above or
 				 * below a certain value */
-    long number_cells;
+    int32_t number_cells;
     float meters_to_first_cell;	/* center! */
     float meters_between_cells;
     float eff_unamb_vel;	/* Effective unambiguous velocity, m/s. */
@@ -129,7 +131,7 @@ struct parameter_d {
 struct parameter_d_v00 {
     char  parameter_des[4];	/* Parameter Descriptor identifier */
 				/* (ascii characters "PARM"). */
-    long parameter_des_length;	/* Parameter Descriptor length in */
+    int32_t parameter_des_length;	/* Parameter Descriptor length in */
 				/* bytes.*/
     char  parameter_name[8];	/* Name of parameter being described. */
     char  param_description[40]; /* Detailed description of this parameter. */
@@ -155,7 +157,7 @@ struct parameter_d_v00 {
     float threshold_value;	/* Value of threshold in ? */
     float parameter_scale;	/* Scale factor for parameter. */
     float parameter_bias;	/* Bias factor for parameter. */
-    long  bad_data;		/* Bad data flag. */
+    int32_t  bad_data;		/* Bad data flag. */
 }; /* End of Structure */
 
 

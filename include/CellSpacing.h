@@ -34,6 +34,8 @@
 #ifndef INCCellSpacingh
 #define INCCellSpacingh
 
+#include <stdint.h>
+
 #ifdef OK_RPC
 
 #if defined(UNIX) && defined(sun)
@@ -49,7 +51,7 @@
 struct cell_spacing_d {
     char   cell_spacing_des[4]; /* Identifier for a cell spacing descriptor */
 				/* (ascii characters CSPD). */
-    long   cell_spacing_des_len; /* Cell Spacing descriptor length in bytes. */
+    int32_t   cell_spacing_des_len; /* Cell Spacing descriptor length in bytes. */
     short  num_segments;	/* Number of segments that contain cells of */
 				/* equal widths. */
     short  distToFirst;		/* Distance to first gate in meters. */

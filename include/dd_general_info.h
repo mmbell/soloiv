@@ -2,12 +2,14 @@
 #ifndef INCdd_general_infoh
 #define INCdd_general_infoh
 
+#include <stdint.h>
+
 # ifndef GNERIC_DESC
 # define GNERIC_DESC
 
 struct generic_descriptor {
     char name_struct[4];	/* "????" */
-    long sizeof_struct;
+    int32_t sizeof_struct;
 };
 typedef struct generic_descriptor *GD_PTR;
 
@@ -64,25 +66,25 @@ struct prev_swps {
 
 struct rot_table_entry {
     float rotation_angle;
-    long offset;
-    long size;
+    int32_t offset;
+    int32_t size;
 };
 
 struct rot_ang_table {
     char name_struct[4];	/* "RKTB" */
-    long sizeof_struct;
+    int32_t sizeof_struct;
     float angle2ndx;
-    long ndx_que_size;
-    long first_key_offset;
-    long angle_table_offset;
-    long num_rays;
+    int32_t ndx_que_size;
+    int32_t first_key_offset;
+    int32_t angle_table_offset;
+    int32_t num_rays;
 };
 
 # endif /* ROTANG_STRUCTS */
 
 struct null_d {
     char name_struct[4];	/* "NULL" */
-    long sizeof_struct;		/* sizeof(struct null_record) */
+    int32_t sizeof_struct;		/* sizeof(struct null_record) */
 };
 typedef struct null_d null_d;
 typedef struct null_d NULL_D;
@@ -217,7 +219,7 @@ struct dd_general_info {
     struct dds_structs *dds;
     struct prev_rays *ray_que;
     struct prev_swps *swp_que;
-    long *rat_angle_ndx1;
+    int32_t *rat_angle_ndx1;
     struct rot_ang_table *rat;
     struct rot_table_entry *rat_entry1;
 

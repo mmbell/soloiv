@@ -1,10 +1,12 @@
 /* 	$Id$	 */
 
+#include <stdint.h>
+
 struct comment_d {
     char comment_des[4];	/* Comment descriptor identifier: ASCII */
 				/* characters "COMM" stand for Comment */
 				/* Descriptor. */
-    long  comment_des_length;	/* Comment descriptor length in bytes. */
+    int32_t  comment_des_length;	/* Comment descriptor length in bytes. */
     char  comment[500];	        /* comment*/
 
 }; /* End of Structure */

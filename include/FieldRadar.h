@@ -31,6 +31,8 @@
 #ifndef INCFieldRadarh
 #define INCFieldRadarh
 
+#include <stdint.h>
+
 #ifdef OK_RPC
 
 #if defined(UNIX) && defined(sun)
@@ -47,9 +49,9 @@ struct field_radar_i {
     char  field_radar_info[4];	/* Identifier for a field written */
 				/* radar information block */
 				/* (ascii characters FRIB). */
-    long field_radar_info_len;	/* Length of this field written radar */
+    int32_t field_radar_info_len;	/* Length of this field written radar */
 				/* information block in bytes. */
-    long data_sys_id;		/* Data system identification. */
+    int32_t data_sys_id;		/* Data system identification. */
     float loss_out;		/* Waveguide Losses between Transmitter and */
 				/* antenna in db. */
     float loss_in;		/* Waveguide Losses between antenna and Low */
@@ -70,21 +72,21 @@ struct field_radar_i {
                                    gain due to summing over the dwell time */
     float processor_const;      /* Constant used to scale dBz to
 				   units the display processors understand */
-    long dly_tube_antenna;	/* Time delay from RF being applied to
+    int32_t dly_tube_antenna;	/* Time delay from RF being applied to
 				   tube and energy leaving antenna in ns. */
-    long dly_rndtrip_chip_atod;/* Time delay from a chip generated in the 
+    int32_t dly_rndtrip_chip_atod;/* Time delay from a chip generated in the
 				   timing module and the RF pulse entering
                                    the A to D converters.  Need to take the
-                                   RF input to the HPA and inject it into 
+                                   RF input to the HPA and inject it into
                                    the waveguide back at the LNA to make this
                                    measurement  in ns*/
-    long dly_timmod_testpulse; /* Time delay from timing Module test
+    int32_t dly_timmod_testpulse; /* Time delay from timing Module test
 				   pulse edge and test pulse arriving at
 				   the A/D converter in ns. */
-    long dly_modulator_on;	/* Modulator rise time (Time between
+    int32_t dly_modulator_on;	/* Modulator rise time (Time between
 				   video on into HPA and modulator full up in
 				   the high power amplifier) in ns. */
-    long dly_modulator_off;	/* Modulator fall time (Time between
+    int32_t dly_modulator_off;	/* Modulator fall time (Time between
 				   video off into the HPA
 				   and modulator full off) in ns. */
     float peak_power_offset;     /*Added to the power meter reading of the
@@ -123,9 +125,9 @@ struct field_radar_iv1 {
     char  field_radar_info[4];	/* Identifier for a field written */
 				/* radar information block */
 				/* (ascii characters FRIB). */
-    long field_radar_info_len;	/* Length of this field written radar */
+    int32_t field_radar_info_len;	/* Length of this field written radar */
 				/* information block in bytes. */
-    long data_sys_id;		/* Data system identification. */
+    int32_t data_sys_id;		/* Data system identification. */
     float loss_out;		/* Waveguide Losses between Transmitter and */
 				/* antenna in db. */
     float loss_in;		/* Waveguide Losses between antenna and Low */
@@ -146,21 +148,21 @@ struct field_radar_iv1 {
                                    gain due to summing over the dwell time */
     float processor_const;      /* Constant used to scale dBz to
 				   units the display processors understand */
-    long dly_tube_antenna;	/* Time delay from RF being applied to
+    int32_t dly_tube_antenna;	/* Time delay from RF being applied to
 				   tube and energy leaving antenna in ns. */
-    long dly_rndtrip_chip_atod; /* Time delay from a chip generated in the 
+    int32_t dly_rndtrip_chip_atod; /* Time delay from a chip generated in the
 				   timing module and the RF pulse entering
                                    the A to D converters.  Need to take the
-                                   RF input to the HPA and inject it into 
+                                   RF input to the HPA and inject it into
                                    the waveguide back at the LNA to make this
                                    measurement  in ns*/
-    long dly_timmod_testpulse;  /* Time delay from timing Module test
+    int32_t dly_timmod_testpulse;  /* Time delay from timing Module test
 				   pulse edge and test pulse arriving at
 				   the A/D converter in ns. */
-    long dly_modulator_on;	/* Modulator rise time (Time between
+    int32_t dly_modulator_on;	/* Modulator rise time (Time between
 				   video on into HPA and modulator full up in
 				   the high power amplifier) in ns. */
-    long dly_modulator_off;	/* Modulator fall time (Time between
+    int32_t dly_modulator_off;	/* Modulator fall time (Time between
 				   video off into the HPA
 				   and modulator full off) in ns. */
     float peak_power_offset;    /* Added to the power meter reading of the
@@ -198,7 +200,7 @@ struct field_radar_i_v0 {
     char  field_radar_info[4];	/* Identifier for a field written */
 				/* radar information block */
 				/* (ascii characters FRIB). */
-    long field_radar_info_len;	/* Length of this field written radar */
+    int32_t field_radar_info_len;	/* Length of this field written radar */
 				/* information block in bytes. */
     short data_sys_id;		/* Data system identification. */
     short signal_source;	/* Signal source. */

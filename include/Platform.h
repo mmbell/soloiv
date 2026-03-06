@@ -41,6 +41,8 @@
 #ifndef INCPlatformh
 #define INCPlatformh
 
+#include <stdint.h>
+
 #ifdef OK_RPC
 
 #if defined(UNIX) && defined(sun)
@@ -56,7 +58,7 @@
 struct platform_i {
     char  platform_info[4];	/* Identifier for the aircraft/ship */
 				/* parameters block (ascii characters ASIB) */
-    long platform_info_length;	/* Length in Bytes of the */
+    int32_t platform_info_length;	/* Length in Bytes of the */
 				/* aircraft/ship arameters block */
     float longitude;		/* Antenna Longitude (Eastern */
 				/* Hemisphere is positive, West */
