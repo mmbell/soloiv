@@ -611,8 +611,9 @@ solo_return_wwptr(ww_num)
 	return(NULL);
     }
 
-    if(spi->solo_windows[ww_num]) 
+    if(spi->solo_windows[ww_num]) {
 	return(spi->solo_windows[ww_num]);
+    }
 
     /*
      * initialize pointers and structs for this window
@@ -674,8 +675,8 @@ solo_return_wwptr(ww_num)
     next->parameter->window_num = ww_num;
     next->parameter->time_modified = time2;
     next->parameter->linked_windows[ww_num] = YES;
-    
-    
+    next->parameter->changed = YES;
+
     next->view = (struct solo_view_info *)
 	  malloc(sizeof(struct solo_view_info));
     memset((char *)next->view, 0, sizeof(struct solo_view_info));

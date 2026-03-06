@@ -1196,6 +1196,9 @@ void sii_really_xfer_images (int frame_num, GdkRectangle *area
   if (frame_num >= sii_return_frame_count ())
     { return; }
 
+  /* Reset colorize_count so the draw function re-colorizes with fresh data */
+  sfc->colorize_count = 0;
+
   /* Queue a redraw - the draw function will handle the actual rendering */
   if (blow_up) {
     if (sfc0->blow_up_frame) {
@@ -1263,6 +1266,9 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
   if (frame_num >= sii_return_frame_count ())
     { return; }
 
+  if (!med_pro_font || !wwptr)
+    { return; }
+
   time_series = sii_time_series (frame_num, &ts_start, &ts_span);
   frame = sfc->frame;
   bup_factor = 1;
@@ -1297,31 +1303,28 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
     }
   }
 
-  else if (!area && img) {
-    set_color_bar (frame_num, font_height);
-    sii_colorize_image (frame_num);
-    sii_cairo_paint_rgb_image (cr, 0, 0,
-			       sfc->width, sfc->height,
-			       img, sfc->width * 3);
-  }
-
-  else if (img && sfc->colorize_count) {
-
-    stride = sfc->width * 3;
-    if (area) {
-       guchar *area_img = img + area->y * stride + area->x * 3;
-       sii_cairo_paint_rgb_image (cr, area->x, area->y,
-				  area->width, area->height,
-				  area_img, stride);
+  else if (img) {
+    if (!sfc->colorize_count) {
+      set_color_bar (frame_num, font_height);
+      sii_colorize_image (frame_num);
     }
-    else {
-      sii_cairo_paint_rgb_image (cr, 0, 0,
-				 sfc->width, sfc->height,
-				 img, stride);
+
+    if (sfc->colorize_count) {
+      stride = sfc->width * 3;
+      if (area) {
+	 guchar *area_img = img + area->y * stride + area->x * 3;
+	 sii_cairo_paint_rgb_image (cr, area->x, area->y,
+				    area->width, area->height,
+				    area_img, stride);
+      }
+      else {
+	sii_cairo_paint_rgb_image (cr, 0, 0,
+				   sfc->width, sfc->height,
+				   img, stride);
+      }
     }
   }
-
-
+  /* else: no image data to render */
 
   /*
    *
@@ -1335,6 +1338,9 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
    * onto the surface.
    *
    */
+  if (!img && !blow_up)
+    { return; }  /* no image data - skip annotation */
+
   if (wwptr->landmark_info->landmark_options == SOLO_LINKED_POSITIONING) {
     wwptrx =  solo_return_wwptr(wwptr->landmark_info->reference_frame-1);
     dd_copy_pisp(wwptrx->landmark, &landmark);
@@ -1370,7 +1376,7 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
     xx2ctr = xctr/ppk;
     yy2ctr = wwptr->center_of_view->range;
   }
-  else if (wwptr->lead_sweep->scan_mode == RHI || wwptr->scan_mode == AIR) {
+  else if (wwptr->lead_sweep && (wwptr->lead_sweep->scan_mode == RHI || wwptr->scan_mode == AIR)) {
      theta = RADIANS (CART_ANGLE (wwptr->center_of_view->rotation_angle));
      xx2ctr = wwptr->center_of_view->range * cos (theta);
      yy2ctr = wwptr->center_of_view->range * sin (theta);

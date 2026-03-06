@@ -1789,7 +1789,7 @@ solo_malloc_pisp()
 	  malloc(sizeof(struct point_in_space));
     memset(next, 0, sizeof(struct point_in_space));
 
-    strcpy(next->name_struct, "PISP");
+    strncpy(next->name_struct, "PISP", 4);
     next->sizeof_struct = sizeof(struct point_in_space);
     return(next);
 }

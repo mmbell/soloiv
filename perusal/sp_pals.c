@@ -409,7 +409,7 @@ solo_malloc_palette(name)
 	  malloc(sizeof(struct solo_palette));
     memset(next->at, 0, sizeof(struct solo_palette));
 
-    strcpy(next->at->name_struct, "SPAL");
+    strncpy(next->at->name_struct, "SPAL", 4);
     next->at->sizeof_struct = sizeof(struct solo_palette);
     next->at->time_modified = time_now();
     next->at->center = 0;
@@ -459,7 +459,7 @@ solo_malloc_old_palette()
 	  malloc(sizeof(struct solo_palette));
     memset(pal, 0, sizeof(struct solo_palette));
 
-    strcpy(pal->name_struct, "SPAL");
+    strncpy(pal->name_struct, "SPAL", 4);
     pal->sizeof_struct = sizeof(struct solo_palette);
     return(pal);
 }

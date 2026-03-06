@@ -3911,7 +3911,7 @@ int dd_rotang_seek(rat, rotang)
      * rotation angle
      */
     int i, j, k, n=rat->ndx_que_size, ang_ndx, ndx;
-    long *iptr;
+    int32_t *iptr;
     char *c=(char *)rat;
     struct rot_table_entry *entry1;
     double diff0, diff1, diff2;
@@ -3924,7 +3924,7 @@ int dd_rotang_seek(rat, rotang)
 
     entry1 = (struct rot_table_entry *)((char *)rat +
 					rat->first_key_offset);
-    iptr = (long *)(c + rat->angle_table_offset);
+    iptr = (int32_t *)(c + rat->angle_table_offset);
     ang_ndx = rotang*rat->angle2ndx;
 
     /* get ray index(s) from the angle index table
@@ -3980,10 +3980,10 @@ void dd_rotang_table(dgi, func)
     static int count=0, trip=170670;
     char *c;
     int i, j, k, mm, ndx, mark, angle_ndx_size=480, first=NO, glitch=NO;
-    long *lp;
+    int32_t *lp;
     float f, rot, angle;
     double dd_rotation_angle();
-    unsigned long nan = 0x7fffff, *langle;
+    uint32_t nan = 0x7fffff;
 
     /* c...mark */
 
@@ -3997,7 +3997,7 @@ void dd_rotang_table(dgi, func)
 	mm = sizeof(struct rot_ang_table);
 	mm = ((mm -1)/8 +1) * 8; /* start tables on an 8 byte boundary */
 
-	size = mm + angle_ndx_size * sizeof(long) +
+	size = mm + angle_ndx_size * sizeof(int32_t) +
 	  dgi->max_rat_entries * sizeof(struct rot_table_entry);
 
 	if(!rat) {
@@ -4017,12 +4017,12 @@ void dd_rotang_table(dgi, func)
 	rat->sizeof_struct = size;
 
 	rat->angle_table_offset = mm;
-	dgi->rat_angle_ndx1 = (long *)(c + rat->angle_table_offset);
+	dgi->rat_angle_ndx1 = (int32_t *)(c + rat->angle_table_offset);
 	rat->angle2ndx = (float)angle_ndx_size/360.;
 	rat->ndx_que_size = angle_ndx_size;
 
 	rat->first_key_offset = rat->angle_table_offset +
-	      rat->ndx_que_size * sizeof(long);
+	      rat->ndx_que_size * sizeof(int32_t);
 	dgi->rat_entry1 = (struct rot_table_entry *)
 	      (c + rat->first_key_offset);
 	mark = 0;

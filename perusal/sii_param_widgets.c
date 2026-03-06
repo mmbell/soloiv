@@ -828,7 +828,13 @@ guint param_text_event_cb(GtkWidget *text, gpointer data)
 
   pd = (ParamData *)frame_configs[frame_num]->param_data;
 
-  nn = 0; /* GTK4: TODO get cursor position from GtkTextBuffer */
+  {
+    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+    GtkTextIter iter;
+    GtkTextMark *mark = gtk_text_buffer_get_insert(tbuf);
+    gtk_text_buffer_get_iter_at_mark(tbuf, &iter, mark);
+    nn = gtk_text_iter_get_offset(&iter);
+  }
 
   switch (wid) {
   case PARAM_NAMES_TEXT:
@@ -886,8 +892,21 @@ guint param_text_event_cb(GtkWidget *text, gpointer data)
      else if ( wid == PARAM_COLORS_TEXT &&
 	      (ok = sii_nab_region_from_text (aa, nn, &start, &end )))
        {
-	  /* GTK4 TODO: selection */ // gtk_editable_select_region (GTK_EDITABLE (text), start, end);
-	  /* GTK4 TODO: clipboard */ // gtk_editable_copy_clipboard (GTK_EDITABLE (text));
+	  {
+	    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+	    GtkTextIter start_iter, end_iter;
+	    gtk_text_buffer_get_iter_at_offset(tbuf, &start_iter, start);
+	    gtk_text_buffer_get_iter_at_offset(tbuf, &end_iter, end);
+	    gtk_text_buffer_select_range(tbuf, &start_iter, &end_iter);
+
+	    GdkClipboard *clipboard = gdk_display_get_clipboard(gdk_display_get_default());
+	    GtkTextIter sel_start, sel_end;
+	    if (gtk_text_buffer_get_selection_bounds(tbuf, &sel_start, &sel_end)) {
+	      char *sel_text = gtk_text_buffer_get_text(tbuf, &sel_start, &sel_end, FALSE);
+	      gdk_clipboard_set_text(clipboard, sel_text);
+	      g_free(sel_text);
+	    }
+	  }
 
 # ifndef obsolete
 	  for (kk=0,jj=start; jj < end; str[kk++] = aa[jj++]); str[kk] = '\0';
@@ -1008,6 +1027,9 @@ void set_color_bar (guint frame_num, guint font_height)
   WW_PTR wwptr = solo_return_wwptr(frame_num);
   gint x, y, jj, kk, ll, nn, nc, len, width, offs, stride;
   
+  if (!pd || !pd->pal)
+    { return; }
+
   len = (pd->cb_loc == PARAM_CB_LEFT || pd->cb_loc == PARAM_CB_RIGHT)
     ? sfc->height : sfc->width;
 
@@ -1126,7 +1148,9 @@ GdkRGBA *sii_annotation_color (guint frame_num, gint exposed)
   ParamData *pd = frame_configs[frame_num]->param_data;
   SiiPalette *pal;
 
-  pal = (exposed) ? pd->orig_pal : pd->pal;
+  if (!pd || !pd->pal)
+    { return NULL; }
+  pal = (exposed && pd->orig_pal) ? pd->orig_pal : pd->pal;
   gcolor = pal->feature_color[FEATURE_ANNOTATION];
   return gcolor;
 }
@@ -1139,7 +1163,9 @@ GdkRGBA *sii_background_color (guint frame_num, gint exposed)
   ParamData *pd = frame_configs[frame_num]->param_data;
   SiiPalette *pal;
 
-  pal = (exposed) ? pd->orig_pal : pd->pal;
+  if (!pd || !pd->pal)
+    { return NULL; }
+  pal = (exposed && pd->orig_pal) ? pd->orig_pal : pd->pal;
   gcolor = pal->feature_color[FEATURE_BACKGROUND];
   return gcolor;
 }
@@ -1152,7 +1178,9 @@ GdkRGBA *sii_boundary_color (guint frame_num, gint exposed)
   ParamData *pd = frame_configs[frame_num]->param_data;
   SiiPalette *pal;
 
-  pal = (exposed) ? pd->orig_pal : pd->pal;
+  if (!pd || !pd->pal)
+    { return NULL; }
+  pal = (exposed && pd->orig_pal) ? pd->orig_pal : pd->pal;
 # ifdef notyet
   gcolor = (GdkRGBA *)g_tree_lookup
     (colors_tree, (gpointer)"purple1");
@@ -1179,6 +1207,9 @@ void sii_colorize_image (guint frame_num)
   ParamData *pd = (ParamData *)frame_configs[frame_num]->param_data;
   guchar *aa, *bb, *cc, **ct_rgbs, *rgbs;
   gint jj, nn, ndx;
+
+  if (!pd || !pd->pal || !pd->orig_pal || !sfc->image)
+    { return; }
 
   sfc->colorize_count++;
   nn = sfc->width * sfc->height;
@@ -1484,6 +1515,9 @@ void sii_do_annotation (guint frame_num, gint exposed, gboolean blow_up, cairo_t
   gdouble cb_locs[64];
 
   
+  if (!pd || !pd->pal)
+    { return; }
+
   if (blow_up) {
     font = sfc0->big_font;
     cb_thickness = sfc->font_height *2;
@@ -1501,7 +1535,7 @@ void sii_do_annotation (guint frame_num, gint exposed, gboolean blow_up, cairo_t
     frame_height = sfc->height;
   }
 
-  pal = (exposed) ? pd->orig_pal : pd->pal;
+  pal = (exposed && pd->orig_pal) ? pd->orig_pal : pd->pal;
   b_width = sii_font_string_width (font, " ");
   
 
@@ -1702,7 +1736,9 @@ GdkRGBA *sii_grid_color (guint frame_num, gint exposed)
   ParamData *pd = frame_configs[frame_num]->param_data;
   SiiPalette *pal;
 
-  pal = (exposed) ? pd->orig_pal : pd->pal;
+  if (!pd || !pd->pal)
+    { return NULL; }
+  pal = (exposed && pd->orig_pal) ? pd->orig_pal : pd->pal;
   gcolor = pal->feature_color[FEATURE_RNG_AZ_GRID];
   return gcolor;
 }
@@ -2506,8 +2542,7 @@ void sii_param_menu_cb ( GtkWidget *w, gpointer   data )
 	  pd->toggle[PARAM_HILIGHT];
 	if( widget ) {
 	   check_item = pd->data_widget[PARAM_HILIGHT];
-	   /* GTK4: menu toggle state managed by actions */ // gtk_check_menu_item_set_active
-	     // (GTK_CHECK_MENU_ITEM (check_item), active );
+	   gtk_check_button_set_active(GTK_CHECK_BUTTON(check_item), active);
 	}
 	solo_return_wwptr(jj)->parameter->changed = YES;
      }
@@ -2528,22 +2563,19 @@ void sii_param_menu_cb ( GtkWidget *w, gpointer   data )
 
 	if( widget ) {
 	   check_item = pd->data_widget[pdx->cb_loc];
-	   /* GTK4: menu toggle state managed by actions */ // gtk_check_menu_item_set_active
-	     // (GTK_CHECK_MENU_ITEM (check_item), TRUE );
+	   gtk_check_button_set_active(GTK_CHECK_BUTTON(check_item), TRUE);
 	}
 	pdx->toggle[PARAM_CB_SYMBOLS] = active = 
 	  pd->toggle[PARAM_CB_SYMBOLS];
 	if( widget ) {
 	   check_item = pd->data_widget[PARAM_CB_SYMBOLS];
-	   /* GTK4: menu toggle state managed by actions */ // gtk_check_menu_item_set_active
-	     // (GTK_CHECK_MENU_ITEM (check_item), active );
+	   gtk_check_button_set_active(GTK_CHECK_BUTTON(check_item), active);
 	}
 	pdx->toggle[PARAM_HILIGHT] = active = 
 	  pd->toggle[PARAM_HILIGHT];
 	if( widget ) {
 	   check_item = pd->data_widget[PARAM_HILIGHT];
-	   /* GTK4: menu toggle state managed by actions */ // gtk_check_menu_item_set_active
-	     // (GTK_CHECK_MENU_ITEM (check_item), active );
+	   gtk_check_button_set_active(GTK_CHECK_BUTTON(check_item), active);
 	}
 	solo_return_wwptr(jj)->parameter->changed = YES;
 	sii_set_param_info (jj);
@@ -3215,10 +3247,7 @@ void sii_param_widget( guint frame_num )
 			    ,"activate"
 			    , G_CALLBACK (sii_param_menu_cb)
 			    , (gpointer)nn );
-	g_signal_connect (G_OBJECT (pdata->data_widget[jj])
-			    ,"paste_clipboard"
-			    , G_CALLBACK (sii_param_entry_paste_cb)
-			    , (gpointer)nn );
+	/* paste_clipboard signal removed - not available in GTK4 */
      }
   }
 }
@@ -3695,12 +3724,9 @@ int solo_hardware_color_table(gint frame_num)
     gcolor = gclist +kk;
     *pal->data_color_table[kk] = *gcolor;
 
-    mm = gcolor->red;
-    pal->color_table_rgbs[kk][0] = (guchar)(mm >> 8);
-    mm = gcolor->green;
-    pal->color_table_rgbs[kk][1] = (guchar)(mm >> 8);
-    mm = gcolor->blue;
-    pal->color_table_rgbs[kk][2] = (guchar)(mm >> 8);
+    pal->color_table_rgbs[kk][0] = (guchar)(gcolor->red * 255.0 + 0.5);
+    pal->color_table_rgbs[kk][1] = (guchar)(gcolor->green * 255.0 + 0.5);
+    pal->color_table_rgbs[kk][2] = (guchar)(gcolor->blue * 255.0 + 0.5);
 
     (wwptr->xcolors+kk)->pixel = kk;
 

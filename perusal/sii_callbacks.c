@@ -26,6 +26,8 @@ void sii_leave_cb(GtkEventControllerMotion *controller, gpointer data);
 void checkup_cb( GtkWidget *w, gpointer   data );
 
 void sii_plot_data (guint frame_num, guint plot_function);
+void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
+				   GdkRectangle *area, gboolean blow_up);
 
 void solo_set_halt_flag();
 
@@ -210,14 +212,12 @@ void sii_frame_draw_func(GtkDrawingArea *area, cairo_t *cr,
    second_expose = sfc->config_sync_num == sfc->expose_sync_num;
   sfc->expose_sync_num = sfc->config_sync_num;
 
-   if (reconfigured) {
+   if (reconfigured && sfc->reconfig_count) {
+     /* first draw after frame creation - data not plotted yet, skip */
      mark = 0;
    }
-   else if (uncovered) {
-     sii_xfer_images (frame_num, &area_rect);
-   }
-   else if (!sfc->reconfig_count && totally_exposed) {
-      sii_xfer_images (frame_num, &area_rect);
+   else if (uncovered || (!sfc->reconfig_count && totally_exposed) || reconfigured) {
+     sii_really_xfer_images_cairo (cr, frame_num, &area_rect, FALSE);
    }
 
    /* the reconfig_count is reset once it's been plotted by sii_displayq() */
@@ -294,6 +294,19 @@ void sii_frame_draw_func(GtkDrawingArea *area, cairo_t *cr,
     */
    sii_append_debug_stuff (gs->str);
 # endif
+
+   /* If displayq never ran (no reconfig event in GTK4), trigger initial plot.
+    * Then render with the now-valid color table and image data.
+    */
+   if (!sfc->colorize_count && !sfc->reconfig_count) {
+     sfc->width = width;
+     sfc->height = height;
+     sfc->data_width = width;
+     sfc->data_height = height;
+     sii_check_image_size (frame_num);
+     sii_plot_data (frame_num, REPLOT_THIS_FRAME);
+     sii_really_xfer_images_cairo (cr, frame_num, &area_rect, FALSE);
+   }
 
 }
 
@@ -1336,15 +1349,88 @@ void sii_focus_out_cb(GtkEventControllerFocus *controller, gpointer data)
 
 /* c---------------------------------------------------------------------- */
 
-/* GTK4 stub for sii_filesel - file selection dialog.
- * TODO: Replace with GtkFileDialog when implementing file operations.
+/* Forward declarations for filesel callback helpers */
+void sii_param_colors_filesel (const gchar *str, GtkWidget *fs);
+
+/* GTK4 file selection callback - called when GtkFileDialog completes */
+static void
+sii_filesel_dialog_cb(GObject *source, GAsyncResult *result, gpointer data)
+{
+  GtkFileDialog *dialog = GTK_FILE_DIALOG(source);
+  GtkWidget *proxy = GTK_WIDGET(data);
+  GFile *file = NULL;
+  GError *error = NULL;
+  gint task;
+  gchar *path;
+
+  file = gtk_file_dialog_open_finish(dialog, result, &error);
+  if (!file) {
+    if (error) {
+      /* User cancelled or error occurred */
+      if (error->code != GTK_DIALOG_ERROR_DISMISSED) {
+        g_warning("sii_filesel: %s", error->message);
+      }
+      g_error_free(error);
+    }
+    /* Destroy the proxy window */
+    gtk_window_destroy(GTK_WINDOW(proxy));
+    return;
+  }
+
+  path = g_file_get_path(file);
+  task = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(proxy), "task"));
+
+  g_message("sii_filesel: selected file: %s (task=%d)", path, task);
+
+  /* Dispatch based on task type - mirrors the original sii_filesel_cb */
+  /* The COLORS case is the primary caller from sii_param_widgets.c */
+  sii_param_colors_filesel(path, proxy);
+
+  g_free(path);
+  g_object_unref(file);
+
+  /* Destroy the proxy window now that we're done */
+  gtk_window_destroy(GTK_WINDOW(proxy));
+}
+
+/* GTK4 file selection using GtkFileDialog (async).
+ * Returns a proxy GtkWindow that callers can attach data to (e.g., "frame_num").
+ * The actual file dialog opens asynchronously; selected file is processed
+ * in sii_filesel_dialog_cb.
  */
 GtkWidget *sii_filesel(gint which_but, gchar *dirroot)
 {
-  GtkWidget *dialog = gtk_window_new();
-  gtk_window_set_title(GTK_WINDOW(dialog), "Select File");
-  g_message("sii_filesel: file selection not yet implemented for GTK4");
-  return dialog;
+  GtkWidget *proxy;
+  GtkFileDialog *dialog;
+  GFile *initial_dir = NULL;
+  const gchar *title;
+
+  /* Create a hidden proxy window for callers to attach data to */
+  proxy = gtk_window_new();
+  gtk_widget_set_visible(proxy, FALSE);
+  g_object_set_data(G_OBJECT(proxy), "task", GINT_TO_POINTER(which_but));
+
+  /* Set dialog title based on task */
+  title = "File Selection";
+
+  /* Create the GTK4 file dialog */
+  dialog = gtk_file_dialog_new();
+  gtk_file_dialog_set_title(dialog, title);
+  gtk_file_dialog_set_modal(dialog, TRUE);
+
+  /* Set initial directory if provided */
+  if (dirroot && strlen(dirroot) > 0) {
+    initial_dir = g_file_new_for_path(dirroot);
+    gtk_file_dialog_set_initial_folder(dialog, initial_dir);
+    g_object_unref(initial_dir);
+  }
+
+  /* Open the dialog asynchronously; pass proxy as user data */
+  gtk_file_dialog_open(dialog, GTK_WINDOW(main_window),
+                       NULL, sii_filesel_dialog_cb, proxy);
+
+  g_object_unref(dialog);
+  return proxy;
 }
 
 /* c---------------------------------------------------------------------- */

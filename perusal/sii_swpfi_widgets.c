@@ -1084,10 +1084,7 @@ void sii_swpfi_widget( guint frame_num )
 			    ,"activate"
 			    , G_CALLBACK (sii_swpfi_menu_cb)
 			    , GUINT_TO_POINTER(nn) );
-	g_signal_connect (G_OBJECT(sd->data_widget[jj])
-			    ,"paste_clipboard"
-			    , G_CALLBACK (sii_swpfi_entry_paste_cb)
-			    , GUINT_TO_POINTER(nn) );
+	/* paste_clipboard signal removed - not available in GTK4 */
      }
   }
   /* --- Make everything visible --- */

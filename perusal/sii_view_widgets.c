@@ -270,15 +270,25 @@ void sii_center_on_clicks (gint num_clicks)
   }
   else if (sii_click_que) {
     prev_pt = pt = (SiiPoint *)sii_click_que->data;
-    if (num_clicks < click_count) {
+    if (num_clicks > clicks_in_que) {
       sii_message ("Not enough clicks in the same frame");
       return;
     }
     frame_num = pt->frame_num;
   }
 
+  if (frame_num >= sii_return_frame_count() || !frame_configs[frame_num]) {
+    sii_message ("Invalid frame number");
+    return;
+  }
+
   vd = (ViewData *)frame_configs[frame_num]->view_data;
   wwptr = solo_return_wwptr(frame_num);
+
+  if (!wwptr) {
+    sii_message ("Window not initialized");
+    return;
+  }
 
   if (num_clicks < 2 && frame_num >= 0) {
     li = frame_configs[frame_num]->link_set[LI_CENTER];
@@ -312,6 +322,10 @@ void sii_center_on_clicks (gint num_clicks)
   sfc = frame_configs[frame_num];
 
   for (jj=0; jj < num_clicks -1; jj++, scq = scq->previous) {
+    if (!scq || !scq->data) {
+      sii_message ("Not enough clicks in the same frame");
+      return;
+    }
     pt = (SiiPoint *)scq->data;
     if (pt->frame_num != frame_num) {
       sii_message ("Not enough clicks in the same frame");
@@ -339,6 +353,10 @@ void sii_center_on_clicks (gint num_clicks)
     { factor = (sfc->height/ppk)/dy; }
 
   li = frame_configs[frame_num]->link_set[LI_VIEW];
+  if (!li) {
+    sii_message ("View links not initialized");
+    return;
+  }
   wwptrc = wwptr;
 
   for(jj=0; jj < SOLO_MAX_WINDOWS; jj++) {
@@ -1835,10 +1853,7 @@ void sii_view_widget( guint frame_num )
 			    ,"activate"
 			    , G_CALLBACK (sii_view_menu_cb)
 			    , (gpointer)nn );
-	g_signal_connect (G_OBJECT(vdata->data_widget[jj])
-			    ,"paste_clipboard"
-			    , G_CALLBACK (sii_view_entry_paste_cb)
-			    , (gpointer)nn );
+	/* paste_clipboard signal removed - not available in GTK4 */
      }
   }
 

@@ -191,6 +191,7 @@ void sii_new_frames ()
     gesture = gtk_gesture_click_new ();
     g_signal_connect (gesture, "pressed",
 		      G_CALLBACK (sii_mouse_click_cb), GINT_TO_POINTER(fn));
+    gtk_gesture_single_set_button (GTK_GESTURE_SINGLE (gesture), 0); /* all buttons */
     gtk_widget_add_controller (frame, GTK_EVENT_CONTROLLER (gesture));
 
     /* --- GtkEventControllerKey for key press --- */
@@ -221,9 +222,14 @@ void sii_new_frames ()
 		      , stp->right_attach - stp->left_attach
 		      , stp->bottom_attach - stp->top_attach
 		      );
+    gtk_widget_set_visible (frame, TRUE);
 
   }
+   gtk_widget_set_visible (main_table, TRUE);
    gtk_widget_set_visible (main_window, TRUE);
+
+   /* Reset window default size so it can shrink on zoom-out */
+   gtk_window_set_default_size (GTK_WINDOW (main_window), 1, 1);
    nn = 0;
 }
 

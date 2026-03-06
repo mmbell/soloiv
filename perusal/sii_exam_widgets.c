@@ -1162,10 +1162,7 @@ void sii_exam_widget( guint frame_num )
 			    ,"activate"
 			    , G_CALLBACK (sii_exam_menu_cb)
 			    , (gpointer)nn );
-	g_signal_connect (G_OBJECT(xmdata->data_widget[jj])
-			    ,"paste_clipboard"
-			    , G_CALLBACK (sii_exam_entry_paste_cb)
-			    , (gpointer)nn );
+	/* paste_clipboard signal removed - not available in GTK4 */
      }
   }
   se_update_exam_widgets (frame_num);

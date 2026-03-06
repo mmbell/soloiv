@@ -837,9 +837,13 @@ guint edit_text_event_cb(GtkWidget *text, GdkEvent *event
     (g_object_get_data (G_OBJECT(text), "frame_num" ));
 
   aa = (gchar *)data;
-  /* Note: cursor_mark.index not available in GTK4 GtkTextView;
-   * this needs further refactoring for GTK4 text cursor position */
-  nn = 0; /* placeholder - was GTK_TEXT (text)->cursor_mark.index */
+  {
+    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+    GtkTextIter iter;
+    GtkTextMark *mark = gtk_text_buffer_get_insert(tbuf);
+    gtk_text_buffer_get_iter_at_mark(tbuf, &iter, mark);
+    nn = gtk_text_iter_get_offset(&iter);
+  }
   line = sii_nab_line_from_text (aa, nn);
   strcat( line, "\n" );
 
@@ -859,14 +863,29 @@ guint sii_edit_help_event_cb(GtkWidget *text, GdkEvent *event
   gboolean ok;
 
   aa = (gchar *)data;
-  /* Note: cursor_mark.index not available in GTK4 GtkTextView;
-   * this needs further refactoring for GTK4 text cursor position */
-  nn = 0; /* placeholder - was GTK_TEXT (text)->cursor_mark.index */
+  {
+    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+    GtkTextIter iter;
+    GtkTextMark *mark = gtk_text_buffer_get_insert(tbuf);
+    gtk_text_buffer_get_iter_at_mark(tbuf, &iter, mark);
+    nn = gtk_text_iter_get_offset(&iter);
+  }
 
   ok = sii_nab_region_from_text (aa, nn, &start, &end);
   if (ok) {
-     gtk_editable_select_region (GTK_EDITABLE (text), start, end+1);
-     /* GTK4: clipboard copy - TODO: implement with GdkClipboard */
+     GtkTextBuffer *selbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+     GtkTextIter start_iter, end_iter;
+     gtk_text_buffer_get_iter_at_offset(selbuf, &start_iter, start);
+     gtk_text_buffer_get_iter_at_offset(selbuf, &end_iter, end+1);
+     gtk_text_buffer_select_range(selbuf, &start_iter, &end_iter);
+
+     GdkClipboard *clipboard = gdk_display_get_clipboard(gdk_display_get_default());
+     GtkTextIter sel_start, sel_end;
+     if (gtk_text_buffer_get_selection_bounds(selbuf, &sel_start, &sel_end)) {
+       char *sel_text = gtk_text_buffer_get_text(selbuf, &sel_start, &sel_end, FALSE);
+       gdk_clipboard_set_text(clipboard, sel_text);
+       g_free(sel_text);
+     }
   }
 
   return FALSE;
@@ -899,13 +918,23 @@ guint edit_file_text_event_cb (GtkWidget *text, GdkEvent *event
   edd = (EditData *)frame_configs[frame_num]->edit_data;
   wid = task = num % TASK_MODULO;
 
-  /* Note: cursor_mark.index not available in GTK4 GtkTextView;
-   * this needs further refactoring for GTK4 text cursor position */
-  nn = 0; /* placeholder - was GTK_TEXT (text)->cursor_mark.index */
+  {
+    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+    GtkTextIter iter;
+    GtkTextMark *mark = gtk_text_buffer_get_insert(tbuf);
+    gtk_text_buffer_get_iter_at_mark(tbuf, &iter, mark);
+    nn = gtk_text_iter_get_offset(&iter);
+  }
   ok = sii_nab_region_from_text (edd->orig_txt[wid]->str, nn, &start, &end);
 
   if (ok) {
-    gtk_editable_select_region (GTK_EDITABLE (text), start, end);
+    {
+      GtkTextBuffer *selbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+      GtkTextIter start_iter, end_iter;
+      gtk_text_buffer_get_iter_at_offset(selbuf, &start_iter, start);
+      gtk_text_buffer_get_iter_at_offset(selbuf, &end_iter, end);
+      gtk_text_buffer_select_range(selbuf, &start_iter, &end_iter);
+    }
     line = sii_nab_line_from_text (edd->orig_txt[wid]->str, nn);
   }
   if (!strlen (line))

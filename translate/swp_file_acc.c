@@ -1383,7 +1383,7 @@ int dd_create_dynamic_rotang_info(DGI_PTR dgi)
   int angle_ndx_size = 480;
   int ii, mm, size;
   int a_offset;
-  long *ang_index;
+  int32_t *ang_index;
   struct rot_ang_table *rat;
   struct rot_table_entry *entry;
 
@@ -1434,7 +1434,7 @@ int dd_create_dynamic_rotang_info(DGI_PTR dgi)
   size = sizeof(struct rot_ang_table);
   size = ((size -1)/8 +1) * 8; /* start tables on an 8 byte boundary */
   mm = size;
-  size += (angle_ndx_size * sizeof(long) +
+  size += (angle_ndx_size * sizeof(int32_t) +
            nrays * sizeof(struct rot_table_entry));
 
   /* alloc rat */
@@ -1453,7 +1453,7 @@ int dd_create_dynamic_rotang_info(DGI_PTR dgi)
   rat->sizeof_struct = size;
   rat->angle2ndx = (float)angle_ndx_size/360.0;
   rat->ndx_que_size = angle_ndx_size;
-  rat->first_key_offset = mm + angle_ndx_size * sizeof(long);
+  rat->first_key_offset = mm + angle_ndx_size * sizeof(int32_t);
   rat->angle_table_offset = mm;
   rat->num_rays = nrays;
 
@@ -1470,7 +1470,7 @@ int dd_create_dynamic_rotang_info(DGI_PTR dgi)
   /* now compute the angle indexes */
 
   a_offset = rat->angle_table_offset;
-  ang_index = (long *) ((char *) rat + a_offset);
+  ang_index = (int32_t *) ((char *) rat + a_offset);
   for (ii = 0; ii < angle_ndx_size; ii++) {
     ang_index[ii] = -1;
   }
