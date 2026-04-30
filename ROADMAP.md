@@ -27,8 +27,8 @@ Out-of-scope (per `memory/project_scope.md`): `translate/` internals
 | 5  | Edit widget smoke test                           | ✅ Done     |
 | 6  | Tree-mode walker + remaining frame widgets       | ✅ Done     |
 | 7  | DORADE load-path robustness (initial fuzz)       | ✅ Done     |
-| 8  | Paint-time UB in `solo_hardware_color_table`     | 🔜 Next     |
-| 9  | Visual issues: Magic Ring Lbls, window resize    | ⏳ Queued   |
+| 8  | Paint-time UB in `solo_hardware_color_table`     | ✅ Done     |
+| 9  | Visual issues: Magic Ring Lbls, window resize    | 🔜 Next     |
 | 10 | Screenshot capture + visual regression baseline  | ⏳ Queued   |
 | 11 | Pure-logic unit tests (color/coord/config)       | ⏳ Queued   |
 
@@ -136,30 +136,26 @@ be added as specific user-reported crashes surface. The infrastructure
 (tempdir setup, `DORADE_DIR` override, `copy_n_bytes` helper) makes
 each new corruption variant a small file.
 
-## 🔜 Phase 8 — Paint-time UB in `solo_hardware_color_table`
+## ✅ Phase 8 — Paint-time UB in `solo_hardware_color_table`
 
-**Goal:** clean ASan run for `test_walk_main_menu` and
-`test_examine_opens`. Same site as the `-O2` `brk` instruction; both
-are catching the same root cause from different angles.
+Root cause: `gboolean ok2;` in `solo_hardware_color_table` was
+declared without an initializer and then read in `if (!ok2)` checks.
+Reading uninitialized storage is undefined behavior, and the compiler
+exploits it differently at each opt level:
 
-The Phase 4 fix (matching `gclist` size to `MAX_COLOR_TABLE_SIZE`)
-addressed one path, but ASan still reports a write at line 3688 with
-"insufficient space for an object of type 'float'" during first paint.
-The reported address doesn't sit inside `gclist`, so something else is
-in play. Plausible candidates: a different overflowing array along the
-draw path, a pointer reinterpretation across struct boundaries, or
-clang's optimizer collapsing dead paths in a way that ASan instruments
-oddly.
+- `-O0` + ASan: silent (whatever was on the stack happened to behave).
+- `-O1` + ASan: ASan flags it as "store with insufficient space" at
+  the next memory op, since the optimizer's value tracking diverges
+  from the memory model.
+- `-O2`: clang infers a code path is unreachable and inserts a
+  `brk #0x1` at the boundary, which fires during first paint.
 
-**Work:**
-- Reproduce under ASan with `-O0` to get clean line info.
-- Identify which allocation ASan is bounds-checking against.
-- Fix; verify the `-O2` `RelWithDebInfo` trap also goes away.
+Fix was a one-line `ok2 = TRUE` initializer (the historical intent was
+"presume success unless a sub-step failed"). After the fix, all 10
+tests pass under three configurations: default Debug, `debug-asan`,
+and `RelWithDebInfo` (-O2).
 
-**Exit criteria:** `ctest --preset debug-asan` passes; running the
-binary built `RelWithDebInfo` no longer traps during paint.
-
-## ⏳ Phase 9 — Visual issues
+## 🔜 Phase 9 — Visual issues
 
 User-flagged at session start. These don't crash but they look wrong
 and should be fixed before we declare the GUI shippable.

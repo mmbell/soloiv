@@ -3584,7 +3584,13 @@ int solo_hardware_color_table(gint frame_num)
   SiiPalette *pal;
   gchar mess[256], *aa, *bb, *cc, line[256], *table, *name, *p_name;
   GdkRGBA *gcolor, *gclist;
-  gboolean ok = TRUE, ok2;
+  /* ok2 was declared without initialization in the original code and
+   * then read in `if (!ok2)` checks below. Reading uninit storage is
+   * UB; clang's optimizer at -O1+ exploits this and ASan flags it
+   * (and at -O2 inserts a brk at the boundary of the inferred-dead
+   * code path). The historical intent was "presume success unless a
+   * sub-step failed", so initialize TRUE. */
+  gboolean ok = TRUE, ok2 = TRUE;
   float red, green, blue, rnum, rden, gnum, gden, bnum, bden;
   
   /* GdkColormap removed in GTK4 */
