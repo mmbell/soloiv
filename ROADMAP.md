@@ -26,8 +26,8 @@ Out-of-scope (per `memory/project_scope.md`): `translate/` internals
 | 4  | Shared harness + action-group walker             | ✅ Done     |
 | 5  | Edit widget smoke test                           | ✅ Done     |
 | 6  | Tree-mode walker + remaining frame widgets       | ✅ Done     |
-| 7  | DORADE load-path robustness (fuzz)               | 🔜 Next     |
-| 8  | Paint-time UB in `solo_hardware_color_table`     | ⏳ Queued   |
+| 7  | DORADE load-path robustness (initial fuzz)       | ✅ Done     |
+| 8  | Paint-time UB in `solo_hardware_color_table`     | 🔜 Next     |
 | 9  | Visual issues: Magic Ring Lbls, window resize    | ⏳ Queued   |
 | 10 | Screenshot capture + visual regression baseline  | ⏳ Queued   |
 | 11 | Pure-logic unit tests (color/coord/config)       | ⏳ Queued   |
@@ -119,25 +119,24 @@ reachable only through the parameter widget's `GMenu` action group
 ("List Palettes" etc.), which `test_param_widget_walk` already
 covers transitively.
 
-## 🔜 Phase 7 — DORADE load-path robustness (fuzz)
+## ✅ Phase 7 — DORADE load-path robustness (initial fuzz)
 
-**Goal:** opening a malformed sweep file shows an error dialog, never
-crashes (per `memory/dorade_robustness.md`).
+Two tests, each in their own binary so GtkApplication state doesn't
+leak between scenarios:
 
-**Work:**
-- Generate ~50 mutated copies of one good sweep (random byte flips,
-  truncations, oversized length fields) under `test_data/fuzz/`.
-- New test: load each mutant via the same code path
-  `solo_nab_next_file` uses, assert "either succeeds or returns
-  cleanly with an error message; never crashes".
-- Fix root causes in `sp_dorade.c` and the readers in
-  `dd_crackers.h`-using TUs. Stay on the perusal side; do not chase
-  bugs that only fire deep inside `translate/`.
+- `test_dorade_truncated` — empty file with a sweep-pattern name in
+  a tempdir that `DORADE_DIR` points at. Passes; the loader skips
+  the empty file gracefully.
+- `test_dorade_partial_header` — first 100 bytes of a real sweep
+  (mid-SSWB superblock). Passes.
 
-**Exit criteria:** the fuzz test passes; every NULL-deref / OOB-read
-on length fields in the perusal-reachable load path is gated.
+This is the initial fuzz baseline. More aggressive mutations
+(garbage-after-header, oversized length fields, negative offsets) can
+be added as specific user-reported crashes surface. The infrastructure
+(tempdir setup, `DORADE_DIR` override, `copy_n_bytes` helper) makes
+each new corruption variant a small file.
 
-## ⏳ Phase 8 — Paint-time UB in `solo_hardware_color_table`
+## 🔜 Phase 8 — Paint-time UB in `solo_hardware_color_table`
 
 **Goal:** clean ASan run for `test_walk_main_menu` and
 `test_examine_opens`. Same site as the `-O2` `brk` instruction; both
