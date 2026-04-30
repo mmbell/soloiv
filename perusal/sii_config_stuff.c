@@ -13,6 +13,8 @@ void sii_initialize_parameter (guint frame_num, gchar *name);
 void sii_initialize_view (guint frame_num);
 void sii_frame_draw_func(GtkDrawingArea *area, cairo_t *cr,
 			 int width, int height, gpointer data);
+void sii_frame_resize_cb(GtkWidget *frame, int width, int height,
+			 gpointer data);
 void sii_mouse_click_cb(GtkGestureClick *gesture, int n_press,
 			double x, double y, gpointer data);
 void sii_focus_in_cb(GtkEventControllerFocus *controller,
@@ -186,6 +188,14 @@ void sii_new_frames ()
     /* --- Draw function --- */
     gtk_drawing_area_set_draw_func (GTK_DRAWING_AREA (frame),
 				    sii_frame_draw_func, GINT_TO_POINTER(fn), NULL);
+
+    /* NOTE: GtkDrawingArea has a "resize" signal that ought to feed
+     * sii_frame_resize_cb so that drag-resize updates the cached image
+     * dimensions. Connecting it triggers a re-entrant repaint via
+     * sii_plot_data2 inside snapshot, which crashes GTK's CSS pipeline.
+     * Until that is properly sequenced, we leave resize unhooked and
+     * disable window resize (see sii_set_main_window_resizable below)
+     * — users use the Zoom menu to change size. */
 
     /* --- GtkGestureClick for button press --- */
     gesture = gtk_gesture_click_new ();

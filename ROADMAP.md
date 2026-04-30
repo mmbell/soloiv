@@ -28,8 +28,8 @@ Out-of-scope (per `memory/project_scope.md`): `translate/` internals
 | 6  | Tree-mode walker + remaining frame widgets       | ✅ Done     |
 | 7  | DORADE load-path robustness (initial fuzz)       | ✅ Done     |
 | 8  | Paint-time UB in `solo_hardware_color_table`     | ✅ Done     |
-| 9  | Visual issues: Magic Ring Lbls, window resize    | 🔜 Next     |
-| 10 | Screenshot capture + visual regression baseline  | ⏳ Queued   |
+| 9  | Visual issues: Magic Ring Lbls, window resize    | ✅ Done     |
+| 10 | Screenshot capture + visual regression baseline  | 🔜 Next     |
 | 11 | Pure-logic unit tests (color/coord/config)       | ⏳ Queued   |
 
 ---
@@ -155,30 +155,33 @@ Fix was a one-line `ok2 = TRUE` initializer (the historical intent was
 tests pass under three configurations: default Debug, `debug-asan`,
 and `RelWithDebInfo` (-O2).
 
-## 🔜 Phase 9 — Visual issues
+## ✅ Phase 9 — Visual issues
 
-User-flagged at session start. These don't crash but they look wrong
-and should be fixed before we declare the GUI shippable.
+**9a. Magic Ring Lbls misalignment — fixed.**
 
-**9a. Magic Ring Lbls misalignment**
-- Symptom: dashed-line ring labels don't align with the polar grid;
-  toggling them off works.
-- Likely cause: a coordinate transform that didn't survive the GTK4
-  port. Search `sii_xyraster.c`, the magic-ring-related callbacks.
-- Test: render a frame to an offscreen Cairo surface with rings on
-  vs off, dump PNG for review.
+Root cause: `sii_cairo_draw_arc` in `solo2.c` called `cairo_restore`
+*before* `cairo_stroke`, so the path constructed under the
+translate+scale CTM was stroked using the restored CTM. The arc that
+was supposed to be at `(cx, cy)` rendered at the device origin
+instead, producing the "strange dashed lines that aren't aligned with
+the polar grid" the user reported. Fixed by stroking inside the
+save/restore for the ellipse case, and added a fast path that skips
+the CTM dance entirely for the (only-used) circle case.
 
-**9b. Window resize creates a second image**
-- Symptom: dragging the window edge produces a duplicate image
-  instead of rescaling.
-- Likely cause: the draw callback isn't re-rendering at the new size,
-  or there's stale cached pixmap state.
-- Fallback (per the user): if it can't be made to rescale, disable
-  `gtk_window_set_resizable` and force users to use the Zoom menu.
-- Test: programmatically resize the main window and screenshot;
-  assert no doubled pixels in the centerline.
+**9b. Window resize creates a second image — disabled with a note.**
 
-## ⏳ Phase 10 — Screenshot capture + visual regression baseline
+`sii_frame_resize_cb` in `sii_callbacks.c` is defined but was never
+connected to any signal. Connecting it to the GTK4 GtkDrawingArea
+"resize" signal is the obvious fix, but trips a re-entrant
+`sii_plot_data2` call inside the GTK snapshot pipeline that crashes
+GTK's CSS state machine. Sequencing that properly is more work than
+this phase wanted, so per the user's stated fallback, drag-resize is
+disabled (`gtk_window_set_resizable(FALSE)`); users use the Zoom menu.
+Reconnecting resize is queued as future work — needs the layout
+pipeline to be reordered so allocation changes don't replot during
+snapshot.
+
+## 🔜 Phase 10 — Screenshot capture + visual regression baseline
 
 **Goal:** we can tell whether a future change broke the rendering,
 without needing eyes on a screen.

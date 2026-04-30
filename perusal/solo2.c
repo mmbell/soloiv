@@ -168,6 +168,27 @@ sii_cairo_draw_arc (cairo_t *cr, gboolean filled,
   double angle1 = (iangle / 64.0) * (G_PI / 180.0);
   double angle2 = ((iangle + iarc_len) / 64.0) * (G_PI / 180.0);
 
+  /* Fast path for the common circle case (the only call site in
+   * solo2.c for soloiv passes width == height).  Going through the
+   * generic ellipse code below is correct but adds a save/restore
+   * dance with subtle line-width behavior. */
+  if (rx == ry) {
+    if (iarc_len >= 0) {
+      cairo_arc (cr, cx, cy, rx, -angle1, -angle2);
+    } else {
+      cairo_arc_negative (cr, cx, cy, rx, -angle1, -angle2);
+    }
+    if (filled) cairo_fill (cr); else cairo_stroke (cr);
+    return;
+  }
+
+  /* Ellipse: translate + non-uniform scale, draw a unit arc, fill or
+   * stroke INSIDE the save/restore so the path is rendered while the
+   * CTM still maps user (0,0) to device (cx,cy).  The previous version
+   * called cairo_restore before cairo_stroke, which moved the stroke
+   * back to the original origin and produced tiny stray dashed lines
+   * away from the radar center — visible to the user as "Magic Ring
+   * Lbls" misalignment with the polar grid. */
   cairo_save (cr);
   cairo_translate (cr, cx, cy);
   cairo_scale (cr, rx, ry);
@@ -178,14 +199,8 @@ sii_cairo_draw_arc (cairo_t *cr, gboolean filled,
     cairo_arc_negative (cr, 0, 0, 1.0, -angle1, -angle2);
   }
 
+  if (filled) cairo_fill (cr); else cairo_stroke (cr);
   cairo_restore (cr);
-
-  /* Restore the CTM but keep the path */
-  if (filled) {
-    cairo_fill (cr);
-  } else {
-    cairo_stroke (cr);
-  }
 }
 
 /* c------------------------------------------------------------------------ */

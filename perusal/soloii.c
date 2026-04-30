@@ -505,7 +505,12 @@ void soloiv_activate(GtkApplication *app, gpointer user_data)
   main_window = gtk_application_window_new (app);
 
   gtk_window_set_title (GTK_WINDOW(main_window), "SoloIV");
-  gtk_window_set_resizable (GTK_WINDOW(main_window), TRUE);
+  /* Drag-resize is currently disabled because the per-frame
+   * GtkDrawingArea "resize" path needs reordering before it can be
+   * safely hooked (see sii_config_stuff.c near the draw func setup).
+   * Without that, dragging the window edge produces duplicated image
+   * fragments. Users change zoom via the Zoom menu instead. */
+  gtk_window_set_resizable (GTK_WINDOW(main_window), FALSE);
 
   /* Key press event via GtkEventControllerKey */
   controller = gtk_event_controller_key_new();
