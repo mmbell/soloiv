@@ -1,0 +1,24 @@
+# Sanitizer suppressions for soloiv tests.
+#
+# Format reference:
+#   https://github.com/google/sanitizers/wiki/AddressSanitizerLeakSanitizer
+#
+# Scope rationale: translate/ is being deprecated in favor of LROSE tooling, so
+# memory issues inside its parsers are out of scope for the GUI hardening
+# effort. Anything originating in perusal/ is in scope and must NOT be
+# suppressed here.
+
+# Leaks anywhere inside translate/ source files.
+leak:translate/
+
+# GTK4 / GLib internals — not ours to fix.
+leak:libgtk-4
+leak:libglib-2
+leak:libgobject-2
+leak:libpango-1
+leak:libcairo
+
+# macOS system frameworks — false positives from the system allocator.
+leak:CoreFoundation
+leak:libobjc
+leak:libsystem

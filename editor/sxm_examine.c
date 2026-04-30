@@ -2446,8 +2446,16 @@ void sxm_update_examine_data(frme, wgt_btn)
 	  return;
 # endif
     wwptr = solo_return_wwptr(frme);
+    /* solo_worksheet() only initializes lead_sweep for windows that are
+     * actually part of a lockstep. Frames not joined to any lockstep
+     * leave lead_sweep == NULL, which crashes the dereferences below.
+     * The convention (see sii_perusal.c:947) is that an unjoined frame is
+     * its own lead — apply that here defensively. */
+    if (!wwptr->lead_sweep) {
+        wwptr->lead_sweep = wwptr;
+    }
     wwptrx = wwptr->lead_sweep;
-    tsrt = wwptr->lead_sweep->tsrt;
+    tsrt = wwptrx->tsrt;
 
     if(wwptr->examine_info->change_count > 0) {
 	slm = spi->list_a_message;

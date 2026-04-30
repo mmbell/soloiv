@@ -1,4 +1,6 @@
 build/
+build-asan/
+build-*/
 *.o
 *.a
 *.dylib
@@ -6,3 +8,7 @@ build/
 *.bak
 *.bak2
 .DS_Store
+
+# Sample data and scratch dirs (kept locally, not tracked)
+test_data/
+tmp/

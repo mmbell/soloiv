@@ -1,6 +1,10 @@
-# perusal/ - soloiv GUI executable
+# perusal/ - soloiv GUI executable + reusable core library
+#
+# All perusal/ source files compile into a static library (soloiv_core) so
+# that test binaries can link the same code without colliding with main().
+# The soloiv executable is a thin wrapper: soloii_main.c + soloiv_core.
 
-set(SOLOIV_SOURCES
+set(SOLOIV_CORE_SOURCES
     soloii.c
     sii_colors_stuff.c
     sii_config_stuff.c
@@ -28,11 +32,12 @@ set(SOLOIV_SOURCES
     sp_lists.c
     sii_bscan.c
     sii_gtk4_compat.c
+    sii_log_handler.c
 )
 
-add_executable(soloiv ${SOLOIV_SOURCES})
+add_library(soloiv_core STATIC ${SOLOIV_CORE_SOURCES})
 
-target_include_directories(soloiv PRIVATE
+target_include_directories(soloiv_core PUBLIC
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/translate
     ${CMAKE_SOURCE_DIR}/editor
@@ -42,22 +47,26 @@ target_include_directories(soloiv PRIVATE
 
 # Legacy C code has many implicit function declarations across files;
 # suppress for now to focus on GTK4 migration errors.
-target_compile_options(soloiv PRIVATE ${GTK4_CFLAGS_OTHER}
+target_compile_options(soloiv_core PRIVATE ${GTK4_CFLAGS_OTHER}
     -Wno-implicit-function-declaration
     -Wno-implicit-int
     -Wno-return-mismatch
 )
 
-target_link_directories(soloiv PRIVATE ${GTK4_LIBRARY_DIRS})
+target_link_directories(soloiv_core PUBLIC ${GTK4_LIBRARY_DIRS})
 
-target_link_libraries(soloiv PRIVATE
+target_link_libraries(soloiv_core PUBLIC
     soloedit
     s2
     ${GTK4_LIBRARIES}
 )
 
 if(MATH_LIBRARY)
-  target_link_libraries(soloiv PRIVATE ${MATH_LIBRARY})
+  target_link_libraries(soloiv_core PUBLIC ${MATH_LIBRARY})
 endif()
+
+# Executable: just main() + the core library.
+add_executable(soloiv soloii_main.c)
+target_link_libraries(soloiv PRIVATE soloiv_core)
 
 install(TARGETS soloiv RUNTIME DESTINATION bin)

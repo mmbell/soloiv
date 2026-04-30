@@ -3625,12 +3625,23 @@ int solo_hardware_color_table(gint frame_num)
     return 0;
   }
   cmax = strlen (table);
-  gclist = (GdkRGBA *)g_malloc0 (256 * sizeof (GdkRGBA));
-  
+  /* Size gclist to match the downstream MAX_COLOR_TABLE_SIZE-bounded
+   * arrays (pal->data_color_table, pal->color_table_rgbs). The previous
+   * size of 256 was both inconsistent with downstream bounds and
+   * insufficient for some color tables, leading to a heap-buffer overflow
+   * caught by ASan. The parse loop also clamps nc below. */
+  gclist = (GdkRGBA *)g_malloc0 (MAX_COLOR_TABLE_SIZE * sizeof (GdkRGBA));
+
   for(; ndx < cmax;) {
-    
+    if (nc >= MAX_COLOR_TABLE_SIZE) {
+      /* Color file declares more entries than we can store. The remaining
+       * entries are silently dropped; the user sees a truncated palette
+       * rather than a corrupt one. */
+      break;
+    }
+
     ok = sii_nab_region_from_text (table, ndx, &start, &end);
-    
+
     if (!ok || end <= start)
       { break; }
     /*

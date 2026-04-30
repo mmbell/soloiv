@@ -56,6 +56,7 @@ target_compile_options(s2 PRIVATE
     -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration
     -Wno-error=implicit-int -Wno-implicit-int
     -Wno-return-mismatch
+    -Wno-error=parentheses -Wno-parentheses
 )
 
 target_include_directories(s2 PUBLIC

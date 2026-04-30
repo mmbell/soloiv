@@ -448,7 +448,7 @@ void click_data_cb (GtkWidget *text, gpointer data )
 
 /* c---------------------------------------------------------------------- */
 
-static void soloiv_activate(GtkApplication *app, gpointer user_data)
+void soloiv_activate(GtkApplication *app, gpointer user_data)
 {
   GdkDisplay *display;
   GdkMonitor *monitor;
@@ -594,19 +594,8 @@ static void soloiv_activate(GtkApplication *app, gpointer user_data)
 
 /* c---------------------------------------------------------------------- */
 
-int main( int argc,
-          char *argv[] )	/* c...main */
-{
-  GtkApplication *app;
-  int status;
-
-  app = gtk_application_new("org.lrose.soloiv", G_APPLICATION_DEFAULT_FLAGS);
-  g_signal_connect(app, "activate", G_CALLBACK(soloiv_activate), NULL);
-  status = g_application_run(G_APPLICATION(app), argc, argv);
-  g_object_unref(app);
-
-  return status;
-}
+/* main() lives in soloii_main.c so that tests can link soloiv_core
+   without colliding with the test harness's own main(). */
 
 /* c---------------------------------------------------------------------- */
 
@@ -950,6 +939,18 @@ static void on_help_action(GSimpleAction *action, GVariant *parameter, gpointer 
   sii_menu_cb(GUINT_TO_POINTER(id));
 }
 
+/* Stashed pointer to the main menu's action group, used by the test
+ * harness to enumerate and fire actions. GTK4 has no public way to get
+ * an action group back off a widget once you insert it, so we keep the
+ * reference here for tests. The pointer is owned by the widget; tests
+ * must not unref it. */
+static GSimpleActionGroup *g_main_menu_actions = NULL;
+
+GActionGroup *soloiv_get_main_menu_actions(void)
+{
+  return G_ACTION_GROUP(g_main_menu_actions);
+}
+
 void soloiv_build_main_menu(GtkWidget *window, GtkWidget *vbox)
 {
   GMenu *menubar_model;
@@ -959,6 +960,7 @@ void soloiv_build_main_menu(GtkWidget *window, GtkWidget *vbox)
   GtkWidget *menu_bar;
 
   actions = g_simple_action_group_new();
+  g_main_menu_actions = actions;
 
   /* File actions */
   GSimpleAction *action;

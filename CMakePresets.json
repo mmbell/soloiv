@@ -1,0 +1,51 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default — Debug, tests on (no sanitizers)",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "_comment": "Debug rather than RelWithDebInfo because -O2 currently triggers a clang trap insertion in solo_hardware_color_table during first paint (separate latent issue, doesn't reproduce in interactive use). Tests need a clean baseline.",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "SOLOIV_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "debug-asan",
+      "displayName": "Debug + AddressSanitizer + UBSan",
+      "binaryDir": "${sourceDir}/build-asan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "SOLOIV_BUILD_TESTS": "ON",
+        "CMAKE_C_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer -O1 -g",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined",
+        "CMAKE_SHARED_LINKER_FLAGS": "-fsanitize=address,undefined"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "default",    "configurePreset": "default" },
+    { "name": "debug-asan", "configurePreset": "debug-asan" }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "output": { "outputOnFailure": true },
+      "execution": { "stopOnFailure": false }
+    },
+    {
+      "name": "debug-asan",
+      "configurePreset": "debug-asan",
+      "output": { "outputOnFailure": true },
+      "execution": { "stopOnFailure": false },
+      "environment": {
+        "ASAN_OPTIONS": "abort_on_error=1:detect_leaks=0:symbolize=1:print_stacktrace=1",
+        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=0",
+        "LSAN_OPTIONS": "suppressions=${sourceDir}/tests/.asan-suppressions"
+      }
+    }
+  ]
+}

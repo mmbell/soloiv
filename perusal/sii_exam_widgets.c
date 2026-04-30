@@ -148,6 +148,7 @@ void sii_exam_menubar( GtkWidget  *window, GtkWidget **menubar
 void sii_exam_menubar2( GtkWidget  *window, GtkWidget **menubar
 		       , guint frame_num);
 void sii_exam_widget( guint frame_num );
+void sii_exam_finalize_radio_state(void);
 
 void show_exam_widget (GtkWidget *text, gpointer data );
 
@@ -480,16 +481,20 @@ void show_exam_widget (GtkWidget *text, gpointer data )
 
 /* c---------------------------------------------------------------------- */
 
-void sii_exam_list_event (GtkWidget *w, GdkEvent *event
-			      , gpointer data )
+/* GTK4 click handler. user_data is the GtkLabel that was clicked; x,y are
+ * the press coordinates inside that label. */
+void sii_exam_list_event (GtkGestureClick *gesture, int n_press,
+                          double x, double y, gpointer data )
 {
    GtkWidget *label = GTK_WIDGET (data);
-   guint num = GPOINTER_TO_UINT (data);
-   guint frame_num, task, wid, exam_index;
+   guint frame_num, exam_index;
    ExamData *xmd;
-   gint xx, yy, cndx;
-   GdkModifierType state;
+   gint xx, cndx;
    struct solo_click_info *sci = clear_click_info();
+
+   (void)gesture;
+   (void)n_press;
+   (void)y;
 
    sci->frame =
      frame_num =
@@ -506,8 +511,7 @@ void sii_exam_list_event (GtkWidget *w, GdkEvent *event
 			 (G_OBJECT(label), "exam_index" ));
 
    xmd->last_list_index = exam_index;
-   /* In GTK4, pointer position is obtained from the event or controller */
-   xx = 0; yy = 0; state = 0;
+   xx = (gint)x;
    sci->which_character =
      xmd->last_char_index =
        cndx = xx/xmd->label_char_width;
@@ -515,8 +519,8 @@ void sii_exam_list_event (GtkWidget *w, GdkEvent *event
    sci->which_widget_button = EX_CLICK_IN_LIST;
    sxm_process_click (sci);
 
-   g_message ("Exam_list: f:%d i:%d c:%d x:%d y:%d s:%d"
-	      , frame_num, exam_index, cndx, xx, yy, state);
+   g_message ("Exam_list: f:%d i:%d c:%d x:%d"
+	      , frame_num, exam_index, cndx, xx );
 }
 
 /* c---------------------------------------------------------------------- */
@@ -1165,6 +1169,14 @@ void sii_exam_widget( guint frame_num )
 	/* paste_clipboard signal removed - not available in GTK4 */
      }
   }
+
+  /* Now that all data_widget entries (entries + radio buttons) exist, it
+   * is safe to set the initial radio state. Doing this earlier — inside
+   * sii_exam_menubar2 itself — emits "toggled" → sii_exam_menu_cb, which
+   * reads data_widget[EXAM_RAY] and crashes with a GTK_IS_EDITABLE
+   * assertion failure because the entry widgets aren't built yet. */
+  sii_exam_finalize_radio_state();
+
   se_update_exam_widgets (frame_num);
 
 
@@ -1187,9 +1199,17 @@ void sii_exam_widget( guint frame_num )
 		      (gpointer)(frame_num*TASK_MODULO+widget_id));
 
   nn = frame_num * TASK_MODULO + widget_id;
-  g_signal_connect (G_OBJECT(window),"key_press_event",
-		      G_CALLBACK (sii_exam_keyboard_event)
-		      , (gpointer)nn);
+  {
+    /* GTK4: key events come from a GtkEventControllerKey, not from a
+     * "key_press_event" signal on the window (which doesn't exist).
+     * sii_exam_keyboard_event already has the controller's "key-pressed"
+     * callback signature. */
+    GtkEventController *kc = gtk_event_controller_key_new();
+    g_signal_connect(kc, "key-pressed",
+                     G_CALLBACK(sii_exam_keyboard_event),
+                     (gpointer)nn);
+    gtk_widget_add_controller(window, kc);
+  }
 
   bb = g_strdup_printf ("Frame %d  Examine Display Widget", frame_num+1 );
   gtk_window_set_title (GTK_WINDOW (window), bb);
@@ -1236,12 +1256,12 @@ void sii_exam_widget( guint frame_num )
   gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW(scrolledwindow), layout);
   gtk_widget_set_size_request(layout, len*width, nn*height);
 
-  /* We set step sizes here since GtkLayout does not set
-   * them itself.
-   */
+  /* GTK4: GtkFixed does not implement GtkScrollable (unlike GtkLayout in
+   * GTK3). The scroll viewport's adjustments live on the scrolled window
+   * itself, so query those instead. */
   {
-    GtkAdjustment *hadj = gtk_scrollable_get_hadjustment(GTK_SCROLLABLE(layout));
-    GtkAdjustment *vadj = gtk_scrollable_get_vadjustment(GTK_SCROLLABLE(layout));
+    GtkAdjustment *hadj = gtk_scrolled_window_get_hadjustment(GTK_SCROLLED_WINDOW(scrolledwindow));
+    GtkAdjustment *vadj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(scrolledwindow));
     gtk_adjustment_set_step_increment(hadj, height);
     gtk_adjustment_set_step_increment(vadj, width);
   }
@@ -1258,9 +1278,15 @@ void sii_exam_widget( guint frame_num )
      gtk_label_set_justify ((GtkLabel *)label, GTK_JUSTIFY_LEFT );
      gtk_label_set_xalign (GTK_LABEL (label), 0.0);
 
-     g_signal_connect (G_OBJECT(event),"button_press_event",
-			 G_CALLBACK (sii_exam_list_event)
-			 , (gpointer)label);
+     {
+       /* GTK4: per-widget click events come from a GtkGestureClick
+        * controller, not a "button_press_event" signal. */
+       GtkGesture *click = gtk_gesture_click_new();
+       g_signal_connect(click, "pressed",
+                        G_CALLBACK(sii_exam_list_event),
+                        (gpointer)label);
+       gtk_widget_add_controller(event, GTK_EVENT_CONTROLLER(click));
+     }
 
      gtk_fixed_put(GTK_FIXED(layout), event,
 		   0, mm*height);
@@ -1308,13 +1334,17 @@ void sii_exam_menubar2( GtkWidget  *window, GtkWidget **menubar
    radio_group = NULL;
    radio_num = 0;
 
+   /* Initial radio state for these check buttons is set AFTER the rest of
+    * sii_exam_widget() has populated data_widget entries (EXAM_RAY etc.).
+    * Setting it here would emit "toggled" → sii_exam_menu_cb → an attempt
+    * to read data_widget[EXAM_RAY] before it exists, which crashes. */
+
    widget_id = EXAM_DATA;
    xmdata->equiv_solo_state[widget_id] = EX_RADAR_DATA;
    xmdata->data_widget[widget_id] = menuitem =
      sii_toggle_submenu_item ( "Cell Values", submenu, widget_id
 			       , (GCallback)sii_exam_menu_cb, frame_num, ++radio_num
 			       , &radio_group);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(menuitem), TRUE);
 
    widget_id = EXAM_RAYS;
    xmdata->equiv_solo_state[widget_id] = EX_BEAM_INVENTORY;
@@ -1322,7 +1352,6 @@ void sii_exam_menubar2( GtkWidget  *window, GtkWidget **menubar
      sii_toggle_submenu_item ( "Ray Info", submenu, widget_id
 			       , (GCallback)sii_exam_menu_cb, frame_num, ++radio_num
 			       , &radio_group);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(menuitem), FALSE);
 
    widget_id = EXAM_METADATA;
    xmdata->equiv_solo_state[widget_id] = EX_DESCRIPTORS;
@@ -1330,7 +1359,6 @@ void sii_exam_menubar2( GtkWidget  *window, GtkWidget **menubar
      sii_toggle_submenu_item ( "Metadata", submenu, widget_id
 			       , (GCallback)sii_exam_menu_cb, frame_num, ++radio_num
 			       , &radio_group);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(menuitem), FALSE);
 
    widget_id = EXAM_EDT_HIST;
    xmdata->equiv_solo_state[widget_id] = EX_EDIT_HIST;
@@ -1338,7 +1366,6 @@ void sii_exam_menubar2( GtkWidget  *window, GtkWidget **menubar
      sii_toggle_submenu_item ( "Edit Hist", submenu, widget_id
 			       , (GCallback)sii_exam_menu_cb, frame_num, ++radio_num
 			       , &radio_group);
-  gtk_check_button_set_active(GTK_CHECK_BUTTON(menuitem), FALSE);
 
 
    submenu = sii_submenu ( "Edit", mbar );
@@ -1505,6 +1532,16 @@ void sii_exam_menubar2( GtkWidget  *window, GtkWidget **menubar
    g_object_set_data(G_OBJECT(menuitem),
 		     "frame_num", GUINT_TO_POINTER(frame_num));
 
+   /* Initial radio-state setup is deferred to sii_exam_finalize_radio_state(),
+    * which the caller (sii_exam_widget) invokes after creating the rest of
+    * the data_widget entries. See note above near the EXAM_DATA radio button. */
+}
+
+/* c---------------------------------------------------------------------- */
+
+void sii_exam_finalize_radio_state(void)
+{
+  GtkWidget *check_item;
 
   check_item = xmdata->data_widget[EXAM_LOG_ACTIVE];
   gtk_check_button_set_active(GTK_CHECK_BUTTON(check_item), FALSE);
@@ -1520,7 +1557,6 @@ void sii_exam_menubar2( GtkWidget  *window, GtkWidget **menubar
   check_item = xmdata->data_widget[EXAM_LST_RNGAZ];
   gtk_check_button_set_active(GTK_CHECK_BUTTON(check_item), TRUE);
   xmdata->label_state = EXAM_LST_RNGAZ;
-
 }
 
 /* c---------------------------------------------------------------------- */
