@@ -224,3 +224,35 @@ accidental.
   this roadmap. Will replace `translate/` entirely; some of these
   phases (especially 7 and parts of 11) will be obviated by that
   switch.
+
+---
+
+## Next-session entry point
+
+When picking up after a fresh context, the quick orientation is:
+
+1. **Where we are**: Phases 1–9 are ✅. The user-reported Examine crash
+   is fixed. 10 tests pass under `default`, `debug-asan`, and
+   `RelWithDebInfo`. Magic Ring Lbls render correctly; drag-resize is
+   disabled as a fallback.
+2. **What you said you'd do**: run `./build/perusal/soloiv` from
+   `test_data/`, take screenshots, look for visual regressions or
+   leftover bugs the automated tests don't catch.
+3. **Where to drop your findings**: the section below. Then either
+   pick the next 🔜 phase from the table at the top, or add new
+   issues to the "Reported issues to triage" section and we'll
+   re-prioritize.
+
+### Visual review notes (next session — fill in)
+
+_Add screenshots, observations, and reproductions here. Format suggestion:_
+
+- **Issue**: short description
+- **Repro**: how to reproduce
+- **Screenshot**: path or attached image
+- **Severity**: blocker / cosmetic / nice-to-have
+
+### Reported issues to triage (next session — fill in)
+
+_Anything else you spotted that isn't on the roadmap yet._
+
