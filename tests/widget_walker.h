@@ -47,4 +47,22 @@ gboolean widget_walker_fire_action(GtkWidget   *widget,
                                    const char  *action_name,
                                    GVariant    *parameter);
 
+/* Tree-walk mode. Recursively descends the widget hierarchy starting
+ * at root and exercises every clickable descendant:
+ *
+ *   GtkButton, GtkLinkButton, GtkMenuButton  -> gtk_widget_activate
+ *   GtkCheckButton, GtkToggleButton          -> toggle, pump, toggle back
+ *   GtkSwitch                                -> set_active opposite, pump
+ *
+ * Between exercises the loop is pumped so the side effects of one
+ * action settle before the next runs.
+ *
+ * skip_labels is a NULL-terminated array of substrings; any clickable
+ * whose visible label contains one of those substrings is bypassed.
+ * Use this for buttons that would tear down the test (Close, Cancel)
+ * or open modal dialogs (file choosers).
+ *
+ * Returns the number of clickables actually exercised. */
+int widget_walker_walk_tree(GtkWidget *root, const char **skip_labels);
+
 #endif /* WIDGET_WALKER_H */

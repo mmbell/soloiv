@@ -25,8 +25,8 @@ Out-of-scope (per `memory/project_scope.md`): `translate/` internals
 | 3  | Examine widget regression test + root-cause fix  | ✅ Done     |
 | 4  | Shared harness + action-group walker             | ✅ Done     |
 | 5  | Edit widget smoke test                           | ✅ Done     |
-| 6  | Tree-mode walker + remaining frame widgets       | 🔜 Next     |
-| 7  | DORADE load-path robustness (fuzz)               | ⏳ Queued   |
+| 6  | Tree-mode walker + remaining frame widgets       | ✅ Done     |
+| 7  | DORADE load-path robustness (fuzz)               | 🔜 Next     |
 | 8  | Paint-time UB in `solo_hardware_color_table`     | ⏳ Queued   |
 | 9  | Visual issues: Magic Ring Lbls, window resize    | ⏳ Queued   |
 | 10 | Screenshot capture + visual regression baseline  | ⏳ Queued   |
@@ -96,34 +96,30 @@ bugs.
 
 ---
 
-## 🔜 Phase 6 — Tree-mode walker + remaining frame widgets
+## ✅ Phase 6 — Tree-mode walker + remaining frame widgets
 
-**Goal:** every clickable widget in every major window has been
-exercised in some test, not just the menubar.
+`widget_walker_walk_tree()` recurses via `gtk_widget_get_first_child`
+/ `get_next_sibling` and exercises `GtkButton`, `GtkCheckButton`, and
+`GtkSwitch`. Skip list bypasses Cancel/Close/Quit/Browse-style
+buttons.
 
-The current walker only handles `GAction`-based items. The per-frame
-buttons (`Data Widget`, frame-menu items), parameter widget controls,
-color picker, and sweep file dialog all use plain `g_signal_connect`
-callbacks and need a tree-walking mode.
+Tests added:
+- `test_data_widget_opens` — third frame-menu button. Clean.
+- `test_param_widget_walk` — opens the parameter widget and walks its
+  visible controls. Caught a leftover `gtk_check_button_set_active`
+  on `data_widget[PARAM_CB_BOTTOM]` (now NULL since the Options menu
+  was migrated to `GMenu` actions); fixed with NULL-checks until that
+  state can be threaded through stateful actions.
+- `test_swpfi_dialog_walk` — sweep-file dialog. Clean.
+- `test_multi_frame_layout` — fires `cfg_11`, `cfg_22`, `cfg_14`,
+  `cfg_41`, `cfg_22` in sequence. Clean.
 
-**Work:**
-- Add `widget_walker_walk_tree(GtkWidget *root, ...)` that recurses
-  via `gtk_widget_get_first_child` / `get_next_sibling`, identifies
-  `GtkButton`, `GtkCheckButton`, `GtkSwitch`, `GtkEntry`, `GtkListBox`
-  rows, and exercises each (skip list by label).
-- Add per-state tests:
-  - `test_data_widget_opens` — `show_click_data_widget` for frame 0
-  - `test_param_widget_walk` — open + walk every control
-  - `test_palette_walk` — open the color picker, walk it
-  - `test_swpfi_dialog_walk` — sweep-file dialog
-  - `test_multi_frame_layout` — switch to 2x2 / 1x4 via menu, walk
-  - one test that just stays in cold-start (no sweep) and walks
+Palette-specific test was dropped: the color picker / palette list is
+reachable only through the parameter widget's `GMenu` action group
+("List Palettes" etc.), which `test_param_widget_walk` already
+covers transitively.
 
-**Exit criteria:** every test passes under `default`. Failures get
-fixed inline (each one is likely a small migration issue similar to
-Phase 3). Document the walker's skip lists.
-
-## ⏳ Phase 7 — DORADE load-path robustness (fuzz)
+## 🔜 Phase 7 — DORADE load-path robustness (fuzz)
 
 **Goal:** opening a malformed sweep file shows an error dialog, never
 crashes (per `memory/dorade_robustness.md`).

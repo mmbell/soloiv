@@ -137,3 +137,115 @@ widget_walker_fire_action(GtkWidget *widget,
     test_app_runner_pump(5);
     return TRUE;
 }
+
+/* Tree walk implementation -------------------------------------------- */
+
+static const char *
+widget_label(GtkWidget *w)
+{
+    /* GtkButton with text label */
+    if (GTK_IS_BUTTON(w)) {
+        const char *l = gtk_button_get_label(GTK_BUTTON(w));
+        if (l) return l;
+    }
+    /* GtkCheckButton (which in GTK4 is independent of GtkToggleButton) */
+    if (GTK_IS_CHECK_BUTTON(w)) {
+        const char *l = gtk_check_button_get_label(GTK_CHECK_BUTTON(w));
+        if (l) return l;
+    }
+    /* GtkLabel — sometimes used as the "label" of a complex button */
+    if (GTK_IS_LABEL(w)) {
+        const char *l = gtk_label_get_text(GTK_LABEL(w));
+        if (l) return l;
+    }
+    return "";
+}
+
+static gboolean
+label_in_skip_list(const char *label, const char **skip)
+{
+    if (!skip || !label || !*label) return FALSE;
+    for (int i = 0; skip[i] != NULL; i++) {
+        if (strstr(label, skip[i])) return TRUE;
+    }
+    return FALSE;
+}
+
+/* Visit one widget. Returns 1 if it was a clickable we exercised,
+ * 0 otherwise. Children are walked by the caller. */
+static int
+visit_widget(GtkWidget *w, const char **skip_labels)
+{
+    if (!w || !gtk_widget_get_visible(w) || !gtk_widget_get_sensitive(w)) {
+        return 0;
+    }
+
+    const char *label = widget_label(w);
+    if (label_in_skip_list(label, skip_labels)) {
+        return 0;
+    }
+
+    /* GtkCheckButton: toggle, pump, toggle back. We do this BEFORE the
+     * GtkButton check because GtkCheckButton is a GtkWidget that
+     * contains a GtkButton-like surface; gtk_widget_activate on it
+     * will toggle, but doing it explicitly is clearer. */
+    if (GTK_IS_CHECK_BUTTON(w)) {
+        gboolean was_active = gtk_check_button_get_active(GTK_CHECK_BUTTON(w));
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(w), !was_active);
+        test_app_runner_pump(3);
+        gtk_check_button_set_active(GTK_CHECK_BUTTON(w), was_active);
+        test_app_runner_pump(3);
+        return 1;
+    }
+
+    /* GtkSwitch: same toggle-and-back pattern. */
+    if (GTK_IS_SWITCH(w)) {
+        gboolean was = gtk_switch_get_active(GTK_SWITCH(w));
+        gtk_switch_set_active(GTK_SWITCH(w), !was);
+        test_app_runner_pump(3);
+        gtk_switch_set_active(GTK_SWITCH(w), was);
+        test_app_runner_pump(3);
+        return 1;
+    }
+
+    /* GtkButton (and subclasses like GtkLinkButton, GtkMenuButton).
+     * gtk_widget_activate emits "clicked" without needing pointer
+     * coordinates. */
+    if (GTK_IS_BUTTON(w)) {
+        gtk_widget_activate(w);
+        test_app_runner_pump(3);
+        return 1;
+    }
+
+    return 0;
+}
+
+static int
+walk_recursive(GtkWidget *w, const char **skip_labels, int depth)
+{
+    int count = 0;
+
+    if (!w) return 0;
+    /* Cap depth to avoid pathological loops in case of cyclic
+     * widget references (shouldn't happen in GTK, but be safe). */
+    if (depth > 64) return 0;
+
+    count += visit_widget(w, skip_labels);
+
+    /* Some widgets keep popovers / overlays attached separately.
+     * For now we just walk normal children; popover walking can be
+     * added later if a test needs it. */
+    GtkWidget *child = gtk_widget_get_first_child(w);
+    while (child) {
+        count += walk_recursive(child, skip_labels, depth + 1);
+        child = gtk_widget_get_next_sibling(child);
+    }
+    return count;
+}
+
+int
+widget_walker_walk_tree(GtkWidget *root, const char **skip_labels)
+{
+    g_assert_nonnull(root);
+    return walk_recursive(root, skip_labels, 0);
+}

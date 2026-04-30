@@ -3998,11 +3998,21 @@ void sii_update_param_widget (guint frame_num)
      { return; }
 
 
+   /* GTK4 migration: the Options menu items (PARAM_CB_BOTTOM/LEFT/RIGHT
+    * and PARAM_CB_SYMBOLS) used to be check buttons stored in
+    * data_widget[]; they are now GMenu actions and the widget slots
+    * are NULL. NULL-check defensively until the radio state is
+    * threaded through stateful GAction (separate refactor). */
    check_item = pd->data_widget[pd->cb_loc];
-   gtk_check_button_set_active (GTK_CHECK_BUTTON (check_item), TRUE );
+   if (check_item && GTK_IS_CHECK_BUTTON(check_item)) {
+       gtk_check_button_set_active (GTK_CHECK_BUTTON (check_item), TRUE );
+   }
 
    check_item = pd->data_widget[PARAM_CB_SYMBOLS];
-   gtk_check_button_set_active(GTK_CHECK_BUTTON(check_item), pd->toggle[PARAM_CB_SYMBOLS]);
+   if (check_item && GTK_IS_CHECK_BUTTON(check_item)) {
+       gtk_check_button_set_active(GTK_CHECK_BUTTON(check_item),
+                                   pd->toggle[PARAM_CB_SYMBOLS]);
+   }
 
    text = pd->data_widget[PARAM_NAMES_TEXT];
    name = wwptr->parameter->parameter_name;
