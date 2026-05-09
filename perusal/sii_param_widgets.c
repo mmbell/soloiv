@@ -2782,8 +2782,8 @@ void sii_param_process_changes (guint frame_num)
      }
    }
    else if(pd->change_flag[kk]) {
-     /* calculate ctr inc */
-     ok = sii_str_values (pd->txt[jj]->str, 2, &f1, &f2);
+     /* calculate ctr inc — read from the MINMAX text (kk), not CTRINC (jj). */
+     ok = sii_str_values (pd->txt[kk]->str, 2, &f1, &f2);
 
      if (ok) {
        pal->minmax[0] = f1; pal->minmax[1] = f2;
