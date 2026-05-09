@@ -362,6 +362,10 @@ void sii_cairo_set_color(cairo_t *cr, GdkRGBA *color);
 /* Color helper functions */
 GdkRGBA *sii_color_new(gfloat red, gfloat green, gfloat blue);
 
+/* Programmatic color-table swap (used by tests; production goes through
+ * the parameter widget OK button). */
+gboolean sii_apply_color_table_by_name (guint frame_num, const gchar *name);
+
 /* GTK4 replacement for gtk_widget_destroyed() */
 void sii_widget_destroyed_cb(GtkWidget *widget, GtkWidget **widget_pointer);
 

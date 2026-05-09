@@ -255,6 +255,18 @@ void sii_set_default_colors ()
   sii_param_add_ctbl (sym_gray12, nn);
   nn = sizeof (carbone42)/sizeof (char *);
   sii_param_add_ctbl (carbone42, nn);
+
+  /* CVD-friendly colormaps from EVS-ATMOS/CVD-colormaps (Sherman et al. 2024). */
+  nn = sizeof (chase_spectral)/sizeof (char *);
+  sii_param_add_ctbl (chase_spectral, nn);
+  nn = sizeof (balance)/sizeof (char *);
+  sii_param_add_ctbl (balance, nn);
+  nn = sizeof (spectral_extended)/sizeof (char *);
+  sii_param_add_ctbl (spectral_extended, nn);
+  nn = sizeof (crameri_oleron_depol)/sizeof (char *);
+  sii_param_add_ctbl (crameri_oleron_depol, nn);
+  nn = sizeof (crameri_roma_rhohv)/sizeof (char *);
+  sii_param_add_ctbl (crameri_roma_rhohv, nn);
 # endif
 
   /*

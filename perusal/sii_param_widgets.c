@@ -131,7 +131,7 @@ enum {
 }ParamWidgetIds;
 
 # define PARAM_MAX_WIDGETS PARAM_LAST_ENUM
-# define MAX_COLOR_TABLE_SIZE 128
+# define MAX_COLOR_TABLE_SIZE 256
 # define MAX_BAR_CLRS 64
 
 enum color_bar_orientation{
@@ -2897,6 +2897,83 @@ void sii_param_set_plot_field (int frame_num, char *fname)
   pfi = (ParamFieldInfo *)sll->data;
   strcpy (pfi->name, str);
   return;
+}
+
+/* c---------------------------------------------------------------------- */
+/*
+ * sii_apply_color_table_by_name
+ *
+ * Programmatically swap the active color table for a frame. The
+ * production path is the parameter widget's PARAM_OK handler
+ * (sii_param_process_changes -> assigns pal->color_table_name ->
+ * solo_parameter_setup -> solo_hardware_color_table). Tests and any
+ * automation that wants to script a palette change without driving
+ * widget clicks come through here instead.
+ *
+ * Returns TRUE on success, FALSE if the frame isn't ready, the named
+ * table isn't registered, or the underlying load failed.
+ */
+gboolean
+sii_apply_color_table_by_name (guint frame_num, const gchar *name)
+{
+  ParamData *pd;
+  SiiPalette *pal;
+  WW_PTR wwptr;
+
+  if (frame_num >= sii_frame_count) return FALSE;
+  if (!name || !*name) return FALSE;
+  if (!g_tree_lookup (ascii_color_tables, (gpointer)name)) return FALSE;
+
+  pd = (ParamData *)frame_configs[frame_num]->param_data;
+  if (!pd) return FALSE;
+
+  wwptr = solo_return_wwptr (frame_num);
+  if (!wwptr || !wwptr->parameter) return FALSE;
+
+  /* solo_hardware_color_table re-resolves pd->pal from the palette stack
+   * via sii_set_palette() when the parameter widget isn't open. Update
+   * the color_table_name on the resolved palette directly so the load
+   * sees the new name regardless of which path it takes. */
+  pal = sii_set_palette (wwptr->parameter->parameter_name);
+  if (!pal) return FALSE;
+  pd->pal = pal;
+  g_string_assign (pal->color_table_name, name);
+
+  if (wwptr->palette) {
+    g_strlcpy (wwptr->palette->color_table_name, name,
+               sizeof (wwptr->palette->color_table_name));
+  }
+
+  /* Preserve the active data range across colormaps with very different
+   * bin counts. Without this, swapping a 17-bin map for a 180-bin map
+   * leaves the same per-bin increment and the data crowds into the low
+   * end. Snapshot the range, load the table (which updates pal->num_colors),
+   * then recompute ctrinc to span the same min/max. */
+  gfloat saved_min = pal->minmax[0];
+  gfloat saved_max = pal->minmax[1];
+
+  if (!solo_hardware_color_table ((gint)frame_num))
+    return FALSE;
+
+  if (saved_max > saved_min && pal->num_colors > 0) {
+    sii_ctr_inc_from_min_max (pal->num_colors,
+                              &pal->ctrinc[0], &pal->ctrinc[1],
+                              &saved_min, &saved_max);
+    pal->minmax[0] = saved_min;
+    pal->minmax[1] = saved_max;
+  }
+
+  solo_data_color_lut (frame_num);
+
+  /* The pixel indices already in sfc->image->data were generated through
+   * the OLD LUT, so just recoloring won't show the new palette across
+   * the data. Force a full replot so the data is re-binned through the
+   * new LUT and the indices reflect the right colormap entries. */
+  if (wwptr->parameter)
+    wwptr->parameter->changed = YES;
+  frame_configs[frame_num]->colorize_count = 0;
+  sii_plot_data (frame_num, REPLOT_THIS_FRAME);
+  return TRUE;
 }
 
 /* c---------------------------------------------------------------------- */
