@@ -2977,6 +2977,64 @@ sii_apply_color_table_by_name (guint frame_num, const gchar *name)
 }
 
 /* c---------------------------------------------------------------------- */
+/*
+ * sii_palette_get_state — read the active palette's range/binning state.
+ *
+ * Test seam. minmax/ctrinc are 2-element output buffers (any may be NULL).
+ * Returns TRUE if the frame's palette is set up.
+ */
+gboolean
+sii_palette_get_state (guint frame_num,
+                       gfloat minmax[2], gfloat ctrinc[2],
+                       guint *ncolors)
+{
+  ParamData *pd;
+  SiiPalette *pal;
+
+  if (frame_num >= sii_frame_count) return FALSE;
+  pd = (ParamData *)frame_configs[frame_num]->param_data;
+  if (!pd || !pd->pal) return FALSE;
+  pal = pd->pal;
+
+  if (minmax)  { minmax[0] = pal->minmax[0];  minmax[1] = pal->minmax[1]; }
+  if (ctrinc)  { ctrinc[0] = pal->ctrinc[0];  ctrinc[1] = pal->ctrinc[1]; }
+  if (ncolors) { *ncolors = pal->num_colors; }
+  return TRUE;
+}
+
+/*
+ * sii_param_widget_simulate_minmax — simulate the user editing the Min/Max
+ * field and clicking OK.
+ *
+ * Test seam for the round-trip that sii_param_process_changes performs.
+ * Requires the frame's parameter widget to already be open
+ * (call show_param_widget first). Returns TRUE on success.
+ */
+gboolean
+sii_param_widget_simulate_minmax (guint frame_num,
+                                  gfloat min_val, gfloat max_val)
+{
+  ParamData *pd;
+  GString *gs;
+
+  if (frame_num >= sii_frame_count) return FALSE;
+  pd = (ParamData *)frame_configs[frame_num]->param_data;
+  if (!pd || !pd->pal) return FALSE;
+  if (!pd->data_widget[PARAM_MINMAX]) return FALSE;
+
+  gs = g_string_new ("");
+  sii_set_string_from_vals (gs, 2, min_val, max_val, 3);
+  gtk_editable_set_text (GTK_EDITABLE (pd->data_widget[PARAM_MINMAX]), gs->str);
+  g_string_free (gs, TRUE);
+
+  /* Drive the same change pipeline PARAM_OK does. process_changes
+   * itself starts with dup_entries + check_changes, so calling it
+   * directly is sufficient. */
+  sii_param_process_changes (frame_num);
+  return TRUE;
+}
+
+/* c---------------------------------------------------------------------- */
 
 void sii_param_toggle_field (guint frame_num)
 {

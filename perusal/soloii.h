@@ -366,6 +366,13 @@ GdkRGBA *sii_color_new(gfloat red, gfloat green, gfloat blue);
  * the parameter widget OK button). */
 gboolean sii_apply_color_table_by_name (guint frame_num, const gchar *name);
 
+/* Test seams for the parameter widget palette state. */
+gboolean sii_palette_get_state (guint frame_num,
+                                gfloat minmax[2], gfloat ctrinc[2],
+                                guint *ncolors);
+gboolean sii_param_widget_simulate_minmax (guint frame_num,
+                                           gfloat min_val, gfloat max_val);
+
 /* GTK4 replacement for gtk_widget_destroyed() */
 void sii_widget_destroyed_cb(GtkWidget *widget, GtkWidget **widget_pointer);
 
