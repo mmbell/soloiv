@@ -12,18 +12,39 @@ ported to GTK4 with a CMake build system and runs natively on 64-bit platforms.
 Requirements:
 - GTK4 development libraries
 - CMake 3.16+
-- C compiler (GCC or Clang)
-- Optional: netCDF libraries (for netCDF file support)
+- C and C++ compilers (Apple Clang / GCC)
+- LROSE `libRadx` for the sweep I/O backend (see below)
+- HDF5 (incl. `hdf5_cpp`), netCDF, and udunits — pulled in transitively by Radx
 
 On macOS with Homebrew:
 ```
-brew install gtk4 cmake
+brew install gtk4 cmake hdf5 netcdf udunits
 ```
 
 On Ubuntu/Debian:
 ```
-sudo apt install libgtk-4-dev cmake build-essential
+sudo apt install libgtk-4-dev cmake build-essential \
+                 libhdf5-dev libnetcdf-dev libudunits2-dev
 ```
+
+### Sweep I/O backend (Radx)
+
+All sweep I/O — DORADE **and** CfRadial (netCDF v1/v2) — is routed through the
+maintained LROSE `libRadx` C++ library via a thin `extern "C"` shim
+(`translate/radx_shim.cc`, `translate/radar_io.c`). The build expects an LROSE
+install providing `libRadx.a` / `libNcxx.a` / `libtoolsa.a` and the `Radx/`
+headers. By default it looks in `/Users/mmbell/lrose`; override with:
+```
+cmake -B build -S . -DLROSE_PREFIX=/path/to/lrose
+```
+
+Build options:
+- `SOLOIV_IO_BACKEND` (`radx` default | `custom`) — selects the I/O backend.
+- `SOLOIV_DORADE_VIA_RADX` (`ON` default) — read/write DORADE through Radx,
+  retiring the legacy in-tree byte parser. The legacy parser stays compiled
+  and can be re-enabled at **runtime** by setting the `SOLOIV_DORADE_LEGACY`
+  environment variable — an instant fallback with no rebuild. CfRadial always
+  uses Radx (there is no legacy reader for it).
 
 Build:
 ```
@@ -36,8 +57,10 @@ The executable will be at `build/perusal/soloiv`.
 ## Usage
 
 The environment variable `DORADE_DIR` should point to a directory containing
-DORADE sweep files. If you start soloiv from a directory containing sweep files,
-you do not need to set `DORADE_DIR`.
+sweep files. If you start soloiv from a directory containing sweep files,
+you do not need to set `DORADE_DIR`. Both DORADE (`swp.*`) and CfRadial
+(`cfrad*.nc`) sweeps in that directory are discovered and listed together;
+edited sweeps are written back in the same format they were read.
 
 ## Status
 

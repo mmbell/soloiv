@@ -22,6 +22,7 @@ static char vcid[] = "$Id$";
 # include <dd_math.h>
 # include <function_decl.h>
 # include <dgi_func_decl.h>
+# include "radar_io.h"
 
 # include <stdarg.h>
 # include <errno.h>
@@ -1153,6 +1154,13 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
     dgi = dd_window_dgi(frme, "");
     slash_path(dgi->directory_name, wwptr->sweep->directory_name);
     dgi->in_swp_fid = wwptr->file_id;
+    strcpy(dgi->sweep_file_name, wwptr->sweep->file_name);
+#ifdef SOLOIV_IO_BACKEND_RADX
+    if (rio_should_use_radx(wwptr->sweep->file_name))
+      dgi->source_fmt = CFRADIAL_FMT;        /* rio-managed (CfRadial or DORADE) */
+    else if (dgi->source_fmt == CFRADIAL_FMT)
+      dgi->source_fmt = DORADE_FMT;
+#endif
     dd_absorb_header_info(dgi);
     dd_absorb_ray_info(dgi);
     wwptr->xy_plane_horizontal = dd_xy_plane_horizontal(dgi);

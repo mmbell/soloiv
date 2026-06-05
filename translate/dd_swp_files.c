@@ -19,6 +19,7 @@ static char vcid[] = "$Id$";
 # include "dd_stats.h"
 # include <dorade_headers.h>
 # include "dd_files.h"
+# include "radar_io.h"
 # include "input_limits.h"
 # include "input_sweepfiles.h"
 # include <function_decl.h>
@@ -76,6 +77,13 @@ void dd_dump_ray(dgi)
 
     /* c...mark */
     dis = dd_return_sweepfile_structs_v3();
+
+#ifdef SOLOIV_IO_BACKEND_RADX
+    if (rio_is_managed(dgi)) {        /* CfRadial / DORADE-via-Radx writer */
+	rio_write_ray(dgi);
+	return;
+    }
+#endif
 
     if(count >= trip) {
 	mark = 0;
@@ -249,8 +257,15 @@ void dd_flush(flush_radar_num)
     for(; ii < jj; ii++ ) {
 	if(dis->editing)
 	      dgi = dd_window_dgi(ii);
-	else 
+	else
 	      dgi = dd_get_structs(ii,0);
+
+#ifdef SOLOIV_IO_BACKEND_RADX
+	if (rio_is_managed(dgi)) {    /* finalize the Radx-assembled volume */
+	    rio_write_sweep_end(dgi);
+	    continue;
+	}
+#endif
 
 	if(!dgi->sweep_fid)	/* file not open */
 	      continue;

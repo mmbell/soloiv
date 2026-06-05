@@ -63,6 +63,10 @@ struct dd_file_name_v3 {
     unsigned char red_link;
     short milliseconds;
     char comment[88];
+    /* Actual on-disk filename when it does NOT follow the DORADE swp.*
+     * convention (e.g. CfRadial cfrad2.*.nc). Empty for DORADE, where the
+     * name is reconstructed from the fields above. */
+    char raw_name[96];
 };
 
 # endif
