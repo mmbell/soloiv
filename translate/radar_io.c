@@ -578,6 +578,15 @@ void rio_rewind(struct dd_general_info *dgi)
   if (st) st->cursor = 0;
 }
 
+void rio_seek_ray(struct dd_general_info *dgi, int ray_index)
+{
+  struct rio_state *st = rio_get_state(dgi);
+  if (!st) return;
+  if (ray_index < 0) ray_index = 0;
+  if (ray_index > st->sweep_nrays) ray_index = st->sweep_nrays;
+  st->cursor = ray_index;
+}
+
 void rio_close(struct dd_general_info *dgi)
 {
   struct rio_state *st = rio_get_state(dgi);

@@ -99,6 +99,7 @@ static char vcid[] = "$Id$";
 # include "input_limits.h"
 # include "input_sweepfiles.h"
 # include "dd_stats.h"
+# include "radar_io.h"
 # include <time.h>
 # include <sys/time.h>
 # ifndef PISP
@@ -4376,6 +4377,12 @@ int dgi_buf_rewind(dgi)
     DGI_PTR dgi;
 {
     int mark;
+
+#ifdef SOLOIV_IO_BACKEND_RADX
+    if (rio_is_managed(dgi)) {        /* reset the Radx ray cursor to ray 0 */
+	rio_rewind(dgi);
+    }
+#endif
 
     dgi->ray_num = 0;
     dgi->buf_bytes_left = dgi->file_byte_count = 0;

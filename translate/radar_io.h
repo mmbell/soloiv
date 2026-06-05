@@ -58,6 +58,11 @@ int rio_read_ray(struct dd_general_info *dgi);
 /* Reset the ray cursor to the start of the current sweep (rewind). */
 void rio_rewind(struct dd_general_info *dgi);
 
+/* Position the ray cursor at `ray_index` within the current sweep, so the
+ * next rio_read_ray returns that ray. Used by the examine widget, which
+ * seeks to a specific ray (the legacy path lseeks to a byte offset). */
+void rio_seek_ray(struct dd_general_info *dgi, int ray_index);
+
 /* Release the cached Radx volume held for this dgi. */
 void rio_close(struct dd_general_info *dgi);
 
