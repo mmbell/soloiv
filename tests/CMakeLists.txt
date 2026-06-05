@@ -67,3 +67,8 @@ soloiv_add_test(test_dorade_truncated)
 soloiv_add_test(test_dorade_partial_header)
 soloiv_add_test(test_cvd_colormaps)
 soloiv_add_test(test_param_minmax_round_trip)
+
+if(SOLOIV_IO_BACKEND STREQUAL "radx")
+    soloiv_add_test(test_radx_smoke)
+    target_include_directories(test_radx_smoke PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+endif()

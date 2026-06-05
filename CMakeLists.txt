@@ -1,8 +1,24 @@
 cmake_minimum_required(VERSION 3.16)
-project(soloiv VERSION 1.21.0 LANGUAGES C)
+project(soloiv VERSION 1.21.0 LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# The Radx I/O shim is C++17 and must match the libc++ ABI that libRadx.a was
+# built with (Apple clang). Do not mix in GCC/libstdc++.
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+list(PREPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+# Sweep I/O backend: radx (libRadx, primary) or custom (netCDF-C, future).
+set(SOLOIV_IO_BACKEND "radx" CACHE STRING "Sweep I/O backend: radx | custom")
+set_property(CACHE SOLOIV_IO_BACKEND PROPERTY STRINGS radx custom)
+
+if(SOLOIV_IO_BACKEND STREQUAL "radx")
+  find_package(Radx REQUIRED)
+  add_compile_definitions(SOLOIV_IO_BACKEND_RADX)
+endif()
 
 # No 32-bit builds
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)

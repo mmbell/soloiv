@@ -48,7 +48,20 @@ set(S2LIB_SOURCES
     dap_common.c
 )
 
+# Radx I/O shim (C++17): only compiled when the radx backend is selected.
+# Exposes a flat extern "C" API (radar_io.h) over libRadx.
+if(SOLOIV_IO_BACKEND STREQUAL "radx")
+  list(APPEND S2LIB_SOURCES radx_shim.cc)
+endif()
+
 add_library(s2 STATIC ${S2LIB_SOURCES})
+
+if(SOLOIV_IO_BACKEND STREQUAL "radx")
+  # PUBLIC so the Radx static archives + libc++ propagate to soloiv's link line.
+  target_link_libraries(s2 PUBLIC Radx::Radx)
+  set_source_files_properties(radx_shim.cc PROPERTIES
+      COMPILE_OPTIONS "-std=c++17")
+endif()
 
 # Legacy K&R C code uses implicit function declarations extensively;
 # downgrade from error to warning so it compiles with modern C compilers.
