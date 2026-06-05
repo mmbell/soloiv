@@ -27,6 +27,7 @@
 
 struct dd_general_info *dd_window_dgi();
 int dd_givfld();
+int dd_cell_num();
 
 static void cfradial_action(GtkWidget *main_window, gpointer user_data)
 {
@@ -76,6 +77,21 @@ static void cfradial_action(GtkWidget *main_window, gpointer user_data)
         }
     }
     g_assert_cmpint(ngood, >, 0);
+
+    /* Regression: a data-cell click maps range->gate via dd_cell_num, which
+     * uses the uniform-cell LUT. If the reader skips dd_set_uniform_cells the
+     * LUT is NULL and dd_cell_num segfaults (the reported click crash). Probe
+     * a spread of ranges and require valid in-bounds gate indices. */
+    {
+        int nc = dds->celv->number_cells;
+        int k, gate;
+        for (k = 0; k < nc; k += (nc / 8 ? nc / 8 : 1)) {
+            float range = dds->celv->dist_cells[k];
+            gate = dd_cell_num(dds, 0, range);
+            g_assert_cmpint(gate, >=, 0);
+            g_assert_cmpint(gate, <, nc);
+        }
+    }
 
     g_message("CfRadial load: %d fields, %d rays, %d gates, %d/%d good gates",
               dgi->num_parms, dds->swib->num_rays, dds->celv->number_cells,

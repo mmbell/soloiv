@@ -39,6 +39,7 @@ extern double d_time_stamp();
 extern void   str_terminate();
 extern void   dd_radar_angles();    /* (asib, cfac, ra, dgi) — Testud georef */
 extern double dd_rotation_angle();   /* (dgi) — scan-mode-aware beam angle    */
+extern void   dd_set_uniform_cells(); /* (dds) — build range->cell LUT         */
 
 /* ------------------------------------------------------------------ *
  *  Per-DGI Radx state (stashed in dgi->gpptr7)                        *
@@ -422,6 +423,11 @@ int rio_read_header(struct dd_general_info *dgi)
          sizeof(struct cell_d));   /* header only; dist_cells aliased below */
   for (i = 0; i < ray0.n_gates && i < MAXCVGATES; i++)
     dds->celvc->dist_cells[i] = dds->celv->dist_cells[i];
+
+  /* Build the range->cell lookup table that dd_cell_num/dd_range_gate (the
+   * click readout + clipping) depend on. Without this, a data-cell click
+   * dereferences a NULL LUT and segfaults. */
+  dd_set_uniform_cells(dds);
 
   /* ---- sweep info ---- */
   dds->swib->num_rays = sw.nrays;
