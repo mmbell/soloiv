@@ -11,8 +11,9 @@ sequence. The order reflects what catches the most user-visible bugs
 per hour of work, not strict architectural dependencies — feel free to
 reorder if priorities shift.
 
-Out-of-scope (per `memory/project_scope.md`): `translate/` internals
-(being replaced by LROSE tooling) and the editor's non-GUI logic.
+Out-of-scope (per `memory/project_scope.md`): the editor's non-GUI logic.
+(Note: `translate/` is no longer being replaced — on the `cfradial` branch
+it became a thin wrapper over LROSE `libRadx`; see below.)
 
 ---
 
@@ -31,6 +32,26 @@ Out-of-scope (per `memory/project_scope.md`): `translate/` internals
 | 9  | Visual issues: Magic Ring Lbls, window resize    | ✅ Done     |
 | 10 | Screenshot capture + visual regression baseline  | 🔜 Next     |
 | 11 | Pure-logic unit tests (color/coord/config)       | ⏳ Queued   |
+
+### CfRadial I/O refactor (`cfradial` branch)
+
+Separate workstream (see `CFRADIAL_PLAN.md`). All sweep I/O now routes
+through LROSE `libRadx`; soloiv reads **and writes** CfRadial (netCDF v1/v2)
+as well as DORADE, reusing the existing int16 render/edit pipeline.
+
+| Phase | Description                                        | Status   |
+|-------|----------------------------------------------------|----------|
+| 0     | Radx shim skeleton + linkage smoke test            | ✅ Done   |
+| 1     | CfRadial read → int16 DGI/DDS                       | ✅ Done   |
+| 2     | Route DORADE read through Radx (legacy fallback)    | ✅ Done   |
+| 3     | Read parity regression (DORADE vs CfRadial twins)   | ✅ Done   |
+| 4     | CfRadial/DORADE write via Radx (editor save seam)   | ✅ Done   |
+| 5     | Cleanup & docs                                      | ✅ Done   |
+| 7     | Native float pipeline (deferred, optional)          | ⏳ Deferred |
+
+Build prerequisites for this branch are documented in `README.md`
+("Sweep I/O backend"). Runtime fallback to the legacy DORADE parser:
+set `SOLOIV_DORADE_LEGACY`.
 
 ---
 
