@@ -86,4 +86,10 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     # Airborne safety net: Radx vs the legacy parser on the N42RF tail sweep.
     soloiv_add_test(test_radx_airborne)
     target_include_directories(test_radx_airborne PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+
+    # CfRadial read -> edit -> write -> reopen round-trip.
+    soloiv_add_test(test_radx_roundtrip)
+    target_include_directories(test_radx_roundtrip PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_radx_roundtrip PROPERTIES
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data/arthur2015/cfradial)
 endif()

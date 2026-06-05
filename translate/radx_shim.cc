@@ -16,6 +16,8 @@
 #include <Radx/RadxGeoref.hh>
 #include <Radx/Radx.hh>
 
+#include <ctime>
+
 #include <string>
 #include <vector>
 #include <cstring>
@@ -251,6 +253,125 @@ int rio_vol_ray_field_fl32(RioVolH vh, int rayIdx, int f,
     *missing_out = fld->getMissingFl32();
     return 0;
   } catch (...) { return -1; }
+}
+
+/* ====================================================================== *
+ *  Write path: assemble a RadxVol from edited DGI/DDS and write it out.   *
+ * ====================================================================== */
+
+namespace {
+struct RioWVol {
+  RadxVol  vol;
+  RadxRay *cur = nullptr;   // ray currently being built
+};
+} // namespace
+
+RioWVolH rio_wvol_new(void)
+{
+  try { return static_cast<RioWVolH>(new RioWVol()); }
+  catch (...) { return nullptr; }
+}
+
+void rio_wvol_set_meta(RioWVolH wvh, const RioRadar *radar, int radx_scan_mode,
+                       long start_secs, double start_nano)
+{
+  if (!wvh || !radar) return;
+  try {
+    RioWVol *h = static_cast<RioWVol *>(wvh);
+    h->vol.setInstrumentName(radar->instrument);
+    h->vol.setScanName(radar->scan_name);
+    h->vol.setLatitudeDeg(radar->lat_deg);
+    h->vol.setLongitudeDeg(radar->lon_deg);
+    h->vol.setAltitudeKm(radar->alt_km);
+    h->vol.setPlatformType(
+        static_cast<Radx::PlatformType_t>(radar->platform_type));
+    h->vol.setStartTime(static_cast<time_t>(start_secs), start_nano);
+    (void) radx_scan_mode;
+  } catch (...) {}
+}
+
+void rio_wvol_begin_ray(RioWVolH wvh, const RioRay *r, int sweep_num,
+                        double fixed_angle, int radx_scan_mode)
+{
+  if (!wvh || !r) return;
+  try {
+    RioWVol *h = static_cast<RioWVol *>(wvh);
+    RadxRay *ray = new RadxRay();
+    ray->setTime(static_cast<time_t>(r->time_secs), r->nano_secs);
+    ray->setAzimuthDeg(r->az_deg);
+    ray->setElevationDeg(r->el_deg);
+    ray->setFixedAngleDeg(fixed_angle);
+    ray->setSweepNumber(sweep_num);
+    ray->setSweepMode(static_cast<Radx::SweepMode_t>(radx_scan_mode));
+    ray->setRangeGeom(r->start_range_km, r->gate_spacing_km);
+    ray->setNGates(r->n_gates);
+    if (r->has_georef) {
+      RadxGeoref g;
+      g.setLatitude(r->georef_lat);
+      g.setLongitude(r->georef_lon);
+      g.setAltitudeKmMsl(r->georef_alt_km);
+      g.setHeading(r->heading);
+      g.setRoll(r->roll);
+      g.setPitch(r->pitch);
+      g.setDrift(r->drift);
+      g.setRotation(r->rotation);
+      g.setTilt(r->tilt);
+      g.setEwVelocity(r->ew_velocity);
+      g.setNsVelocity(r->ns_velocity);
+      g.setVertVelocity(r->vert_velocity);
+      ray->setGeoref(g);
+    }
+    h->cur = ray;
+  } catch (...) {}
+}
+
+void rio_wvol_ray_field_si16(RioWVolH wvh, const char *name, const char *units,
+                             int ngates, double scale, double offset,
+                             short missing, const short *data)
+{
+  if (!wvh || !name || !data) return;
+  try {
+    RioWVol *h = static_cast<RioWVol *>(wvh);
+    if (!h->cur) return;
+    h->cur->addField(std::string(name), units ? std::string(units) : "",
+                     static_cast<size_t>(ngates),
+                     static_cast<Radx::si16>(missing),
+                     reinterpret_cast<const Radx::si16 *>(data),
+                     scale, offset, true /* isLocal: Radx copies */);
+  } catch (...) {}
+}
+
+void rio_wvol_end_ray(RioWVolH wvh)
+{
+  if (!wvh) return;
+  try {
+    RioWVol *h = static_cast<RioWVol *>(wvh);
+    if (h->cur) { h->vol.addRay(h->cur); h->cur = nullptr; }
+  } catch (...) {}
+}
+
+int rio_wvol_write(RioWVolH wvh, const char *dir, int dorade)
+{
+  if (!wvh || !dir) return -1;
+  try {
+    RioWVol *h = static_cast<RioWVol *>(wvh);
+    h->vol.loadSweepInfoFromRays();
+    h->vol.loadVolumeInfoFromRays();
+    RadxFile f;
+    f.setFileFormat(dorade ? RadxFile::FILE_FORMAT_DORADE
+                           : RadxFile::FILE_FORMAT_CFRADIAL2);
+    return f.writeToDir(h->vol, std::string(dir), false, false);
+  } catch (...) { return -1; }
+}
+
+void rio_wvol_free(RioWVolH wvh)
+{
+  if (!wvh) return;
+  try {
+    RioWVol *h = static_cast<RioWVol *>(wvh);
+    if (h->cur) delete h->cur;
+    delete h;
+  } catch (...) {}
 }
 
 } /* extern "C" */

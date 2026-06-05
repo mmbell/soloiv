@@ -62,6 +62,24 @@ void rio_rewind(struct dd_general_info *dgi);
 void rio_close(struct dd_general_info *dgi);
 
 /* ------------------------------------------------------------------ *
+ *  Write path (dispatched from dd_dump_ray / dd_flush)                *
+ * ------------------------------------------------------------------ */
+
+/* Append the current edited ray (ryib/asib/qdat_ptrs) to an in-memory
+ * RadxVol being assembled for this dgi. Begins a fresh volume on new_sweep.
+ * Returns 1 on success. */
+int rio_write_ray(struct dd_general_info *dgi);
+
+/* Finalize the assembled volume and write it to dgi->directory_name. Output
+ * format mirrors the source (CfRadial-2 for CfRadial, DORADE for DORADE).
+ * Returns 0 on success. */
+int rio_write_sweep_end(struct dd_general_info *dgi);
+
+/* True if this dgi's sweep is being read through the Radx backend (and so
+ * should also be written through it). */
+int rio_is_managed(struct dd_general_info *dgi);
+
+/* ------------------------------------------------------------------ *
  *  Neutral C++ shim accessors (implemented in radx_shim.cc)           *
  *  No soloiv structs cross this boundary.                             *
  * ------------------------------------------------------------------ */
@@ -123,6 +141,21 @@ int     rio_vol_field(RioVolH vh, int f, RioField *out);
 int     rio_vol_ray_field_fl32(RioVolH vh, int rayIdx, int f,
                                const float **data_out, int *ngates_out,
                                float *missing_out);
+
+/* ---- Write-side shim handles (implemented in radx_shim.cc) ---- */
+typedef void *RioWVolH;
+
+RioWVolH rio_wvol_new(void);
+void rio_wvol_set_meta(RioWVolH wv, const RioRadar *radar, int radx_scan_mode,
+                       long start_secs, double start_nano);
+void rio_wvol_begin_ray(RioWVolH wv, const RioRay *ray, int sweep_num,
+                        double fixed_angle, int radx_scan_mode);
+void rio_wvol_ray_field_si16(RioWVolH wv, const char *name, const char *units,
+                             int ngates, double scale, double offset,
+                             short missing, const short *data);
+void rio_wvol_end_ray(RioWVolH wv);
+int  rio_wvol_write(RioWVolH wv, const char *dir, int dorade);  /* 0 ok */
+void rio_wvol_free(RioWVolH wv);
 
 /* Radx::DataType_t mirror (must match Radx/Radx.hh ordering). */
 enum {

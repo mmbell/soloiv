@@ -51,11 +51,30 @@ struct rio_state {
   int     sweep_nrays;
   int     cursor;           /* 0..sweep_nrays-1: next ray to read      */
   int     nfields;
+  rio_fmt_t src_fmt;        /* original on-disk format (for write-back) */
+  RioRadar  radar;          /* captured radar/platform metadata         */
+  int     radx_sweep_mode;  /* Radx::SweepMode_t of the source sweep    */
+};
+
+/* Per-DGI write state (in dgi->gpptr6): the RadxVol being assembled. */
+struct rio_write_state {
+  RioWVolH wvol;
 };
 
 static struct rio_state *rio_get_state(struct dd_general_info *dgi)
 {
   return (struct rio_state *) dgi->gpptr7;
+}
+
+static struct rio_write_state *rio_ensure_write_state(struct dd_general_info *dgi)
+{
+  struct rio_write_state *ws = (struct rio_write_state *) dgi->gpptr6;
+  if (!ws) {
+    ws = (struct rio_write_state *) malloc(sizeof(*ws));
+    memset(ws, 0, sizeof(*ws));
+    dgi->gpptr6 = (void *) ws;
+  }
+  return ws;
 }
 
 static struct rio_state *rio_ensure_state(struct dd_general_info *dgi)
@@ -359,6 +378,9 @@ int rio_read_header(struct dd_general_info *dgi)
   st->sweep_start_ray = sw.start_ray;
   st->sweep_nrays = sw.nrays;
   st->cursor = 0;
+  st->src_fmt = rio_sniff(path);
+  st->radar = radar;
+  st->radx_sweep_mode = sw.sweep_mode;
 
   if (rio_vol_ray(st->vol, sw.start_ray, &ray0) != 0) return -1;
   radar_type = rio_dorade_radar_type(radar.platform_type);
@@ -553,8 +575,143 @@ void rio_rewind(struct dd_general_info *dgi)
 void rio_close(struct dd_general_info *dgi)
 {
   struct rio_state *st = rio_get_state(dgi);
+  struct rio_write_state *ws = (struct rio_write_state *) dgi->gpptr6;
+  if (ws) {
+    if (ws->wvol) rio_wvol_free(ws->wvol);
+    free(ws);
+    dgi->gpptr6 = NULL;
+  }
   if (!st) return;
   if (st->vol) rio_vol_close(st->vol);
   free(st);
   dgi->gpptr7 = NULL;
+}
+
+/* ================================================================== *
+ *  Write path                                                         *
+ * ================================================================== */
+
+int rio_is_managed(struct dd_general_info *dgi)
+{
+  return dgi->source_fmt == CFRADIAL_FMT;
+}
+
+/* DORADE scan_mode -> Radx::SweepMode_t (inverse of rio_dorade_scan_mode). */
+static int rio_radx_scan_mode(int dorade_mode)
+{
+  switch (dorade_mode) {
+    case RIO_DM_CAL: return 0;    /* CALIBRATION */
+    case RIO_DM_PPI: return 1;    /* SECTOR */
+    case RIO_DM_COP: return 2;    /* COPLANE */
+    case RIO_DM_RHI: return 3;    /* RHI */
+    case RIO_DM_VER: return 4;    /* VERTICAL_POINTING */
+    case RIO_DM_SUR: return 8;    /* AZIMUTH_SURVEILLANCE */
+    case AIR:        return 8;    /* airborne -> surveillance */
+    default:         return 8;
+  }
+}
+
+int rio_write_ray(struct dd_general_info *dgi)
+{
+  DDS_PTR dds = dgi->dds;
+  struct rio_state *rs = rio_get_state(dgi);
+  struct rio_write_state *ws = rio_ensure_write_state(dgi);
+  RioRay r;
+  int pn, ncells = dds->celv->number_cells;
+  int radx_mode;
+  long secs;
+
+  /* Begin a fresh volume at the first ray of a sweep. The previous sweep's
+   * volume is finalized + freed by rio_write_sweep_end (dd_flush), so a NULL
+   * wvol reliably marks the first ray of the next output sweep. */
+  if (!ws->wvol) {
+    RioRadar radar;
+    long ssecs;
+    double snano;
+    ws->wvol = rio_wvol_new();
+    if (!ws->wvol) return 0;
+
+    if (rs) {
+      radar = rs->radar;
+      radx_mode = rs->radx_sweep_mode;
+    } else {
+      memset(&radar, 0, sizeof(radar));
+      radar.lat_deg = dds->radd->radar_latitude;
+      radar.lon_deg = dds->radd->radar_longitude;
+      radar.alt_km = dds->radd->radar_altitude;
+      str_terminate(radar.instrument, dds->radd->radar_name, 8);
+      radx_mode = rio_radx_scan_mode(dds->radd->scan_mode);
+    }
+    ssecs = (long) dgi->time0;
+    snano = (dgi->time0 - (double) ssecs) * 1e9;
+    rio_wvol_set_meta(ws->wvol, &radar, radx_mode, ssecs, snano);
+  }
+
+  radx_mode = rs ? rs->radx_sweep_mode
+                 : rio_radx_scan_mode(dds->radd->scan_mode);
+
+  /* Build the ray geometry from the (possibly edited) DGI. */
+  memset(&r, 0, sizeof(r));
+  r.az_deg = dds->ryib->azimuth;
+  r.el_deg = dds->ryib->elevation;
+  secs = (long) dgi->time;
+  r.time_secs = secs;
+  r.nano_secs = (dgi->time - (double) secs) * 1e9;
+  r.n_gates = ncells;
+  r.start_range_km = dds->celv->dist_cells[0] / 1000.0;
+  r.gate_spacing_km = ncells > 1
+      ? (dds->celv->dist_cells[1] - dds->celv->dist_cells[0]) / 1000.0
+      : 0.0;
+  if (dds->radd->radar_type != GROUND) {
+    r.has_georef = 1;
+    r.georef_lat = dds->asib->latitude;
+    r.georef_lon = dds->asib->longitude;
+    r.georef_alt_km = dds->asib->altitude_msl;
+    r.heading = dds->asib->heading;
+    r.roll = dds->asib->roll;
+    r.pitch = dds->asib->pitch;
+    r.drift = dds->asib->drift_angle;
+    r.rotation = dds->asib->rotation_angle;
+    r.tilt = dds->asib->tilt;
+    r.ew_velocity = dds->asib->ew_velocity;
+    r.ns_velocity = dds->asib->ns_velocity;
+    r.vert_velocity = dds->asib->vert_velocity;
+  }
+
+  rio_wvol_begin_ray(ws->wvol, &r, dds->swib->sweep_num,
+                     dds->swib->fixed_angle, radx_mode);
+
+  for (pn = 0; pn < dgi->num_parms; pn++) {
+    struct parameter_d *parm = dds->parm[pn];
+    double pscale, scale_cf, offset_cf;
+    char name[12], units[12];
+    if (!dds->field_present[pn] || !dds->qdat_ptrs[pn]) continue;
+    pscale = parm->parameter_scale;
+    scale_cf  = pscale != 0.0 ? 1.0 / pscale : 1.0;
+    offset_cf = pscale != 0.0 ? -parm->parameter_bias / pscale : 0.0;
+    str_terminate(name, parm->parameter_name, 8);
+    str_terminate(units, parm->param_units, 8);
+    rio_wvol_ray_field_si16(ws->wvol, name, units, ncells, scale_cf, offset_cf,
+                            (short) parm->bad_data,
+                            (short *) dds->qdat_ptrs[pn]);
+  }
+  rio_wvol_end_ray(ws->wvol);
+  return 1;
+}
+
+int rio_write_sweep_end(struct dd_general_info *dgi)
+{
+  struct rio_write_state *ws = (struct rio_write_state *) dgi->gpptr6;
+  struct rio_state *rs = rio_get_state(dgi);
+  int dorade, rc;
+
+  if (!ws || !ws->wvol) return -1;
+  dorade = (rs && rs->src_fmt == RIO_FMT_DORADE) ? 1 : 0;
+  rc = rio_wvol_write(ws->wvol, dgi->directory_name, dorade);
+  if (rc != 0)
+    fprintf(stderr, "rio_write_sweep_end: write failed for %s\n",
+            dgi->directory_name);
+  rio_wvol_free(ws->wvol);
+  ws->wvol = NULL;
+  return rc;
 }
