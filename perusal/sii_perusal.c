@@ -1156,8 +1156,8 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
     dgi->in_swp_fid = wwptr->file_id;
     strcpy(dgi->sweep_file_name, wwptr->sweep->file_name);
 #ifdef SOLOIV_IO_BACKEND_RADX
-    if (rio_sniff(wwptr->sweep->file_name) == RIO_FMT_CFRADIAL)
-      dgi->source_fmt = CFRADIAL_FMT;
+    if (rio_should_use_radx(wwptr->sweep->file_name))
+      dgi->source_fmt = CFRADIAL_FMT;        /* rio-managed (CfRadial or DORADE) */
     else if (dgi->source_fmt == CFRADIAL_FMT)
       dgi->source_fmt = DORADE_FMT;
 #endif

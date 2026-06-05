@@ -195,6 +195,15 @@ int rio_vol_ray(RioVolH vh, int rayIdx, RioRay *out)
       out->georef_lat   = g->getLatitude();
       out->georef_lon   = g->getLongitude();
       out->georef_alt_km= g->getAltitudeKmMsl();
+      out->heading      = g->getHeading();
+      out->roll         = g->getRoll();
+      out->pitch        = g->getPitch();
+      out->drift        = g->getDrift();
+      out->rotation     = g->getRotation();
+      out->tilt         = g->getTilt();
+      out->ew_velocity  = g->getEwVelocity();
+      out->ns_velocity  = g->getNsVelocity();
+      out->vert_velocity= g->getVertVelocity();
     }
     return 0;
   } catch (...) { return -1; }

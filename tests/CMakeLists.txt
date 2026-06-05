@@ -78,4 +78,12 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     target_include_directories(test_cfradial_loads PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_cfradial_loads PROPERTIES
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data/arthur2015/cfradial)
+
+    # DORADE-via-Radx vs CfRadial-via-Radx parity on the twinned samples.
+    soloiv_add_test(test_radx_parity)
+    target_include_directories(test_radx_parity PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+
+    # Airborne safety net: Radx vs the legacy parser on the N42RF tail sweep.
+    soloiv_add_test(test_radx_airborne)
+    target_include_directories(test_radx_airborne PRIVATE ${CMAKE_SOURCE_DIR}/translate)
 endif()

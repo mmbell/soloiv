@@ -18,6 +18,14 @@ set_property(CACHE SOLOIV_IO_BACKEND PROPERTY STRINGS radx custom)
 if(SOLOIV_IO_BACKEND STREQUAL "radx")
   find_package(Radx REQUIRED)
   add_compile_definitions(SOLOIV_IO_BACKEND_RADX)
+
+  # Route DORADE reads through Radx too (retiring the in-tree parser). ON by
+  # default; the legacy parser stays compiled and is reachable at runtime via
+  # the SOLOIV_DORADE_LEGACY environment variable.
+  option(SOLOIV_DORADE_VIA_RADX "Read DORADE sweeps via Radx" ON)
+  if(SOLOIV_DORADE_VIA_RADX)
+    add_compile_definitions(SOLOIV_DORADE_VIA_RADX)
+  endif()
 endif()
 
 # No 32-bit builds

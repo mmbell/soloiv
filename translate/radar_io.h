@@ -31,6 +31,12 @@ rio_fmt_t rio_sniff(const char *path);
 /* True if rio_scan should accept this directory entry as a sweep file. */
 int rio_filename_is_sweep(const char *name);
 
+/* Should this file be read through the Radx backend (vs the legacy in-tree
+ * DORADE parser)? CfRadial is always Radx. DORADE is Radx when built with
+ * SOLOIV_DORADE_VIA_RADX, unless the SOLOIV_DORADE_LEGACY env var is set —
+ * a runtime escape hatch back to the proven parser. */
+int rio_should_use_radx(const char *path);
+
 /* Parse a CfRadial filename into a dd_file_name_v3 (time, radar, ms).
  * Returns >=1 on success (like craack_ddfn), <1 on failure. */
 int rio_craack_cfradial(const char *name, struct dd_file_name_v3 *ddfn);
@@ -92,6 +98,8 @@ typedef struct {
   double unambig_range_km;
   int    has_georef;
   double georef_lat, georef_lon, georef_alt_km;
+  double heading, roll, pitch, drift, rotation, tilt;   /* airborne, deg */
+  double ew_velocity, ns_velocity, vert_velocity;       /* m/s */
 } RioRay;
 
 typedef struct {

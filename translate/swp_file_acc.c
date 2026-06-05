@@ -1202,6 +1202,14 @@ int ddswp_new_sweep_v3(usi)
 	usi->forget_it = YES;
 	return(END_OF_TIME_SPAN);
     }
+#ifdef SOLOIV_IO_BACKEND_RADX
+    strcpy(dgi->sweep_file_name, usi->filename);
+    slash_path(dgi->directory_name, usi->directory);
+    if (rio_should_use_radx(usi->filename))
+	dgi->source_fmt = CFRADIAL_FMT;        /* rio-managed (CfRadial or DORADE) */
+    else if (dgi->source_fmt == CFRADIAL_FMT)
+	dgi->source_fmt = DORADE_FMT;
+#endif
     nn = dd_absorb_header_info(dgi);
     usi->num_rays = dgi->source_num_rays;
     dgi->swp_que->segment_num = ddfn->milliseconds;

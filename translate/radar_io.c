@@ -37,6 +37,8 @@ extern void   dd_alloc_data_field();
 extern int    dd_return_id_num();
 extern double d_time_stamp();
 extern void   str_terminate();
+extern void   dd_radar_angles();    /* (asib, cfac, ra, dgi) — Testud georef */
+extern double dd_rotation_angle();   /* (dgi) — scan-mode-aware beam angle    */
 
 /* ------------------------------------------------------------------ *
  *  Per-DGI Radx state (stashed in dgi->gpptr7)                        *
@@ -95,6 +97,17 @@ int rio_filename_is_sweep(const char *name)
   if (strstr(name, ".tmp")) return 0;
   if (strncmp(name, "swp.", 4) == 0) return 1;
   if (strncmp(name, "cfrad", 5) == 0 && has_suffix(name, ".nc")) return 1;
+  return 0;
+}
+
+int rio_should_use_radx(const char *path)
+{
+  rio_fmt_t f = rio_sniff(path);
+  if (f == RIO_FMT_CFRADIAL) return 1;     /* only Radx reads CfRadial */
+#ifdef SOLOIV_DORADE_VIA_RADX
+  if (f == RIO_FMT_DORADE)
+    return getenv("SOLOIV_DORADE_LEGACY") ? 0 : 1;
+#endif
   return 0;
 }
 
@@ -169,28 +182,50 @@ static int rio_dorade_scan_mode(int radx_mode)
   }
 }
 
-/* Radx::PlatformType_t -> DORADE radar_type. */
+/* Radx::PlatformType_t -> DORADE radar_type (see dd_defines.h). */
 static int rio_dorade_radar_type(int ptype)
 {
   switch (ptype) {
-    case 5: return 1;   /* AIRCRAFT_FORE */
-    case 6: return 2;   /* AIRCRAFT_AFT  */
-    case 7: return 3;   /* AIRCRAFT_TAIL */
-    case 3: return 5;   /* SHIP          */
-    default: return 0;  /* GROUND        */
+    case 5: return AIR_FORE;   /* AIRCRAFT_FORE  */
+    case 6: return AIR_AFT;    /* AIRCRAFT_AFT   */
+    case 7: return AIR_TAIL;   /* AIRCRAFT_TAIL  */
+    case 8: return AIR_LF;     /* AIRCRAFT_BELLY */
+    case 4: return AIR_FORE;   /* AIRCRAFT       */
+    case 3: return SHIP;       /* SHIP           */
+    default: return GROUND;
   }
 }
 
-static double rio_rot_angle(int dorade_scan_mode, double az, double el)
+static int rio_is_airborne(int radar_type)
 {
-  double r;
-  if (dorade_scan_mode == RIO_DM_RHI) {
-    r = fmod(450.0 - el, 360.0);
-  } else {
-    r = fmod(az, 360.0);
+  return radar_type == AIR_FORE || radar_type == AIR_AFT ||
+         radar_type == AIR_TAIL || radar_type == AIR_LF  ||
+         radar_type == AIR_NOSE;
+}
+
+/* Populate dds->ryib + dds->asib from a Radx ray and compute the derived
+ * radar_angles (ra) using the same Testud georef the legacy DORADE reader
+ * uses, so beam positioning is identical for ground and airborne data. */
+static void rio_fill_ray_angles(struct dd_general_info *dgi, const RioRay *ray)
+{
+  DDS_PTR dds = dgi->dds;
+  dds->ryib->azimuth = (float) ray->az_deg;
+  dds->ryib->elevation = (float) ray->el_deg;
+  if (ray->has_georef) {
+    dds->asib->latitude = (float) ray->georef_lat;
+    dds->asib->longitude = (float) ray->georef_lon;
+    dds->asib->altitude_msl = (float) ray->georef_alt_km;
+    dds->asib->heading = (float) ray->heading;
+    dds->asib->roll = (float) ray->roll;
+    dds->asib->pitch = (float) ray->pitch;
+    dds->asib->drift_angle = (float) ray->drift;
+    dds->asib->rotation_angle = (float) ray->rotation;
+    dds->asib->tilt = (float) ray->tilt;
+    dds->asib->ew_velocity = (float) ray->ew_velocity;
+    dds->asib->ns_velocity = (float) ray->ns_velocity;
+    dds->asib->vert_velocity = (float) ray->vert_velocity;
   }
-  if (r < 0) r += 360.0;
-  return r;
+  dd_radar_angles(dds->asib, dds->cfac, dds->ra, dgi);
 }
 
 /* §4.2.1 field scale/bias selection. Packed integer fields carry the file's
@@ -264,11 +299,12 @@ static int rio_build_rotang(struct dd_general_info *dgi, struct rio_state *st,
     RioRay r;
     if (rio_vol_ray(st->vol, st->sweep_start_ray + ii, &r) != 0)
       return -1;
-    entry->rotation_angle =
-      (float) rio_rot_angle(dorade_scan_mode, r.az_deg, r.el_deg);
+    rio_fill_ray_angles(dgi, &r);
+    entry->rotation_angle = (float) dd_rotation_angle(dgi);
     entry->offset = ii;
     entry->size = 0;
   }
+  (void) dorade_scan_mode;
 
   a_offset = rat->angle_table_offset;
   ang_index = (int32_t *) ((char *) rat + a_offset);
@@ -294,7 +330,7 @@ int rio_read_header(struct dd_general_info *dgi)
   RioRadar radar;
   RioRay ray0;
   char path[768];
-  int scan_mode, pn, i;
+  int scan_mode, radar_type, pn, i;
 
   st = rio_ensure_state(dgi);
 
@@ -325,13 +361,17 @@ int rio_read_header(struct dd_general_info *dgi)
   st->cursor = 0;
 
   if (rio_vol_ray(st->vol, sw.start_ray, &ray0) != 0) return -1;
-  scan_mode = rio_dorade_scan_mode(sw.sweep_mode);
+  radar_type = rio_dorade_radar_type(radar.platform_type);
+  /* Airborne platforms use the DORADE AIR scan mode so dd_rotation_angle /
+   * dd_azimuth_angle take the platform-georeferenced branch. */
+  scan_mode = rio_is_airborne(radar_type) ? AIR
+                                          : rio_dorade_scan_mode(sw.sweep_mode);
 
   /* ---- radar descriptor ---- */
   str_terminate(dgi->radar_name, radar.instrument, 8);
   str_terminate(dds->radd->radar_name, radar.instrument, 8);
   dds->radd->scan_mode = scan_mode;
-  dds->radd->radar_type = rio_dorade_radar_type(radar.platform_type);
+  dds->radd->radar_type = radar_type;
   dds->radd->radar_latitude = (float) radar.lat_deg;
   dds->radd->radar_longitude = (float) radar.lon_deg;
   dds->radd->radar_altitude = (float) radar.alt_km;
@@ -368,11 +408,12 @@ int rio_read_header(struct dd_general_info *dgi)
   str_terminate(dds->swib->radar_name, radar.instrument, 8);
   {
     RioRay rlast;
-    dds->swib->start_angle =
-      (float) rio_rot_angle(scan_mode, ray0.az_deg, ray0.el_deg);
-    if (rio_vol_ray(st->vol, sw.start_ray + sw.nrays - 1, &rlast) == 0)
-      dds->swib->stop_angle =
-        (float) rio_rot_angle(scan_mode, rlast.az_deg, rlast.el_deg);
+    rio_fill_ray_angles(dgi, &ray0);
+    dds->swib->start_angle = (float) dd_rotation_angle(dgi);
+    if (rio_vol_ray(st->vol, sw.start_ray + sw.nrays - 1, &rlast) == 0) {
+      rio_fill_ray_angles(dgi, &rlast);
+      dds->swib->stop_angle = (float) dd_rotation_angle(dgi);
+    }
   }
 
   /* ---- volume header (mostly for time/writer) ---- */
@@ -450,9 +491,8 @@ int rio_read_ray(struct dd_general_info *dgi)
   rayIdx = st->sweep_start_ray + st->cursor;
   if (rio_vol_ray(st->vol, rayIdx, &ray) != 0) return 0;
 
-  /* ---- ray info ---- */
-  dds->ryib->azimuth = (float) ray.az_deg;
-  dds->ryib->elevation = (float) ray.el_deg;
+  /* ---- ray info (az/el, platform georef, derived radar angles) ---- */
+  rio_fill_ray_angles(dgi, &ray);
   dds->ryib->sweep_num = dds->swib->sweep_num;
   dds->ryib->ray_status = 0;
 
@@ -466,12 +506,6 @@ int rio_read_ray(struct dd_general_info *dgi)
 
   dgi->time = (double) ray.time_secs + ray.nano_secs * 1e-9;
   if (st->cursor == 0) dgi->time0 = dgi->time;
-
-  if (ray.has_georef) {
-    dds->asib->latitude = (float) ray.georef_lat;
-    dds->asib->longitude = (float) ray.georef_lon;
-    dds->asib->altitude_msl = (float) ray.georef_alt_km;
-  }
 
   /* ---- gate data: re-quantize Radx fl32 to scaled int16 ---- */
   ncells = dds->celv->number_cells;
