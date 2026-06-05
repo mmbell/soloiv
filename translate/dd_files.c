@@ -50,6 +50,7 @@ static char vcid[] = "$Id$";
 
 # include <dd_defines.h>
 # include "dd_files.h"
+# include "radar_io.h"
 # include <dorade_share.h>
 # include "solo_utils.h"
 # include <function_decl.h>
@@ -177,6 +178,7 @@ int craack_ddfn(fn, ddfn)
     char *delim=DD_NAME_DELIMITER;
     char *sptr[4];
     char str[128], *last_field, number[8];
+    *ddfn->raw_name = '\0';   /* DORADE: reconstruct from fields */
     int times[6];
     int ii, jj, v, ndots;
     int yy, mon, dd, hh, mm, ss, ms;
@@ -281,6 +283,11 @@ void ddfn_file_name(ddfn, name)
   char *name;
 {
     int v;
+
+    if(ddfn->raw_name[0]) {     /* non-DORADE name (e.g. CfRadial) */
+	strcpy(name, ddfn->raw_name);
+	return;
+    }
 
     v = ddfn->version*1000 +ddfn->milliseconds;
     dd_file_name("swp", (long)ddfn->time_stamp
@@ -655,7 +662,11 @@ int ddir_files_v3(dir_num, dir)
 	}
         fprintf(stderr, "soloii - checking file: %s\n", dp->d_name);
 
+#ifdef SOLOIV_IO_BACKEND_RADX
+	if(rio_filename_is_sweep(dp->d_name)) { /* DORADE swp.* or CfRadial *.nc */
+#else
 	if(strncmp(dp->d_name, "swp.", 4) == 0) { /* only want sweep files */
+#endif
             fprintf(stderr, "looks like sweep file: %s\n", dp->d_name);
 	    if(strstr(dp->d_name, ".tmp")) { /* not a complete file */
               continue;
@@ -667,8 +678,17 @@ int ddir_files_v3(dir_num, dir)
     	    if(strstr(dp->d_name, "ARMAR")) {
 		mark = 0;
 	    }
+#ifdef SOLOIV_IO_BACKEND_RADX
+	    if(rio_sniff(dp->d_name) == RIO_FMT_CFRADIAL) {
+		if(rio_craack_cfradial(dp->d_name, ddfn) < 1)
+		  continue;
+	    }
+	    else if(craack_ddfn( dp->d_name, ddfn ) < 1) /* not a valid name */
+	      continue;
+#else
 	    if(craack_ddfn( dp->d_name, ddfn ) < 1) /* not a valid name */
 	      continue;
+#endif
 	    /*
 	     * find out which radar
 	     */

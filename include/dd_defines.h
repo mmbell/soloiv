@@ -136,6 +136,7 @@ typedef  long *LONG_PTR;
 # define         CIMM_FMT 23
 # define       NETCDF_FMT 24
 # define       PIRAQX_FMT 25
+# define     CFRADIAL_FMT 26
 
 /* Dorade radar types */
 # define	   GROUND 0

@@ -71,4 +71,11 @@ soloiv_add_test(test_param_minmax_round_trip)
 if(SOLOIV_IO_BACKEND STREQUAL "radx")
     soloiv_add_test(test_radx_smoke)
     target_include_directories(test_radx_smoke PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+
+    # Runs with cwd = the CfRadial sample dir so default startup loads a
+    # cfrad2.*.nc sweep through the Radx backend.
+    soloiv_add_test(test_cfradial_loads)
+    target_include_directories(test_cfradial_loads PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_cfradial_loads PROPERTIES
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data/arthur2015/cfradial)
 endif()

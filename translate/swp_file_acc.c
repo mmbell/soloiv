@@ -40,6 +40,7 @@ static char vcid[] = "$Id$";
 # include <dgi_func_decl.h>
 # include <stdlib.h>
 # include "FieldRadar.h"
+# include "radar_io.h"
 
 # ifndef notyet
 #   include <piraq/piraqx.h>
@@ -99,6 +100,13 @@ int dd_absorb_header_info(dgi)
     struct cfac_wrap *cfw, *ddswp_nab_cfacs ();
     XTRA_STUFF *xstf;
     struct field_radar_i *frib = 0;
+
+#ifdef SOLOIV_IO_BACKEND_RADX
+    /* CfRadial (and, from Phase 2, DORADE) are read via the Radx backend. */
+    if (dgi->source_fmt == CFRADIAL_FMT) {
+        return rio_read_header(dgi);
+    }
+#endif
 
     /*
      * absorb header info
@@ -435,6 +443,12 @@ int dd_absorb_ray_info(dgi)
 # ifndef notyet
    PIRAQX *prqx;
 # endif
+
+#ifdef SOLOIV_IO_BACKEND_RADX
+    if (dgi->source_fmt == CFRADIAL_FMT) {
+        return rio_read_ray(dgi);
+    }
+#endif
 
     count++;
     if( count >= doodah ) {

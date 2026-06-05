@@ -48,10 +48,10 @@ set(S2LIB_SOURCES
     dap_common.c
 )
 
-# Radx I/O shim (C++17): only compiled when the radx backend is selected.
-# Exposes a flat extern "C" API (radar_io.h) over libRadx.
+# Radx I/O shim (C++17) + pure-C dispatch layer: only compiled when the radx
+# backend is selected. radar_io.c fills DGI/DDS; radx_shim.cc bridges libRadx.
 if(SOLOIV_IO_BACKEND STREQUAL "radx")
-  list(APPEND S2LIB_SOURCES radx_shim.cc)
+  list(APPEND S2LIB_SOURCES radx_shim.cc radar_io.c)
 endif()
 
 add_library(s2 STATIC ${S2LIB_SOURCES})
