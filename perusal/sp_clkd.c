@@ -19,6 +19,7 @@ static char vcid[] = "$Id$";
 # include <sys/types.h>
 # include <dirent.h>
 # include <dorade_headers.h>
+# include "radar_io.h"
 # include "solo_window_structs.h"
 # include <dd_files.h>
 # include <sed_shared_structs.h>
@@ -322,6 +323,11 @@ void sp_ts_seek_field_vals(frme)
 	dd_absorb_header_info(dgi);
 	entry1 = dd_return_rotang1(rat);
 	dgi_buf_rewind(dgi);
+#ifdef SOLOIV_IO_BACKEND_RADX
+	if (rio_is_managed(dgi))
+	    rio_seek_ray(dgi, (entry1+tsri->ray_num)->offset);
+	else
+#endif
 	nn = lseek(dgi->in_swp_fid
 		  , (long)(entry1+tsri->ray_num)->offset, 0L);
 	dd_absorb_ray_info(dgi);
@@ -752,6 +758,11 @@ void sp_locate_this_point(sci, bpm)
     }
 
     dgi_buf_rewind(dgi);
+#ifdef SOLOIV_IO_BACKEND_RADX
+    if (rio_is_managed(dgi))
+	rio_seek_ray(dgi, (entry1+kk)->offset);
+    else
+#endif
     nn = lseek(dgi->in_swp_fid, (long)(entry1+kk)->offset, 0L);
     dd_absorb_ray_info(dgi);
 
@@ -904,6 +915,11 @@ void sp_seek_field_vals(frme)
 	    state = SFV_CENTER;
 	}
 	dgi_buf_rewind(dgi);
+#ifdef SOLOIV_IO_BACKEND_RADX
+	if (rio_is_managed(dgi))
+	    rio_seek_ray(dgi, (entry1+indices[ii])->offset);
+	else
+#endif
 	nn = lseek(dgi->in_swp_fid
 		  , (long)(entry1+indices[ii])->offset, 0L);
 	dd_absorb_ray_info(dgi);

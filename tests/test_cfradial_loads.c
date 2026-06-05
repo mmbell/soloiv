@@ -28,6 +28,10 @@
 struct dd_general_info *dd_window_dgi();
 int dd_givfld();
 int dd_cell_num();
+int dd_absorb_ray_info();
+int dd_absorb_header_info();
+int dgi_buf_rewind();
+struct rot_table_entry *dd_return_rotang1();
 
 static void cfradial_action(GtkWidget *main_window, gpointer user_data)
 {
@@ -90,6 +94,32 @@ static void cfradial_action(GtkWidget *main_window, gpointer user_data)
             gate = dd_cell_num(dds, 0, range);
             g_assert_cmpint(gate, >=, 0);
             g_assert_cmpint(gate, <, nc);
+        }
+    }
+
+    /* Regression: seeking to a specific ray (what the click readout and
+     * examine widget do) must land on THAT ray. For a SUR sweep the rotation
+     * table angle equals the ray azimuth, so after rio_seek_ray(k) + read the
+     * ray azimuth must match rotation-table entry k. Before the fix the
+     * legacy lseek-by-byte-offset read the wrong ray. */
+    {
+        struct rot_table_entry *e1;
+        int nr, k, step;
+        /* Re-read the header to establish a known cursor/ray-count state,
+         * decoupled from the timing of the async startup render. */
+        nr = dd_absorb_header_info(dgi);
+        g_assert_cmpint(nr, ==, dds->swib->num_rays);
+        e1 = dd_return_rotang1(dgi->source_rat);
+        step = nr / 6 ? nr / 6 : 1;
+        for (k = 0; k < nr; k += step) {
+            float az, want = e1[k].rotation_angle;
+            dgi_buf_rewind(dgi);
+            rio_seek_ray(dgi, k);
+            g_assert_cmpint(dd_absorb_ray_info(dgi), >=, 1);
+            az = dgi->dds->ryib->azimuth;
+            while (az < 0) az += 360.0f;
+            while (az >= 360.0f) az -= 360.0f;
+            g_assert_cmpfloat(fabs(az - want), <, 0.6);
         }
     }
 
