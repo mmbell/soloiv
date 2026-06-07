@@ -105,6 +105,7 @@ typedef struct {
   char   instrument[32];
   char   scan_name[32];
   int    platform_type;        /* Radx::PlatformType_t */
+  int    primary_axis;         /* Radx::PrimaryAxis_t (axis of rotation)   */
   double nyquist_mps;
   double unambig_range_km;
   long   start_time_secs;

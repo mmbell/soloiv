@@ -159,6 +159,7 @@ int rio_vol_radar(RioVolH vh, RioRadar *out)
     copy_str(out->instrument, sizeof(out->instrument), v.getInstrumentName());
     copy_str(out->scan_name,  sizeof(out->scan_name),  v.getScanName());
     out->platform_type   = static_cast<int>(v.getPlatformType());
+    out->primary_axis    = static_cast<int>(v.getPrimaryAxis());
     out->start_time_secs = static_cast<long>(v.getStartTimeSecs());
     /* Nyquist / unambiguous range are per-ray in Radx; take the first ray's
      * as a volume-level representative (matches DORADE's single radd value). */

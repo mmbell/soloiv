@@ -32,6 +32,18 @@
 #define RIO_DM_TAR 5
 #define RIO_DM_SUR 8
 
+/* Radx::PrimaryAxis_t values (axis of antenna rotation). The vertical axes
+ * (Z, Z_PRIME) describe an ordinary azimuth/elevation-surveillance scan that
+ * is plotted by azimuth; the others (Y, X, Y_PRIME, X_PRIME) describe the
+ * airborne tail/fuselage scanning convention plotted from rotation/tilt. */
+#define RIO_AXIS_Z       0
+#define RIO_AXIS_Y       1
+#define RIO_AXIS_X       2
+#define RIO_AXIS_Z_PRIME 3
+#define RIO_AXIS_Y_PRIME 4
+#define RIO_AXIS_X_PRIME 5
+#define RIO_AXIS_IS_VERTICAL(a) ((a) == RIO_AXIS_Z || (a) == RIO_AXIS_Z_PRIME)
+
 /* From the rest of the s2 library (K&R prototypes). */
 extern void   dd_alloc_data_field();
 extern int    dd_return_id_num();
@@ -385,10 +397,25 @@ int rio_read_header(struct dd_general_info *dgi)
 
   if (rio_vol_ray(st->vol, sw.start_ray, &ray0) != 0) return -1;
   radar_type = rio_dorade_radar_type(radar.platform_type);
-  /* Airborne platforms use the DORADE AIR scan mode so dd_rotation_angle /
-   * dd_azimuth_angle take the platform-georeferenced branch. */
-  scan_mode = rio_is_airborne(radar_type) ? AIR
-                                          : rio_dorade_scan_mode(sw.sweep_mode);
+  /* The axis of rotation -- not the platform label -- decides how the beam
+   * is positioned. Tail/fuselage scans (Y/X/Y_PRIME/X_PRIME) use the DORADE
+   * AIR scan mode so dd_rotation_angle / dd_azimuth_angle take the
+   * platform-georeferenced (rotation/tilt) branch. A vertical axis (Z/Z_PRIME)
+   * is an ordinary azimuth/elevation surveillance PPI plotted from the
+   * earth-relative azimuth -- even when the platform is a moving ship that the
+   * source mislabels platform_type=aircraft (e.g. SEAPOL). In that case drop
+   * the airborne radar_type too, so the georef-projection display paths are
+   * bypassed and the sweep renders as a plain ground-style PPI (as HawkEye
+   * does). */
+  if (rio_is_airborne(radar_type) &&
+      !RIO_AXIS_IS_VERTICAL(radar.primary_axis)) {
+    scan_mode = AIR;
+  } else {
+    scan_mode = rio_dorade_scan_mode(sw.sweep_mode);
+    if (rio_is_airborne(radar_type)) {
+      radar_type = GROUND;
+    }
+  }
 
   /* ---- radar descriptor ---- */
   str_terminate(dgi->radar_name, radar.instrument, 8);
