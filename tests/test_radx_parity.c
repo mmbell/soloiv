@@ -37,8 +37,8 @@ static void normalize_name(char *s)
         if (*s == '-') *s = '_';
 }
 
-#define SWEEPS_DIR  "arthur2015/sweeps/"
-#define CFRAD_DIR   "arthur2015/cfradial/"
+#define SWEEPS_DIR  "ground/dorade/"
+#define CFRAD_DIR   "ground/cf2/"
 #define DORADE_FILE "swp.1140703215739.KLTX.317.0.9_SUR_v775"
 #define CFRAD_FILE  "cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
 

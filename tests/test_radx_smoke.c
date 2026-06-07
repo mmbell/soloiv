@@ -14,9 +14,9 @@
 #include "radar_io.h"
 
 #define CFRAD_SAMPLE \
-    "arthur2015/cfradial/cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
+    "ground/cf2/cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
 #define DORADE_SAMPLE \
-    "arthur2015/sweeps/swp.1140703215739.KLTX.317.0.9_SUR_v775"
+    "ground/dorade/swp.1140703215739.KLTX.317.0.9_SUR_v775"
 
 static void test_radx_reads_cfradial(void)
 {

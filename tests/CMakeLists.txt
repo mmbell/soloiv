@@ -30,6 +30,14 @@ target_link_libraries(soloiv_test_support PUBLIC
     ${GTK4_LIBRARIES}
 )
 
+# Curated, version-controlled test fixtures (small range-clipped real sweeps).
+# Tests resolve data from here instead of the large, git-ignored test_data/
+# tree, so a clean checkout and GitHub CI can run the data-path tests.
+# Overridable at runtime via the SOLOIV_FIXTURE_DIR env var.
+target_compile_definitions(soloiv_test_support PUBLIC
+    SOLOIV_FIXTURE_DIR="${CMAKE_SOURCE_DIR}/tests/fixtures"
+)
+
 # --- Helper to declare a test ----------------------------------------------
 
 function(soloiv_add_test name)
@@ -69,32 +77,40 @@ soloiv_add_test(test_cvd_colormaps)
 soloiv_add_test(test_param_minmax_round_trip)
 
 if(SOLOIV_IO_BACKEND STREQUAL "radx")
+    set(FIXTURES ${CMAKE_SOURCE_DIR}/tests/fixtures)
+
+    # cwd = tests/fixtures so the relative ground/{cf2,dorade} sample paths
+    # resolve.
     soloiv_add_test(test_radx_smoke)
     target_include_directories(test_radx_smoke PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_radx_smoke PROPERTIES WORKING_DIRECTORY ${FIXTURES})
 
-    # Runs with cwd = the CfRadial sample dir so default startup loads a
-    # cfrad2.*.nc sweep through the Radx backend.
+    # Runs with cwd = the ground CfRadial fixture dir so default startup loads
+    # the cfrad2.*.nc sweep through the Radx backend.
     soloiv_add_test(test_cfradial_loads)
     target_include_directories(test_cfradial_loads PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_cfradial_loads PROPERTIES
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data/arthur2015/cfradial)
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 
-    # DORADE-via-Radx vs CfRadial-via-Radx parity on the twinned samples.
+    # DORADE-via-Radx vs CfRadial-via-Radx parity on the twinned ground samples.
     soloiv_add_test(test_radx_parity)
     target_include_directories(test_radx_parity PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_radx_parity PROPERTIES WORKING_DIRECTORY ${FIXTURES})
 
     # Airborne safety net: Radx vs the legacy parser on the N42RF tail sweep.
     soloiv_add_test(test_radx_airborne)
     target_include_directories(test_radx_airborne PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_radx_airborne PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/airborne/dorade)
 
     # CfRadial read -> edit -> write -> reopen round-trip.
     soloiv_add_test(test_radx_roundtrip)
     target_include_directories(test_radx_roundtrip PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_radx_roundtrip PROPERTIES
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data/arthur2015/cfradial)
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 
     # Examine widget on a CfRadial sweep (rewind + per-ray display list).
     soloiv_add_test(test_cfradial_examine)
     set_tests_properties(test_cfradial_examine PROPERTIES
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data/arthur2015/cfradial)
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 endif()
