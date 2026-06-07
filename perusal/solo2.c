@@ -171,12 +171,29 @@ sii_cairo_draw_arc (cairo_t *cr, gboolean filled,
   /* Fast path for the common circle case (the only call site in
    * solo2.c for soloiv passes width == height).  Going through the
    * generic ellipse code below is correct but adds a save/restore
-   * dance with subtle line-width behavior. */
+   * dance with subtle line-width behavior.
+   *
+   * The angles arrive in the GDK convention (counter-clockwise from the
+   * 3 o'clock position).  Cairo's user space here has y pointing DOWN, so
+   * a counter-clockwise GDK sweep is a sweep of *decreasing* cairo angle
+   * -- cairo_arc_negative draws that short arc, whereas plain cairo_arc
+   * would wrap the long way round and leave only the off-screen remnant
+   * (the "stray lines at the display edge" bug).  A full circle is drawn
+   * explicitly because -0 .. -2pi collapses to a zero-length arc.
+   *
+   * cairo_new_sub_path() is essential: cairo_arc() draws a line from the
+   * current point to the arc start, and the range-ring labels (drawn with
+   * pango_cairo_show_layout via a cairo_move_to) leave a dangling current
+   * point.  Without this, each ring is joined to the previous label by a
+   * stray straight line. */
   if (rx == ry) {
-    if (iarc_len >= 0) {
-      cairo_arc (cr, cx, cy, rx, -angle1, -angle2);
-    } else {
+    cairo_new_sub_path (cr);
+    if (iarc_len >= 360 * 64 || iarc_len <= -360 * 64) {
+      cairo_arc (cr, cx, cy, rx, 0.0, 2.0 * G_PI);
+    } else if (iarc_len >= 0) {
       cairo_arc_negative (cr, cx, cy, rx, -angle1, -angle2);
+    } else {
+      cairo_arc (cr, cx, cy, rx, -angle1, -angle2);
     }
     if (filled) cairo_fill (cr); else cairo_stroke (cr);
     return;
@@ -193,10 +210,13 @@ sii_cairo_draw_arc (cairo_t *cr, gboolean filled,
   cairo_translate (cr, cx, cy);
   cairo_scale (cr, rx, ry);
 
-  if (iarc_len >= 0) {
-    cairo_arc (cr, 0, 0, 1.0, -angle1, -angle2);
-  } else {
+  cairo_new_sub_path (cr);
+  if (iarc_len >= 360 * 64 || iarc_len <= -360 * 64) {
+    cairo_arc (cr, 0, 0, 1.0, 0.0, 2.0 * G_PI);
+  } else if (iarc_len >= 0) {
     cairo_arc_negative (cr, 0, 0, 1.0, -angle1, -angle2);
+  } else {
+    cairo_arc (cr, 0, 0, 1.0, -angle1, -angle2);
   }
 
   if (filled) cairo_fill (cr); else cairo_stroke (cr);
@@ -1539,9 +1559,10 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
     y = (gint)((yy > 0) ? yy +.5 : yy -.5) * bup_factor;
     width = height = (gint)(2 * rng*ppk +.5) * bup_factor;
 
-    if (rng > wwptr->view->rng_ring_int_km) {
+    if (rng >= wwptr->view->rng_ring_int_km) {
        /* look for partial circles
 	* drawing full circles gets very slow at high zooms
+	* (>= so the innermost ring is drawn too, not just labelled)
 	*/
        num_arcs = 0;
        num_arcs = sii_rng_ring_arcs (frame_num, rng);
