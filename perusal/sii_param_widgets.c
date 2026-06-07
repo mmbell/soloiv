@@ -238,8 +238,9 @@ param_entry_widget( guint frame_num, const gchar *prompt, const gchar * dirroot)
 static void
 param_list_widget( guint frame_num, guint widget_id
 		  , guint menu_wid);
-guint
-param_text_event_cb(GtkWidget *text, gpointer data);
+void
+param_text_event_cb(GtkGestureClick *gesture, int n_press,
+		     double x, double y, gpointer data);
 
 const gchar *
 set_cb_labeling_info (guint frame_num, gdouble *relative_locs);
@@ -804,10 +805,15 @@ static void param_list_widget( guint frame_num, guint widget_id
 
 /* c---------------------------------------------------------------------- */
 
-guint param_text_event_cb(GtkWidget *text, gpointer data)
+void param_text_event_cb(GtkGestureClick *gesture, int n_press,
+			 double x, double y, gpointer data)
 {
+  /* GTK4: the GtkGestureClick "pressed" signal passes the gesture as the
+   * first argument and the connected user_data (the GtkTextView) last.  The
+   * clicked line is resolved from the press coordinates (x,y), not from the
+   * insert mark -- this is a non-editable view, so the cursor never moves. */
+  GtkWidget *text = GTK_WIDGET (data);
   GtkWidget* draw_widget;
-  guint position = 0; /* GTK4: cursor position from GtkTextView */
   guint frame_num, wid;
   gint jj, kk, nn, nt, mark, start, end;
   const gchar *aa, *bb = "", *p_name, *name;
@@ -817,6 +823,9 @@ guint param_text_event_cb(GtkWidget *text, gpointer data)
   gchar str[256], *sptrs[32];
 
   GdkRGBA *test_color;
+
+  (void)gesture;
+  (void)n_press;
 
   nn = PARAM_CLR_TBL_TEXT;
 
@@ -829,11 +838,13 @@ guint param_text_event_cb(GtkWidget *text, gpointer data)
   pd = (ParamData *)frame_configs[frame_num]->param_data;
 
   {
-    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
     GtkTextIter iter;
-    GtkTextMark *mark = gtk_text_buffer_get_insert(tbuf);
-    gtk_text_buffer_get_iter_at_mark(tbuf, &iter, mark);
-    nn = gtk_text_iter_get_offset(&iter);
+    gint bx, by;
+    gtk_text_view_window_to_buffer_coords (GTK_TEXT_VIEW (text),
+					   GTK_TEXT_WINDOW_WIDGET,
+					   (gint)x, (gint)y, &bx, &by);
+    gtk_text_view_get_iter_at_location (GTK_TEXT_VIEW (text), &iter, bx, by);
+    nn = gtk_text_iter_get_offset (&iter);
   }
 
   switch (wid) {
