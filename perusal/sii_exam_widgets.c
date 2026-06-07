@@ -494,7 +494,6 @@ void sii_exam_list_event (GtkGestureClick *gesture, int n_press,
 
    (void)gesture;
    (void)n_press;
-   (void)y;
 
    sci->frame =
      frame_num =
@@ -512,9 +511,24 @@ void sii_exam_list_event (GtkGestureClick *gesture, int n_press,
 
    xmd->last_list_index = exam_index;
    xx = (gint)x;
+
+   /* Map the press to a character offset using the label's own PangoLayout
+    * so the result matches the rendered glyphs exactly (no hardcoded
+    * character-width guess).  The data lines are ASCII, so the returned
+    * byte index equals the character offset that col_lims[] expects. */
+   {
+     PangoLayout *layout = gtk_label_get_layout (GTK_LABEL (label));
+     gint lx = 0, ly = 0, index = 0, trailing = 0;
+     gtk_label_get_layout_offsets (GTK_LABEL (label), &lx, &ly);
+     pango_layout_xy_to_index (layout,
+			       (xx - lx) * PANGO_SCALE,
+			       ((gint)y - ly) * PANGO_SCALE,
+			       &index, &trailing);
+     (void)trailing;          /* select the gate the press is over */
+     cndx = index;
+   }
    sci->which_character =
-     xmd->last_char_index =
-       cndx = xx/xmd->label_char_width;
+     xmd->last_char_index = cndx;
 
    sci->which_widget_button = EX_CLICK_IN_LIST;
    sxm_process_click (sci);
@@ -1240,13 +1254,20 @@ void sii_exam_widget( guint frame_num )
   gtk_box_append (GTK_BOX (vbox0), scrolledwindow);
 
   nn = xmdata->max_possible_cells;
-  /* Use a reasonable default for label metrics since GdkFont is gone in GTK4.
-   * These should be computed from a PangoFontDescription if precise metrics are needed.
-   */
-  xmdata->label_height =
-    height = 16; /* approximate line height for a medium fixed font */
-  xmdata->label_char_width =
-    width = 8;   /* approximate character width for a medium fixed font */
+  /* Render the examine grid in a monospace font so the fixed-width data
+   * columns line up, and derive the per-character / per-line metrics from
+   * that same font rather than guessing.  The click handler maps a press
+   * to a gate via the label's PangoLayout, but these metrics are still
+   * used for laying out and scrolling the grid. */
+  {
+    SiiFont *mf = sii_font_new ("Monospace", 100, TRUE); /* 10pt */
+    gint cw = sii_font_string_width (mf, "0000000000") / 10;
+    width  = (cw > 0) ? cw : 8;
+    height = (mf->ascent + mf->descent > 0) ? mf->ascent + mf->descent : 16;
+    sii_font_free (mf);
+  }
+  xmdata->label_char_width = width;
+  xmdata->label_height = height;
   len = xmdata->max_chars_per_line -1;
   str[len] = '\0';
   gtk_widget_set_size_request (scrolledwindow, 120*width, 30*height);
@@ -1277,6 +1298,16 @@ void sii_exam_widget( guint frame_num )
      xmdata->label_items[mm] = label;
      gtk_label_set_justify ((GtkLabel *)label, GTK_JUSTIFY_LEFT );
      gtk_label_set_xalign (GTK_LABEL (label), 0.0);
+
+     /* Monospace at the same size used for the metrics above so the
+      * fixed-width columns line up and click->column mapping is sane. */
+     {
+       PangoAttrList *attrs = pango_attr_list_new ();
+       pango_attr_list_insert (attrs, pango_attr_family_new ("Monospace"));
+       pango_attr_list_insert (attrs, pango_attr_size_new (10 * PANGO_SCALE));
+       gtk_label_set_attributes (GTK_LABEL (label), attrs);
+       pango_attr_list_unref (attrs);
+     }
 
      {
        /* GTK4: per-widget click events come from a GtkGestureClick
