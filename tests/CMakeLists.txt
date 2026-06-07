@@ -92,4 +92,9 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     target_include_directories(test_radx_roundtrip PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_radx_roundtrip PROPERTIES
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data/arthur2015/cfradial)
+
+    # Examine widget on a CfRadial sweep (rewind + per-ray display list).
+    soloiv_add_test(test_cfradial_examine)
+    set_tests_properties(test_cfradial_examine PROPERTIES
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data/arthur2015/cfradial)
 endif()

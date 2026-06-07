@@ -8,6 +8,7 @@ static char vcid[] = "$Id$";
 
 # include <dorade_headers.h>
 # include <input_sweepfiles.h>
+# include "radar_io.h"
 # include <solo_editor_structs.h>
 # include <seds.h>
 # include <solo_list_widget_ids.h>
@@ -2546,6 +2547,12 @@ void sxm_update_examine_data(frme, wgt_btn)
     rat = dgi->source_rat;	/* rotation angle table */
     entry1 = dd_return_rotang1(rat); /* first entry in rat */
     dgi_buf_rewind(dgi);
+#ifdef SOLOIV_IO_BACKEND_RADX
+    if (rio_is_managed(dgi)) {    /* Radx: offset is a ray index, not a byte offset */
+	rio_seek_ray(dgi, (entry1 +tsri->ray_num)->offset);
+    }
+    else
+#endif
     nn = lseek(dgi->in_swp_fid
 	       , (long)(entry1 +tsri->ray_num)->offset, 0L);
     dd_absorb_ray_info(dgi);
@@ -2782,6 +2789,12 @@ void sxm_update_examine_data(frme, wgt_btn)
 	    rat = dgi->source_rat;	/* rotation angle table */
 	    entry1 = dd_return_rotang1(rat); /* first entry in rat */
 	    dgi_buf_rewind(dgi);
+#ifdef SOLOIV_IO_BACKEND_RADX
+	    if (rio_is_managed(dgi)) {  /* Radx: offset is a ray index */
+		rio_seek_ray(dgi, (entry1 +tsri->ray_num)->offset);
+	    }
+	    else
+#endif
 	    nn = lseek(dgi->in_swp_fid
 		       , (long)(entry1 +tsri->ray_num)->offset, 0L);
 	    dd_absorb_ray_info(dgi);

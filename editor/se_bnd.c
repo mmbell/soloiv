@@ -52,6 +52,7 @@ static char vcid[] = "$Id$";
  * 
  */
 # include <dorade_headers.h>
+# include "radar_io.h"
 # include <solo_window_structs.h>
 # include <solo_editor_structs.h>
 # include <solo_list_widget_ids.h>
@@ -2549,6 +2550,11 @@ int list_zmap_values( fname, frame )
 	dd_absorb_header_info(dgi);
 	dgi_buf_rewind(dgi);
 	kk = dd_rotang_seek(rat, (float)theta);
+#ifdef SOLOIV_IO_BACKEND_RADX
+	if (rio_is_managed(dgi))
+	    rio_seek_ray(dgi, (entry1+kk)->offset);
+	else
+#endif
 	nn = lseek(dgi->in_swp_fid, (long)(entry1+kk)->offset, 0L);
 	dd_absorb_ray_info(dgi);
 	pn = dd_find_field( dgi, fname );
