@@ -983,11 +983,22 @@ void se_erase_segments (int frame_num, int num_points
 
 /* c------------------------------------------------------------------------ */
 
+/* During a draw-function pass the live cairo_t is stashed here so the
+ * legacy boundary redraw chain (se_redraw_all_bnds_for_frame ->
+ * se_draw_bnd_for_frame -> se_draw_segments) can paint directly without
+ * threading cairo_t through the K&R-style editor functions.  It is NULL
+ * outside the draw callback, in which case se_draw_segments just queues a
+ * redraw so the boundary is painted on the next frame. */
+static cairo_t *bnd_draw_cr = NULL;
+
+void se_draw_segments_cairo (cairo_t *cr, int frame_num, int num_points,
+			     struct bnd_point_mgmt *bpm);
+
 /* se_draw_segments: Draw boundary segments.
- * In GTK4, direct drawing to widget surfaces is not allowed.
- * Instead, we store the boundary state and trigger a redraw.
- * The actual drawing happens inside the draw function callback.
- * For now, this function queues a redraw on the frame widget.
+ * When called from inside the draw function (bnd_draw_cr set), paint the
+ * segments with the live cairo_t.  Otherwise (interactive point add) we
+ * cannot draw directly in GTK4, so queue a redraw and let the draw
+ * function call back into this chain with a cairo_t.
  */
 void se_draw_segments (int frame_num, int num_points,
 		       struct bnd_point_mgmt *bpm)
@@ -998,13 +1009,12 @@ void se_draw_segments (int frame_num, int num_points,
   if (frame_num >= sii_return_frame_count() || num_points < 2)
     { return; }
 
-  /* Store boundary drawing info so the draw function can use it.
-   * The actual drawing of boundary segments is done in
-   * sii_really_xfer_images_cairo which is called from the draw function
-   * with a cairo_t.
-   *
-   * Queue a redraw to trigger the draw function.
-   */
+  if (bnd_draw_cr) {
+    se_draw_segments_cairo (bnd_draw_cr, frame_num, num_points, bpm);
+    return;
+  }
+
+  /* Queue a redraw to trigger the draw function. */
   if (sfc->frame) {
     gtk_widget_queue_draw (sfc->frame);
   }
@@ -1775,8 +1785,13 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
   cairo_rectangle (cr, ix, iy, width, height);
   cairo_stroke (cr);
 
-  if (redraw_bnd)
-    { se_redraw_all_bnds_for_frame (frame_num); }
+  if (redraw_bnd) {
+    /* Stash the live cairo_t so the legacy boundary redraw chain paints
+     * directly via se_draw_segments instead of merely queuing a redraw. */
+    bnd_draw_cr = cr;
+    se_redraw_all_bnds_for_frame (frame_num);
+    bnd_draw_cr = NULL;
+  }
 }
 
 /* c------------------------------------------------------------------------ */
