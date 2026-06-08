@@ -27,6 +27,7 @@ static GTree *edit_cmds_help = NULL;
 static GTree *edit_egs_help = NULL;
 static GSList *edit_cmds_list_help = NULL;
 static GtkWidget *vbox_hlp_cmds = NULL;
+static guint hlp_cmds_frame = 0;	/* frame whose edit boxes the help list feeds */
 static GString *cmds_one_time_only = NULL;
 static GString *cmds_for_each_ray = NULL;
 static gint max_cmd_width = 0;
@@ -2028,6 +2029,7 @@ void edit_cmds_help_widget (guint frame_num )
 
   vbox_hlp_cmds = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
   gtk_window_set_child (GTK_WINDOW(window), vbox_hlp_cmds);
+  hlp_cmds_frame = frame_num;	/* clicks feed this frame's edit boxes */
 
   button = gtk_button_new_with_label ("Cancel");
   gtk_box_append (GTK_BOX(vbox_hlp_cmds), button );
@@ -2237,22 +2239,77 @@ gboolean set_edit_help_items( gpointer a_str, gpointer words )
   label = gtk_label_new ((gchar *)a_str);
   gtk_label_set_justify ((GtkLabel *)label, GTK_JUSTIFY_LEFT );
   gtk_box_append (GTK_BOX (vbox_hlp_cmds), label);
-  /* GTK4: click a command name to pop up its help text */
-  sii_connect_click (label, G_CALLBACK (sii_cmds_help_event), words);
+  /* GTK4: click a command name to drop its template into the edit box.
+   * a_str is the command keyword (the GTree key, a stable allocation). */
+  (void)words;
+  sii_connect_click (label, G_CALLBACK (sii_cmds_help_event), a_str);
 
   return( FALSE );		/* to continue a tree traverse */
 }
 
 /* c---------------------------------------------------------------------- */
 
+/* Look in `slm` for the command template whose keyword matches `name`
+ * (e.g. name "ignore-field" -> "ignore-field <field>"). Returns the template
+ * string or NULL. */
+static const char *sii_find_cmd_template (struct solo_list_mgmt *slm,
+					  const char *name)
+{
+   int ii, nn;
+   size_t len = strlen (name);
+   char *aa;
+
+   if (!slm)
+     { return NULL; }
+   nn = slm->num_entries;
+   for (ii = 0; ii < nn; ii++) {
+      aa = solo_list_entry (slm, ii);
+      if (!aa || !strlen (aa))
+	{ continue; }
+      /* match the keyword exactly: same chars then a space or end-of-string,
+       * so "copy" does not match "copy-bad-flags". */
+      if (strncmp (aa, name, len) == 0 && (aa[len] == ' ' || aa[len] == '\0'))
+	{ return aa; }
+   }
+   return NULL;
+}
+
+/* Clicking a command in the "Cmds with Help" list drops its template into the
+ * matching edit box: For-Each-Ray commands go to the FER box, one-time setup
+ * commands to the OTO box. The list of commands is split into all_fer_cmds vs
+ * all_other_cmds, which also tells us which box to use. */
 void sii_cmds_help_event (GtkGestureClick *gesture, int n_press,
 			  double x, double y, gpointer data )
 {
+   const char *name = (const char *)data;
+   const char *tmplt;
+   guint wid;
+   EditData *edd;
+   GtkTextBuffer *buffer;
+   struct solo_edit_stuff *seds, *return_sed_stuff();
+   gchar line[SE_MAX_STRING];
+
    (void)gesture;
    (void)n_press;
    (void)x;
    (void)y;
-   edit_help_widget  ((gchar *)data);
+
+   seds = return_sed_stuff();
+
+   if ((tmplt = sii_find_cmd_template (seds->all_fer_cmds, name)))
+     { wid = EDIT_FER_TEXT; }
+   else if ((tmplt = sii_find_cmd_template (seds->all_other_cmds, name)))
+     { wid = EDIT_OTO_TEXT; }
+   else
+     { tmplt = name; wid = EDIT_FER_TEXT; }	/* fall back to the bare name */
+
+   edd = (EditData *)frame_configs[hlp_cmds_frame]->edit_data;
+   if (!edd || !edd->data_widget[wid])
+     { return; }
+
+   g_snprintf (line, sizeof (line), "%s\n", tmplt);
+   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (edd->data_widget[wid]));
+   gtk_text_buffer_insert_at_cursor (buffer, line, -1);
 }
 
 /* c---------------------------------------------------------------------- */
