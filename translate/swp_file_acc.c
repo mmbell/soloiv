@@ -446,7 +446,24 @@ int dd_absorb_ray_info(dgi)
 
 #ifdef SOLOIV_IO_BACKEND_RADX
     if (dgi->source_fmt == CFRADIAL_FMT) {
-        return rio_read_ray(dgi);
+        nn = rio_read_ray(dgi);
+        /* rio_read_ray fills the ray but, unlike the legacy reader below, never
+         * sets the clip gate. Left at 0, nc = clip_gate+1 == 1 in every
+         * for-each-ray editor op that iterates to the clip gate
+         * (unconditional-delete, set/assert-bad-flags, BB-unfolding, ...), so
+         * they touch a single gate and silently do nothing. remove-ring and
+         * ignore-field escape because they compute their own gate range / drop
+         * the whole field. Mirror the legacy clip-gate logic here. */
+        if (nn > 0) {
+            difs = dd_return_difs_ptr();
+            if (difs->altitude_truncations)
+                dgi->clip_gate = dd_clip_gate
+                    (dgi, dds->ra->elevation, dds->asib->altitude_msl,
+                     difs->altitude_limits->lower, difs->altitude_limits->upper);
+            else
+                dgi->clip_gate = dds->celv->number_cells - 1;
+        }
+        return nn;
     }
 #endif
 

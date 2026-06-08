@@ -145,6 +145,11 @@ static int drop_check(const char *label, int win, const char *file)
     for (r = 0; r < nrays; r++) {
         double a;
         if (dd_absorb_ray_info(dw) < 1) break;
+        /* The rio read path must set the clip gate to the last cell; if it
+         * stays 0, every for-each-ray editor op that iterates to clip_gate+1
+         * touches a single gate and silently no-ops. */
+        if (r == 0)
+            g_assert_cmpint(dw->clip_gate, ==, ncells - 1);
         ndx = keepndx; g1 = 1; n = ncells;
         if (n > 8192) n = 8192;
         dd_givfld(dw, &ndx, &g1, &n, vals, &bad);
