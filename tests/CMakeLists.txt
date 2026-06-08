@@ -63,6 +63,8 @@ endfunction()
 
 # --- Tests ------------------------------------------------------------------
 
+set(FIXTURES ${CMAKE_SOURCE_DIR}/tests/fixtures)
+
 soloiv_add_test(test_smoke)
 soloiv_add_test(test_examine_opens)
 soloiv_add_test(test_edit_opens)
@@ -76,8 +78,17 @@ soloiv_add_test(test_dorade_partial_header)
 soloiv_add_test(test_cvd_colormaps)
 soloiv_add_test(test_param_minmax_round_trip)
 
+# These GUI tests open data-dependent widgets, so they need a loaded sweep:
+# run them with cwd = a committed fixture sweep dir. (Previously they relied
+# on sweeps sitting at test_data/ root, which no longer holds any after the
+# data was reorganized into per-dataset subdirs.)
+foreach(t test_examine_opens test_edit_opens test_param_widget_walk
+          test_swpfi_dialog_walk test_multi_frame_layout
+          test_param_minmax_round_trip)
+    set_tests_properties(${t} PROPERTIES WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+endforeach()
+
 if(SOLOIV_IO_BACKEND STREQUAL "radx")
-    set(FIXTURES ${CMAKE_SOURCE_DIR}/tests/fixtures)
 
     # cwd = tests/fixtures so the relative ground/{cf2,dorade} sample paths
     # resolve.

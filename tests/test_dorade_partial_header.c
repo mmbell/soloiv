@@ -22,8 +22,8 @@
 #include "sii_log_handler.h"
 #include "test_app_runner.h"
 
-#define GOOD_SWEEP "/Users/mmbell/Development/soloiv/test_data/" \
-                   "swp.1220907125318.N42RF-TM.857.20.0_AIR_v2"
+#define GOOD_SWEEP SOLOIV_FIXTURE_DIR \
+                   "/airborne/dorade/swp.1220907125318.N42RF-TM.857.20.0_AIR_v2"
 
 static char g_tmpdir[256];
 
