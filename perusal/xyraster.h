@@ -16,10 +16,10 @@
 				 * each side so the jaggies will
 				 * not be visible
 				 */
-union rxu {
+typedef union rxu {
     long scaled_val;
     short val;
-} u;
+} rxu_t;
 
 struct rxy_coords {
     double x;

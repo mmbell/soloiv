@@ -33,6 +33,9 @@ cmake --build build
 
 The executable will be at `build/perusal/soloiv`.
 
+See [BUILD_AND_RUN.md](BUILD_AND_RUN.md) for conda setup, NCAR display notes,
+and troubleshooting.
+
 ## Usage
 
 The environment variable `DORADE_DIR` should point to a directory containing
