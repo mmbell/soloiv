@@ -121,6 +121,15 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     set_tests_properties(test_radx_roundtrip PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 
+    # Regression: dropping one field (ignore-field) then writing must NOT
+    # disturb the remaining fields' data, and must preserve the airborne
+    # primary_axis so the reopened sweep stays AIR (not misclassified RHI,
+    # which collapsed the display into a wedge).
+    soloiv_add_test(test_radx_drop_field)
+    target_include_directories(test_radx_drop_field PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_radx_drop_field PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground)
+
     # Examine widget on a CfRadial sweep (rewind + per-ray display list).
     soloiv_add_test(test_cfradial_examine)
     set_tests_properties(test_cfradial_examine PROPERTIES

@@ -286,6 +286,13 @@ void rio_wvol_set_meta(RioWVolH wvh, const RioRadar *radar, int radx_scan_mode,
     h->vol.setAltitudeKm(radar->alt_km);
     h->vol.setPlatformType(
         static_cast<Radx::PlatformType_t>(radar->platform_type));
+    /* The primary axis of rotation must round-trip: the reader keys airborne
+     * (rotation/tilt) vs surveillance (azimuth) beam positioning off it, not
+     * off the platform label. Omitting it lets it default to axis_z (vertical),
+     * which silently demotes an airborne tail sweep to RHI on reopen and
+     * collapses the display into a wedge. */
+    h->vol.setPrimaryAxis(
+        static_cast<Radx::PrimaryAxis_t>(radar->primary_axis));
     h->vol.setStartTime(static_cast<time_t>(start_secs), start_nano);
     (void) radx_scan_mode;
   } catch (...) {}
