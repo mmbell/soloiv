@@ -53,20 +53,20 @@ convert -dorade 30 \
 convert -cf2 30 \
   "$SRC/arthur2015/cfradial/cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc" \
   "$HERE/ground/cf2" "cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
+# cf1 has no native source; derive it from the cf2 sweep.
+convert -cfradial 30 \
+  "$SRC/arthur2015/cfradial/cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc" \
+  "$HERE/ground/cf1" "cfrad.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
 
 # --- airborne: N42RF-TM P3 tail, primary_axis=axis_y_prime (georef/AIR) ---
 echo "airborne/ (N42RF-TM)"
-# The DORADE fixture is COPIED VERBATIM, not range-clipped: test_radx_airborne
-# reads it with the in-tree byte parser (the legacy safety net), and that
-# parser rejects RadxConvert-written DORADE ("sweep file is garbage" — a block
-# sizeof_struct it considers out of range). A genuine DORADE sweep is required,
-# so this one fixture stays full size. The cf1/cf2 twins below are clipped.
-mkdir -p "$HERE/airborne/dorade"
-cp "$SRC/fiona2022/dorade/swp.1220907125318.N42RF-TM.857.20.0_AIR_v2" \
-   "$HERE/airborne/dorade/swp.1220907125318.N42RF-TM.857.20.0_AIR_v2"
-printf "  %-7s %-8s %s\n" \
-  "$(du -h "$HERE/airborne/dorade/swp.1220907125318.N42RF-TM.857.20.0_AIR_v2" | cut -f1)" \
-  "copy" "swp.1220907125318.N42RF-TM.857.20.0_AIR_v2"
+# All three airborne formats are range-clipped via Radx. The DORADE fixture is
+# derived from the genuine DORADE source (not the cf2) so the DORADE-vs-cf2
+# parity test is not circular. (Radx-written DORADE is not readable by the
+# in-tree byte parser, so the airborne test reads every format through Radx.)
+convert -dorade 15 \
+  "$SRC/fiona2022/dorade/swp.1220907125318.N42RF-TM.857.20.0_AIR_v2" \
+  "$HERE/airborne/dorade" "swp.1220907125318.N42RF-TM.857.20.0_AIR_v2"
 convert -cfradial 15 \
   "$SRC/fiona2022/cf1/cfrad.20220907_125318.857_to_20220907_125322.837_N42RF-TM_AIR.nc" \
   "$HERE/airborne/cf1" "cfrad.20220907_125318.857_to_20220907_125322.837_N42RF-TM_AIR.nc"
@@ -82,5 +82,9 @@ convert -cfradial 20 \
 convert -cf2 20 \
   "$SRC/piccolo/cf2/cfrad2.20240903_120008.372_to_20240903_120037.547_SEAPOL_PICCOLO_LONG_SUR.nc" \
   "$HERE/ship/cf2" "cfrad2.20240903_120008.372_to_20240903_120037.547_SEAPOL_PICCOLO_LONG_SUR.nc"
+# SEAPOL is native CfRadial; derive a DORADE sweep from the cf2 for coverage.
+convert -dorade 20 \
+  "$SRC/piccolo/cf2/cfrad2.20240903_120008.372_to_20240903_120037.547_SEAPOL_PICCOLO_LONG_SUR.nc" \
+  "$HERE/ship/dorade" "swp.1240903120008.SEAPOL.372.0.5_SUR_v7344"
 
 echo "Done."

@@ -108,11 +108,12 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     target_include_directories(test_radx_parity PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_radx_parity PROPERTIES WORKING_DIRECTORY ${FIXTURES})
 
-    # Airborne safety net: Radx vs the legacy parser on the N42RF tail sweep.
+    # Airborne parity: DORADE-via-Radx vs CfRadial-via-Radx on the N42RF tail
+    # sweep (georef/AIR scan mode).
     soloiv_add_test(test_radx_airborne)
     target_include_directories(test_radx_airborne PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_radx_airborne PROPERTIES
-        WORKING_DIRECTORY ${FIXTURES}/airborne/dorade)
+        WORKING_DIRECTORY ${FIXTURES})
 
     # CfRadial read -> edit -> write -> reopen round-trip.
     soloiv_add_test(test_radx_roundtrip)

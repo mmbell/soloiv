@@ -1,66 +1,68 @@
 /* test_radx_airborne.c
  *
- * Validates DORADE-via-Radx against the PROVEN in-tree parser on airborne
- * data, where platform georeferencing (rotation/roll/pitch/tilt + Testud
- * equations) drives beam positioning. The N42RF-TM tail-radar sweep in
- * test_data/ is read two ways in one process:
- *   - legacy: the in-tree dd_absorb_* byte parser (SOLOIV_DORADE_LEGACY)
- *   - radx:   the Radx backend (rio_read_*)
- * and the two decodings are asserted to agree on ray count, fixed angle,
- * per-ray azimuth/elevation, range geometry, and field values.
+ * Airborne parity: the N42RF-TM P3 tail sweep (primary_axis=axis_y_prime,
+ * georeference-driven beam positioning) read two ways through Radx -- DORADE
+ * and CfRadial-2 -- must decode to matching geometry and field values, and
+ * both must take soloii's AIR scan mode. This is the airborne analog of
+ * test_radx_parity, and the counterpart to test_seapol_wedge (which asserts a
+ * vertical-axis platform does NOT take AIR mode).
  *
- * This is the airborne safety net behind the default-ON DORADE-via-Radx
- * switch: if Radx ever diverges from the legacy parser on aircraft data,
- * this test fails. Runs with cwd = test_data/.
+ * The former legacy-byte-parser cross-check was dropped: all DORADE I/O now
+ * flows through Radx, and the in-tree byte parser cannot read Radx-written
+ * DORADE. Both formats are therefore read through the Radx backend here.
+ *
+ * Runs with cwd = tests/fixtures so the relative airborne/{dorade,cf2} paths
+ * resolve.
  */
 
 #include <gtk/gtk.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
 #include <math.h>
 
 #include "dorade_headers.h"
 #include "dd_defines.h"
-#include "radar_io.h"
 #include "test_app_runner.h"
 
 struct dd_general_info *dd_window_dgi();
 int dd_givfld();
+int dd_absorb_ray_info();
+int dd_absorb_header_info();
 
-#define AIR_FILE "swp.1220907125318.N42RF-TM.857.20.0_AIR_v2"
-
-/* Load via the legacy in-tree DORADE parser (source_fmt left non-CfRadial,
- * real fd opened for the byte reader). */
-static struct dd_general_info *load_legacy(int win, const char *fname, int *nr)
+/* DORADE field names sometimes substitute '-' for '_'; normalize before
+ * matching a field to its twin. */
+static void normalize_name(char *s)
 {
-    struct dd_general_info *dgi = dd_window_dgi(win, "");
-    int r, n;
-    dgi->source_fmt = DORADE_FMT;          /* legacy byte parser */
-    dgi->in_swp_fid = open(fname, O_RDONLY, 0);
-    g_assert_cmpint(dgi->in_swp_fid, >, 0);
-    n = dd_absorb_header_info(dgi);
-    *nr = dgi->dds->swib->num_rays;
-    (void)n;
-    for (r = 0; r < *nr; r++)
-        if (dd_absorb_ray_info(dgi) < 1) break;
-    return dgi;
+    g_strstrip(s);
+    for (; *s; s++)
+        if (*s == '-') *s = '_';
 }
 
-/* Load via the Radx backend (force the rio dispatch). */
-static struct dd_general_info *load_radx(int win, const char *fname, int *nr)
+#define DORADE_DIR  "airborne/dorade/"
+#define DORADE_FILE "swp.1220907125318.N42RF-TM.857.20.0_AIR_v2"
+#define CF2_DIR     "airborne/cf2/"
+#define CF2_FILE    "cfrad2.20220907_125318.857_to_20220907_125322.837_N42RF-TM_AIR.nc"
+
+/* Load a sweep into window `win` through the Radx backend, draining all rays
+ * so geometry/value state is fully exercised. */
+static struct dd_general_info *load_via_radx(int win, const char *dir,
+                                             const char *fname, int *nr)
 {
     struct dd_general_info *dgi = dd_window_dgi(win, "");
-    int r;
-    g_strlcpy(dgi->directory_name, "./", sizeof(dgi->directory_name));
+    int n, r;
+
+    g_strlcpy(dgi->directory_name, dir, sizeof(dgi->directory_name));
     g_strlcpy(dgi->sweep_file_name, fname, sizeof(dgi->sweep_file_name));
-    dgi->source_fmt = CFRADIAL_FMT;        /* rio backend */
-    *nr = dd_absorb_header_info(dgi);
-    for (r = 0; r < *nr; r++)
+    dgi->source_fmt = CFRADIAL_FMT;     /* force the rio (Radx) backend */
+
+    n = dd_absorb_header_info(dgi);
+    *nr = n;
+    for (r = 0; r < n; r++)
         if (dd_absorb_ray_info(dgi) < 1) break;
     return dgi;
 }
 
+/* Mean physical value over non-bad gates of field `pn`, last-read ray. */
 static double field_mean(struct dd_general_info *dgi, int pn, int *ngood)
 {
     int ndx = pn, g1 = 1, n = dgi->dds->celv->number_cells, i, ng = 0;
@@ -76,49 +78,62 @@ static double field_mean(struct dd_general_info *dgi, int pn, int *ngood)
 
 static void airborne_action(GtkWidget *main_window, gpointer user_data)
 {
-    struct dd_general_info *dl, *dr;
-    int nl = 0, nr = 0, i;
+    struct dd_general_info *dd, *dc;
+    int nd = 0, nc = 0, i;
 
     (void)main_window;
     (void)user_data;
 
-    dl = load_legacy(2, AIR_FILE, &nl);
-    dr = load_radx(3, AIR_FILE, &nr);
+    dd = load_via_radx(2, DORADE_DIR, DORADE_FILE, &nd);
+    dc = load_via_radx(3, CF2_DIR,    CF2_FILE,    &nc);
 
-    /* This is an airborne tail-radar sweep. */
-    g_assert_cmpint(dl->dds->radd->radar_type, ==, AIR_TAIL);
-    g_assert_cmpint(dr->dds->radd->radar_type, ==, AIR_TAIL);
-    g_assert_cmpint(dl->dds->radd->scan_mode, ==, AIR);
-    g_assert_cmpint(dr->dds->radd->scan_mode, ==, AIR);
+    /* Airborne tail radar: a non-vertical primary axis means both formats take
+     * the georeferenced AIR scan mode (contrast test_seapol_wedge). */
+    g_assert_cmpint(dd->dds->radd->radar_type, ==, AIR_TAIL);
+    g_assert_cmpint(dc->dds->radd->radar_type, ==, AIR_TAIL);
+    g_assert_cmpint(dd->dds->radd->scan_mode, ==, AIR);
+    g_assert_cmpint(dc->dds->radd->scan_mode, ==, AIR);
 
-    /* Same structure. */
-    g_assert_cmpint(nl, >, 100);
-    g_assert_cmpint(nl, ==, nr);
-    g_assert_cmpint(dl->num_parms, ==, dr->num_parms);
-    g_assert_cmpint(dl->dds->celv->number_cells, ==,
-                    dr->dds->celv->number_cells);
-    g_assert_cmpfloat(fabs(dl->dds->swib->fixed_angle -
-                           dr->dds->swib->fixed_angle), <, 0.1);
+    /* Same structure across the two formats. */
+    g_assert_cmpint(nd, >, 100);
+    g_assert_cmpint(nd, ==, nc);
+    g_assert_cmpint(dd->num_parms, ==, dc->num_parms);
+    g_assert_cmpint(dd->dds->celv->number_cells, ==,
+                    dc->dds->celv->number_cells);
+    g_assert_cmpfloat(fabs(dd->dds->swib->fixed_angle -
+                           dc->dds->swib->fixed_angle), <, 0.1);
 
-    /* Last-read ray: same beam pointing (az/el) and platform rotation. */
-    g_assert_cmpfloat(fabs(dl->dds->ryib->azimuth - dr->dds->ryib->azimuth),
+    /* Last-read ray: same georeferenced beam pointing and platform rotation. */
+    g_assert_cmpfloat(fabs(dd->dds->ryib->azimuth - dc->dds->ryib->azimuth),
                       <, 0.1);
-    g_assert_cmpfloat(fabs(dl->dds->ryib->elevation - dr->dds->ryib->elevation),
+    g_assert_cmpfloat(fabs(dd->dds->ryib->elevation - dc->dds->ryib->elevation),
                       <, 0.1);
-    g_assert_cmpfloat(fabs(dl->dds->asib->rotation_angle -
-                           dr->dds->asib->rotation_angle), <, 0.1);
+    g_assert_cmpfloat(fabs(dd->dds->asib->rotation_angle -
+                           dc->dds->asib->rotation_angle), <, 0.1);
 
-    /* Field values agree within the int16 quantization step. */
-    for (i = 0; i < dl->num_parms; i++) {
-        int gl = 0, gr = 0;
-        double ml = field_mean(dl, i, &gl);
-        double mr = field_mean(dr, i, &gr);
-        g_assert_cmpint(gl, >, 0);
-        g_assert_cmpfloat(fabs(ml - mr), <, 1.0);
+    /* Same field set, but the two readers may enumerate fields in a different
+     * order. Match each DORADE field to its CfRadial twin by name and compare
+     * physical means within the int16 step. */
+    for (i = 0; i < dd->num_parms; i++) {
+        char nd_name[12], nc_name[12];
+        int j, jmatch = -1, gd = 0, gc = 0;
+        double md, mc;
+        g_strlcpy(nd_name, dd->dds->parm[i]->parameter_name, sizeof(nd_name));
+        normalize_name(nd_name);
+        for (j = 0; j < dc->num_parms; j++) {
+            g_strlcpy(nc_name, dc->dds->parm[j]->parameter_name, sizeof(nc_name));
+            normalize_name(nc_name);
+            if (strcmp(nd_name, nc_name) == 0) { jmatch = j; break; }
+        }
+        g_assert_cmpint(jmatch, >=, 0);
+        md = field_mean(dd, i, &gd);
+        mc = field_mean(dc, jmatch, &gc);
+        g_assert_cmpint(gd, >, 0);
+        g_assert_cmpfloat(fabs(md - mc), <, 1.0);
     }
 
-    g_message("Airborne legacy-vs-Radx OK: %d rays, %d fields agree",
-              nl, dl->num_parms);
+    g_message("Airborne DORADE-vs-cf2 OK: %d rays, %d fields agree",
+              nd, dd->num_parms);
 }
 
 int main(int argc, char *argv[])
