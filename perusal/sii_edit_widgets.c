@@ -167,8 +167,8 @@ char *solo_list_entry (struct solo_list_mgmt  *slm, int jj);
 
 void put_edit_cmds_help (gchar *name, GString *words);
 
-void sii_cmds_help_event (GtkWidget *w, GdkEvent *event
-			      , gpointer data );
+void sii_cmds_help_event (GtkGestureClick *gesture, int n_press,
+			  double x, double y, gpointer data );
 gboolean set_edit_help_items( gpointer a_str, gpointer words );
 void edit_cmds_help_widget (guint frame_num );
 void show_edit_cmd_help_widget (guint frame_num);
@@ -820,56 +820,71 @@ void boundary_buttons_cb (GtkWidget *text, gpointer data )
 
 /* c---------------------------------------------------------------------- */
 
-guint edit_text_event_cb(GtkWidget *text, GdkEvent *event
-			      , gpointer data )
+/* GTK4: attach a left-button click handler to a widget. GTK3 connected
+ * "button_press_event"/"button_release_event" directly on the widget; in GTK4
+ * per-widget clicks arrive through a GtkGestureClick controller instead. */
+void sii_connect_click (GtkWidget *widget, GCallback cb, gpointer data)
 {
-# ifdef notuseful
-  guint position = gtk_text_get_point (GTK_TEXT (text));
-# endif
-  guint frame_num;
-  gint mm, nn, cndx;		/* GPOINTER_TO_UINT (data) */
-  gchar str[256], *aa, *bb, *cc, *line;
-  GtkWidget *cmds;
+  GtkGesture *click = gtk_gesture_click_new ();
+  g_signal_connect (click, "pressed", cb, data);
+  gtk_widget_add_controller (widget, GTK_EVENT_CONTROLLER (click));
+}
+
+/* GTK4: map a click at widget coords (x,y) to a character offset in a
+ * GtkTextView buffer. Replaces the old reliance on the insertion cursor, which
+ * was only positioned by the default press handler and so raced our own. */
+static gint sii_text_offset_at_xy (GtkWidget *text, double x, double y)
+{
+  GtkTextIter iter;
+  gint bx, by;
+
+  gtk_text_view_window_to_buffer_coords (GTK_TEXT_VIEW (text),
+					 GTK_TEXT_WINDOW_WIDGET,
+					 (int)x, (int)y, &bx, &by);
+  gtk_text_view_get_iter_at_location (GTK_TEXT_VIEW (text), &iter, bx, by);
+  return gtk_text_iter_get_offset (&iter);
+}
+
+/* c---------------------------------------------------------------------- */
+
+void edit_text_event_cb(GtkGestureClick *gesture, int n_press,
+			double x, double y, gpointer data )
+{
+  gint nn;
+  gchar *aa, *line;
+  GtkWidget *text, *cmds;
   GtkTextBuffer *buffer;
 
+  (void)n_press;
+  text = gtk_event_controller_get_widget (GTK_EVENT_CONTROLLER (gesture));
   cmds = (GtkWidget *)g_object_get_data (G_OBJECT(text), "cmds_dest" );
-  frame_num = GPOINTER_TO_UINT
-    (g_object_get_data (G_OBJECT(text), "frame_num" ));
+  if (!cmds)
+    { return; }
 
   aa = (gchar *)data;
-  {
-    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
-    GtkTextIter iter;
-    GtkTextMark *mark = gtk_text_buffer_get_insert(tbuf);
-    gtk_text_buffer_get_iter_at_mark(tbuf, &iter, mark);
-    nn = gtk_text_iter_get_offset(&iter);
-  }
+  nn = sii_text_offset_at_xy (text, x, y);
+
   line = sii_nab_line_from_text (aa, nn);
   strcat( line, "\n" );
 
   buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(cmds));
   gtk_text_buffer_insert_at_cursor(buffer, line, strlen(line));
-  return FALSE;
 }
 
 /* c---------------------------------------------------------------------- */
 
-guint sii_edit_help_event_cb(GtkWidget *text, GdkEvent *event
-			     , gpointer data )
+void sii_edit_help_event_cb(GtkGestureClick *gesture, int n_press,
+			    double x, double y, gpointer data )
 {
-  guint frame_num;
-  gint mm, nn, nt, start, end;
-  gchar str[256], *sptrs[32], *aa, *bb, *cc, *line;
+  gint nn, start, end;
+  gchar *aa;
   gboolean ok;
+  GtkWidget *text;
 
+  (void)n_press;
+  text = gtk_event_controller_get_widget (GTK_EVENT_CONTROLLER (gesture));
   aa = (gchar *)data;
-  {
-    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
-    GtkTextIter iter;
-    GtkTextMark *mark = gtk_text_buffer_get_insert(tbuf);
-    gtk_text_buffer_get_iter_at_mark(tbuf, &iter, mark);
-    nn = gtk_text_iter_get_offset(&iter);
-  }
+  nn = sii_text_offset_at_xy (text, x, y);
 
   ok = sii_nab_region_from_text (aa, nn, &start, &end);
   if (ok) {
@@ -887,22 +902,19 @@ guint sii_edit_help_event_cb(GtkWidget *text, GdkEvent *event
        g_free(sel_text);
      }
   }
-
-  return FALSE;
 }
 
 /* c---------------------------------------------------------------------- */
 
-guint edit_file_text_event_cb (GtkWidget *text, GdkEvent *event
-			       , gpointer data )
+void edit_file_text_event_cb (GtkGestureClick *gesture, int n_press,
+			      double x, double y, gpointer data )
 {
   guint num = GPOINTER_TO_UINT (data);
-  guint frame_num, task, wid, wid2, tid;
-  gint mm, nn, cndx, jj;
-  gchar str[256], *aa, *bb, *cc, *line="";
+  guint frame_num, task, wid;
+  gint nn, jj;
+  gchar str[256], *aa, *line="";
   char *buf;
   int size;
-  GtkWidget *entry, *text2;
   EditData *edd;
   gint start, end;
   gboolean ok;
@@ -910,6 +922,10 @@ guint edit_file_text_event_cb (GtkWidget *text, GdkEvent *event
   struct sed_command_files *scf, *se_return_cmd_files_struct();
   struct solo_list_mgmt *slm, *se_update_list();
   GtkTextBuffer *buffer;
+  GtkWidget *text;
+
+  (void)n_press;
+  text = gtk_event_controller_get_widget (GTK_EVENT_CONTROLLER (gesture));
 
   if (!gs)
     { gs = g_string_new (""); }
@@ -918,13 +934,7 @@ guint edit_file_text_event_cb (GtkWidget *text, GdkEvent *event
   edd = (EditData *)frame_configs[frame_num]->edit_data;
   wid = task = num % TASK_MODULO;
 
-  {
-    GtkTextBuffer *tbuf = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
-    GtkTextIter iter;
-    GtkTextMark *mark = gtk_text_buffer_get_insert(tbuf);
-    gtk_text_buffer_get_iter_at_mark(tbuf, &iter, mark);
-    nn = gtk_text_iter_get_offset(&iter);
-  }
+  nn = sii_text_offset_at_xy (text, x, y);
   ok = sii_nab_region_from_text (edd->orig_txt[wid]->str, nn, &start, &end);
 
   if (ok) {
@@ -938,7 +948,7 @@ guint edit_file_text_event_cb (GtkWidget *text, GdkEvent *event
     line = sii_nab_line_from_text (edd->orig_txt[wid]->str, nn);
   }
   if (!strlen (line))
-    { return FALSE; }
+    { return; }
 
   if (wid == EDIT_CMD_FILES) {
      scf = se_return_cmd_files_struct();
@@ -999,7 +1009,6 @@ guint edit_file_text_event_cb (GtkWidget *text, GdkEvent *event
     ok = sii_nab_boundary
       (frame_num, edd->orig_txt[EDIT_BND_DIR]->str, line);
   }
-  return FALSE;
 }
 
 /* c---------------------------------------------------------------------- */
@@ -1148,7 +1157,9 @@ void edit_files_widget (guint frame_num )
   gtk_widget_set_size_request (text, 400, 72);
   edd->data_widget[wid] = text;
   nn = frame_num * TASK_MODULO + wid;
-  /* Note: button_press_event replaced; needs GtkGestureClick in GTK4 */
+  /* GTK4: click a file in the list to load its commands */
+  sii_connect_click (text, G_CALLBACK (edit_file_text_event_cb),
+		     GUINT_TO_POINTER (nn));
 
   buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
   gtk_text_buffer_set_text(buffer, edd->orig_txt[wid]->str, -1);
@@ -1222,7 +1233,9 @@ void edit_files_widget (guint frame_num )
   gtk_widget_set_size_request (text, 400, 72);
   edd->data_widget[wid] = text;
   nn = frame_num * TASK_MODULO + wid;
-  /* Note: button_press_event replaced; needs GtkGestureClick in GTK4 */
+  /* GTK4: click a boundary file in the list to load it */
+  sii_connect_click (text, G_CALLBACK (edit_file_text_event_cb),
+		     GUINT_TO_POINTER (nn));
 
   buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
   gtk_text_buffer_set_text(buffer, edd->orig_txt[wid]->str, -1);
@@ -1274,7 +1287,9 @@ void edit_files_widget (guint frame_num )
   gtk_widget_set_size_request (text, 400, 72);
   edd->data_widget[wid] = text;
   nn = frame_num * TASK_MODULO + wid;
-  /* Note: button_press_event replaced; needs GtkGestureClick in GTK4 */
+  /* GTK4: click a lat/lon boundary file in the list to import it */
+  sii_connect_click (text, G_CALLBACK (edit_file_text_event_cb),
+		     GUINT_TO_POINTER (nn));
 
   buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
   gtk_text_buffer_set_text(buffer, edd->orig_txt[wid]->str, -1);
@@ -1578,7 +1593,9 @@ void main_edit_widget( guint frame_num )
   buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
   gtk_text_buffer_set_text(buffer, cmds_for_each_ray->str, -1);
 
-  /* Note: button_release_event replaced; needs GtkGestureClick in GTK4 */
+  /* GTK4: click a command in the list to copy it into the For Each Ray box */
+  sii_connect_click (text, G_CALLBACK (edit_text_event_cb),
+		     (gpointer)cmds_for_each_ray->str);
 
  /* one time only commands */
 
@@ -1649,7 +1666,9 @@ void main_edit_widget( guint frame_num )
   buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
   gtk_text_buffer_set_text(buffer, cmds_one_time_only->str, -1);
 
-  /* Note: button_release_event replaced; needs GtkGestureClick in GTK4 */
+  /* GTK4: click a command in the list to copy it into the One Time Only box */
+  sii_connect_click (text, G_CALLBACK (edit_text_event_cb),
+		     (gpointer)cmds_one_time_only->str);
 
 
   grid = gtk_grid_new ();
@@ -2212,20 +2231,21 @@ gboolean set_edit_help_items( gpointer a_str, gpointer words )
   label = gtk_label_new ((gchar *)a_str);
   gtk_label_set_justify ((GtkLabel *)label, GTK_JUSTIFY_LEFT );
   gtk_box_append (GTK_BOX (vbox_hlp_cmds), label);
-  /* Note: button_press_event replaced; needs GtkGestureClick in GTK4 */
+  /* GTK4: click a command name to pop up its help text */
+  sii_connect_click (label, G_CALLBACK (sii_cmds_help_event), words);
 
   return( FALSE );		/* to continue a tree traverse */
 }
 
 /* c---------------------------------------------------------------------- */
 
-void sii_cmds_help_event (GtkWidget *w, GdkEvent *event
-			      , gpointer data )
+void sii_cmds_help_event (GtkGestureClick *gesture, int n_press,
+			  double x, double y, gpointer data )
 {
-   gchar *words = (gchar *)data;
-   gchar str[128], *sptr[16], *aa;
-   GdkModifierType state, statexy;
-
+   (void)gesture;
+   (void)n_press;
+   (void)x;
+   (void)y;
    edit_help_widget  ((gchar *)data);
 }
 
@@ -2293,7 +2313,8 @@ static void edit_help_widget (gchar *words)
 # ifdef notyet
 # endif
   gtk_widget_set_size_request (text, 480, 300);
-  /* Note: button_press_event replaced; needs GtkGestureClick in GTK4 */
+  /* GTK4: click within the help text to select and copy a command region */
+  sii_connect_click (text, G_CALLBACK (sii_edit_help_event_cb), aa);
 
   scrolled_window = gtk_scrolled_window_new ();
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
