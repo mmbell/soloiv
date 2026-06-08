@@ -124,4 +124,12 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     soloiv_add_test(test_cfradial_examine)
     set_tests_properties(test_cfradial_examine PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
+    # Regression: shipborne SEAPOL (mislabeled platform_type=aircraft, but
+    # primary_axis=axis_z) must render as a full surveillance PPI, not the
+    # ~88-degree wedge produced when it was forced into AIR scan mode.
+    soloiv_add_test(test_seapol_wedge)
+    target_include_directories(test_seapol_wedge PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_seapol_wedge PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ship/cf2)
 endif()
