@@ -377,12 +377,25 @@ void sii_edit_menu_cb ( GtkWidget *w, gpointer data )
       se_process_data(arg, cmds, time_series, automatic, down, d_ctr
 		      , frame_num);
       sii_edit_reset_times (frame_num);
-      /* The edit wrote a new sweep version; mark the lead sweep modified so the
-       * (auto or manual) replot re-reads it from disk. Without this the display
-       * keeps showing the pre-edit data until some other event re-reads the
-       * file. The examine path does the same (see sxm_examine.c). */
-      if (seds->modified && wwptr->lead_sweep)
-	{ wwptr->lead_sweep->sweep_file_modified = YES; }
+      if (seds->modified) {
+#ifdef SOLOIV_IO_BACKEND_RADX
+	/* The rio reader caches the input volume keyed on file path. An
+	 * in-place edit overwrites the sweep under the same name, so the cache
+	 * would keep serving the pre-edit data to a repaint, the Replot button,
+	 * and the next edit. Drop it so they re-read the edited file from disk
+	 * (and chained edits build on each other). */
+	struct dd_general_info *dgi, *dd_window_dgi();
+	void rio_invalidate_read();
+	int rio_is_managed();
+	dgi = dd_window_dgi (frame_num, "");
+	if (dgi && rio_is_managed (dgi))
+	  { rio_invalidate_read (dgi); }
+#endif
+	/* Mark the lead sweep modified so the (auto or manual) replot re-reads
+	 * from disk. The examine path does the same (see sxm_examine.c). */
+	if (wwptr->lead_sweep)
+	  { wwptr->lead_sweep->sweep_file_modified = YES; }
+      }
       if (edd->toggle[EDIT_AUTO_REPLOT])
 	{ sii_plot_data (frame_num, REPLOT_LOCK_STEP); }
       break;

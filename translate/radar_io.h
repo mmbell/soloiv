@@ -66,6 +66,10 @@ void rio_seek_ray(struct dd_general_info *dgi, int ray_index);
 /* Release the cached Radx volume held for this dgi. */
 void rio_close(struct dd_general_info *dgi);
 
+/* Drop the cached input volume (keep the dgi state) so the next read re-opens
+ * from disk. Call after an in-place edit overwrites the sweep. */
+void rio_invalidate_read(struct dd_general_info *dgi);
+
 /* ------------------------------------------------------------------ *
  *  Write path (dispatched from dd_dump_ray / dd_flush)                *
  * ------------------------------------------------------------------ */

@@ -641,6 +641,21 @@ void rio_close(struct dd_general_info *dgi)
   dgi->gpptr7 = NULL;
 }
 
+/* Drop the cached input volume so the next rio_read_header re-opens the file
+ * from disk. The read cache (gpptr7) is keyed on path and only refreshed when
+ * the path changes; an in-place edit overwrites the sweep under the same name,
+ * so without this a repaint / replot / subsequent edit keeps reading the stale
+ * pre-edit volume. The per-DGI state struct is kept; only the open handle and
+ * the cached path are cleared. */
+void rio_invalidate_read(struct dd_general_info *dgi)
+{
+  struct rio_state *st = rio_get_state(dgi);
+  if (!st) return;
+  if (st->vol) rio_vol_close(st->vol);
+  st->vol = NULL;
+  st->path[0] = '\0';
+}
+
 /* ================================================================== *
  *  Write path                                                         *
  * ================================================================== */

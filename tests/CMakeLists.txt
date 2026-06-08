@@ -130,6 +130,14 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     set_tests_properties(test_radx_drop_field PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ground)
 
+    # Regression: after an in-place edit overwrites a sweep, the rio read cache
+    # must be invalidated so a re-read returns the edited data (drives Replot
+    # refresh and chained edits).
+    soloiv_add_test(test_radx_reload)
+    target_include_directories(test_radx_reload PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_radx_reload PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
     # Examine widget on a CfRadial sweep (rewind + per-ray display list).
     soloiv_add_test(test_cfradial_examine)
     set_tests_properties(test_cfradial_examine PROPERTIES
