@@ -132,4 +132,9 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     target_include_directories(test_seapol_wedge PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_seapol_wedge PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ship/cf2)
+
+    # Regression: CfRadial filename -> radar name must be consistent across
+    # cf1/cf2 so the catalog groups a radar's sweeps for next/prev navigation.
+    soloiv_add_test(test_cfradial_filename)
+    target_include_directories(test_cfradial_filename PRIVATE ${CMAKE_SOURCE_DIR}/translate)
 endif()

@@ -150,7 +150,7 @@ int rio_craack_cfradial(const char *name, struct dd_file_name_v3 *ddfn)
 {
   const char *p, *dot;
   char base[256], *tok, *toks[32];
-  int ntok = 0, yy, mon, dd, hh, mm, ss, ms = 0;
+  int ntok = 0, yy, mon, dd, hh, mm, ss, ms = 0, jj, instr;
   DD_TIME dts;
 
   if (!name || !ddfn) return -1;
@@ -175,13 +175,25 @@ int rio_craack_cfradial(const char *name, struct dd_file_name_v3 *ddfn)
   ddfn->milliseconds = ms;
   ddfn->version = 1;
 
-  /* radar name = second-to-last underscore token of the basename. */
+  /* Radar/instrument name = the token immediately after the time spec.
+   * Names are cfrad[2].<t1>[_to_<t2>]_<instrument>_<scan>.nc. Token 0 is
+   * "cfrad.<date>" and token 1 the time-of-day; an optional "to" + date +
+   * time precede the instrument. The scan name may itself contain underscores
+   * (e.g. SEAPOL_PICCOLO_LONG_SUR), so a "second-to-last token" heuristic
+   * mis-reads the radar as "LONG"/"VOL1" and each file lands under its own
+   * radar in the catalog -- breaking next/prev file navigation. */
   strncpy(base, name, sizeof(base) - 1);
   base[sizeof(base) - 1] = '\0';
   { char *nc = strstr(base, ".nc"); if (nc) *nc = '\0'; }
   for (tok = strtok(base, "_"); tok && ntok < 32; tok = strtok(NULL, "_"))
     toks[ntok++] = tok;
-  if (ntok >= 2)
+  instr = 2;                        /* no "_to_": cfrad.<date> <time> <instr> */
+  for (jj = 0; jj < ntok; jj++) {
+    if (strcmp(toks[jj], "to") == 0) { instr = jj + 3; break; }
+  }
+  if (instr < ntok)
+    strncpy(ddfn->radar_name, toks[instr], sizeof(ddfn->radar_name) - 1);
+  else if (ntok >= 2)
     strncpy(ddfn->radar_name, toks[ntok - 2], sizeof(ddfn->radar_name) - 1);
   else
     strcpy(ddfn->radar_name, "RADAR");
