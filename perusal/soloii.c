@@ -512,8 +512,12 @@ void soloiv_activate(GtkApplication *app, gpointer user_data)
    * fragments. Users change zoom via the Zoom menu instead. */
   gtk_window_set_resizable (GTK_WINDOW(main_window), FALSE);
 
-  /* Key press event via GtkEventControllerKey */
+  /* Key press event via GtkEventControllerKey.
+   * Capture phase so the sweep-stepping arrow keys are handled (and consumed)
+   * before the focused GtkPopoverMenuBar gets them — otherwise Left/Right both
+   * step the sweep AND move the menubar's item focus. */
   controller = gtk_event_controller_key_new();
+  gtk_event_controller_set_propagation_phase(controller, GTK_PHASE_CAPTURE);
   g_signal_connect(controller, "key-pressed",
                    G_CALLBACK(sii_frame_key_pressed_cb), GUINT_TO_POINTER(77));
   gtk_widget_add_controller(main_window, controller);

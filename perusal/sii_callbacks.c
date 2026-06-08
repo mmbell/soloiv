@@ -827,7 +827,8 @@ gboolean sii_frame_key_pressed_cb(GtkEventControllerKey *controller,
       g_message( "Caught Right " );
 # endif
     }
-    break;
+    /* Consume the arrow so the focused menu bar does not also navigate. */
+    return GDK_EVENT_STOP;
 
   case GDK_KEY_Left:
     /* Same as Right only the other direction */
@@ -846,15 +847,17 @@ gboolean sii_frame_key_pressed_cb(GtkEventControllerKey *controller,
       g_message( "Caught Left " );
 # endif
     }
-    break;
+    /* Consume the arrow so the focused menu bar does not also navigate. */
+    return GDK_EVENT_STOP;
 
   case GDK_KEY_Up:
-    /* Next sweep at same fixed angle */
-      break;
+    /* Next sweep at same fixed angle (reserved); consume so the menu bar
+     * does not open/navigate on arrow keys. */
+    return GDK_EVENT_STOP;
 
   case GDK_KEY_Down:
-    /* Previous sweep at same fixed angle */
-    break;
+    /* Previous sweep at same fixed angle (reserved); consume as above. */
+    return GDK_EVENT_STOP;
 
 
   case GDK_KEY_Return:
