@@ -162,4 +162,18 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     target_include_directories(test_cfradial_multisweep PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_cfradial_multisweep PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/volume)
+
+    # Issue #2: end-to-end next/prev sweep navigation steps through every sweep
+    # of a multi-sweep volume (solo_nab_next_file), not just sweep 0.
+    soloiv_add_test(test_multisweep_nav)
+    target_include_directories(test_multisweep_nav PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_multisweep_nav PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/volume)
+
+    # Issue #2 safety: editing one sweep of a multi-sweep volume writes a new
+    # per-sweep file and leaves the volume file byte-for-byte intact.
+    soloiv_add_test(test_multisweep_edit_safe)
+    target_include_directories(test_multisweep_edit_safe PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_multisweep_edit_safe PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/volume)
 endif()
