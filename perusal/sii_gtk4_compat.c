@@ -10,6 +10,25 @@
 /* Font management - replaces GdkFont with PangoFontDescription */
 /* c---------------------------------------------------------------------- */
 
+/* A single long-lived PangoContext shared by all text measurement.
+ *
+ * Previously sii_font_string_width() and sii_cairo_draw_text() created (and
+ * destroyed) a fresh PangoContext + PangoLayout on every call -- many times
+ * per frame draw. Each fresh context re-resolves the font family through the
+ * platform backend; on macOS that drove Pango's CoreText font-descriptor
+ * cache hard and was the source of a rare crash (objc_msgSend on a freed
+ * CoreText object inside the draw path, GH #3). Reusing one context + one
+ * cached layout per role keeps the resolved font warm and removes the
+ * per-call churn. The GUI draws on the main thread only, so a process-wide
+ * cache is safe. */
+static PangoContext *sii_shared_context(void)
+{
+  static PangoContext *ctx = NULL;
+  if (!ctx)
+    ctx = pango_font_map_create_context(pango_cairo_font_map_get_default());
+  return ctx;
+}
+
 SiiFont *sii_font_new(const char *family, int size_points, gboolean monospace)
 {
   SiiFont *f = g_malloc0(sizeof(SiiFont));
@@ -28,16 +47,14 @@ SiiFont *sii_font_new(const char *family, int size_points, gboolean monospace)
   pango_font_description_set_size(f->desc,
     (size_points * PANGO_SCALE) / 10);
 
-  /* Get metrics for ascent/descent calculation */
-  context = pango_font_map_create_context(
-    pango_cairo_font_map_get_default());
+  /* Get metrics for ascent/descent calculation (shared context, not a
+   * throwaway one). */
+  context = sii_shared_context();
   lang = pango_language_get_default();
   f->metrics = pango_context_get_metrics(context, f->desc, lang);
 
   f->ascent = pango_font_metrics_get_ascent(f->metrics) / PANGO_SCALE;
   f->descent = pango_font_metrics_get_descent(f->metrics) / PANGO_SCALE;
-
-  g_object_unref(context);
 
   return f;
 }
@@ -52,19 +69,14 @@ void sii_font_free(SiiFont *font)
 
 gint sii_font_string_width(SiiFont *font, const gchar *text)
 {
-  PangoContext *context;
-  PangoLayout *layout;
+  static PangoLayout *layout = NULL;
   gint width, height;
 
-  context = pango_font_map_create_context(
-    pango_cairo_font_map_get_default());
-  layout = pango_layout_new(context);
+  if (!layout)
+    layout = pango_layout_new(sii_shared_context());
   pango_layout_set_font_description(layout, font->desc);
   pango_layout_set_text(layout, text, -1);
   pango_layout_get_pixel_size(layout, &width, &height);
-
-  g_object_unref(layout);
-  g_object_unref(context);
 
   return width;
 }
@@ -76,12 +88,18 @@ gint sii_font_string_width(SiiFont *font, const gchar *text)
 void sii_cairo_draw_text(cairo_t *cr, SiiFont *font, double x, double y,
                          const gchar *text, int len)
 {
-  PangoLayout *layout;
+  static PangoLayout *layout = NULL;
   gchar *str;
 
   if (!text || len == 0) return;
 
-  layout = pango_cairo_create_layout(cr);
+  /* Reuse one layout, re-binding it to the current cairo context each call
+   * (rather than creating + destroying a layout, and re-resolving the font,
+   * on every draw). See sii_shared_context() above for the rationale. */
+  if (!layout)
+    layout = pango_cairo_create_layout(cr);
+  else
+    pango_cairo_update_layout(cr, layout);
   pango_layout_set_font_description(layout, font->desc);
 
   if (len < 0) {
@@ -95,8 +113,6 @@ void sii_cairo_draw_text(cairo_t *cr, SiiFont *font, double x, double y,
   /* Position text: y is baseline in old API, but Pango draws from top-left */
   cairo_move_to(cr, x, y - font->ascent);
   pango_cairo_show_layout(cr, layout);
-
-  g_object_unref(layout);
 }
 
 void sii_cairo_set_color(cairo_t *cr, GdkRGBA *color)
