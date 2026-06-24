@@ -211,6 +211,11 @@ struct dd_general_info {
     int sweep_fid;		/* output fid */
     int sweep_num;
     int source_num_rays;
+    /* CfRadial multi-sweep: which sweep within the loaded volume the next
+     * read should return (0 = first). Sweep navigation sets this; the Radx
+     * reader clamps it to the volume's sweep count. 0 for single-sweep files
+     * and all DORADE files, so those paths are unaffected. */
+    int rio_req_sweep;
     int version;		/* output version number */
     int vol_count;
     int vol_num;

@@ -155,4 +155,11 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     # cf1/cf2 so the catalog groups a radar's sweeps for next/prev navigation.
     soloiv_add_test(test_cfradial_filename)
     target_include_directories(test_cfradial_filename PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+
+    # Issue #2: a multi-sweep CfRadial volume must expose every sweep, not just
+    # sweep 0. The reader honors dgi->rio_req_sweep to step through all sweeps.
+    soloiv_add_test(test_cfradial_multisweep)
+    target_include_directories(test_cfradial_multisweep PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_cfradial_multisweep PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/volume)
 endif()
