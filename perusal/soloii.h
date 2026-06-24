@@ -38,15 +38,15 @@ typedef struct { gint x, y; } GdkPoint;
 # define DEFAULT_WIDTH 300
 # define DEFAULT_HEIGHT 180
 
-enum {
+typedef enum {
    MAIN_ZERO,
    MAIN_PNG,
    MAIN_GIF,
    MAIN_PRNT,
    MAIN_LAST_ENUM,
-}MainOps;
+} MainOps;
 
-enum {				/* top level window ids for each frame */
+typedef enum {			/* top level window ids for each frame */
    FRAME_ZERO,
    FRAME_MENU,
    FRAME_CLICK_DATA,
@@ -103,7 +103,7 @@ static const int FrameZoomResize = 0x4;
 static const int FrameNewConfig  = 0x8;
 static const int FrameReshape    = 0x10;
 
-enum {
+typedef enum {
    ENTRY_ZERO,
    ENTRY_ONE_FLOAT,
    ENTRY_TWO_FLOATS,
@@ -114,7 +114,7 @@ enum {
 
 } EntryOpts;
 
-enum {
+typedef enum {
    LI_ZERO,
    LI_SWPFI,
    LI_LOCKSTEP,
@@ -124,7 +124,7 @@ enum {
    LI_LANDMARK,
    LI_LAST_ENUM,
 
-}LinksIds;
+} LinksIds;
 
 typedef GdkRectangle		  Rectangle;
 typedef graphene_point_t	  Point;

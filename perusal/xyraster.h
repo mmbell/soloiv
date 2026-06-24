@@ -19,7 +19,7 @@
 union rxu {
     long scaled_val;
     short val;
-} u;
+};
 
 struct rxy_coords {
     double x;
