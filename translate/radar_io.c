@@ -395,7 +395,20 @@ int rio_read_header(struct dd_general_info *dgi)
     }
     strncpy(st->path, path, sizeof(st->path) - 1);
     st->path[sizeof(st->path) - 1] = '\0';
-    st->swp_index = 0;     /* samples are 1 sweep/file (see §4.4) */
+  }
+
+  /* Which sweep within the volume? Sweep navigation sets dgi->rio_req_sweep
+   * (0 for single-sweep files and DORADE). Clamp to the volume's range so a
+   * stale request can never read out of bounds. This is evaluated on every
+   * header read -- including cached re-reads of the same file -- so stepping
+   * to another sweep of an already-open volume needs no reopen. */
+  {
+    int nsw = rio_vol_nsweeps(st->vol);
+    int want = dgi->rio_req_sweep;
+    if (nsw < 1) nsw = 1;
+    if (want < 0) want = 0;
+    if (want >= nsw) want = nsw - 1;
+    st->swp_index = want;
   }
 
   if (rio_vol_sweep(st->vol, st->swp_index, &sw) != 0) return -1;
@@ -654,6 +667,25 @@ void rio_invalidate_read(struct dd_general_info *dgi)
   if (st->vol) rio_vol_close(st->vol);
   st->vol = NULL;
   st->path[0] = '\0';
+}
+
+/* Number of sweeps in the currently-loaded volume (0 if none open). Used by
+ * sweep navigation to decide whether to step within the volume or advance to
+ * the next file. The volume is read in full on load, so this is the real
+ * count -- including for multi-sweep CfRadial volumes. */
+int rio_volume_nsweeps(struct dd_general_info *dgi)
+{
+  struct rio_state *st = rio_get_state(dgi);
+  if (!st || !st->vol) return 0;
+  return rio_vol_nsweeps(st->vol);
+}
+
+/* The sweep index within the volume that the last read returned. */
+int rio_current_sweep(struct dd_general_info *dgi)
+{
+  struct rio_state *st = rio_get_state(dgi);
+  if (!st || !st->vol) return 0;
+  return st->swp_index;
 }
 
 /* ================================================================== *

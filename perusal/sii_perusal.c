@@ -1011,6 +1011,7 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
     double dd_heading(), dd_roll(), dd_pitch(), dd_drift(), dd_tilt_angle();
     double diff;
     int ii, jj, n, rnx, vv, mark, filter_set = 0, vn, vn_ref, nsms, frame_num;
+    int within_volume_step = NO;
     struct solo_list_mgmt *slm;
     struct solo_perusal_info *solo_return_winfo_ptr();
     const char *smptr;
@@ -1077,7 +1078,30 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
 	     return(NO);
 	  }
 
-    if (filter_set) {
+#ifdef SOLOIV_IO_BACKEND_RADX
+    /* CfRadial multi-sweep: if the loaded volume holds more sweeps in the
+     * requested direction, step to the next/previous sweep within it instead
+     * of advancing to another file. The reader serves the new sweep from the
+     * already-cached volume (no reopen). Plain next/prev only -- time-sync,
+     * filters and TIME_NEAREST jumps fall through to normal file navigation. */
+    if ((file_action == FORWARD || file_action == BACKWARD)
+	&& !swpfi_time_sync && !filter_set) {
+      struct dd_general_info *cdgi = dd_window_dgi(frme, "");
+      int nsw = cdgi ? rio_volume_nsweeps(cdgi) : 0;
+      if (nsw > 1) {
+	int cur = rio_current_sweep(cdgi);
+	if (file_action == FORWARD && cur < nsw - 1) {
+	  cdgi->rio_req_sweep = cur + 1;
+	  within_volume_step = YES;
+	} else if (file_action == BACKWARD && cur > 0) {
+	  cdgi->rio_req_sweep = cur - 1;
+	  within_volume_step = YES;
+	}
+      }
+    }
+#endif
+
+    if (filter_set && !within_volume_step) {
       d_mddir_file_info_v3(frme, wwptr->sweep->radar_num
 			   , wwptr->d_sweepfile_time_stamp
 			   , TIME_NEAREST, version, &vv
@@ -1091,7 +1115,7 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
       nsms = dd_tokenz (scan_modes, smptrs, sii_item_delims());
     }
 
-    for(ii=0; ii < sweep_skip || filter_set; ii++) {
+    for(ii=0; !within_volume_step && (ii < sweep_skip || filter_set); ii++) {
 	wwptr->d_prev_time_stamp = wwptr->d_sweepfile_time_stamp;
 
 	if (swpfi_time_sync) {
@@ -1160,6 +1184,10 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
       dgi->source_fmt = CFRADIAL_FMT;        /* rio-managed (CfRadial or DORADE) */
     else if (dgi->source_fmt == CFRADIAL_FMT)
       dgi->source_fmt = DORADE_FMT;
+    /* A move to a different file starts at that file's first sweep; only a
+     * within-volume step carries a nonzero requested sweep index. */
+    if (!within_volume_step)
+      dgi->rio_req_sweep = 0;
 #endif
     dd_absorb_header_info(dgi);
     dd_absorb_ray_info(dgi);

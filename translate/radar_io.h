@@ -70,6 +70,11 @@ void rio_close(struct dd_general_info *dgi);
  * from disk. Call after an in-place edit overwrites the sweep. */
 void rio_invalidate_read(struct dd_general_info *dgi);
 
+/* Multi-sweep CfRadial: sweep count of the loaded volume, and the sweep index
+ * the last read returned. Used by sweep navigation to step within a volume. */
+int rio_volume_nsweeps(struct dd_general_info *dgi);
+int rio_current_sweep(struct dd_general_info *dgi);
+
 /* ------------------------------------------------------------------ *
  *  Write path (dispatched from dd_dump_ray / dd_flush)                *
  * ------------------------------------------------------------------ */
