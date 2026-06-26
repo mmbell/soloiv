@@ -78,6 +78,11 @@ soloiv_add_test(test_dorade_partial_header)
 soloiv_add_test(test_cvd_colormaps)
 soloiv_add_test(test_param_minmax_round_trip)
 
+# Issue #3: the per-frame text path reuses a cached Pango context/layout
+# instead of recreating them per call (the churn behind the macOS CoreText
+# crash). Hammer measurement + draw and check widths stay correct.
+soloiv_add_test(test_font_cache)
+
 # These GUI tests open data-dependent widgets, so they need a loaded sweep:
 # run them with cwd = a committed fixture sweep dir. (Previously they relied
 # on sweeps sitting at test_data/ root, which no longer holds any after the
