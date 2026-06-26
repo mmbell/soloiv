@@ -130,6 +130,14 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     set_tests_properties(test_radx_drop_field PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ground)
 
+    # Regression (issue #6): a real for-each-ray editor command must apply
+    # across the WHOLE ray, not just gate 0. The Radx read path used to leave
+    # clip_gate at 0, so for-each-ray ops silently no-oped past the first gate.
+    soloiv_add_test(test_edit_applies)
+    target_include_directories(test_edit_applies PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_edit_applies PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground)
+
     # Regression: after an in-place edit overwrites a sweep, the rio read cache
     # must be invalidated so a re-read returns the edited data (drives Replot
     # refresh and chained edits).
