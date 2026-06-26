@@ -138,6 +138,13 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     set_tests_properties(test_edit_applies PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ground)
 
+    # Issue #7: multi-level edit undo snapshots the sweep file before each edit
+    # and restores it (LIFO) on Undo.
+    soloiv_add_test(test_edit_undo)
+    target_include_directories(test_edit_undo PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_edit_undo PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground)
+
     # Regression: after an in-place edit overwrites a sweep, the rio read cache
     # must be invalidated so a re-read returns the edited data (drives Replot
     # refresh and chained edits).

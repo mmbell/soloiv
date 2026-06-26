@@ -12,6 +12,8 @@
 # include <sed_shared_structs.h>
 # include <seds.h>
 # include <solo_list_widget_ids.h>
+# include <dd_general_info.h>
+# include <glib/gstdio.h>
 
 # ifndef ETERNITY
 # define DAY_ZERO 0
@@ -41,6 +43,7 @@ enum {
    EDIT_CLEAR_BND,
    EDIT_CLEAR_CURRENT_BND,
    EDIT_DO_IT,
+   EDIT_UNDO,
    EDIT_CLEAR_FER,
    EDIT_CLEAR_OTO,
 
@@ -133,7 +136,122 @@ typedef struct {
 
 static EditData *edata;
 
+/* c---------------------------------------------------------------------- */
+/* Edit undo support (issue #7)
+ *
+ * Editing commands overwrite the sweep file in place under the same name, so
+ * a byte-for-byte copy of the file taken just before a "Do It" is a complete,
+ * format-agnostic (DORADE or CfRadial) snapshot of the pre-edit state. The
+ * snapshots form a bounded LIFO stack so several successive edits can be
+ * undone one at a time. Scope is the frame's current (lead) sweep; a batch
+ * edit that spans several sweeps restores only that lead sweep. */
 
+# define SE_UNDO_DEPTH 32
+
+struct se_undo_entry {
+  char orig_path[256];      /* the sweep file that was edited */
+  char backup_path[512];    /* our private byte copy of its pre-edit state */
+};
+
+static struct se_undo_entry se_undo_stack[SE_UNDO_DEPTH];
+static int se_undo_count = 0;
+static gchar *se_undo_tmpdir = NULL;
+static guint se_undo_seq = 0;
+
+static gboolean se_undo_copy_file (const char *src, const char *dst)
+{
+  gchar *buf = NULL;
+  gsize len = 0;
+  GError *err = NULL;
+
+  if (!g_file_get_contents (src, &buf, &len, &err)) {
+    if (err) g_error_free (err);
+    return FALSE;
+  }
+  if (!g_file_set_contents (dst, buf, len, &err)) {
+    if (err) g_error_free (err);
+    g_free (buf);
+    return FALSE;
+  }
+  g_free (buf);
+  return TRUE;
+}
+
+/* Build the on-disk path of the sweep file the given frame is editing. */
+static gboolean se_undo_frame_path (guint frame_num, char *out, gsize cap)
+{
+  struct dd_general_info *dgi, *dd_window_dgi();
+
+  dgi = dd_window_dgi (frame_num, "");
+  if (!dgi || !dgi->sweep_file_name[0])
+    return FALSE;
+  g_snprintf (out, cap, "%s%s", dgi->directory_name, dgi->sweep_file_name);
+  return TRUE;
+}
+
+/* Snapshot the frame's current sweep file onto the undo stack.
+ * Returns TRUE if a snapshot was taken. (Non-static: exercised by tests.) */
+gboolean se_undo_push (guint frame_num)
+{
+  char path[256];
+  struct se_undo_entry *e;
+
+  if (!se_undo_frame_path (frame_num, path, sizeof(path)))
+    return FALSE;
+  if (!g_file_test (path, G_FILE_TEST_IS_REGULAR))
+    return FALSE;
+
+  if (!se_undo_tmpdir) {
+    se_undo_tmpdir = g_dir_make_tmp ("soloiv_undo_XXXXXX", NULL);
+    if (!se_undo_tmpdir)
+      return FALSE;
+  }
+
+  /* drop the oldest entry if the stack is full */
+  if (se_undo_count == SE_UNDO_DEPTH) {
+    g_remove (se_undo_stack[0].backup_path);
+    memmove (&se_undo_stack[0], &se_undo_stack[1],
+             (SE_UNDO_DEPTH - 1) * sizeof(struct se_undo_entry));
+    se_undo_count--;
+  }
+
+  e = &se_undo_stack[se_undo_count];
+  g_strlcpy (e->orig_path, path, sizeof(e->orig_path));
+  g_snprintf (e->backup_path, sizeof(e->backup_path),
+              "%s/undo_%u_%u", se_undo_tmpdir, frame_num, se_undo_seq++);
+  if (!se_undo_copy_file (path, e->backup_path))
+    return FALSE;
+
+  se_undo_count++;
+  return TRUE;
+}
+
+/* Discard the most recent snapshot (e.g. the Do It turned out to be a no-op). */
+void se_undo_discard_top (void)
+{
+  if (se_undo_count <= 0)
+    return;
+  se_undo_count--;
+  g_remove (se_undo_stack[se_undo_count].backup_path);
+}
+
+/* Restore the most recent snapshot, reverting the last edit.
+ * Returns TRUE if an edit was undone. (Non-static: exercised by tests.) */
+gboolean se_undo_pop_restore (void)
+{
+  struct se_undo_entry *e;
+
+  if (se_undo_count <= 0)
+    return FALSE;
+  e = &se_undo_stack[se_undo_count - 1];
+  if (!se_undo_copy_file (e->backup_path, e->orig_path))
+    return FALSE;
+  g_remove (e->backup_path);
+  se_undo_count--;
+  return TRUE;
+}
+
+/* c---------------------------------------------------------------------- */
 
 void main_edit_widget( guint frame_num );
 static GSList *radio_group = NULL;
@@ -256,6 +374,7 @@ void sii_edit_menu_cb ( GtkWidget *w, gpointer data )
    struct swp_file_input_control *sfic;
    WW_PTR wwptr, solo_return_wwptr();
    GtkTextBuffer *buffer;
+   gboolean did_snapshot = FALSE;
 
 
 
@@ -374,9 +493,15 @@ void sii_edit_menu_cb ( GtkWidget *w, gpointer data )
       down = wwptr->view->type_of_plot & TS_PLOT_DOWN;
       d_ctr = wwptr->view->ts_ctr_km;
 
+      /* Snapshot the sweep file before editing so this Do It can be undone. */
+      did_snapshot = se_undo_push (frame_num);
+
       se_process_data(arg, cmds, time_series, automatic, down, d_ctr
 		      , frame_num);
       sii_edit_reset_times (frame_num);
+      /* A Do It that changed nothing should not leave an undo entry. */
+      if (did_snapshot && !seds->modified)
+	{ se_undo_discard_top (); }
       if (seds->modified) {
 #ifdef SOLOIV_IO_BACKEND_RADX
 	/* The rio reader caches the input volume keyed on file path. An
@@ -398,6 +523,28 @@ void sii_edit_menu_cb ( GtkWidget *w, gpointer data )
       }
       if (edd->toggle[EDIT_AUTO_REPLOT])
 	{ sii_plot_data (frame_num, REPLOT_LOCK_STEP); }
+      break;
+
+    case EDIT_UNDO:
+      /* Revert the most recent edit by restoring the pre-edit sweep file. */
+      if (se_undo_pop_restore ()) {
+#ifdef SOLOIV_IO_BACKEND_RADX
+	/* The restored file is back on disk under the same name; drop the rio
+	 * read cache so a repaint/Replot re-reads the reverted data. */
+	{
+	  struct dd_general_info *dgi, *dd_window_dgi();
+	  void rio_invalidate_read();
+	  int rio_is_managed();
+	  dgi = dd_window_dgi (frame_num, "");
+	  if (dgi && rio_is_managed (dgi))
+	    { rio_invalidate_read (dgi); }
+	}
+#endif
+	wwptr = solo_return_wwptr (frame_num);
+	if (wwptr->lead_sweep)
+	  { wwptr->lead_sweep->sweep_file_modified = YES; }
+	sii_plot_data (frame_num, REPLOT_LOCK_STEP);
+      }
       break;
 
       /* Radio menu items */
@@ -1334,6 +1481,22 @@ void edit_files_widget (guint frame_num )
 
 /* c---------------------------------------------------------------------- */
 
+/* Key handler for the edit window: Ctrl+Z triggers Undo (issue #7). */
+gboolean sii_edit_keyboard_event (GtkEventControllerKey *controller,
+				  guint keyval, guint keycode,
+				  GdkModifierType state, gpointer data)
+{
+  guint num = GPOINTER_TO_UINT (data);
+  guint frame_num = num / TASK_MODULO;
+
+  if ((state & GDK_CONTROL_MASK) &&
+      (keyval == GDK_KEY_z || keyval == GDK_KEY_Z)) {
+    sii_edit_menu_cb (NULL, (gpointer)(frame_num * TASK_MODULO + EDIT_UNDO));
+    return TRUE;
+  }
+  return FALSE;
+}
+
 void main_edit_widget( guint frame_num )
 {
   GtkWidget *label;
@@ -1447,6 +1610,15 @@ void main_edit_widget( guint frame_num )
 		      G_CALLBACK(sii_nullify_widget_cb),
 		      (gpointer)(frame_num * TASK_MODULO + FRAME_EDITOR));
 
+  /* Ctrl+Z on the edit window undoes the most recent edit (issue #7). */
+  {
+    GtkEventController *kc = gtk_event_controller_key_new();
+    g_signal_connect (kc, "key-pressed",
+		      G_CALLBACK(sii_edit_keyboard_event),
+		      (gpointer)(frame_num * TASK_MODULO));
+    gtk_widget_add_controller (window, kc);
+  }
+
   /* --- Title and border --- */
   bb = g_strdup_printf ("Frame %d  Edit Widget", frame_num+1 );
   gtk_window_set_title (GTK_WINDOW (window), bb);
@@ -1498,6 +1670,18 @@ void main_edit_widget( guint frame_num )
   gtk_grid_attach (GTK_GRID (grid), button, 0, row, 1, 2);
   row++;
   nn = frame_num*TASK_MODULO + EDIT_DO_IT;
+  g_signal_connect (G_OBJECT(button)
+		      ,"clicked"
+		      , G_CALLBACK (sii_edit_menu_cb)
+		      , (gpointer)nn
+		      );
+
+  button = gtk_button_new_with_label (" Undo ");
+  gtk_widget_set_hexpand (button, TRUE);
+  gtk_widget_set_vexpand (button, TRUE);
+  row++;
+  gtk_grid_attach (GTK_GRID (grid), button, 0, row, 1, 1);
+  nn = frame_num*TASK_MODULO + EDIT_UNDO;
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
