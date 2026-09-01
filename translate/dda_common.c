@@ -922,7 +922,17 @@ dd_window_dgi(window_num)
     if(Num_windows == 0) {		/* first time! */
 	for(i=0; i < MAX_SENSORS; i++ ) window_dgi[i] = NULL;
     }
-    
+
+    /* window_dgi[] is MAX_SENSORS long and callers pass frame numbers, radar
+     * numbers and derived indices (SE_FRAME, and test/scratch slots), so an
+     * out-of-range index is reachable. Reading past the array is a
+     * global-buffer-overflow; refuse instead. */
+    if(window_num < 0 || window_num >= MAX_SENSORS) {
+	printf("dd_window_dgi: window %d out of range (max %d)\n"
+	       , window_num, MAX_SENSORS-1);
+	return(NULL);
+    }
+
     if(!window_dgi[window_num]) {
 	window_dgi[window_num] = dd_ini(window_num, "");
 	Num_windows++;

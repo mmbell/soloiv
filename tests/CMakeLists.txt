@@ -214,6 +214,15 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     set_tests_properties(test_edit_refresh_multisweep PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/volume)
 
+    # Hardening: the directory catalog and dd_window_dgi must reject an
+    # out-of-range radar/window index instead of indexing past their arrays.
+    # A rescan (which every edit triggers) renumbers radars, so a stale index
+    # is reachable in normal use.
+    soloiv_add_test(test_catalog_bad_radar)
+    target_include_directories(test_catalog_bad_radar PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_catalog_bad_radar PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
     soloiv_add_test(test_plot_buffers_wide)
     set_tests_properties(test_plot_buffers_wide PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ship/cf1)

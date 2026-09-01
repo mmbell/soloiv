@@ -380,7 +380,14 @@ ddfn_search(dir_num, radar_num, d_target_time, req_type, version)
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(NULL);
-    rni = ddir->rni[radar_num];
+    /* radar_num comes from caller state that a directory rescan can
+     * invalidate (the catalog is rebuilt and radars renumbered), so validate
+     * before indexing. rni[] is zero-filled, hence an unchecked index is a
+     * NULL dereference, not just a bad read. */
+    if(radar_num < 0 || radar_num >= ddir->num_radars)
+	  return(NULL);
+    if(!(rni = ddir->rni[radar_num]))
+	  return(NULL);
 
     if(req_type == TIME_AFTER && req_type == rni->prev_req_type) {
 	this = rni->prev_ddfn;
@@ -561,7 +568,10 @@ int ddfnp_list(dir_num, radar_num, list_type)
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(-1);
-    rni = ddir->rni[radar_num];
+    if(radar_num < 0 || radar_num >= ddir->num_radars)
+	  return(-1);
+    if(!(rni = ddir->rni[radar_num]))
+	  return(-1);
     this = rni->h_node->right;
     /*
      */
@@ -879,8 +889,11 @@ int mddir_gen_swp_str_list_v3(dir_num, radar_num, full_file_name, lm)
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(0);
-    rni = ddir->rni[radar_num];
+    if(radar_num < 0 || radar_num >= ddir->num_radars)
+	  return(0);
     ddfnp = mddir_entire_list_v3(dir_num, radar_num, &num_sweeps);
+    if(!ddfnp)
+	  return(0);
     mm = num_sweeps > 0 ? num_sweeps : 0;
 
     lm->num_entries = 0;
@@ -982,9 +995,14 @@ ddfnp_list_entry(dir_num, radar_num, ent_num, version, line, file_name)
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(0);
-    rni = ddir->rni[radar_num];
-    if(ent_num < 0 || ent_num >= rni->num_sweeps || radar_num < 0 ||
-       radar_num >= ddir->num_radars)
+    /* radar_num must be validated BEFORE rni[] is indexed; the original test
+     * dereferenced rni->num_sweeps in the same expression that was meant to
+     * bounds-check radar_num. */
+    if(radar_num < 0 || radar_num >= ddir->num_radars)
+	  return(0);
+    if(!(rni = ddir->rni[radar_num]))
+	  return(0);
+    if(ent_num < 0 || ent_num >= rni->num_sweeps)
 	  return(0);
     ddfnp = mddir_entire_list_v3(dir_num, radar_num, &nn);
     ddfn = *(rni->first_ddfnp +ent_num);
