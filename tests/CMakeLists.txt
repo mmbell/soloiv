@@ -205,6 +205,15 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     # allocation (e.g. the sweep-list reload) turned it into a crash.
     # Fails under ASan without the fix. The committed fixtures are
     # range-clipped, so this test widens the geometry itself.
+    # Issue #13: after a Do It the frame must end up on the file the edit
+    # actually wrote. On a multi-sweep volume the Radx writer produces a NEW
+    # per-sweep file and leaves the volume intact, so a frame still pointed at
+    # the volume can never show the edit -- the reported symptom.
+    soloiv_add_test(test_edit_refresh_multisweep)
+    target_include_directories(test_edit_refresh_multisweep PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_edit_refresh_multisweep PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/volume)
+
     soloiv_add_test(test_plot_buffers_wide)
     set_tests_properties(test_plot_buffers_wide PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ship/cf1)

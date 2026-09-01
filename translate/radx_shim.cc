@@ -360,6 +360,19 @@ void rio_wvol_end_ray(RioWVolH wvh)
 
 int rio_wvol_write(RioWVolH wvh, const char *dir, int dorade)
 {
+  return rio_wvol_write_path(wvh, dir, dorade, NULL, 0);
+}
+
+/* As rio_wvol_write, but also reports the path Radx actually wrote.
+ *
+ * Radx names its output from the written volume's own start/end times, so the
+ * caller cannot predict it: editing one sweep of a multi-sweep volume produces
+ * a new per-sweep file rather than overwriting the volume. The display needs
+ * that name to re-point the frame at what was just written. */
+int rio_wvol_write_path(RioWVolH wvh, const char *dir, int dorade,
+                        char *path_out, int path_cap)
+{
+  if (path_out && path_cap > 0) path_out[0] = '\0';
   if (!wvh || !dir) return -1;
   try {
     RioWVol *h = static_cast<RioWVol *>(wvh);
@@ -368,7 +381,15 @@ int rio_wvol_write(RioWVolH wvh, const char *dir, int dorade)
     RadxFile f;
     f.setFileFormat(dorade ? RadxFile::FILE_FORMAT_DORADE
                            : RadxFile::FILE_FORMAT_CFRADIAL2);
-    return f.writeToDir(h->vol, std::string(dir), false, false);
+    int rc = f.writeToDir(h->vol, std::string(dir), false, false);
+    if (rc == 0 && path_out && path_cap > 0) {
+      const std::string &used = f.getPathInUse();
+      if (!used.empty()) {
+        std::strncpy(path_out, used.c_str(), (size_t) path_cap - 1);
+        path_out[path_cap - 1] = '\0';
+      }
+    }
+    return rc;
   } catch (...) { return -1; }
 }
 

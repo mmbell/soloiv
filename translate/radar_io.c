@@ -72,6 +72,11 @@ struct rio_state {
 /* Per-DGI write state (in dgi->gpptr6): the RadxVol being assembled. */
 struct rio_write_state {
   RioWVolH wvol;
+  /* Path of the file the last write produced. Radx names its output from the
+   * written volume's own times, so an edited sweep of a multi-sweep volume is
+   * written as a NEW per-sweep file and the caller cannot predict the name;
+   * the display needs it to re-point the frame at what was just written. */
+  char last_path[768];
 };
 
 static struct rio_state *rio_get_state(struct dd_general_info *dgi)
@@ -669,6 +674,15 @@ void rio_invalidate_read(struct dd_general_info *dgi)
   st->path[0] = '\0';
 }
 
+/* Full path of the file the last rio_write_sweep_end() on this dgi produced.
+ * Empty string if nothing has been written. The write state (gpptr6) outlives
+ * the RadxVol it assembled, so this stays valid until the next write. */
+const char *rio_last_written_path(struct dd_general_info *dgi)
+{
+  struct rio_write_state *ws = (struct rio_write_state *) dgi->gpptr6;
+  return (ws && ws->last_path[0]) ? ws->last_path : "";
+}
+
 /* Number of sweeps in the currently-loaded volume (0 if none open). Used by
  * sweep navigation to decide whether to step within the volume or advance to
  * the next file. The volume is read in full on load, so this is the real
@@ -808,7 +822,9 @@ int rio_write_sweep_end(struct dd_general_info *dgi)
 
   if (!ws || !ws->wvol) return -1;
   dorade = (rs && rs->src_fmt == RIO_FMT_DORADE) ? 1 : 0;
-  rc = rio_wvol_write(ws->wvol, dgi->directory_name, dorade);
+  ws->last_path[0] = '\0';
+  rc = rio_wvol_write_path(ws->wvol, dgi->directory_name, dorade,
+                           ws->last_path, (int) sizeof(ws->last_path));
   if (rc != 0)
     fprintf(stderr, "rio_write_sweep_end: write failed for %s\n",
             dgi->directory_name);
