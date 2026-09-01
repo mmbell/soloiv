@@ -107,7 +107,12 @@ struct ddir_info_v3 {
     int num_radars;
     int rescan_urgent;
     struct dd_radar_name_info_v3 *rni[MAX_SENSORS];
-    char *radar_name[MAX_SENSORS];
+    /* Own the radar names rather than aliasing them. These used to be
+     * pointers into a dd_file_name_v3, but every rescan pushes those structs
+     * onto the ddfn_spairs free list and ddfn_pop_spair memsets them on reuse,
+     * so a name that outlived its rescan pointed at zeroed or repurposed
+     * memory. Sized to match dd_file_name_v3.radar_name. */
+    char radar_name[MAX_SENSORS][12];
     char directory[128];
 };
 /* c------------------------------------------------------------------------ */
@@ -728,7 +733,9 @@ int ddir_files_v3(dir_num, dir)
 		else {
 		    rni = ddir->rni[rn];
 		}
-		ddir->radar_name[rn] = ddfn->radar_name;
+		strncpy(ddir->radar_name[rn], ddfn->radar_name
+			, sizeof(ddir->radar_name[rn]) - 1);
+		ddir->radar_name[rn][sizeof(ddir->radar_name[rn]) - 1] = '\0';
 		rni->top_ddfn = rni->h_node->right = NULL;
 		rni->num_sweeps = 0;
 		rni->prev_req_type = TIME_NEAREST;
