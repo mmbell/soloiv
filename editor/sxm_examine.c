@@ -2550,6 +2550,18 @@ void sxm_update_examine_data(frme, wgt_btn)
     dd_absorb_header_info(dgi);
     rat = dgi->source_rat;	/* rotation angle table */
     entry1 = dd_return_rotang1(rat); /* first entry in rat */
+    if(!rat || !entry1 || rat->num_rays < 1) {
+	g_string_sprintfa (gs_complaints
+			   , "No rotation angle table for sweep %s\n", str);
+	return;
+    }
+    /* ray_num was clamped against the table this sweep had BEFORE the
+     * possible reload above; an edited sweep can have fewer rays, so re-clamp
+     * against the table that was just rebuilt. */
+    if(tsri->ray_num >= rat->num_rays)
+	  tsri->ray_num = rat->num_rays - 1;
+    if(tsri->ray_num < 0)
+	  tsri->ray_num = 0;
     dgi_buf_rewind(dgi);
 #ifdef SOLOIV_IO_BACKEND_RADX
     if (rio_is_managed(dgi)) {    /* Radx: offset is a ray index, not a byte offset */
@@ -2792,6 +2804,13 @@ void sxm_update_examine_data(frme, wgt_btn)
 	    dd_absorb_header_info(dgi);
 	    rat = dgi->source_rat;	/* rotation angle table */
 	    entry1 = dd_return_rotang1(rat); /* first entry in rat */
+	    if(!rat || !entry1 || rat->num_rays < 1)
+		  return;
+	    /* the ray index was chosen against the previous sweep's table */
+	    if(tsri->ray_num >= rat->num_rays)
+		  tsri->ray_num = rat->num_rays - 1;
+	    if(tsri->ray_num < 0)
+		  tsri->ray_num = 0;
 	    dgi_buf_rewind(dgi);
 #ifdef SOLOIV_IO_BACKEND_RADX
 	    if (rio_is_managed(dgi)) {  /* Radx: offset is a ray index */
