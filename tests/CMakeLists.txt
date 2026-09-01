@@ -218,6 +218,14 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     # out-of-range radar/window index instead of indexing past their arrays.
     # A rescan (which every edit triggers) renumbers radars, so a stale index
     # is reachable in normal use.
+    # Hardening: the Radx reader must clear field_present[] on every header
+    # read. Without it, fields from a previously loaded wider sweep stayed
+    # marked present with stale parm[]/qdat_ptrs[], and an editor
+    # ignore-field leaked into every later sweep.
+    soloiv_add_test(test_field_present_reset)
+    set_tests_properties(test_field_present_reset PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
     soloiv_add_test(test_catalog_bad_radar)
     target_include_directories(test_catalog_bad_radar PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_catalog_bad_radar PROPERTIES

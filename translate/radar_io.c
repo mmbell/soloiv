@@ -471,6 +471,16 @@ int rio_read_header(struct dd_general_info *dgi)
   }
 
   /* ---- cell vector (range geometry) ---- */
+  /* Clamp to what dist_cells[] can actually hold. The fill loops below were
+   * already bounded by MAXCVGATES, but number_cells was not, so a sweep with
+   * more gates than that left the count describing more cells than the array
+   * held and every downstream "for (i = 0; i < number_cells; ...)" over
+   * dist_cells ran off the end. */
+  if (ray0.n_gates > MAXCVGATES) {
+    fprintf(stderr, "rio_read_header: %d gates exceeds MAXCVGATES (%d);"
+                    " clipping range\n", ray0.n_gates, MAXCVGATES);
+    ray0.n_gates = MAXCVGATES;
+  }
   dds->celv->number_cells = ray0.n_gates;
   for (i = 0; i < ray0.n_gates && i < MAXCVGATES; i++) {
     dds->celv->dist_cells[i] =
@@ -515,6 +525,14 @@ int rio_read_header(struct dd_general_info *dgi)
   /* ---- parameters / fields ---- */
   st->nfields = rio_vol_nfields(st->vol);
   if (st->nfields > MAX_PARMS) st->nfields = MAX_PARMS;
+  /* Clear the whole presence map first. Only indices below nfields are set
+   * below, so without this a field from a previously loaded, wider sweep
+   * stayed marked present with stale parm[]/qdat_ptrs[] -- and an editor
+   * "ignore-field" (which clears field_present) leaked into every later
+   * sweep. The legacy DORADE reader has always done this on RADD
+   * (swp_file_acc.c); the Radx path was missing it. */
+  for (i = 0; i < MAX_PARMS; i++)
+    dds->field_present[i] = NO;
   for (pn = 0; pn < st->nfields; pn++) {
     RioField fm;
     float scale = 100.0f, bias = 0.0f;
