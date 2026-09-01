@@ -321,7 +321,18 @@ void sp_ts_seek_field_vals(frme)
 	slash_path(dgi->directory_name, tssi->directory);
 	dgi->in_swp_fid = wwptr->file_id;
 	dd_absorb_header_info(dgi);
+	/* The read above freed dgi->source_rat and built a new one, so the
+	 * table captured before the loop is dangling. Re-read it each pass. */
+	rat = dgi->source_rat;
+	if(!rat)
+	      return;
 	entry1 = dd_return_rotang1(rat);
+	if(!entry1)
+	      return;
+	/* ray_num was chosen against a previous sweep's table, which may have
+	 * had more rays than this one. */
+	if(tsri->ray_num < 0 || tsri->ray_num >= rat->num_rays)
+	      return;
 	dgi_buf_rewind(dgi);
 #ifdef SOLOIV_IO_BACKEND_RADX
 	if (rio_is_managed(dgi))
@@ -667,7 +678,8 @@ void sp_locate_this_point(sci, bpm)
     /* this routine loads up a pisp struct with all the positioning
      * info for this boundary point
      */
-    int frme, ww, ii, jj, kk, nn, nr, ypos;
+    int frme, ww, ii, jj, nn, nr, ypos;
+    int kk = -1;
     int file_action=TIME_NEAREST, version=LATEST_VERSION;
     int sweep_skip=1, replot=YES;
     struct dd_general_info *dgi, *dd_window_dgi();
@@ -680,8 +692,8 @@ void sp_locate_this_point(sci, bpm)
 	  , dd_elevation_angle(), dd_earthr(), dd_nav_tilt_angle();
     double dd_latitude(), dd_longitude(), dd_altitude();
     double dd_heading(), dd_roll(), dd_pitch(), dd_drift();
-    struct rot_table_entry *entry1, *dd_return_rotang1();
-    struct rot_ang_table *rat;
+    struct rot_table_entry *entry1 = NULL, *dd_return_rotang1();
+    struct rot_ang_table *rat = NULL;
     struct point_in_space *pisp=bpm->pisp;
     char str[256];
 
@@ -691,8 +703,11 @@ void sp_locate_this_point(sci, bpm)
     wwptrld = wwptr->lead_sweep;
     ww = wwptrld->window_num;
     dgi = dd_window_dgi(ww, "");
-    rat = dgi->source_rat;	/* rotation angle table */
-    entry1 = dd_return_rotang1(rat);
+    /* rat/entry1 are deliberately NOT captured here. Both branches below can
+     * call dd_absorb_header_info / solo_nab_next_file, and both of those free
+     * dgi->source_rat and build a new one, so anything captured now would be
+     * dangling by the time it is used. sp_seek_field_vals already reloads
+     * first and captures afterwards; do the same. */
 
     strcpy(pisp->id, "BND_PT_V1");
     pisp->state = PISP_AZELRG | PISP_EARTH;
@@ -735,6 +750,8 @@ void sp_locate_this_point(sci, bpm)
 	dgi->in_swp_fid = wwptrld->file_id;
 	dd_absorb_header_info(dgi);
 	wwptrld->sweep_file_modified = NO;
+	rat = dgi->source_rat;		/* rebuilt by the read above */
+	entry1 = dd_return_rotang1(rat);
     }
     else {
 	x = sci->x;
@@ -747,7 +764,13 @@ void sp_locate_this_point(sci, bpm)
 	    solo_nab_next_file(ww, file_action, version, sweep_skip, replot);
 	    wwptr->lead_sweep->sweep_file_modified = NO;
 	}
+	rat = dgi->source_rat;		/* may have been rebuilt just above */
+	entry1 = dd_return_rotang1(rat);
+	if(!rat || !entry1)
+	      return;
 	kk = dd_rotang_seek(rat, (float)theta);
+	if(kk < 0)
+	      return;			/* empty rotation table */
 	pisp->x = M_TO_KM(bpm->x);
 	pisp->y = M_TO_KM(bpm->y);
 	pisp->range = range;
@@ -757,6 +780,8 @@ void sp_locate_this_point(sci, bpm)
 	      pisp->state |= PISP_PLOT_RELATIVE;
     }
 
+    if(!entry1 || kk < 0)
+	  return;
     dgi_buf_rewind(dgi);
 #ifdef SOLOIV_IO_BACKEND_RADX
     if (rio_is_managed(dgi))
@@ -892,11 +917,14 @@ void sp_seek_field_vals(frme)
     if(!rat)
 	  return;		/* bad lead sweep info...probably */
     entry1 = dd_return_rotang1(rat);
+    if(!entry1)
+	  return;
 
-    
     /* get the index of entry closest to theta
      */
     indices[1] = kk = dd_rotang_seek(rat, (float)theta); 
+    if(kk < 0)
+	  return;		/* empty rotation table */
     angles[1] = angle_k = (entry1+kk)->rotation_angle;
     
     indices[0] = jj = DEC_NDX(kk, rat->num_rays); /* index of ray before */

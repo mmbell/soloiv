@@ -142,6 +142,13 @@ void solo_color_cells(frme)
     wwptr = solo_return_wwptr(frme);
     ww = wwptr->lead_sweep->window_num;
     dgi = dd_window_dgi(ww, "");
+    /* parameter_num is carried across sweeps and the new sweep may have fewer
+     * fields. parm[] is preallocated to MAX_PARMS so a stale index yields a
+     * valid pointer to garbage (silent), but qdat_ptrs[] is not preallocated,
+     * so the same index yields NULL and the inner loops fault. Refuse rather
+     * than plot from the wrong field. */
+    if(wwptr->parameter_num < 0 || wwptr->parameter_num >= dgi->num_parms)
+	  return;
     binary_format = dgi->dds->parm[wwptr->parameter_num]->binary_format;
 
     if (batch_threshold_field) { /* batch thresholding to be applied */
@@ -151,6 +158,7 @@ void solo_color_cells(frme)
             scaled_thr_val = (int)(d * batch_threshold_value);
             bad = dgi->dds->parm[wwptr->parameter_num]->bad_data;
             tt = (short *)dgi->dds->qdat_ptrs[thr_ndx];
+            if (!tt) thr_ndx = -1;      /* no data: skip thresholding */
         }
     }
 
@@ -160,7 +168,11 @@ void solo_color_cells(frme)
 
     /* pointer to start of data */
     dd = (unsigned char *)dgi->dds->qdat_ptrs[wwptr->parameter_num];
+    if(!dd)
+	  return;			/* field carries no data this sweep */
     ng = wwptr->number_cells;
+    if(ng > wwptr->cell_capacity)	/* never write past cell_colors */
+	  ng = wwptr->cell_capacity;
 
     switch (binary_format) {
     case DD_8_BITS:

@@ -894,6 +894,12 @@ int mddir_gen_swp_str_list_v3(dir_num, radar_num, full_file_name, lm)
     struct ddir_info_v3 *ddir, *return_ddir();
     struct dd_radar_name_info_v3 *rni;
 
+    /* Empty the caller's list up front. Every early return below leaves the
+     * list empty rather than silently handing back the PREVIOUS radar's
+     * entries, which the caller would then treat as current. */
+    if(lm)
+	  lm->num_entries = 0;
+
     if(!(ddir = return_ddir(dir_num)))
 	  return(0);
     if(radar_num < 0 || radar_num >= ddir->num_radars)
@@ -902,8 +908,6 @@ int mddir_gen_swp_str_list_v3(dir_num, radar_num, full_file_name, lm)
     if(!ddfnp)
 	  return(0);
     mm = num_sweeps > 0 ? num_sweeps : 0;
-
-    lm->num_entries = 0;
 
     for(; mm--;) {
 	ddfn = *ddfnp++;

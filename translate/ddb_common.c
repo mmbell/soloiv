@@ -3917,7 +3917,7 @@ int dd_rotang_seek(rat, rotang)
     struct rot_table_entry *entry1;
     double diff0, diff1, diff2;
 
-    if(rat->num_rays < 1)
+    if(!rat || rat->num_rays < 1)
 	  return(-1);
 
     for(; rotang < 0; rotang+=360.);

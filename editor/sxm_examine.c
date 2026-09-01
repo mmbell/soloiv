@@ -2188,10 +2188,14 @@ sxm_ray_list(frme, wgt_btn)
 	    sei->ray_num++;
 	}
 	rat = dgi->source_rat;	/* rotation angle table */
+	if(!rat || rat->num_rays < 1)
+	      return;		/* nothing to display from this sweep */
 
 	if(ecs->ctr_on_click) {
-	    sei->ray_num = dd_rotang_seek(rat, (float)ecs->click_angle)
-		  - sei->ray_count/2;
+	    int seek_ndx = dd_rotang_seek(rat, (float)ecs->click_angle);
+	    if(seek_ndx < 0)
+		  seek_ndx = 0;
+	    sei->ray_num = seek_ndx - sei->ray_count/2;
 	    sei->at_cell = dd_cell_num(dgi->dds, 0, (float)ecs->click_range)
 		  - sei->cell_count/2;
 	    ecs->ctr_on_click = NO;
