@@ -69,6 +69,9 @@ void rio_close(struct dd_general_info *dgi);
 /* Drop the cached input volume (keep the dgi state) so the next read re-opens
  * from disk. Call after an in-place edit overwrites the sweep. */
 void rio_invalidate_read(struct dd_general_info *dgi);
+/* Full path of the file the last rio_write_sweep_end() on this dgi produced,
+ * or "" if it has not written one. See rio_wvol_write_path. */
+const char *rio_last_written_path(struct dd_general_info *dgi);
 
 /* Multi-sweep CfRadial: sweep count of the loaded volume, and the sweep index
  * the last read returned. Used by sweep navigation to step within a volume. */
@@ -170,6 +173,12 @@ void rio_wvol_ray_field_si16(RioWVolH wv, const char *name, const char *units,
                              short missing, const short *data);
 void rio_wvol_end_ray(RioWVolH wv);
 int  rio_wvol_write(RioWVolH wv, const char *dir, int dorade);  /* 0 ok */
+/* As rio_wvol_write, but copies the path Radx actually wrote into path_out.
+ * Radx derives the name from the volume's own times, so an edited sweep of a
+ * multi-sweep volume lands in a NEW per-sweep file rather than overwriting the
+ * volume -- the caller cannot predict the name. */
+int  rio_wvol_write_path(RioWVolH wv, const char *dir, int dorade,
+                         char *path_out, int path_cap);
 void rio_wvol_free(RioWVolH wv);
 
 /* Radx::DataType_t mirror (must match Radx/Radx.hh ordering). */

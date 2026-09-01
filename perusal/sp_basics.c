@@ -34,6 +34,57 @@ static struct solo_perusal_info *solo_perusal_info=NULL;
 struct solo_perusal_info *solo_return_winfo_ptr();
 
 /* c------------------------------------------------------------------------ */
+
+/* Make sure this frame's per-cell plot buffers hold at least ncells entries.
+ *
+ * data_cell_lut (uniform cell -> real cell number) and cell_colors (uniform
+ * cell -> color) are both indexed by uniform cell number, which is derived
+ * per sweep from the range geometry by solo_cell_lut(). They used to be
+ * allocated once at frame-creation time with fixed sizes (4096 shorts and,
+ * through a sizeof(int)/unsigned long mismatch, only 1024 usable color slots).
+ * A modern sweep has more cells than that -- a SEAPOL surveillance sweep has
+ * ~1200 gates -- so every ray of every plot wrote off the end of cell_colors.
+ *
+ * Grows only; never shrinks, so a frame that has seen a wide sweep keeps the
+ * capacity for the next one. Returns the capacity now available.
+ */
+int solo_ensure_cell_capacity (WW_PTR wwptr, int ncells)
+{
+    int want;
+
+    if(!wwptr)
+	  return(0);
+    if(ncells < SOLO_INITIAL_CELLS)
+	  ncells = SOLO_INITIAL_CELLS;
+    if(wwptr->cell_capacity >= ncells && wwptr->data_cell_lut
+       && wwptr->cell_colors)
+	  return(wwptr->cell_capacity);
+
+    /* a little headroom so a slowly growing sweep doesn't realloc every time */
+    want = ncells + (ncells >> 2) + 16;
+
+    wwptr->data_cell_lut = (short *)
+	  realloc(wwptr->data_cell_lut, want * sizeof(*wwptr->data_cell_lut));
+    if(!wwptr->data_cell_lut) {
+	uii_printf("Unable to grow data_cell_lut to %d cells for frame: %d\n"
+		   , want, wwptr->window_num);
+	exit(1);
+    }
+    memset(wwptr->data_cell_lut, 0, want * sizeof(*wwptr->data_cell_lut));
+
+    wwptr->cell_colors = (unsigned long *)
+	  realloc(wwptr->cell_colors, want * sizeof(*wwptr->cell_colors));
+    if(!wwptr->cell_colors) {
+	uii_printf("Unable to grow cell_colors to %d cells for frame: %d\n"
+		   , want, wwptr->window_num);
+	exit(1);
+    }
+    memset(wwptr->cell_colors, 0, want * sizeof(*wwptr->cell_colors));
+
+    wwptr->cell_capacity = want;
+    return(want);
+}
+/* c------------------------------------------------------------------------ */
 /* c------------------------------------------------------------------------ */
 
 char *sp_ts_ascii_time(frme, xpos, atime)
@@ -750,20 +801,15 @@ solo_return_wwptr(ww_num)
     /* now center it */
     next->data_color_lut += K32;
     
-    next->data_cell_lut = (short *)malloc(4096*sizeof(short));
-    if(!next->data_cell_lut) {
-	uii_printf("Unable to malloc next->data_cell_lut for frame: %d\n"
-		  , ww_num);
-	exit(1);
-    }
-    memset (next->data_cell_lut, 0, 4096*sizeof(short));
-    next->cell_colors = (unsigned long *)malloc(2048*sizeof(int));
-    if(!next->cell_colors) {
-	uii_printf("Unable to malloc next->cell_colors for frame: %d\n"
-		  , ww_num);
-	exit(1);
-    }
-    memset (next->cell_colors, 0, 2048*sizeof(int));
+    /* data_cell_lut and cell_colors are indexed by uniform cell number, so
+     * they must hold at least wwptr->number_cells entries. Modern sweeps far
+     * exceed the old fixed sizes -- a SEAPOL surveillance sweep has ~1200
+     * gates -- so start at a nominal size and let solo_ensure_cell_capacity()
+     * grow them per sweep. The original code allocated cell_colors with
+     * sizeof(int) while indexing it as unsigned long, which on LP64 gave it
+     * half the slots it appeared to have. */
+    next->cell_capacity = 0;
+    solo_ensure_cell_capacity (next, SOLO_INITIAL_CELLS);
     next->landmark_info = (struct landmark_info *)
 	  malloc(sizeof(struct landmark_info));
     memset(next->landmark_info, 0, sizeof(struct landmark_info));

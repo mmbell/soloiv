@@ -57,6 +57,7 @@ void dd_new_vol();		/* dd_swp_files.c */
 int ddswp_last_ray();		/* swp_file_acc.c */
 void sp_sweep_file_check();	/* sp_clkd.c */
 int se_free_raqs();		/* dorade_share.c */
+int se_malloc_flagged_arrays();	/* se_utils.c */
 void ddir_rescan_urgent();	/* dd_files.c */
 int se_sizeof_bnd_set();	/* se_bnd.c */
 void se_pack_bnd_set();		/* se_bnd.c */
@@ -270,6 +271,21 @@ void dd_edd(time_series, automatic, down, d_ctr)
       seds->sweep_ray_count++;
       seds->volume_ray_count++;
       nc = dgi->clip_gate+1;
+      /* The flagged arrays (boundary mask, all-ones mask, bad-flag mask) are
+       * indexed by gate, and the boundary block below writes nc+1 entries.
+       * They were allocated once at SE_MAX_GATES (2048) and never grown, so a
+       * sweep with more gates than that overran every one of them. Grow to fit
+       * this sweep before anything touches them; se_malloc_flagged_arrays is a
+       * no-op when the arrays are already big enough. */
+      if(nc+1 > seds->max_gates) {
+	 if(!se_malloc_flagged_arrays(seds, nc+1)) {
+	    g_string_sprintfa (gs_complaints
+			       , "Unable to size edit arrays for %d gates\n"
+			       , nc+1);
+	    stopped = YES;
+	    break;
+	 }
+      }
       seds->num_segments = 0;
       
       if(seds->boundary_exists) {

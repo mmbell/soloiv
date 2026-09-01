@@ -13,6 +13,7 @@
 # include <seds.h>
 # include <solo_list_widget_ids.h>
 # include <dd_general_info.h>
+# include <dd_defines.h>
 # include <glib/gstdio.h>
 
 # ifndef ETERNITY
@@ -225,6 +226,144 @@ gboolean se_undo_push (guint frame_num)
   se_undo_count++;
   return TRUE;
 }
+
+/* c---------------------------------------------------------------------- */
+/* Post-edit refresh support (issue #13)
+ *
+ * Three things have to happen after a modifying "Do It" or an Undo before the
+ * frame shows the new data:
+ *
+ *  1. The frame has to be looking at the file the edit actually wrote. For a
+ *     single-sweep CfRadial file that is the same name, but the Radx writer
+ *     derives its output name from the written sweep's own start/end times, so
+ *     editing a sweep of a MULTI-SWEEP volume produces a new per-sweep file
+ *     and leaves the volume untouched (deliberately -- see
+ *     tests/test_multisweep_edit_safe.c). A frame still pointed at the volume
+ *     can never show the edit, no matter how much cache is dropped. That is
+ *     the reported symptom: the edit is only visible after picking the new
+ *     file out of the Sweepfiles list by hand.
+ *
+ *  2. Every dgi that the replot will read through has to drop its cached
+ *     volume -- the rio reader keys its cache on the file path, and an
+ *     in-place edit reuses the path. displayq() re-reads and renders through
+ *     the LEAD frame of the lockstep set, not necessarily the frame the Do It
+ *     was pressed in.
+ *
+ *  3. The editor's own dgi (SE_FRAME) has to drop its cache too, or the next
+ *     Do It reads the pre-edit volume and writes it back over this edit --
+ *     chained commands silently do not stack.
+ */
+
+# ifdef SOLOIV_IO_BACKEND_RADX
+
+/* Drop the rio read cache on every dgi the replot may read through: the frame
+ * itself, its lead sweep, the editor's own frame, and every lockstep-linked
+ * frame. Dropping a cache that was not stale is harmless -- the next read just
+ * re-opens the file. */
+/* Non-static: exercised directly by tests, as se_undo_push is. */
+void se_invalidate_read_caches (guint frame_num)
+{
+  struct dd_general_info *dgi, *dd_window_dgi();
+  struct solo_edit_stuff *seds, *return_sed_stuff();
+  void rio_invalidate_read();
+  int rio_is_managed();
+  WW_PTR wwptr, solo_return_wwptr();
+  int ii, wins[SOLO_TOTAL_WINDOWS + 2], nwins = 0;
+
+  wwptr = solo_return_wwptr (frame_num);
+  wins[nwins++] = frame_num;
+  if (wwptr && wwptr->lead_sweep)
+    { wins[nwins++] = wwptr->lead_sweep->window_num; }
+  seds = return_sed_stuff ();
+  if (seds)
+    { wins[nwins++] = seds->se_frame; }
+  if (wwptr && wwptr->sweep) {
+    for (ii = 0; ii < SOLO_MAX_WINDOWS && nwins < (int)(sizeof(wins)/sizeof(wins[0])); ii++) {
+      if (wwptr->sweep->linked_windows[ii])
+	{ wins[nwins++] = ii; }
+    }
+  }
+  for (ii = 0; ii < nwins; ii++) {
+    if (wins[ii] < 0 || wins[ii] >= MAX_SENSORS)
+      continue;
+    dgi = dd_window_dgi (wins[ii], "");
+    if (dgi && rio_is_managed (dgi))
+      { rio_invalidate_read (dgi); }
+  }
+}
+
+/* Point frame_num at the file the edit just wrote, when that is not the file
+ * the frame is already showing.
+ *
+ * The replot does not use wwptr->sweep->file_name directly -- solo_nab_next_file
+ * re-resolves the file from wwptr->d_sweepfile_time_stamp via a TIME_NEAREST
+ * catalog lookup. So the frame is re-pointed by moving its time stamp onto the
+ * new file's catalog entry, after a rescan has picked the new file up.
+ *
+ * Returns TRUE if the frame was moved. */
+/* Non-static: exercised directly by tests, as se_undo_push is. */
+gboolean se_point_frame_at_written (guint frame_num)
+{
+  struct dd_general_info *dgi, *dd_window_dgi();
+  struct solo_edit_stuff *seds, *return_sed_stuff();
+  const char *rio_last_written_path();
+  int rio_is_managed();
+  struct dd_file_name_v3 **mddir_return_swp_list_v3();
+  double ddfnp_list_entry();
+  WW_PTR wwptr, solo_return_wwptr();
+  const char *written, *base;
+  char info[128], fname[128];
+  int ii, nswps = 0, ver = 0;
+  double dtime;
+
+  seds = return_sed_stuff ();
+  if (!seds)
+    return FALSE;
+  dgi = dd_window_dgi (seds->se_frame, "");   /* the edit writes through this */
+  if (!dgi || !rio_is_managed (dgi))
+    return FALSE;
+
+  written = rio_last_written_path (dgi);
+  if (!written || !*written)
+    return FALSE;
+  base = strrchr (written, '/');
+  base = base ? base + 1 : written;
+
+  wwptr = solo_return_wwptr (frame_num);
+  if (!wwptr || !wwptr->sweep)
+    return FALSE;
+  if (strcmp (base, wwptr->sweep->file_name) == 0)
+    return FALSE;                    /* edited in place; nothing to re-point */
+
+  /* Make the new file visible in the catalog before looking it up. */
+  ddir_rescan_urgent (frame_num);
+  if (mddir_file_list_v3 (frame_num, wwptr->sweep->directory_name) < 1)
+    return FALSE;
+  mddir_return_swp_list_v3 (frame_num, wwptr->sweep->radar_num, &nswps);
+
+  for (ii = 0; ii < nswps; ii++) {
+    dtime = ddfnp_list_entry (frame_num, wwptr->sweep->radar_num, ii,
+			      &ver, info, fname);
+    if (dtime == 0 || strcmp (fname, base) != 0)
+      continue;
+    /* Found the written sweep in the catalog: move the frame onto it. */
+    g_strlcpy (wwptr->sweep->file_name, fname, sizeof(wwptr->sweep->file_name));
+    g_strlcpy (wwptr->show_file_info, info, sizeof(wwptr->show_file_info));
+    wwptr->d_sweepfile_time_stamp = dtime;
+    wwptr->sweep->time_stamp = wwptr->sweep->start_time = dtime;
+    wwptr->sweep->stop_time = dtime;
+    wwptr->sweep->version_num = ver;
+    wwptr->sweep->changed = YES;
+    /* The written file holds exactly the one edited sweep. */
+    { struct dd_general_info *fdgi = dd_window_dgi (frame_num, "");
+      if (fdgi) fdgi->rio_req_sweep = 0; }
+    return TRUE;
+  }
+  return FALSE;
+}
+# endif /* SOLOIV_IO_BACKEND_RADX */
+
+/* c---------------------------------------------------------------------- */
 
 /* Discard the most recent snapshot (e.g. the Do It turned out to be a no-op). */
 void se_undo_discard_top (void)
@@ -504,22 +643,25 @@ void sii_edit_menu_cb ( GtkWidget *w, gpointer data )
 	{ se_undo_discard_top (); }
       if (seds->modified) {
 #ifdef SOLOIV_IO_BACKEND_RADX
-	/* The rio reader caches the input volume keyed on file path. An
-	 * in-place edit overwrites the sweep under the same name, so the cache
-	 * would keep serving the pre-edit data to a repaint, the Replot button,
-	 * and the next edit. Drop it so they re-read the edited file from disk
-	 * (and chained edits build on each other). */
-	struct dd_general_info *dgi, *dd_window_dgi();
-	void rio_invalidate_read();
-	int rio_is_managed();
-	dgi = dd_window_dgi (frame_num, "");
-	if (dgi && rio_is_managed (dgi))
-	  { rio_invalidate_read (dgi); }
+	/* Point the frame at the file the edit actually wrote. On a
+	 * multi-sweep volume that is a NEW per-sweep file, not the volume the
+	 * frame is showing, so without this the replot re-reads unedited data
+	 * however hard the caches are dropped (issue #13). */
+	se_point_frame_at_written (frame_num);
+	/* The rio reader caches the input volume keyed on file path, and an
+	 * in-place edit reuses the path. Drop the cache on every dgi the
+	 * replot reads through -- the lead frame and the lockstep set, not
+	 * just this frame -- and on the editor's own frame so the next Do It
+	 * builds on this one instead of overwriting it. */
+	se_invalidate_read_caches (frame_num);
 #endif
 	/* Mark the lead sweep modified so the (auto or manual) replot re-reads
 	 * from disk. The examine path does the same (see sxm_examine.c). */
 	if (wwptr->lead_sweep)
 	  { wwptr->lead_sweep->sweep_file_modified = YES; }
+	/* solo_nab_next_file gates its rescan on the frame's own flag, while
+	 * the click paths consume the lead sweep's; set both. */
+	wwptr->sweep_file_modified = YES;
       }
       if (edd->toggle[EDIT_AUTO_REPLOT])
 	{ sii_plot_data (frame_num, REPLOT_LOCK_STEP); }
@@ -530,19 +672,14 @@ void sii_edit_menu_cb ( GtkWidget *w, gpointer data )
       if (se_undo_pop_restore ()) {
 #ifdef SOLOIV_IO_BACKEND_RADX
 	/* The restored file is back on disk under the same name; drop the rio
-	 * read cache so a repaint/Replot re-reads the reverted data. */
-	{
-	  struct dd_general_info *dgi, *dd_window_dgi();
-	  void rio_invalidate_read();
-	  int rio_is_managed();
-	  dgi = dd_window_dgi (frame_num, "");
-	  if (dgi && rio_is_managed (dgi))
-	    { rio_invalidate_read (dgi); }
-	}
+	 * read cache on every dgi the replot reads through so it re-reads the
+	 * reverted data. */
+	se_invalidate_read_caches (frame_num);
 #endif
 	wwptr = solo_return_wwptr (frame_num);
 	if (wwptr->lead_sweep)
 	  { wwptr->lead_sweep->sweep_file_modified = YES; }
+	wwptr->sweep_file_modified = YES;
 	sii_plot_data (frame_num, REPLOT_LOCK_STEP);
       }
       break;

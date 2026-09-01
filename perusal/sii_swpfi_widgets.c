@@ -87,6 +87,10 @@ typedef struct {
    guint label_char_width;
 
    guint layout_label_count;
+   /* How many of the layout's rows currently carry a real sweep. The rows are
+    * created in blocks of 500 and bake in their own index, so the click
+    * handler needs this to reject clicks on the blank filler rows. */
+   gint  swpfi_list_entries;
    guint swpfi_list_popup_count;
 
    gdouble radar_lat;
@@ -575,6 +579,12 @@ sii_swpfi_list_click_cb (GtkGestureClick *gesture, int n_press,
   swpfi_index = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT(label),
 			  "swpfi_index" ));
 
+  /* Blank filler row: ignore it. Passing the index on would set
+   * sweep->start_time to 0 and clear sweep->file_name, which then drives a
+   * TIME_NEAREST jump to whatever file happens to sort first. */
+  if ((gint)swpfi_index >= sd->swpfi_list_entries)
+    { return; }
+
 # ifdef obsolete
    g_message( "layout widget label fn: %d  swpfi_index: %d"
 	     , frame_num, swpfi_index );
@@ -654,6 +664,30 @@ sii_swpfi_key_pressed (GtkEventControllerKey *controller,
 
 /* c---------------------------------------------------------------------- */
 
+/* The sweep-list window owns the scrolled window, the layout box and every
+ * label in it. When it is destroyed those all go with it, so drop our cached
+ * pointers -- otherwise the next open reuses freed GTK objects. */
+static void
+sii_swpfi_list_destroyed_cb (GtkWidget *widget, gpointer data)
+{
+  guint frame_num = GPOINTER_TO_UINT (data);
+  SwpfiData *sd;
+
+  if (frame_num >= (guint) maxFrames || !frame_configs[frame_num])
+    return;
+  sd = (SwpfiData *)frame_configs[frame_num]->swpfi_data;
+  if (!sd)
+    return;
+  sd->data_widget[SWPFI_SCROLLED] = NULL;
+  sd->data_widget[SWPFI_LAYOUT] = NULL;
+  g_free (sd->label_items);
+  sd->label_items = NULL;
+  sd->layout_label_count = 0;
+  sd->swpfi_list_entries = 0;
+}
+
+/* c---------------------------------------------------------------------- */
+
 void sii_swpfi_list_widget( guint frame_num )
 {
   GtkWidget *label;
@@ -704,6 +738,16 @@ void sii_swpfi_list_widget( guint frame_num )
 		      G_CALLBACK(sii_nullify_widget_cb),
 		      (gpointer)(frame_num*TASK_MODULO+widget_id));
 
+    /* sii_nullify_widget_cb only clears the widget-pointer table entry. The
+     * scrolled window, the layout box and the label array are children of
+     * this window and die with it, but sd->data_widget[] and sd->label_items
+     * kept pointing at them -- and the "first time" test below keys off
+     * SWPFI_SCROLLED, so closing the list and reopening it operated on
+     * destroyed widgets. Clear our own references too. */
+    g_signal_connect (G_OBJECT (window), "destroy",
+		      G_CALLBACK(sii_swpfi_list_destroyed_cb),
+		      GUINT_TO_POINTER(frame_num));
+
     nn = frame_num * TASK_MODULO + widget_id;
     key_controller = gtk_event_controller_key_new ();
     g_signal_connect (key_controller, "key-pressed",
@@ -727,14 +771,21 @@ void sii_swpfi_list_widget( guint frame_num )
   font = med_fxd_font;
 
   slm = sii_return_swpfi_list (frame_num);
-  mm = strlen (solo_list_entry (slm, 0)) +4;
-  nn = (((slm->num_entries -1)/500) +1) * 500;
+  /* solo_list_entry returns NULL for an out-of-range index, so an empty list
+   * (a directory or radar with no sweeps -- reachable after an edit moves
+   * files out from under the current radar) used to segfault right here. */
+  cc = (slm && slm->num_entries > 0) ? solo_list_entry (slm, 0) : NULL;
+  mm = (cc ? strlen (cc) : strlen (tt)) + 4;
+  nn = (slm && slm->num_entries > 0)
+    ? ((((slm->num_entries -1)/500) +1) * 500) : 500;
 
   if (nn > sd->layout_label_count && sd->data_widget[SWPFI_LAYOUT] ) {
     /* Remove old box from scrolled window */
     gtk_scrolled_window_set_child (GTK_SCROLLED_WINDOW (sd->data_widget[SWPFI_SCROLLED]), NULL);
     sd->data_widget[SWPFI_LAYOUT] = NULL;
     g_free (sd->label_items);
+    sd->label_items = NULL;
+    sd->layout_label_count = 0;
   }
   else if (nn < sd->layout_label_count)
     { nn = sd->layout_label_count; }
@@ -784,10 +835,16 @@ void sii_swpfi_list_widget( guint frame_num )
     gtk_widget_set_visible (vbox, TRUE);
   }
 
+  /* Remember how many rows carry a real sweep; the click handler needs it to
+   * reject clicks on the blank filler rows. The labels are created in blocks
+   * of 500 and bake in their row index, so a click on a blank row used to
+   * pass an out-of-range index straight through to the catalog. */
+  sd->swpfi_list_entries = (slm) ? slm->num_entries : 0;
+
   for (mm = 0; mm < nn; mm++) {
-    if (mm < slm->num_entries) {
+    if (slm && mm < slm->num_entries) {
       cc = solo_list_entry (slm, mm);
-      gtk_label_set_text (GTK_LABEL (sd->label_items[mm]), cc );
+      gtk_label_set_text (GTK_LABEL (sd->label_items[mm]), cc ? cc : " " );
     }
     else {
       gtk_label_set_text (GTK_LABEL (sd->label_items[mm]), " " );

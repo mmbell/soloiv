@@ -107,7 +107,12 @@ struct ddir_info_v3 {
     int num_radars;
     int rescan_urgent;
     struct dd_radar_name_info_v3 *rni[MAX_SENSORS];
-    char *radar_name[MAX_SENSORS];
+    /* Own the radar names rather than aliasing them. These used to be
+     * pointers into a dd_file_name_v3, but every rescan pushes those structs
+     * onto the ddfn_spairs free list and ddfn_pop_spair memsets them on reuse,
+     * so a name that outlived its rescan pointed at zeroed or repurposed
+     * memory. Sized to match dd_file_name_v3.radar_name. */
+    char radar_name[MAX_SENSORS][12];
     char directory[128];
 };
 /* c------------------------------------------------------------------------ */
@@ -380,7 +385,14 @@ ddfn_search(dir_num, radar_num, d_target_time, req_type, version)
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(NULL);
-    rni = ddir->rni[radar_num];
+    /* radar_num comes from caller state that a directory rescan can
+     * invalidate (the catalog is rebuilt and radars renumbered), so validate
+     * before indexing. rni[] is zero-filled, hence an unchecked index is a
+     * NULL dereference, not just a bad read. */
+    if(radar_num < 0 || radar_num >= ddir->num_radars)
+	  return(NULL);
+    if(!(rni = ddir->rni[radar_num]))
+	  return(NULL);
 
     if(req_type == TIME_AFTER && req_type == rni->prev_req_type) {
 	this = rni->prev_ddfn;
@@ -561,7 +573,10 @@ int ddfnp_list(dir_num, radar_num, list_type)
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(-1);
-    rni = ddir->rni[radar_num];
+    if(radar_num < 0 || radar_num >= ddir->num_radars)
+	  return(-1);
+    if(!(rni = ddir->rni[radar_num]))
+	  return(-1);
     this = rni->h_node->right;
     /*
      */
@@ -718,7 +733,9 @@ int ddir_files_v3(dir_num, dir)
 		else {
 		    rni = ddir->rni[rn];
 		}
-		ddir->radar_name[rn] = ddfn->radar_name;
+		strncpy(ddir->radar_name[rn], ddfn->radar_name
+			, sizeof(ddir->radar_name[rn]) - 1);
+		ddir->radar_name[rn][sizeof(ddir->radar_name[rn]) - 1] = '\0';
 		rni->top_ddfn = rni->h_node->right = NULL;
 		rni->num_sweeps = 0;
 		rni->prev_req_type = TIME_NEAREST;
@@ -877,13 +894,20 @@ int mddir_gen_swp_str_list_v3(dir_num, radar_num, full_file_name, lm)
     struct ddir_info_v3 *ddir, *return_ddir();
     struct dd_radar_name_info_v3 *rni;
 
+    /* Empty the caller's list up front. Every early return below leaves the
+     * list empty rather than silently handing back the PREVIOUS radar's
+     * entries, which the caller would then treat as current. */
+    if(lm)
+	  lm->num_entries = 0;
+
     if(!(ddir = return_ddir(dir_num)))
 	  return(0);
-    rni = ddir->rni[radar_num];
+    if(radar_num < 0 || radar_num >= ddir->num_radars)
+	  return(0);
     ddfnp = mddir_entire_list_v3(dir_num, radar_num, &num_sweeps);
+    if(!ddfnp)
+	  return(0);
     mm = num_sweeps > 0 ? num_sweeps : 0;
-
-    lm->num_entries = 0;
 
     for(; mm--;) {
 	ddfn = *ddfnp++;
@@ -982,9 +1006,14 @@ ddfnp_list_entry(dir_num, radar_num, ent_num, version, line, file_name)
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(0);
-    rni = ddir->rni[radar_num];
-    if(ent_num < 0 || ent_num >= rni->num_sweeps || radar_num < 0 ||
-       radar_num >= ddir->num_radars)
+    /* radar_num must be validated BEFORE rni[] is indexed; the original test
+     * dereferenced rni->num_sweeps in the same expression that was meant to
+     * bounds-check radar_num. */
+    if(radar_num < 0 || radar_num >= ddir->num_radars)
+	  return(0);
+    if(!(rni = ddir->rni[radar_num]))
+	  return(0);
+    if(ent_num < 0 || ent_num >= rni->num_sweeps)
 	  return(0);
     ddfnp = mddir_entire_list_v3(dir_num, radar_num, &nn);
     ddfn = *(rni->first_ddfnp +ent_num);

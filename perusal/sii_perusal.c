@@ -1266,12 +1266,22 @@ int solo_parameter_setup(frme)
     dgi = dd_window_dgi(ww, "");
 
     pnum = dd_ndx_name(dgi, wwptr->parameter->parameter_name);
-    if(pnum != wwptr->parameter_num 
-       || wwptr->parameter_scale !=
-       dgi->dds->parm[pnum]->parameter_scale
-       || wwptr->parameter_bias !=
-       dgi->dds->parm[pnum]->parameter_bias 
-       || wwptr->parameter_bad_val != 
+    /* The bounds test must come BEFORE parm[] is indexed. dd_ndx_name returns
+     * -1 when the field is absent from this sweep, and parameter_num is a
+     * stale index from the previous sweep, which may have had more fields --
+     * the original code read parm[pnum] and parm[wwptr->parameter_num] first
+     * and only tested pnum < 0 afterwards. parm[-1] is the array slot before
+     * parm[] in struct dds_structs, i.e. a wild pointer that was then
+     * dereferenced. */
+    if(pnum < 0 || pnum >= dgi->num_parms
+       || wwptr->parameter_num < 0
+       || wwptr->parameter_num >= dgi->num_parms
+       || pnum != wwptr->parameter_num
+       /* || short-circuits, so parm[] below is only reached once both
+        * indices above are known to be in range */
+       || wwptr->parameter_scale != dgi->dds->parm[pnum]->parameter_scale
+       || wwptr->parameter_bias != dgi->dds->parm[pnum]->parameter_bias
+       || wwptr->parameter_bad_val !=
        dgi->dds->parm[wwptr->parameter_num]->bad_data
        )
 	  {
@@ -1282,6 +1292,13 @@ int solo_parameter_setup(frme)
 	sprintf(mess, "Parameter %s does not exist in this sweep"
 		, wwptr->parameter->parameter_name);
 	g_message (mess);
+	if(dgi->num_parms < 1) {
+	    /* nothing to substitute, and the modulo below would divide by
+	     * zero */
+	    sprintf(mess, "Sweep has no fields; cannot plot\n");
+	    g_message (mess);
+	    return(NO);
+	}
 	pnum = (frme < dgi->num_parms) ? frme : frme % dgi->num_parms;
 	str_terminate
 	      (wwptr->parameter->parameter_name

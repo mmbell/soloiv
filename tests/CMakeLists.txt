@@ -196,4 +196,49 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     target_include_directories(test_multisweep_edit_safe PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_multisweep_edit_safe PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/volume)
+
+    # Issue #14: the per-frame uniform-cell buffers (data_cell_lut,
+    # cell_colors) must be sized for the loaded sweep. They used to be fixed
+    # at frame creation, and cell_colors was allocated with sizeof(int) while
+    # indexed as unsigned long -- 1024 real slots. A ~1200-gate surveillance
+    # sweep overran it on every ray, corrupting the heap until a later
+    # allocation (e.g. the sweep-list reload) turned it into a crash.
+    # Fails under ASan without the fix. The committed fixtures are
+    # range-clipped, so this test widens the geometry itself.
+    # Issue #13: after a Do It the frame must end up on the file the edit
+    # actually wrote. On a multi-sweep volume the Radx writer produces a NEW
+    # per-sweep file and leaves the volume intact, so a frame still pointed at
+    # the volume can never show the edit -- the reported symptom.
+    soloiv_add_test(test_edit_refresh_multisweep)
+    target_include_directories(test_edit_refresh_multisweep PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_edit_refresh_multisweep PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/volume)
+
+    # Hardening: the directory catalog and dd_window_dgi must reject an
+    # out-of-range radar/window index instead of indexing past their arrays.
+    # A rescan (which every edit triggers) renumbers radars, so a stale index
+    # is reachable in normal use.
+    # Hardening: the Radx reader must clear field_present[] on every header
+    # read. Without it, fields from a previously loaded wider sweep stayed
+    # marked present with stale parm[]/qdat_ptrs[], and an editor
+    # ignore-field leaked into every later sweep.
+    # Hardening: the sweep-file list must survive an empty list (strlen(NULL)
+    # on solo_list_entry) and must not act on clicks against its blank filler
+    # rows. Both are reachable after an edit-triggered rescan.
+    soloiv_add_test(test_swpfi_empty_list)
+    set_tests_properties(test_swpfi_empty_list PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
+    soloiv_add_test(test_field_present_reset)
+    set_tests_properties(test_field_present_reset PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
+    soloiv_add_test(test_catalog_bad_radar)
+    target_include_directories(test_catalog_bad_radar PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_catalog_bad_radar PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
+    soloiv_add_test(test_plot_buffers_wide)
+    set_tests_properties(test_plot_buffers_wide PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ship/cf1)
 endif()

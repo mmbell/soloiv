@@ -169,7 +169,11 @@ static int drop_check(const char *label, int win, const char *file)
 
     g_assert_true(find_written(tmpdir, written, sizeof(written)));
 
-    dr = dd_window_dgi(win + 10, "");
+    /* A second dgi to read the written file back through. Must stay inside
+     * MAX_SENSORS (16): the old win+10 gave 18 for the AIR-CfRadial case and
+     * read past window_dgi[]. win+1 is unused by the other drop_check calls,
+     * which use even slots. */
+    dr = dd_window_dgi(win + 1, "");
     g_strlcpy(dr->directory_name, tmpdir, sizeof(dr->directory_name));
     if (dr->directory_name[strlen(dr->directory_name) - 1] != '/')
         g_strlcat(dr->directory_name, "/", sizeof(dr->directory_name));

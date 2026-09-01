@@ -53,6 +53,11 @@ static inline void XPutPixel(XImage *img, int x, int y, unsigned long pixel) {
 
 /* end FIXME */
 
+/* Starting capacity, in uniform cells, of a frame's data_cell_lut and
+ * cell_colors buffers. Not a maximum -- solo_ensure_cell_capacity() grows them
+ * to whatever the loaded sweep needs. */
+# define        SOLO_INITIAL_CELLS 2048
+
 # define          SOLO_MAX_WINDOWS 12
 # define            SOLO_UI_WINDOW SOLO_MAX_WINDOWS
 # define        SOLO_TOTAL_WINDOWS SOLO_MAX_WINDOWS+1
@@ -800,6 +805,11 @@ struct solo_window_ptrs {
     float uniform_cell_one;
     int number_cells;
     unsigned long *cell_colors;
+    /* Allocated capacity, in cells, of data_cell_lut and cell_colors. Both are
+     * indexed by uniform cell number (0..number_cells-1), so they must be
+     * grown whenever a sweep needs more cells than the last one did. See
+     * solo_ensure_cell_capacity() in sp_basics.c. */
+    int cell_capacity;
     char top_line[128];
     unsigned char *color_bar;
     float clicked_angle;
