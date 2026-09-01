@@ -28,6 +28,8 @@ static char vcid[] = "$Id$";
  * solo_color_cells
  * 
  */
+
+int solo_ensure_cell_capacity();	/* sp_basics.c */
 /* c------------------------------------------------------------------------ */
 
 void solo_cell_lut(frme)
@@ -38,7 +40,7 @@ void solo_cell_lut(frme)
      * this is necessary because we are likely to have nonuniform cell spacing
      * and the rasterization algorithm needs uniform cell spacing
      */
-    int ww, g, i, ii, j, k, n, nc, ng;
+    int ww, g, i, ii, j, k, n, nc, ng, max_cells;
     WW_PTR wwptr, solo_return_wwptr();
     struct dd_general_info *dgi, *dd_window_dgi();
     struct cell_d *celv;
@@ -47,12 +49,15 @@ void solo_cell_lut(frme)
     short *lut;
 
     wwptr = solo_return_wwptr(frme);
-    lut = wwptr->data_cell_lut;
     ww = wwptr->lead_sweep->window_num;
     dgi = dd_window_dgi(ww, "");
 
     celv = dgi->dds->celvc;	/* corrected cell vector */
     nc = celv->number_cells-1;
+    if(nc > MAXCVGATES-1)		/* never index past dist_cells[] */
+	  nc = MAXCVGATES-1;
+    if(nc < 0)
+	  nc = 0;
     rmax = celv->dist_cells[nc];
     f = rmax - celv->dist_cells[0];
 
@@ -61,20 +66,39 @@ void solo_cell_lut(frme)
     else {
 	/* find an early gate spacing > 0
 	 */
-	for(ii=0; ii < MAXCVGATES; ii++) {
+	gs = 0;			/* nc may be 0: leave gs defined */
+	for(ii=0; ii < nc; ii++) {
 	    gs = celv->dist_cells[ii+1] - celv->dist_cells[ii];
 	    if(gs > 0)
 		  break;
 	}
 	wwptr->uniform_cell_spacing = gs;
     }
+    if(gs <= 0) {
+	/* Degenerate range geometry: without a positive gate spacing the
+	 * fill loops below would never advance. Plot nothing rather than
+	 * spin. */
+	wwptr->number_cells = 0;
+	wwptr->uniform_cell_one = celv->dist_cells[0];
+	return;
+    }
+    /* Size the uniform-cell buffers for this sweep before filling them. The
+     * count is (range span)/(uniform spacing), plus slop for the boundary
+     * conditions in the two loops below. */
+    max_cells = (int)(f/gs) + 4;
+    max_cells = solo_ensure_cell_capacity(wwptr, max_cells);
+    lut = wwptr->data_cell_lut;
     /* get out in front of the radar */
     for(g=0; g < nc && celv->dist_cells[g] < .5*gs; g++);
+    /* the loop below reads dist_cells[g+1], and the g++ inside it stops at
+     * g+1 > nc, so keep the first read in range too */
+    if(g > nc-1)
+	  g = (nc > 0) ? nc-1 : 0;
     r = celv->dist_cells[g];
     /*
      * now create the lookup table
      */
-    for(ii=0;; r+=gs) {
+    for(ii=0; ii < max_cells; r+=gs) {
 	if(fabs((double)(r-celv->dist_cells[g])) >
 	   .5*fabs((double)(celv->dist_cells[g+1] -celv->dist_cells[g]))) {
 	    /*
@@ -88,7 +112,7 @@ void solo_cell_lut(frme)
 	}
 	*(lut+ii++) = g;
     }
-    for(; r < rmax+.5*gs; r+=gs) {
+    for(; ii < max_cells && r < rmax+.5*gs; r+=gs) {
 	  *(lut+ii++) = g;
     }
     wwptr->number_cells = ii;

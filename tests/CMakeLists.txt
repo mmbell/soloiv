@@ -196,4 +196,16 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     target_include_directories(test_multisweep_edit_safe PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_multisweep_edit_safe PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/volume)
+
+    # Issue #14: the per-frame uniform-cell buffers (data_cell_lut,
+    # cell_colors) must be sized for the loaded sweep. They used to be fixed
+    # at frame creation, and cell_colors was allocated with sizeof(int) while
+    # indexed as unsigned long -- 1024 real slots. A ~1200-gate surveillance
+    # sweep overran it on every ray, corrupting the heap until a later
+    # allocation (e.g. the sweep-list reload) turned it into a crash.
+    # Fails under ASan without the fix. The committed fixtures are
+    # range-clipped, so this test widens the geometry itself.
+    soloiv_add_test(test_plot_buffers_wide)
+    set_tests_properties(test_plot_buffers_wide PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ship/cf1)
 endif()
