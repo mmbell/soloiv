@@ -107,19 +107,12 @@ static char vcid[] = "$Id$";
 # endif
 # include <dd_math.h>
 # include <sys/stat.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 
 static char *dd_sweep_modes[] =
 { "CAL", "PPI", "COP", "RHI", "VER", "TAR", "MAN", "IDL", "SUR", "AIR"
 	, "???", "???", "???", "???", "???", "???" };
 
-char *dd_align_structs();
-void dd_get_cfac();
-void dd_get_lims();
-struct dd_general_info *dd_ini();
-void dd_reset_d_limits();
-char *put_tagged_string();
 
 
 
@@ -143,13 +136,12 @@ int dd_get_scan_mode(char *mne)
 struct cfac_wrap *dd_absorb_cfacs(char *list, char *radar_name)
 {
     char *aa=list;
-    char *dd_link_dev_name();
     char str[1024], *sptrs[32], *fnptrs[16];
     FILE *stream;
     struct cfac_wrap *cfw, *cfw_prev, *first_cfw = 0;
     struct correction_d *cfac;
     int ii, nt, nt2;
-    char radar[16], *str_terminate();
+    char radar[16];
     static int cfac_print = 0;
 
 
@@ -205,7 +197,6 @@ struct cfac_wrap *dd_absorb_cfacs(char *list, char *radar_name)
 void dd_absorb_cfac(char *list, char *radar_name, struct correction_d *cfac)
 {
     char *a=list;
-    char *dd_link_dev_name();
     char str[256];
     FILE *stream;
     static int cfac_print = 0;
@@ -379,7 +370,6 @@ dd_clip_gate (
     int g, lc=celv->number_cells-1, parameter_num = 0;
     float f, r;
     double alt_msl=alt*1000., d, rcp_sin;
-    double dd_elevation_angle();
 
     elev = RADIANS(dd_elevation_angle(dgi));
 
@@ -629,10 +619,13 @@ double dd_elevation_angle(struct dd_general_info *dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-char *dd_find_desc(char *a, char *b, char *desc)
+char *dd_find_desc(char *a, void *b, char *desc)
 {
+    /* look for descriptor "desc" between a and the end pointer b */
     struct generic_descriptor *gd;
-    while(a < b) {
+    char *end = b;
+
+    while(a < end) {
 	if(strncmp(a, desc, 4) == 0)
 	      return(a);
 	gd = (struct generic_descriptor *)a;
@@ -678,7 +671,7 @@ void dd_get_cfac(FILE *stream, struct correction_d *cfac)
     int nn, nt;
     char str[256], *aa, *bb;
     char string_space[256], *strptrs[16];
-    double d, atof();
+    double d;
     float f;
 
     for(d = 0; aa = fgets(string_space, 256, stream); d = 0) { /* next line */
@@ -752,10 +745,10 @@ void dd_get_cfac(FILE *stream, struct correction_d *cfac)
 void dd_get_difs(struct dd_input_filters *difs)
 {
     int ii, jj, kk, nn, nt, sizeof_env=K64, num_ptrs=999;
-    char *a, *bb, *get_tagged_string(), str[2048], *str_ptrs[99];
+    char *a, *bb, str[2048], *str_ptrs[99];
     char *env=NULL, **env_ptrs;
     DD_TIME dts;
-    double d, t1=0, t2=0, d_time_stamp(), atof();
+    double d, t1=0, t2=0;
 
 
     difs->final_stop_time = MAX_FLOAT;
@@ -1008,7 +1001,7 @@ int dd_givfld(DGI_PTR dgi, int *ndx, int *g1, int *n, float *dd, float *badval)
     char *buf, *deep6=0;
     float bias;
     short gate[MAXCVGATES];
-    int bad, i, idx= *ndx, m, df, dd_hrd16(), mark;
+    int bad, i, idx= *ndx, m, df, mark;
     int gndx= *g1-1, ng=dgi->dds->celv->number_cells;
     float rcp_scale, *ff;
     short *ss;
@@ -1079,13 +1072,12 @@ struct dd_general_info *dd_ini(int rn, char *radar_name)
      */
     int i, jj, k, nn, isize, sod=sizeof(double), ssize;
     static int sizeof_dgi=0;
-    long time_now();
-    char *a, *c, *get_tagged_string(), *dd_align_structs();
-    struct dd_input_filters *difs, *dd_return_difs_ptr();
+    char *a, *c;
+    struct dd_input_filters *difs;
     struct dd_general_info *dgi;
     struct dds_structs *dds;
     struct volume_d *vold;
-    struct radar_d *radd, *dd_malloc_radd();
+    struct radar_d *radd;
     struct comment_d *comm;
     struct correction_d *cfac;
     struct cell_d *celv, *celvc;
@@ -1096,8 +1088,8 @@ struct dd_general_info *dd_ini(int rn, char *radar_name)
     struct lidar_d *lidr;
     struct prev_rays *pr, *pr_last;
     struct prev_swps *ps, *ps_last;
-    DD_TIME xdts, *d_unstamp_time();
-    struct cfac_wrap *cfw, *ddswp_nab_cfacs ();
+    DD_TIME xdts;
+    struct cfac_wrap *cfw;
 
 
     if(!sizeof_dgi) {
@@ -1497,7 +1489,7 @@ struct dd_general_info *dd_ini(int rn, char *radar_name)
 
 void dd_input_strings(void)
 {
-    char *a, *getenv(), *put_tagged_strings();
+    char *a;
 
     /* c...mark */
 
@@ -2196,8 +2188,7 @@ void dgi_interest_really(struct dd_general_info *dgi, int verbosity, char *pream
      * other front ends such as UF output from sweep files.
      */
     int ii, jj, nn;
-    char str[256], *a, *dts_print(), *str_terminate();
-    DD_TIME *d_unstamp_time();
+    char str[256], *a;
     struct dds_structs *dds;
 
     dds = dgi->dds;
@@ -2276,7 +2267,7 @@ void dd_latlon_relative(struct point_in_space *p0, struct point_in_space *p1)
      * with (0,0,0) for p0
      */
     double del_lat, del_lon, lat=RADIANS(p1->latitude);
-    double dd_earthr(), r_earth, xx, yy, zz, R_earth;
+    double r_earth, xx, yy, zz, R_earth;
 
     R_earth = dd_earthr(p1->latitude); 
     loop_ll2xy_v3( &p0->latitude, &p0->longitude, &p0->altitude
@@ -2357,7 +2348,7 @@ void dd_latlon_shift(struct point_in_space *p0, struct point_in_space *p1)
      * with (x,y,z) for p0
      */
     double d, r, xx=p0->x, yy=p0->y, zz=p0->z;
-    double dd_earthr(), r_earth;
+    double r_earth;
     double dlon = -p1->longitude;
     double R_earth;
 
@@ -2435,7 +2426,7 @@ char *dd_link_dev_name(char *radar_name, char *dev_links, char *str)
      * to be associated with the radar
      */
     char *str_ptrs[32], string_space[256];
-    char radar[16], *str_terminate();
+    char radar[16];
     int ii, nt;
 
     str_terminate(radar, radar_name, 8);
@@ -2524,7 +2515,7 @@ struct radar_d *dd_malloc_radd(DGI_PTR dgi, char *config_name)
 
 double dd_nav_rotation_angle(struct dd_general_info *dgi)
 {
-    double d_rot, dd_azimuth_angle();
+    double d_rot;
 
     switch(dgi->dds->radd->scan_mode) {
 
@@ -2706,7 +2697,7 @@ void dor_print_celv(struct cell_d *celv, struct solo_list_mgmt *slm)
 
 void dor_print_cfac(struct correction_d *cfac, struct solo_list_mgmt *slm)
 {
-    char str[64], *str_terminate();
+    char str[64];
     char *aa, bstr[128];
 
     /* routine to print the contents of the descriptor */
@@ -2760,7 +2751,7 @@ void dor_print_cfac(struct correction_d *cfac, struct solo_list_mgmt *slm)
 
 void dor_print_parm(struct parameter_d *parm, struct solo_list_mgmt *slm)
 {
-    char str[64], *str_terminate();
+    char str[64];
     char *aa, bstr[128];
 
     aa = bstr;
@@ -2824,7 +2815,7 @@ void dor_print_frib(struct field_radar_i *frib, struct solo_list_mgmt *slm)
 {
   char *sptrs[128], str[512], mess[256];
   int i, jj, nn;
-  char *aa=mess, c[128], *str_terminate();
+  char *aa=mess, c[128];
   
   solo_add_list_entry(slm, " ", 1);
   solo_add_list_entry(slm, " ", 1);
@@ -2946,7 +2937,7 @@ void dor_print_frib(struct field_radar_i *frib, struct solo_list_mgmt *slm)
 
 void dor_print_radd(struct radar_d *radd, struct solo_list_mgmt *slm)
 {
-    char str[128], *str_terminate();
+    char str[128];
     char *aa, bstr[128];
 
     aa = bstr;
@@ -3136,7 +3127,6 @@ void dor_print_ryib(struct ray_i *ryib, struct solo_list_mgmt *slm)
 
 void dor_print_swib(struct sweepinfo_d *swib, struct solo_list_mgmt *slm)
 {
-    char *str_terminate();
     char *aa, bstr[128];
 
     aa = bstr;
@@ -3172,7 +3162,7 @@ void dor_print_swib(struct sweepinfo_d *swib, struct solo_list_mgmt *slm)
 void dor_print_sswb(struct super_SWIB *sswb, struct solo_list_mgmt *slm)
 {
     int ii;
-    char str[128], *str_terminate();
+    char str[128];
     char *aa, bstr[128];
     DD_TIME dts;
     double dt;
@@ -3257,7 +3247,7 @@ void dor_print_sswb(struct super_SWIB *sswb, struct solo_list_mgmt *slm)
 
 void dor_print_vold(struct volume_d *vold, struct solo_list_mgmt *slm)
 {
-    char str[128], *str_terminate();
+    char str[128];
     char *aa, bstr[128];
 
     aa = bstr;
@@ -3553,9 +3543,8 @@ char *dd_radar_namec(char *name0)
 void dd_radar_selected(char *radar_name, int radar_num, struct dd_input_filters *difs)
 {
     int ii, jj, kk, nt;
-    char *a, *b, *c, str[256], *get_tagged_string(), radar[16];
+    char *a, *b, *c, str[256], radar[16];
     char *str_ptrs[32];
-    char *dd_whiteout(), *dd_delimit(), *str_terminate();
 
     if(!(a=get_tagged_string("SELECT_RADARS"))) {
 	for(ii=0; ii < MAX_SENSORS; ii++ )
@@ -3634,9 +3623,9 @@ dd_ray_coverage (
     /* this routine returns the sector in degrees covered by
      * the request ray
      */
-    struct rot_table_entry *ray0, *ray1, *ray2, *return_rotang1();
+    struct rot_table_entry *ray0, *ray1, *ray2;
     static struct dd_ray_sector rs;
-    double d, angdiff(), sector;
+    double d, sector;
     
     ray0 = (struct rot_table_entry *)((char *)rat +
 					rat->first_key_offset);
@@ -3711,7 +3700,7 @@ void dd_reset_d_limits(struct d_limits **at)
 
 int dd_return_id_num(char *name)
 {
-    char *a, *b, str[16], *str_terminate();
+    char *a, *b, str[16];
 
     a = str_terminate(str, name, 8);
     b = "DBZ";
@@ -3853,7 +3842,6 @@ void dd_rotang_table(DGI_PTR dgi, int func)
     int i, j, k, mm, ndx, mark, angle_ndx_size=480, first=NO, glitch=NO;
     int32_t *lp;
     float f, rot, angle;
-    double dd_rotation_angle();
     uint32_t nan = 0x7fffff;
 
     /* c...mark */
@@ -3938,7 +3926,7 @@ double dd_rotation_angle(struct dd_general_info *dgi)
 {
 # define Not_Track_Relative
 
-    double d_rot, dd_azimuth_angle();
+    double d_rot;
 
 
     switch(dgi->dds->radd->scan_mode) {
@@ -4002,7 +3990,6 @@ void dd_set_uniform_cells(struct dds_structs *dds)
     int ndx=0, nc, just_the_cell_count=YES;
     int nu;
     float cell_spacing, cx, r0, r;
-    void dd_uniform_cell_spacing();
 
 
     /* the lowest resolution cell spacing is based on the
@@ -4078,7 +4065,7 @@ void dd_site_name(char *proj_name, char *site_name)
 
 int dd_src_fid(int *io_type)
 {
-    char *a, *get_tagged_string();
+    char *a;
     int fid;
 
     if((a=get_tagged_string("SOURCE_DEV"))) {
@@ -4129,7 +4116,6 @@ int dd_tokens(char *att, char *str_ptrs[])
 {
     int nargs=0;
     char *b=att, *dlims=" \t\n"; /* blank, tab, and new line */
-    char *strtok();
 
     for(b=strtok(b, dlims);  b; b = strtok(NULL, dlims)) {
 	str_ptrs[nargs++] = b;
@@ -4147,7 +4133,6 @@ dd_tokenz (
 {
     int nargs=0;
     char *b=att;
-    char *strtok();
 
     for(b=strtok(b, dlims); b;  b = strtok(NULL, dlims)) {
 	str_ptrs[nargs++] = b;
@@ -4266,7 +4251,6 @@ int HRD_recompress(unsigned short *src, unsigned short *dst, int flag, int n, in
      * and return the number of 16-bit words of compressed data
      */
     int mark, bcount=0;
-    struct dd_input_filters *dd_return_difs_ptr();
 
 
     if( n < 1 ) {
@@ -4401,7 +4385,7 @@ swap4 (		/* swap integer*4 */
 )
 {
     union {
-	long newval;
+	int32_t newval;
 	char nv[4];
     }u;
     u.nv[3] = *ov++; u.nv[2] = *ov++; u.nv[1] = *ov++; u.nv[0] = *ov++;
@@ -4416,7 +4400,7 @@ xswap4 ( /* assemble an integer*4 variable */
 )
 {
     union {
-	long newval;
+	int32_t newval;
 	char nv[4];
     }u;
     u.nv[3] = *v_lower++;

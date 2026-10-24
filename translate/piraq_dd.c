@@ -13,8 +13,9 @@ static char vcid[] = "$Id$";
 # include <dorade_share.h>
 # include <dd_math.h>
 # include <Platform.h>
-# include <function_decl.h>
+# include <s2_protos.h>
 # include <errno.h>
+# include <stdint.h>
 # include <piraq/piraqx.h>
 
 # include "piraq.h"
@@ -36,8 +37,6 @@ static char vcid[] = "$Id$";
 # endif
 
 
-struct solo_list_mgmt *solo_malloc_list_mgmt();
-int generic_sweepfiles();
 
 /* c------------------------------------------------------------------------ */
 
@@ -301,57 +300,33 @@ static char *acmrg=NULL;
 FILE * ts_fid = NULL;
 int sizeof_ts_fi = 0;
 
-short sig_swap2();
 
-int fof_sl_next_entry();
-void piraq_dd_conv();
-int piraq_isa_new_vol();
-int piraq_isa_new_sweep();
-int piraq_select_ray();
-void piraq_print_stat_line();
-void piraq_reset();
-static void piraq_ini();
-void piraq_name_replace();
-void piraq_name_aliases();
-static int piraq_next_ray();
-static void piraq_backwards_reset();
-static void piraq_map_hdr();
-static void piraq_header();
-static void piraq_fields();
-static void simplepp();
-double pc_swap4f();
-long pc_swap4();
-void piraq_positioning();
-int piraq_inventory();
-void piraq_dump_this_ray();
-void piraq_print_headers();
-void piraq_print_hdr();
-void piraq_print_rhdr();
-static void products();
-void polypp();
-void dualpol1();
-void dualpol3();
-void dualpol12();
-void dualpolplus();
-void fullpolplus();
-void fullpolplusGf();
-void smallhvsimul();
-void dualprt();
-void xdualpol12();
-void dualspolx();
-int pui_next_block();
-static void do_Noise_lut12();
-static void do_Noise_lut15();
+static void piraq_ini(void);
+static int piraq_next_ray(void);
+static void piraq_backwards_reset(int modest);
+static void piraq_map_hdr(char *aa, int gotta_header);
+static void piraq_header(void);
+static void piraq_fields(void);
+static void simplepp(DWELLV *dwell, RADARV *radar, float *prods);
+static void products(DWELLV *dwell, RADARV *radar, float *prods);
+static void do_Noise_lut12(double noise, double scale2ln, float *lut);
+static void do_Noise_lut15(double noise, double scale2ln, float *lut);
 
-struct run_sum *init_run_sum();
-void reset_running_sum();
-double running_sum();
-double short_running_sum();
-double avg_running_sum();
-double short_avg_running_sum();
+/* these take piraq.h types, so they are declared here rather than in
+ * s2_protos.h; nothing outside this file calls them */
+void piraq_print_hdr(HEADERV *hdr, struct solo_list_mgmt *slm, RADARV *rhdr);
+void piraq_print_rhdr(RADARV *rhdr, struct solo_list_mgmt *slm);
+void dualprt(DWELLV *dwell, RADARV *radar, float *pptr);
+void polypp(DWELLV *dwell, RADARV *radar, float *prods);
+void dualpol1(DWELLV *dwell, RADARV *radar, float *prods);
+void dualpol3(DWELLV *dwell, RADARV *radar, float *prods);
+void dualpol12(DWELLV *dwellness, RADARV *radar, float *prods);
+void fullpolplus(DWELLV *dwellness, RADARV *radar, float *prods);
+void dualpolplus(DWELLV *dwellness, RADARV *radar, float *prods);
+void dualpolplusGf(DWELLV *dwellness, RADARV *radar, float *prods);
+void smallhvsimul(DWELLV *dwell, RADARV *radar, float *prods);
 void update_prqxx (PIRAQX *prqx, RADARV *rhdr, HEADERV *dwel);
 void update_prqx (PIRAQX *prqx, LeRADARV *rhdr, LeHEADERV *dwel);
-char *eld_nimbus_fix_asib();
 
 
 /* c------------------------------------------------------------------------ */
@@ -422,8 +397,7 @@ int pui_next_block(void)
   int unsigned short recordlen=0;
   int size=-1, ugly_record_count=0;
   int dwel_record, rhdr_record;
-  DD_TIME *d_unstamp_time();
-  char *aa, *bb, *cc = NULL, *dd_next_source_dev_name(), *dts_print();
+  char *aa, *bb, *cc = NULL;
   char mess[256], *last_top;
   TOP *gh;
   static TOP *last_gh;
@@ -749,7 +723,7 @@ int piraq_isa_new_sweep(void)
     int ii, nn, new = NO, az_turnaround, el_turnaround;
     int cond_a, cond_b, cond_c;
     int lag_rays = 2;
-    double mrd, d, d2, d3, angdiff(), ang_tol, time_tol, dt, da;
+    double mrd, d, d2, d3, ang_tol, time_tol, dt, da;
     double daz, avgDaz=0, ddaz, dddaz, del, avgDel=0, ddel, halfMad;
     double sumDaz=0, sumDel=0, short_sum_az_diffs, short_sum_el_diffs;
     double short_avg_az, short_avg_az_diff, short_avg_el, short_avg_el_diff;
@@ -1100,8 +1074,7 @@ int piraq_select_ray(void)
 
 void piraq_print_stat_line(int count)
 {
-    DD_TIME *dts=gri->dts, *d_unstamp_time();
-    char *dts_print();
+    DD_TIME *dts=gri->dts;
     
     dts->time_stamp = gri->time;
     d_unstamp_time(dts);
@@ -1173,17 +1146,11 @@ void piraq_reset(void)
 static void piraq_ini(void)
 {
     int ii, jj, nn, nt;
-    CHAR_PTR aa, bb, put_tagged_string(), get_tagged_string();
+    CHAR_PTR aa, bb;
     char str[256], *sptrs[32], *sptrs2[32];
-    struct generic_radar_info *return_gri_ptr();
-    struct dd_input_filters *dd_return_difs_ptr();
-    struct dd_stats *dd_return_stats_ptr();
     double d;
     DD_TIME dts;
     float f;
-    struct input_read_info *dd_return_ios();
-    char *dd_establish_source_dev_names(), *dd_next_source_dev_name();
-    char *dd_est_src_dev_names_list();
     struct piraq_ray_que *rq, *last_rq;
     struct piraq_swp_que *sq, *last_sq;
     struct solo_list_mgmt *slm;
@@ -1572,7 +1539,7 @@ void piraq_name_aliases(char *aliases, struct rename_str **top)
 static int piraq_next_ray(void)
 {
     static int whats_left=0;
-    struct io_packet *dd_return_next_packet(), *dp, *dpx;
+    struct io_packet *dp, *dpx;
     int ii, kk, nn, eof_count = 0, mark, gotta_header=NO, looping, size;
     int err_count = 0;
     int ugly_record_count=0, delay = 0;
@@ -2228,7 +2195,7 @@ static void piraq_header(void)
 {
     int ii, pn=0, nbins;
     float scale = 100., bias = 0, r, gs;
-    char *aa, *str_terminate(), mess[256];
+    char *aa, mess[256];
 
 
     if(!(pui->options & SPOL_FLAG)) {
@@ -2373,7 +2340,7 @@ static void piraq_fields(void)
 {
     int ii, pn=0, nbins;
     float scale = 100., bias = 0, r, gs;
-    char *aa, *str_terminate();
+    char *aa;
 
     nbins = gri->num_bins;
     gri->num_fields_present = 0;
@@ -2759,7 +2726,7 @@ KDP   Specific diff. prop. phase btwn HH, VV
 
 
 static void 
-simplepp(DWELL *dwell, RADARV *radar, float *prods)      
+simplepp(DWELLV *dwell, RADARV *radar, float *prods)      
 {
     int mark, gg;
     int  i;
@@ -2874,7 +2841,7 @@ simplepp(DWELL *dwell, RADARV *radar, float *prods)
 /* c------------------------------------------------------------------------ */
 
 static void 
-simplepp16(DWELL *dwell, RADARV *radar, float *prods)      
+simplepp16(DWELLV *dwell, RADARV *radar, float *prods)      
 {
    /* 16-bit integers instead of floats
     */
@@ -2986,7 +2953,7 @@ pc_swap4 (		/* swap real*4 */
 {
     double d;
     union {
-	long newval;
+	int32_t newval;
 	unsigned char nv[4];
     }u;
 
@@ -3010,9 +2977,8 @@ void piraq_positioning(void)
     static float fx1=.8, fx2=1.2;
     static float fxd_ang_tol=.2;
     float f;
-    double d, fabs(), dd_relative_time(), dtarget, d_time_stamp();
-    struct io_packet *dp, *dp0, *dd_return_current_packet();
-    struct solo_list_mgmt *solo_malloc_list_mgmt();
+    double d, dtarget;
+    struct io_packet *dp, *dp0;
 
     preamble[0] = '\0';
     gri_interest(gri, 1, preamble, postamble);
@@ -3320,7 +3286,7 @@ int piraq_inventory(struct input_read_info *irq)
     int nn, ival;
     float val;
     char str[256];
-    double d, fabs();
+    double d;
 
 
     for(;;) {
@@ -3348,7 +3314,7 @@ int piraq_inventory(struct input_read_info *irq)
 void piraq_dump_this_ray(struct solo_list_mgmt *slm)
 {
     int gg, ii, nf, nn, fw=10;
-    char *aa, *bb, *cc, str[128], *str_terminate(), tmp_str[16];
+    char *aa, *bb, *cc, str[128], tmp_str[16];
     float unscale[8], bias[8], *fp=NULL;
 
     aa = str;
@@ -3402,11 +3368,10 @@ void piraq_print_headers(struct solo_list_mgmt *slm)
 void piraq_print_hdr(HEADERV *hdr, struct solo_list_mgmt *slm, RADARV *rhdr)
 {
     int ii;
-    char *aa, str[128], *str_terminate(), tmp[32];
+    char *aa, str[128], tmp[32];
 
-    DD_TIME dts, *d_unstamp_time();
+    DD_TIME dts;
     double d;
-    char *dts_print();
 
     aa = str;
 
@@ -3499,7 +3464,7 @@ void piraq_print_hdr(HEADERV *hdr, struct solo_list_mgmt *slm, RADARV *rhdr)
 void piraq_print_rhdr(RADARV *rhdr, struct solo_list_mgmt *slm)
 {
     int ii, jj, nc, nn;
-    char *aa, *bb, *cc, *zz, str[128], *str_terminate(), tmp[32];
+    char *aa, *bb, *cc, *zz, str[128], tmp[32];
 
     aa = str;
     solo_add_list_entry(slm, " ", 1);
@@ -3596,7 +3561,7 @@ void piraq_print_rhdr(RADARV *rhdr, struct solo_list_mgmt *slm)
 /* c------------------------------------------------------------------------ */
 
 static
-void products(DWELL *dwell, RADARV *radar, float *prods)      
+void products(DWELLV *dwell, RADARV *radar, float *prods)      
 {
   switch(hdr->dataformat)
     {
@@ -3656,7 +3621,7 @@ void products(DWELL *dwell, RADARV *radar, float *prods)
 
 /* c------------------------------------------------------------------------ */
 
-void dualprt(DWELL *dwell, RADAR *radar, float *pptr) {
+void dualprt(DWELLV *dwell, RADARV *radar, float *pptr) {
     int  i,j;   
     short        *abpptr;
     double       cp,p,cp1,cp2,p1,p2,v1,v2,vel,v,w1,w2,pcorrect,ratio;
@@ -3848,7 +3813,7 @@ void dualprt(DWELL *dwell, RADAR *radar, float *pptr) {
 /* c------------------------------------------------------------------------ */
 /* c------------------------------------------------------------------------ */
 
-void polypp(DWELL *dwell, RADARV *radar, float *prods)      
+void polypp(DWELLV *dwell, RADARV *radar, float *prods)      
    {
    int  i;   
    float        *aptr,*pptr;
@@ -3938,7 +3903,6 @@ void dualprt(DWELL *dwell, RADARV *radar, float *prods)
    double       a,b,p,a2,b2,cp,pcorrect,biga,bigb;
    double       logstuff,noise,velconst;
    double       dbm,widthconst,range,rconst,width,r12;
-   double       sqrt();   
 
    rconst = radar->rconst - 20.0 * log10(radar->xmit_pulsewidth / hdr->rcvr_pulsewidth);
    noise = (radar->noise_power > -10.0) ? 0.0 : 0.0;
@@ -3987,7 +3951,7 @@ void dualprt(DWELL *dwell, RADARV *radar, float *prods)
 # endif
 /* c------------------------------------------------------------------------ */
 
-  void dualpol1(DWELL *dwell, RADARV *radar, float *prods)      
+  void dualpol1(DWELLV *dwell, RADARV *radar, float *prods)      
 {
     int whichv, mark;
     int  i;   
@@ -4125,7 +4089,7 @@ void dualprt(DWELL *dwell, RADARV *radar, float *prods)
 #define LOG2    0.69314718056
 
 /* works off of log data */
-void dualpol3(DWELL *dwell, RADARV *radar, float *prods) {
+void dualpol3(DWELLV *dwell, RADARV *radar, float *prods) {
    int  ii, cnt;   
    short        *aptr, itemp;
    float        *pptr;
@@ -4358,7 +4322,7 @@ void dualpol3(DWELL *dwell, RADARV *radar, float *prods) {
 /* c------------------------------------------------------------------------ */
 
 /* works off of log data */
-void dualpol12(DWELL *dwellness, RADARV *radar, float *prods) {
+void dualpol12(DWELLV *dwellness, RADARV *radar, float *prods) {
 
    int  ii, gg, cnt, num_gates;   
    short        *aptr, itemp;
@@ -4678,7 +4642,7 @@ calibration steps:
 	7) Adjust the software vreceiver_gain to get the correct V Power.
 ****************************************************************************/
 /* c------------------------------------------------------------------------ */
-void fullpolplus(DWELL *dwellness, RADARV *radar, float *prods) {
+void fullpolplus(DWELLV *dwellness, RADARV *radar, float *prods) {
 
     short *velp=gri->scaled_data[ve_ndx];
     short *dbmp=gri->scaled_data[dbm_ndx];
@@ -5140,7 +5104,7 @@ void fullpolplus(DWELL *dwellness, RADARV *radar, float *prods) {
 /* c------------------------------------------------------------------------ */
 
 /* works off of log data */
-void dualpolplus(DWELL *dwellness, RADARV *radar, float *prods) {
+void dualpolplus(DWELLV *dwellness, RADARV *radar, float *prods) {
 
    int  ii, gg, cnt, num_gates;   
    short        *aptr, itemp;
@@ -5484,7 +5448,7 @@ void dualpolplus(DWELL *dwellness, RADARV *radar, float *prods) {
 /* c------------------------------------------------------------------------ */
 
 /* works off of log data */
-void dualpolplusGf(DWELL *dwellness, RADARV *radar, float *prods) {
+void dualpolplusGf(DWELLV *dwellness, RADARV *radar, float *prods) {
 
    int  ii, gg, cnt, num_gates, mark;   
    short        *aptr, itemp;
@@ -6318,7 +6282,7 @@ void update_prqxx (PIRAQX *prqx, RADARV *rhdr, HEADERV *dwel)
 #define STARTGATE       5      /* start gate for power average of all gates */
 /* c------------------------------------------------------------------------ */
 
-void smallhvsimul(DWELL *dwell, RADAR *radar, float *prods)      
+void smallhvsimul(DWELLV *dwell, RADARV *radar, float *prods)      
    {
    int          i,avecount,num_gates, mark;   
    short        *aptr;

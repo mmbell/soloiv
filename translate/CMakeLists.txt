@@ -44,13 +44,14 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
       COMPILE_OPTIONS "-std=c++17")
 endif()
 
-# Legacy K&R C code uses implicit function declarations extensively;
-# downgrade from error to warning so it compiles with modern C compilers.
+# Every C function in s2 is prototyped (include/s2_protos.h); keep it that
+# way by making a missing prototype or an implicit declaration an error.
+# C only: radx_shim.cc is C++.
 target_compile_options(s2 PRIVATE
-    -Wno-error=implicit-function-declaration -Wno-implicit-function-declaration
-    -Wno-error=implicit-int -Wno-implicit-int
     -Wno-return-mismatch
     -Wno-error=parentheses -Wno-parentheses
+    $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Clang,AppleClang>>:-Werror=deprecated-non-prototype -Werror=implicit-function-declaration -Werror=implicit-int -Werror=strict-prototypes>
+    $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:-Werror=implicit-function-declaration -Werror=implicit-int -Werror=old-style-definition -Werror=strict-prototypes>
 )
 
 target_include_directories(s2 PUBLIC

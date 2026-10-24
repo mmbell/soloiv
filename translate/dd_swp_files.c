@@ -22,19 +22,12 @@ static char vcid[] = "$Id$";
 # include "radar_io.h"
 # include "input_limits.h"
 # include "input_sweepfiles.h"
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 
 
 static int sizeof_prev_file=0;
 static int unique_vol_id = NO;
 
-void dd_insert_headers();
-void dd_new_vol();
-void dd_catalog();
-void produce_nssl_mrd();
-void produce_ncdf();
-void dd_tape();
 
 
 
@@ -70,8 +63,7 @@ void dd_dump_ray(struct dd_general_info *dgi)
     struct radar_d *radd=dgi->dds->radd;
     struct paramdata_d *rdat;
     struct qparamdata_d *qdat;
-    double dd_rotation_angle();
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+    struct dd_input_sweepfiles_v3 *dis;
 
     /* c...mark */
     dis = dd_return_sweepfile_structs_v3();
@@ -177,7 +169,7 @@ void dd_dump_ray(struct dd_general_info *dgi)
 # endif
 
 	    num_short = HRD_recompress
-		  ((short *)b, (short *)c
+		  ((unsigned short *)b, (unsigned short *)c
 		   , dgi->dds->parm[pn]->bad_data, num_short
 		   , (int)dgi->compression_scheme);
 # ifdef obsolete
@@ -230,10 +222,9 @@ void dd_flush(int flush_radar_num)
      * sweep and close the file
      */
     int ii, jj, nn;
-    int dd_min_rays_per_sweep();
     char str[256];
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
-    struct dd_general_info *dgi, *dd_get_structs(), *dd_window_dgi();
+    struct dd_input_sweepfiles_v3 *dis;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     struct super_SWIB *sswb;
     struct sweepinfo_d *swib;
@@ -255,7 +246,7 @@ void dd_flush(int flush_radar_num)
 	if(dis->editing)
 	      dgi = dd_window_dgi(ii);
 	else
-	      dgi = dd_get_structs(ii,0);
+	      dgi = dd_get_structs(ii);
 
 #ifdef SOLOIV_IO_BACKEND_RADX
 	if (rio_is_managed(dgi)) {    /* finalize the Radx-assembled volume */
@@ -357,19 +348,17 @@ void dd_insert_headers(struct dd_general_info *dgi)
 {
     struct dds_structs *dds=dgi->dds;
     int ii, np, nn, bsize=0, ncomm, ssize;
-    double dd_rotation_angle();
-    char *dd_scan_mode_mne();
-    char *dd_radar_name(), *c;
+    char *c;
     struct super_SWIB *sswb=dds->sswb;
     struct sweepinfo_d *swib=dds->swib;
     struct volume_d *vold=dds->vold, *voldo;
     struct radar_d *radd=dds->radd, *raddo;
-    struct comment_d *comm=dds->comm, *commo, *dd_return_comment();
+    struct comment_d *comm=dds->comm, *commo;
     struct correction_d *cfac=dds->cfac, *cfaco;
     struct cell_d *celv=dds->celv, *celvo;
     struct parameter_d *parmo;
-    struct dd_stats *dd_stats, *dd_return_stats_ptr();
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+    struct dd_stats *dd_stats;
+    struct dd_input_sweepfiles_v3 *dis;
     char scan_mode_mne[16];
 
     dis = dd_return_sweepfile_structs_v3();
@@ -522,11 +511,10 @@ void dd_insert_headers(struct dd_general_info *dgi)
 void dd_new_vol(struct dd_general_info *dgi)
 {
     int ii;
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+    struct dd_input_sweepfiles_v3 *dis;
     struct dds_structs *dds=dgi->dds;
     struct volume_d *vold=dds->vold;
     DD_TIME *dts=dgi->dds->dts;
-    DD_TIME *d_unstamp_time();
 
     dis = dd_return_sweepfile_structs_v3();
     dgi->vol_count++;

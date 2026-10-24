@@ -8,7 +8,7 @@ static char vcid[] = "$Id$";
 # include "generic_radar_info.h"
 # include <dd_time.h>
 # include <dd_math.h>
-# include <function_decl.h>
+# include <s2_protos.h>
 
 # ifndef SEEK_SET
 # define SEEK_SET 0
@@ -61,11 +61,6 @@ static float db_off, attenuation, log_intercept, log_slope;
 static float min_curve, max_value;
 
 
-int wsrqc_correct();
-int wsrqc_init();
-struct wsrqc_stuff_ptrs *wsr_malloc();
-int nab_wsrqc_stuff();
-int wsrqc_power_cor();
 
 
 # ifdef obsolete
@@ -73,13 +68,13 @@ int wsrqc_power_cor();
 
 int main(void)
 {
-    struct generic_radar_info *gri, *return_gri_ptr();
+    struct generic_radar_info *gri;
 
     long ival=0x40000004;
-    double d, cvt_hp1000fp(), d_time_stamp();
+    double d;
     int ii, jj, kk, nn;
     int yy=92, mon=11, dd=06, hh=4, mm=1, ss=0;
-    char *a,  *getenv();
+    char *a;
     
 
     gri = return_gri_ptr();
@@ -112,7 +107,7 @@ int main(void)
 
 int wsrqc_correct(struct generic_radar_info *gri, char *name)
 {
-    static count=0;
+    static int count=0;
     int ii, mm, mark;
 
     if(!wsr_correct)
@@ -190,9 +185,9 @@ int wsrqc_init(struct generic_radar_info *gri)
      * read in all the scope2 descriptors then
      * loop to postition near the first scope3 entry
      */
-    char *a, *get_tagged_string(), *strstr();
+    char *a;
     int ii, jj, kk, mm, nn, mark;
-    struct wsrqc_stuff_ptrs *wsp, *last_wsp, *wsr_malloc();
+    struct wsrqc_stuff_ptrs *wsp, *last_wsp;
     long fpos, flen, finc;
 
 
@@ -362,11 +357,10 @@ int nab_wsrqc_stuff(FILE *stream,
      * to the last line read in
      */
     int ii, nn, hh, mm, ss, noc=0, mark, lc;
-    char *a, *b, *c=buf, *nl, *dd_whiteout(), *dd_delimit();
-    char *strstr(), *fgetsx();
+    char *a, *b, *c=buf, *nl;
     struct wsrqc_stuff *ws=wsp->at;
     DD_TIME dts;
-    double d, d_time_stamp();
+    double d;
 
     if(last_line && (nn=strlen(last_line))) {
 	/* move last line to beginning of buffer

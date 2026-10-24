@@ -73,8 +73,8 @@ static char vcid[] = "$Id$";
 # include <time.h>
 # include <sys/time.h>
 
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloiv_core_protos.h>
 
 # ifdef HAVE_SYS_MTIO_H
 #   include <sys/mtio.h>
@@ -92,7 +92,6 @@ static char *Stypes[] = { "CAL", "PPI", "COP", "RHI", "VER",
 			  "TAR", "MAN", "IDL", "SUR", "AIR", "???" };
 
 
-void solo_message();
 
 static struct running_avg_que *top_raq=NULL;
 static char *tags[MAX_TAGS], *tagged_strings[MAX_TAGS];
@@ -168,7 +167,7 @@ int dd_strings_to_slm (const char **lines, struct solo_list_mgmt *slm, int nn)
 int dd_absorb_strings (char *path_name, struct solo_list_mgmt *slm)
 {
     int ii, nn, nt, mark;
-    char *aa, *bb, str[256], str2[256], *sptrs[64], *fgetz();
+    char *aa, *bb, str[256], str2[256], *sptrs[64];
     FILE *stream;
 
 
@@ -589,7 +588,7 @@ int dd_crack_file_name(char *type, long *time_stamp, char *radar, int *version, 
     char *a=fn, *b, str[64];
     long clock;
     struct tm tm;
-    double d, d_time_stamp();
+    double d;
     DD_TIME dts;
 
     *version = *time_stamp = 0;
@@ -644,7 +643,7 @@ int dd_crack_file_name(char *type, long *time_stamp, char *radar, int *version, 
 int dd_crack_file_name(char *type, long *time_stamp, char *radar, int *version, char *fn)
 {
     char *delim=DD_NAME_DELIMITER;
-    double d, d_time_stamp();
+    double d;
     DD_TIME dts;
     char string_space[256], *str_ptrs[32];
     int nt, mon, day, hrs, min, secs, ival;
@@ -689,7 +688,7 @@ int dd_crack_file_name_ms(char *type, double *time_stamp, char *radar, int *vers
     char *delim=DD_NAME_DELIMITER;
     int i, t[8];
     char *a=fn, *b, str[4];
-    double d, d_time_stamp();
+    double d;
     DD_TIME dts;
 
     *version = *time_stamp = 0;
@@ -747,7 +746,7 @@ int dd_crack_file_name_ms(char *type, double *time_stamp, char *radar, int *vers
 int dd_crack_file_name_ms(char *type, double *time_stamp, char *radar, int *version, char *fn, int *ms)
 {
     char *delim=DD_NAME_DELIMITER;
-    double d, d_time_stamp();
+    double d;
     DD_TIME dts;
     char string_space[256], *str_ptrs[32];
     int nt, mon, day, hrs, min, secs, ival;
@@ -792,7 +791,7 @@ int dd_crack_file_name_ms(char *type, double *time_stamp, char *radar, int *vers
 
 void dd_file_name(char *type, long time_stamp, char *radar, int version, char *fn)
 {
-    DD_TIME dts, *d_unstamp_time();
+    DD_TIME dts;
 
     dts.time_stamp = time_stamp;
     d_unstamp_time(&dts);
@@ -815,7 +814,7 @@ void dd_file_name(char *type, long time_stamp, char *radar, int version, char *f
 void dd_file_name_ms(char *type, long time_stamp, char *radar, int version, char *fn, int ms)
 {
     int vzn=ms+version*1000;
-    DD_TIME dts, *d_unstamp_time();
+    DD_TIME dts;
 
     dts.time_stamp = time_stamp;
     d_unstamp_time(&dts);
@@ -968,7 +967,7 @@ int dd_hrd16LE_uncompressx(unsigned short *ss, unsigned short *dd, int flag, int
 
 int dd_nab_floats(char *str, float *vals)
 {
-    int ii, jj, nt, dd_tokens();
+    int ii, jj, nt;
     char string_space[256], *str_ptrs[32];
 
     strcpy(string_space, str);
@@ -1093,7 +1092,7 @@ char *dd_unquote_string(char *uqs, char *qs)
 double dorade_time_stamp(struct volume_d *vold, struct ray_i *ryib, DD_TIME *dts)
 {
 
-    double d, d_time_stamp();
+    double d;
 
     dts->year = vold->year > 1900 ? vold->year : vold->year +1900;
     dts->month = dts->day = 0;
@@ -1125,7 +1124,7 @@ char *dts_print(DD_TIME *dts)
 
 double eldora_time_stamp(struct volume_d *vold, struct ray_i *ryib)
 {
-    double d, d_time_stamp(), dorade_time_stamp();
+    double d;
     DD_TIME dts;
 
     d = dorade_time_stamp(vold, ryib, &dts);
@@ -1138,7 +1137,8 @@ int fb_read(int fin, char *buf, int count)
 {
     /* fortran-binary read routine
      */
-    long int size_rec=0, rlen1, rlen2=0, nab;
+    int32_t size_rec=0, nab;	/* fortran record length word */
+    long int rlen1, rlen2=0;
 
     /* read the record size */
     rlen1 = read (fin, &nab, sizeof(nab));
@@ -1180,7 +1180,8 @@ int fb_write(int fout, char *buf, int count)
 {
     /* fortran-binary write routine
      */
-    long int size_rec=count, rlen1, rlen2=0, blip;
+    int32_t size_rec=count, blip;	/* fortran record length word */
+    long int rlen1, rlen2=0;
 
     if(LittleEndian) {
        swack4(&size_rec, &blip);
@@ -1212,26 +1213,26 @@ int fb_write(int fout, char *buf, int count)
 /* c------------------------------------------------------------------------ */
 
 char *
-fgetsx(unsigned char *aa, int nn, FILE *stream)
+fgetsx(char *aa, int nn, FILE *stream)
 {
     /* similar to fgets()
      */
     int ii, jj=0;
-    unsigned char *c=aa;
+    char *c=aa;
 
     for(; nn--; c++,jj++) {
 	ii = fgetc(stream);
 	if(ii == EOF) {
 	    if(jj) {
 		*c = '\0';
-		return( (char *) aa);
+		return(aa);
 	    }
 	    return(NULL);
 	}
 	*c = ii;
 	if(ii == '\n') {
 	    *(++c) = '\0';
-	    return( (char *) aa);
+	    return(aa);
 	}
     }
     return(NULL);
@@ -1310,7 +1311,7 @@ int gp_read(int fid, char *buf, int size, int io_type)
 }
 /* c------------------------------------------------------------------------ */
 
-int gp_write(int fid, char *buf, int size, int io_type)
+int gp_write(int fid, void *buf, int size, int io_type)
 {
     /* general purpose write
      */
@@ -1549,7 +1550,7 @@ void slm_print_list(struct solo_list_mgmt *slm)
 void solo_add_list_entry(struct solo_list_mgmt *which, char *entry, int len)
 {
     int ii;
-    char *a, *c, *str_terminate();
+    char *a, *c;
 
     if(!which)
 	  return;
@@ -1597,7 +1598,6 @@ void solo_list_remove_dups(struct solo_list_mgmt *slm)
     /* remove duplicate strings from the list
      */
     int ii, jj, nd;
-    void solo_list_remove_entry();
 
     if(!slm || slm->num_entries <= 0)
 	  return;
@@ -1620,7 +1620,6 @@ void solo_list_remove_entry(struct solo_list_mgmt *slm, int ii, int jj)
      */
     int kk, nn, nd;
     char *keep;
-    long file_time_stamp();
 
     if(!slm || slm->num_entries <= 0 || ii < 0 || ii >= slm->num_entries)
 	  return;
@@ -1650,7 +1649,6 @@ void solo_list_sort_file_names(struct solo_list_mgmt *slm)
 {
     int ii, jj;
     char *keep;
-    long file_time_stamp();
 
     if(!slm || slm->num_entries <= 0)
 	  return;
@@ -1697,7 +1695,7 @@ struct point_in_space *solo_malloc_pisp(void)
 char *solo_modify_list_entry(struct solo_list_mgmt *which, char *entry, int len, int entry_num)
 {
     int ii;
-    char *a, *c, *str_terminate();
+    char *a, *c;
 
     if(!which || entry_num > which->num_entries || entry_num < 0)
 	  return(NULL);
@@ -1808,7 +1806,7 @@ long time_now(void)
 
 time_t todays_date(short date_time[])
 {
-    struct tm *tm, *localtime();
+    struct tm *tm;
     int i;
     struct timeval tp;
     struct timezone tzp;

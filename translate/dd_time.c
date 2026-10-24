@@ -6,6 +6,7 @@ static char vcid[] = "$Id$";
 
 # include "dd_time.h"
 # include <string.h>
+# include <s2_protos.h>
 
 # ifndef SECONDS_PER_DAY
 # define SECONDS_PER_DAY 86400
@@ -25,7 +26,7 @@ static double *accumulated_months[MAX_YEARS+1];
 static double accumulated_years[MAX_YEARS+1];
 static int first_d_time=1;
 static int iguess=WILD_GUESS -REFERENCE_YEAR;
-static void init_d_time();
+static void init_d_time(void);
 
 /* c------------------------------------------------------------------------ */
 

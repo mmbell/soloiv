@@ -1,3 +1,9 @@
+/*
+ * Legacy K&R declarations of s2 (translate/) functions, kept only for
+ * perusal/ and editor/ until they are converted to prototypes.  Do not
+ * add to this file: the prototypes live in s2_protos.h, and translate/
+ * no longer includes it.  (difs_terminators is no longer defined anywhere)
+ */
 #ifndef INCfunction_declh
 #define INCfunction_declh
 

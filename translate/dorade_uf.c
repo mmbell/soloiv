@@ -18,8 +18,7 @@ static char vcid[] = "$Id$";
 
 # include "dd_uf.h"
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 
 # define PMODE 0666
 # define NO_UF_CLIPPING 0x1
@@ -55,10 +54,6 @@ static int num_parms=0;
 static double max_media_size = 4200 * 1.e6; /* 4.2 GB */
 static struct field_name_aliases *field_aliases = NULL;
 
-void ufp_init();
-void ufp_stuff_ray();
-void ufp_uf_stuff();
-int ufp_write();
 
 
 /* c------------------------------------------------------------------------ */
@@ -67,7 +62,7 @@ void produce_uf(struct dd_general_info *dgi)
 {
     struct field_name_aliases *fna, *prev_fna;
     struct uf_production *ufp;
-    char *a, *get_tagged_string();
+    char *a;
     char str[256], *str_ptrs[36], *aa, *bb, *cc;
     double d;
     int ii, nt, mark;
@@ -307,8 +302,7 @@ void ufp_init(struct dd_general_info *dgi, struct uf_production *ufp)
     UF_DATA_HED *dhed;
     UF_FLD_ID_ARRAY *fida;
     int ii, m, n, nt;
-    char *uf_ptr, str[512], *a, *ufn, *get_tagged_string();
-    char *dd_link_dev_name();
+    char *uf_ptr, str[512], *a, *ufn;
     short *w, tdate[6];
 
     ufp->last_ray_num = -1;
@@ -765,7 +759,6 @@ void ufp_uf_stuff(struct dd_general_info *dgi, struct uf_production *ufp)
     int g, i, ii, jj, pn, mm, nn;
     float gs, r, x, y;
     int g2;
-    double  dorade_time_stamp();
     DD_TIME *dts=dgi->dds->dts;
     char *aa, fname[16];
 

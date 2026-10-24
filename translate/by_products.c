@@ -4,15 +4,7 @@
 static char vcid[] = "$Id$";
 #endif /* lint */
 # include <dorade_headers.h>
-
-void dd_derived_fields();
-void dd_pct_stats();
-void dd_cappiz();
-void produce_uf();
-void dd_gecho();
-void dd_product_x();
-void produce_nssl_mrd();
-void produce_shanes_data();
+# include <s2_protos.h>
 
 /* c------------------------------------------------------------------------ */
 

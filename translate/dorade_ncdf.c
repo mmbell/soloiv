@@ -23,8 +23,7 @@ static char vcid[] = "$Id$";
 # include <dorade_headers.h>
 # include "dd_time.h"
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 # include <piraq/piraqx.h>
 # include "piraq.h"
 # include "dd_io_structs.h"
@@ -361,7 +360,6 @@ struct rnc_info * return_rnc_info( char * name )
 }
 /* c------------------------------------------------------------------------ */
 
-struct input_read_info *return_pir_irq();
 static struct input_read_info *irq;
 static int num_vars = 0;
 static char *nc_var_list;
@@ -482,17 +480,15 @@ static float def_fill = -32767;
 static float def_missing = -32768;
 static int notSet = -32768;
 
-void produce_ncdf();
-static void ncp_stuff_ray();
-static void ncdf_finish();
-static void ncdf_init_sweep();
+static void ncp_stuff_ray(struct dd_general_info *dgi, struct ncdf_production *ncp);
+static void ncdf_finish(struct ncdf_production *ncp);
+static void ncdf_init_sweep(struct dd_general_info *dgi, struct ncdf_production *ncp);
 
-static int dd_setFxdR1GsEtc();
-static int dd_setRcvrXmtrStuff();
-static int dd_setLatLonAlt();
-static int dd_setACparams();
-static int dd_setAzEl();
-void return_piraq_radar_consts();
+static int dd_setFxdR1GsEtc(struct ncdf_production *ncp, int num_dims, int *dims);
+static int dd_setRcvrXmtrStuff(struct ncdf_production *ncp, int num_dims, int *dims);
+static int dd_setLatLonAlt(struct ncdf_production *ncp, int num_dims, int *dims);
+static int dd_setACparams(struct dd_general_info *dgi, struct ncdf_production *ncp, int num_dims, int *dims);
+static int dd_setAzEl(struct ncdf_production *ncp, int num_dims, int *dims);
 
 # ifdef obsolete
 stati int ();
@@ -568,7 +564,6 @@ void produce_ncdf(struct dd_general_info *dgi, int finish)
 {
 
     struct ncdf_production *ncp;
-    char *get_tagged_string();
     char str[256], *sptrs[32], *aa, *bb, *cc;
     int ii, jj, kk, nt, mark;
 
