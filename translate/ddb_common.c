@@ -1257,7 +1257,9 @@ dd_ini(rn, radar_name)
 	}
 	pr->next = dgi->ray_que;
 	dgi->ray_que->last = pr_last = pr;
+# ifndef NEW_ALLOC_SCHEME
 	c = dd_align_structs(c, sizeof(struct prev_rays));
+# endif
     }
 
     for(i=0; i < MAX_PREV_SWPS; i++){
@@ -1275,7 +1277,9 @@ dd_ini(rn, radar_name)
 	}
 	ps->next = dgi->swp_que;
 	dgi->swp_que->last = ps_last = ps;
+# ifndef NEW_ALLOC_SCHEME
 	c = dd_align_structs(c, sizeof(struct prev_swps));
+# endif
     }
 
     /* establish all the other headers */

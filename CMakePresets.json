@@ -5,9 +5,9 @@
     {
       "name": "default",
       "displayName": "Default — Debug, tests on (no sanitizers)",
+      "description": "Debug rather than RelWithDebInfo because -O2 currently triggers a clang trap insertion in solo_hardware_color_table during first paint (separate latent issue, doesn't reproduce in interactive use). Tests need a clean baseline.",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "_comment": "Debug rather than RelWithDebInfo because -O2 currently triggers a clang trap insertion in solo_hardware_color_table during first paint (separate latent issue, doesn't reproduce in interactive use). Tests need a clean baseline.",
         "CMAKE_BUILD_TYPE": "Debug",
         "SOLOIV_BUILD_TESTS": "ON"
       }
@@ -43,7 +43,7 @@
       "execution": { "stopOnFailure": false },
       "environment": {
         "ASAN_OPTIONS": "abort_on_error=1:detect_leaks=0:symbolize=1:print_stacktrace=1",
-        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=0",
+        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1",
         "LSAN_OPTIONS": "suppressions=${sourceDir}/tests/.asan-suppressions"
       }
     }
