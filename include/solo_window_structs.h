@@ -17,14 +17,15 @@ typedef struct {
   int blue;
 }XXColor;
 
-typedef struct {
+/* tagged so that soloiv_core_protos.h can name them without GTK */
+typedef struct XColor {
   unsigned long pixel;
   unsigned short red;
   unsigned short green;
   unsigned short blue;
 }XColor;
 
-typedef struct {
+typedef struct XImage {
   int bits_per_pixel;
   int bytes_per_line;
   int byte_order;
@@ -132,8 +133,10 @@ static inline void XPutPixel(XImage *img, int x, int y, unsigned long pixel) {
 
 /* c------------------------------------------------------------------------ */
 
-struct solo_window_ptrs *solo_return_wwptr (int frame_num);
-struct solo_perusal_info *solo_return_winfo_ptr ();
+/* the same prototypes as in soloiv_core_protos.h, for the files that
+ * include only this header */
+struct solo_window_ptrs *solo_return_wwptr(int ww_num);
+struct solo_perusal_info *solo_return_winfo_ptr(void);
 
 /* c------------------------------------------------------------------------ */
 /* c------------------------------------------------------------------------ */

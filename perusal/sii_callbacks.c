@@ -4,6 +4,7 @@
 # include "sii_externals.h"
 # include "sii_enums.h"
 # include <gdk/gdk.h>
+# include <s2_protos.h>
 # define config_debug
 
 /* c---------------------------------------------------------------------- */
@@ -11,34 +12,9 @@
 /* c---------------------------------------------------------------------- */
 
 /* GTK4: expose_event -> GtkDrawingArea draw function */
-void sii_frame_draw_func(GtkDrawingArea *area, cairo_t *cr,
-			 int width, int height, gpointer data);
 /* GTK4: configure_event -> resize signal handler */
-void sii_frame_resize_cb(GtkWidget *frame, int width, int height,
-			 gpointer data);
 /* GTK4: focus events -> GtkEventControllerFocus */
-void sii_focus_in_cb(GtkEventControllerFocus *controller, gpointer data);
-void sii_focus_out_cb(GtkEventControllerFocus *controller, gpointer data);
 /* GTK4: enter/leave -> GtkEventControllerMotion */
-void sii_enter_cb(GtkEventControllerMotion *controller, double x, double y,
-		  gpointer data);
-void sii_leave_cb(GtkEventControllerMotion *controller, gpointer data);
-void checkup_cb( GtkWidget *w, gpointer   data );
-
-void sii_plot_data (guint frame_num, guint plot_function);
-void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
-				   GdkRectangle *area, gboolean blow_up);
-
-void solo_set_halt_flag();
-
-void sii_set_geo_coords ( int frame_num, gdouble dx, gdouble dy);
-
-void sii_check_def_widget_sizes ();
-
-void sii_dump_debug_stuff();
-
-guint sii_inc_master_seq_num ();
-guint sii_get_master_seq_num ();
 
 /* c---------------------------------------------------------------------- */
 
@@ -313,7 +289,7 @@ void sii_frame_draw_func(GtkDrawingArea *area, cairo_t *cr,
 /* c---------------------------------------------------------------------- */
 
 /* GTK4: blow up configure -> resize signal */
-void sii_blow_up_resize_cb(GtkWidget *frame, int width, int height,
+void sii_blow_up_resize_cb(GtkDrawingArea *frame, int width, int height,
 			   gpointer data)
 {
 			/* c...config */
@@ -341,7 +317,7 @@ void sii_blow_up_resize_cb(GtkWidget *frame, int width, int height,
 /* c---------------------------------------------------------------------- */
 
 /* GTK4: frame configure -> resize signal */
-void sii_frame_resize_cb(GtkWidget *frame, int width, int height,
+void sii_frame_resize_cb(GtkDrawingArea *frame, int width, int height,
 			 gpointer data)
 {
 			/* c...config */
@@ -1152,13 +1128,12 @@ void config_cb( GtkWidget *w, gpointer   data )
 }
 
 /* c---------------------------------------------------------------------- */
-guint test_event_cb(GtkWidget *label, gpointer data )
+void test_event_cb(GtkWidget *label, gpointer data )
 {
   guint position = GPOINTER_TO_UINT (data);
   g_message( "layout widget line: %d"
 	    , position
 	    );
-  return FALSE;
 }
 
 /* c---------------------------------------------------------------------- */
@@ -1353,8 +1328,6 @@ void sii_focus_out_cb(GtkEventControllerFocus *controller, gpointer data)
 
 /* c---------------------------------------------------------------------- */
 
-/* Forward declarations for filesel callback helpers */
-void sii_param_colors_filesel (const gchar *str, GtkWidget *fs);
 
 /* GTK4 file selection callback - called when GtkFileDialog completes */
 static void

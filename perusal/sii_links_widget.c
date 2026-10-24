@@ -27,9 +27,6 @@ enum {
    LINKS_LAST_ENUM,
 };
 
-void sii_links_widget( guint frame_num, guint widget_id, LinksInfo *linkfo );
-void sii_view_update_links (guint frame_num, int li_type);
-
 /* c---------------------------------------------------------------------- */
 
 void sii_set_links_from_solo_struct (int frame_num, int links_id,

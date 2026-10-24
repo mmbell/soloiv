@@ -33,50 +33,16 @@ static char vcid[] = "$Id$";
 # include <dd_files.h>
 # include <sed_shared_structs.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
-
-
-/* external routines */
-int solo_color_check();		/* sp_colors.c */
-int solo_pixelate_color();	/* sp_colors.c */
-void solo_message();		/* solo.c */
-void solo_check_zap_parms();	/* sp_pals.c */
-void solo_subscribe_palette();	/* sp_pals.c */
-int solo_get_files();		/* sp_lists.c */
-int solo_hardware_color_table(); /* sp_colors.c */
-void solo_palette_message();	/* sp_pals.c */
-void solo_trigger_dir_rescans(); /* sp_basics.c */
-void dd_razel_to_xyz();		/* ddb_common.c */
-
-
-
-/* internal routines */
-void sp_cpy_lmrk_info();
-void sp_cpy_ctr_info();
-void solo_cpy_lock_info();
-void solo_cpy_parameter_info();
-void solo_cpy_sweep_info();
-void solo_cpy_view_info();
-char *solo_gen_file_info();
-int solo_parameter_colors_check();
-void solo_parameter_numbers_check();
-int solo_set_lock_info();
-int solo_set_parameter_info();
-int solo_set_sweep_info();
-void sp_set_landmark_info();
-void sp_set_center_of_view_info();
-int solo_set_view_info();
-
-
-
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 
 
 /* c------------------------------------------------------------------------ */
 
 void sp_cpy_lmrk_info(int src_frme, int dst_frme)
 {
-    WW_PTR wwptrs, wwptrd, solo_return_wwptr();
+    WW_PTR wwptrs, wwptrd;
 
     if (src_frme == dst_frme)
       { return; }
@@ -96,7 +62,7 @@ void sp_cpy_lmrk_info(int src_frme, int dst_frme)
 
 void sp_cpy_ctr_info(int src_frme, int dst_frme)
 {
-    WW_PTR wwptrs, wwptrd, solo_return_wwptr();
+    WW_PTR wwptrs, wwptrd;
 
     if (src_frme == dst_frme)
       { return; }
@@ -116,7 +82,7 @@ void sp_cpy_ctr_info(int src_frme, int dst_frme)
 
 void solo_cpy_lock_info(int src_frme, int dst_frme)
 {
-    WW_PTR wwptrs, wwptrd, solo_return_wwptr();
+    WW_PTR wwptrs, wwptrd;
 
     if (src_frme == dst_frme)
       { return; }
@@ -131,7 +97,7 @@ void solo_cpy_lock_info(int src_frme, int dst_frme)
 
 void solo_cpy_parameter_info(int src_frme, int dst_frme)
 {
-    WW_PTR wwptrs, wwptrd, solo_return_wwptr();
+    WW_PTR wwptrs, wwptrd;
 
     if (src_frme == dst_frme)
       { return; }
@@ -151,7 +117,7 @@ void solo_cpy_parameter_info(int src_frme, int dst_frme)
 
 void solo_cpy_sweep_info(int src_frme, int dst_frme)
 {
-    WW_PTR wwptrs, wwptrd, solo_return_wwptr();
+    WW_PTR wwptrs, wwptrd;
 
     if (src_frme == dst_frme)
       { return; }
@@ -182,7 +148,7 @@ void solo_cpy_sweep_info(int src_frme, int dst_frme)
 
 void solo_cpy_view_info(int src_frme, int dst_frme)
 {
-    WW_PTR wwptrs, wwptrd, solo_return_wwptr();
+    WW_PTR wwptrs, wwptrd;
 
     if (src_frme == dst_frme)
       { return; }
@@ -200,7 +166,7 @@ void solo_cpy_view_info(int src_frme, int dst_frme)
 
 char *solo_gen_file_info(int frme)
 {
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
     return(wwptr->show_file_info);
@@ -216,8 +182,8 @@ int solo_set_lock_info(struct sweep_widget_info *swi)
     int ww, it, ii, i, j, k, n, mark, changed=NO, ok;
     int changed_center=NO;
     int dangling_links[SOLO_MAX_WINDOWS];
-    WW_PTR wwptr, wwptrc, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptr, wwptrc;
+    struct solo_perusal_info *spi;
     char mess[256];
 
     if(frme < 0 || frme >= SOLO_MAX_WINDOWS) {
@@ -287,21 +253,14 @@ int solo_set_parameter_info(struct parameter_widget_info *pwi)
     int changed_parameter, changed_palette, check_widget_info=YES;
     int changed_center, changed_increment, changed_min_max = NO;
     int push_palette = NO, changed_color_table = NO;
-    int dd_tokenz();
-    WW_PTR wwptr, wwptrc, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptr, wwptrc;
+    struct solo_perusal_info *spi;
     struct solo_list_mgmt *lm;
     char *aa;
 
-    struct solo_palette_ptr
-	  *pal=NULL, *top
-		, *solo_get_palette()
-		      , *solo_malloc_palette()
-			    , *solo_push_palette()
-				  , *solo_topof_palettes()
-					, *solo_this_palette();
+    struct solo_palette_ptr *pal=NULL, *top;
 
-    double d, fabs(), d_min, d_max, atof();
+    double d, d_min, d_max;
     float f_min, f_max;
     char mess[256], directory[128], filename[128];
     char string_space[64], *strptrs[16];
@@ -554,21 +513,19 @@ int solo_set_sweep_info(struct sweep_widget_info *swi)
      */
 
     int frme=swi->frame_num;
-    long time, time_now(), lnn;
-    double dtime, ddfnp_list_entry(), time_span, d_start, d_stop;
-    double d, d_time_stamp(), dd_relative_time();
-    long mddir_file_info_v3();
-    double d_mddir_file_info_v3();
+    long time, lnn;
+    double dtime, time_span, d_start, d_stop;
+    double d;
     int ww, ii, j, n, mark, rn, num_swps, version
 	  , dangling_links[SOLO_MAX_WINDOWS];
-    int dir_changed, radar_changed=NO, rnx, vv, dd_crack_datime();
+    int dir_changed, radar_changed=NO, rnx, vv;
     int time_series, time_sync;
-    char *aa, *bb, *cc, str[128], *mddir_radar_name(), *dts_print();
-    char line[88], radar_name[16], mess[256], *mddir_radar_name_v3();
-    struct dd_file_name **fnp, **mddir_return_swp_list();
-    WW_PTR wwptr, wwptrc, wwptrx, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    DD_TIME dts, *d_unstamp_time();
+    char *aa, *bb, *cc, str[128];
+    char line[88], radar_name[16], mess[256];
+    struct dd_file_name **fnp;
+    WW_PTR wwptr, wwptrc, wwptrx;
+    struct solo_perusal_info *spi;
+    DD_TIME dts;
     struct solo_list_mgmt *slm;
 
 
@@ -656,12 +613,14 @@ int solo_set_sweep_info(struct sweep_widget_info *swi)
     if(swi->sweep_num >= 0) {
       /* select this sweep
        */
+      /* ddfnp_list_entry() stores an int; version_num is a long */
       wwptr->sweep->start_time = dtime = wwptr->d_sweepfile_time_stamp = 
 	ddfnp_list_entry(frme, wwptr->sweep->radar_num
 			 , swi->sweep_num
-			 , &wwptr->sweep->version_num
+			 , &version
 			 , wwptr->show_file_info
 			 , wwptr->sweep->file_name);
+      wwptr->sweep->version_num = version;
       wwptr->sweep->stop_time = (time_series) ? dtime +time_span : dtime;
       wwptr->sweep->time_stamp = dtime;
     }
@@ -769,9 +728,9 @@ void sp_set_landmark_info(struct landmark_widget_info *lwi)
     int frme=lwi->frame_num;
     int ww, it, ii, jj, kk, nn, mark, changed=NO, ok;
     int dangling_links[SOLO_MAX_WINDOWS];
-    WW_PTR wwptr, wwptrc, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    double d, fabs();
+    WW_PTR wwptr, wwptrc;
+    struct solo_perusal_info *spi;
+    double d;
     char mess[256];
 
     wwptr = solo_return_wwptr(frme);
@@ -839,9 +798,9 @@ void sp_set_center_of_view_info(struct view_widget_info *pvi, struct centering_w
     int ww, it, ii, jj, kk, nn, mark, changed=NO, ok;
     int dangling_links[SOLO_MAX_WINDOWS], linked_windows[SOLO_MAX_WINDOWS];
     int ref_frme, option;
-    WW_PTR wwptr, wwptrc, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    double d, fabs();
+    WW_PTR wwptr, wwptrc;
+    struct solo_perusal_info *spi;
+    double d;
     char mess[256];
 
     wwptr = solo_return_wwptr(frme);
@@ -995,11 +954,11 @@ int solo_set_view_info(struct view_widget_info *pvi, struct landmark_widget_info
     int ww, it, ii, i, j, k, n, mark, changed=NO, ok;
     int changed_center=NO;
     int dangling_links[SOLO_MAX_WINDOWS];
-    WW_PTR wwptr, wwptrc, wwptrx, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptr, wwptrc, wwptrx;
+    struct solo_perusal_info *spi;
     struct solo_list_mgmt *lm;
     struct solo_field_vals *sfv;
-    double d, fabs();
+    double d;
     char mess[256];
 
     if(frme < 0 || frme >= SOLO_MAX_WINDOWS) {

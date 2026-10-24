@@ -3,6 +3,7 @@
 # include <solo_window_structs.h>
 # include <solo_editor_structs.h>
 # include <sii_widget_content_structs.h>
+# include <soloiv_core_protos.h>
 
 /* c------------------------------------------------------------------------ */
 void se_dump_bnd_files_widget (struct boundary_stuff *sebs) {}

@@ -9,31 +9,6 @@ static gchar *def_param_names[] =
 
 /* c---------------------------------------------------------------------- */
 
-void sii_initialize_parameter (guint frame_num, gchar *name);
-void sii_initialize_view (guint frame_num);
-void sii_frame_draw_func(GtkDrawingArea *area, cairo_t *cr,
-			 int width, int height, gpointer data);
-void sii_frame_resize_cb(GtkWidget *frame, int width, int height,
-			 gpointer data);
-void sii_mouse_click_cb(GtkGestureClick *gesture, int n_press,
-			double x, double y, gpointer data);
-void sii_focus_in_cb(GtkEventControllerFocus *controller,
-		     gpointer data);
-void sii_focus_out_cb(GtkEventControllerFocus *controller,
-		      gpointer data);
-void sii_enter_cb(GtkEventControllerMotion *controller,
-		  double x, double y, gpointer data);
-void sii_leave_cb(GtkEventControllerMotion *controller,
-		  gpointer data);
-gboolean sii_frame_key_pressed_cb(GtkEventControllerKey *controller,
-				  guint keyval, guint keycode,
-				  GdkModifierType state, gpointer data);
-void sii_new_frames ();
-
-void sii_check_def_widget_sizes ();
-
-SiiLinkedList *sii_init_linked_list (guint length);
-
 /* c---------------------------------------------------------------------- */
 
 /* c---------------------------------------------------------------------- */

@@ -12,9 +12,9 @@
  *     declared at the top of piraq_dd.c (nothing else calls them).
  *   - Functions defined in other libraries and called from translate/
  *     get their prototypes from that library's GTK-free header
- *     (soloiv_core_protos.h for perusal/; editor/ gets a
- *     soloedit_protos.h when it is converted), never from local
- *     declarations.  Each library's header follows this same layout.
+ *     (soloiv_core_protos.h for perusal/, soloedit_protos.h for
+ *     editor/), never from local declarations.  Each library's
+ *     header follows this same layout.
  *   - No K&R declarations ("int foo();") anywhere, at file scope or
  *     inside functions.  Static functions get a full prototype near
  *     the top of their file if they are used before they are defined.
@@ -274,20 +274,20 @@ void nssl_crack_head2(void *srs, void *dst, int limit);
 void se_crack_bdhd(void *srs, void *dst, int limit);
 void se_crack_pisp(void *srs, void *dst, int limit);
 void sp_crack_sxmn(void *srs, void *dst, int limit);
-void sp_crack_slmk0(void *srs, void *dst, int limit, int swap_em);
+void sp_crack_slmk0(void *srs, void *dst, int limit);
 void sp_crack_slmk(void *srs, void *dst, int limit);
-void sp_crack_sctr0(void *srs, void *dst, int limit, int swap_em);
+void sp_crack_sctr0(void *srs, void *dst, int limit);
 void sp_crack_sctr(void *srs, void *dst, int limit);
-void sp_crack_sptl0(void *srs, void *dst, int limit, int swap_em);
+void sp_crack_sptl0(void *srs, void *dst, int limit);
 void sp_crack_sptl(void *srs, void *dst, int limit);
-void sp_crack_ssfi0(void *srs, void *dst, int limit, int swap_em);
+void sp_crack_ssfi0(void *srs, void *dst, int limit);
 void sp_crack_ssfi(void *srs, void *dst, int limit);
 void sp_crack_ssfiLE(void *srs, void *dst, int limit);
 void sp_crack_ssfiLE0(void *srs, void *dst, int limit);
-void sp_crack_spmi0(void *srs, void *dst, int limit, int swap_em);
+void sp_crack_spmi0(void *srs, void *dst, int limit);
 void sp_crack_spmi(void *srs, void *dst, int limit);
 void sp_crack_spal(void *srs, void *dst, int limit);
-void sp_crack_swvi0(void *srs, void *dst, int limit, int swap_em);
+void sp_crack_swvi0(void *srs, void *dst, int limit);
 void sp_crack_swvi(void *srs, void *dst, int limit);
 void ddin_crack_rktb(void *srs, void *dst, int limit);
 void ddin_crack_sswbLE_aligned8(void *srs, void *dst, int limit);
@@ -541,11 +541,11 @@ int in_sector(double ang, double ang1, double ang2);
 char *put_tagged_string(char *tag, char *string);
 int se_free_raqs(void);
 struct running_avg_que *se_return_ravgs(int nvals);
-char *slash_path(char *dst, char *srs);
+char *slash_path(char *dst, const char *srs);
 void slm_dump_list(struct solo_list_mgmt *slm);
 void slm_print_list(struct solo_list_mgmt *slm);
 void solo_add_list_entry(struct solo_list_mgmt *which, char *entry, int len);
-char *solo_list_entry(struct solo_list_mgmt *which, int entry_num);
+char *solo_list_entry(const struct solo_list_mgmt *which, int entry_num);
 void solo_list_remove_dups(struct solo_list_mgmt *slm);
 void solo_list_remove_entry(struct solo_list_mgmt *slm, int ii, int jj);
 void solo_list_sort_file_names(struct solo_list_mgmt *slm);

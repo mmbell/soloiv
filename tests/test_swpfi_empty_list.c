@@ -35,7 +35,7 @@
 
 void show_swpfi_widget(GtkWidget *text, gpointer data);
 void sii_swpfi_list_widget(guint frame_num);
-GtkWidget *sii_get_widget_ptr(guint frame_num, guint widget_id);
+GtkWidget *sii_get_widget_ptr(guint frame_num, gint widget_id);
 WW_PTR solo_return_wwptr();
 
 static void empty_list_action(GtkWidget *main_window, gpointer user_data)

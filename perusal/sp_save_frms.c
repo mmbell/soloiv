@@ -16,8 +16,9 @@ static char vcid[] = "$Id$";
 # include <dd_defines.h>
 # include <dd_general_info.h>
 # include <sed_shared_structs.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include "soloii.h"
 # include "sii_externals.h"
 
@@ -33,13 +34,6 @@ static char vcid[] = "$Id$";
 
 extern int LittleEndian;
 
-void se_fix_comment();		/* se_utils.c */
-
-SiiLinkedList *sii_solo_palette_stack ();
-
-gchar *return_image_dir();
-void sii_png_image_prep (char *dir);
-
 /* c------------------------------------------------------------------------ */
 
 struct solo_sii_extras {
@@ -52,7 +46,7 @@ static struct solo_sii_extras *siiex, *sse = NULL;
 
 /* c------------------------------------------------------------------------ */
 
-int solo_absorb_window_info (char *dir, char *fname, int ignore_swpfi_info)
+int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpfi_info)
 {
     int ww, ii, jj, kk, mm, nn, mark, count=0, pcount=0, gottaSwap=NO;
     int frame_count = 0, config_count = 0, ba, ta, ra, la, cfg, old_sos;
@@ -65,9 +59,9 @@ int solo_absorb_window_info (char *dir, char *fname, int ignore_swpfi_info)
     struct solo_generic_window_struct *gws, gwx;
     struct point_in_space pisp;
     struct solo_view_info view;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     struct solo_palette spal;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     SiiFrameConfig *sfc;
     sii_table_parameters stp;
     gchar *png_dir;
@@ -592,15 +586,15 @@ void solo_save_window_info (const char *dir, const char *a_comment)
     size_t len, lenx;
     FILE *stream;
     fpos_t pos;
-    long time, time_now();
+    long time;
     char *a, *b, *c, *buf, *e, str[256], uid[32];
-    struct solo_frame_state_files *sfsf, *se_return_state_files_struct();
+    struct solo_frame_state_files *sfsf;
     struct solo_palette *spal;
     struct solo_generic_window_struct *gws;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct solo_palette_ptr *pal, *solo_topof_palettes();
+    WW_PTR wwptr;
+    struct solo_palette_ptr *pal;
     
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     char mess[512];
     SiiFrameConfig *sfc;
     SiiLinkedList *sps, *top;

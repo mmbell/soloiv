@@ -15,8 +15,9 @@ static char vcid[] = "$Id$";
 # include <dd_files.h>
 # include <sed_shared_structs.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 
 # include <stdarg.h>
 
@@ -30,8 +31,6 @@ extern int Solo_state;
 
 static int Solo_Busy_Signal=NO;
 static struct solo_perusal_info *solo_perusal_info=NULL;
-
-struct solo_perusal_info *solo_return_winfo_ptr();
 
 /* c------------------------------------------------------------------------ */
 
@@ -90,10 +89,10 @@ int solo_ensure_cell_capacity (WW_PTR wwptr, int ncells)
 char *sp_ts_ascii_time(int frme, int xpos, char *atime)
 {
     int width;
-    char *aa, str[32], *dts_print();
-    DD_TIME dts, *d_unstamp_time();
-    double d, d_time_stamp(), time_span;
-    WW_PTR wwptr, solo_return_wwptr();
+    char *aa, str[32];
+    DD_TIME dts;
+    double d, time_span;
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
     time_span = wwptr->sweep->stop_time - wwptr->sweep->start_time;
@@ -117,22 +116,22 @@ void sp_ui_plot_cmds(int arg, struct ui_command *cmds)
      */
     int ii, nn, ww;
     long ltime;
-    char *aa, *bb, str[64], *cc, *dir, *ftype, command[256], *getenv();
+    char *aa, *bb, str[64], *cc, *dir, *ftype, command[256];
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    WW_PTR wwptr, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    Window windowID=0, get_window();
+    WW_PTR wwptr;
+    struct dd_general_info *dgi;
+    struct solo_perusal_info *spi;
+    Window windowID=0;
     DD_TIME dts;
     float f;
     double d;
-    char *suffix=NULL, mne[8], *dd_scan_mode_mne();
+    char *suffix=NULL, mne[8];
 
 
     spi = solo_return_winfo_ptr();
     wwptr = solo_return_wwptr((int)0);
     ww = wwptr->lead_sweep->window_num;
-    dgi = dd_window_dgi(ww, "");
+    dgi = dd_window_dgi(ww);
 
 
     if(!strncmp(cmds->uc_text, "set-x-tic-mag", 7)) {
@@ -279,14 +278,13 @@ int sp_ts_service(int arg, struct ui_command *cmds)
     /* "^" is the exclusive or symbol
      */
     int ii, nn, start, relative=NO, ok=YES;
-    char *aa, *bb, str[64], *dts_print();
+    char *aa, *bb, str[64];
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    WW_PTR wwptr, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    DD_TIME dts, *d_unstamp_time();
+    WW_PTR wwptr;
+    struct solo_perusal_info *spi;
+    DD_TIME dts;
     float f;
-    double d, d_time_stamp(), dd_relative_time(), span, d_start, d_stop;
-    double dd_relative_time();
+    double d, span, d_start, d_stop;
 
 
     spi = solo_return_winfo_ptr();
@@ -451,7 +449,7 @@ int solo_busy(void)
 
 void solo_return_radar_name(int frme, char *name)
 {
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
     strcpy(name, wwptr->sweep->radar_name);
@@ -460,7 +458,7 @@ void solo_return_radar_name(int frme, char *name)
 
 struct point_in_space *solo_return_radar_pisp(int frme)
 {
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
     return(wwptr->radar_location);
@@ -472,8 +470,8 @@ void solo_activate_frame(int dst_frme)
     /* current thinking is just to clone the last active window
      */
     int ii, jj, kk, nn, mark, ww, src_frme;
-    WW_PTR wwptrd, wwptrb, wwptrs, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptrd, wwptrb, wwptrs;
+    struct solo_perusal_info *spi;
 
     wwptrd = solo_return_wwptr(dst_frme);
     spi = solo_return_winfo_ptr();
@@ -562,7 +560,6 @@ int solo_return_state(void)
 
 struct solo_perusal_info *solo_return_winfo_ptr(void)
 {
-    struct solo_list_mgmt *solo_malloc_list_mgmt();
     struct solo_perusal_info *next;
     /* c...mark */
 
@@ -630,11 +627,9 @@ struct solo_window_ptrs *solo_return_wwptr(int ww_num)
 {
     int i, j, mm;
     struct solo_window_ptrs *next;
-    struct point_in_space *solo_malloc_pisp();
     struct solo_field_vals *sfv, *last_sfv;
-    long time_now(), time2;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    struct solo_list_mgmt *solo_malloc_list_mgmt();
+    long time2;
+    struct solo_perusal_info *spi;
     struct ts_ray_table *tsrt;
     struct ts_sweep_info *tssi;
     /* c...mark */
@@ -868,13 +863,12 @@ void se_set_sfic_from_frame(int frme)
      * make sure the editor info is current
      */
     long lnn;
-    double d_mddir_file_info_v3(), dd_ts_start();
     int ii, nn, mark, vv, lead_frame;
-    char *a, *b, *c, info[128], name[128], *mddir_radar_name_v3();
-    char *se_string_time(), ts[24];
-    struct swp_file_input_control * sfic, *return_swp_fi_in_cntrl();
-    WW_PTR wwptr, solo_return_wwptr();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    char *a, *b, *c, info[128], name[128];
+    char ts[24];
+    struct swp_file_input_control * sfic;
+    WW_PTR wwptr;
+    struct solo_edit_stuff *seds;
 
 
     seds = return_sed_stuff();
@@ -938,8 +932,8 @@ void solo_trigger_dir_rescans(char *dir)
 {
     int ii, nn, ww, mark;
     char *a, *b, dirx[128], diry[128];
-    WW_PTR wwptr, wwptrc, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptr, wwptrc;
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     slash_path(dirx, dir);
@@ -959,8 +953,8 @@ void solo_trigger_dir_rescans(char *dir)
 void solo_update_active_info(void)
 {
     int ii, jj, ww, frme;
-    WW_PTR wwptr, wwptrc, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptr, wwptrc;
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
 
@@ -983,17 +977,16 @@ void solo_update_active_info(void)
 void solo_ww_top_line(int frme)
 {
     int ww;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    DD_TIME dtx, *dts, *d_unstamp_time();
-    WW_PTR wwptr, solo_return_wwptr(), wwptrx;
-    char *aa, *bb, str[16], *str_terminate(), *dd_scan_mode_mne(), mne[16];
-    char *dts_print();
+    struct dd_general_info *dgi;
+    DD_TIME dtx, *dts;
+    WW_PTR wwptr, wwptrx;
+    char *aa, *bb, str[16], mne[16];
 
     wwptr = solo_return_wwptr(frme);
     wwptrx = wwptr->lead_sweep;
     aa = wwptr->top_line;
     ww = wwptr->lead_sweep->window_num;
-    dgi = dd_window_dgi(ww, "");
+    dgi = dd_window_dgi(ww);
     dtx.time_stamp = wwptrx->view->type_of_plot & SOLO_TIME_SERIES
 	  ? wwptrx->sweep->start_time : dgi->time;
 # ifdef obsolete

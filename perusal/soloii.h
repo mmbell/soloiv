@@ -348,36 +348,12 @@ typedef struct {
 
 } sii_config_cell;
 
-/* c---------------------------------------------------------------------- */
-/* Font helper functions */
-SiiFont *sii_font_new(const char *family, int size_points, gboolean monospace);
-void sii_font_free(SiiFont *font);
-gint sii_font_string_width(SiiFont *font, const gchar *text);
-
-/* Drawing helper functions */
-void sii_cairo_draw_text(cairo_t *cr, SiiFont *font, double x, double y,
-                         const gchar *text, int len);
-void sii_cairo_set_color(cairo_t *cr, GdkRGBA *color);
-
-/* Color helper functions */
-GdkRGBA *sii_color_new(gfloat red, gfloat green, gfloat blue);
-
-/* Programmatic color-table swap (used by tests; production goes through
- * the parameter widget OK button). */
-gboolean sii_apply_color_table_by_name (guint frame_num, const gchar *name);
-
-/* Test seams for the parameter widget palette state. */
-gboolean sii_palette_get_state (guint frame_num,
-                                gfloat minmax[2], gfloat ctrinc[2],
-                                guint *ncolors);
-gboolean sii_param_widget_simulate_minmax (guint frame_num,
-                                           gfloat min_val, gfloat max_val);
-
-/* GTK4 replacement for gtk_widget_destroyed() */
-void sii_widget_destroyed_cb(GtkWidget *widget, GtkWidget **widget_pointer);
 
 /* c---------------------------------------------------------------------- */
 /* c---------------------------------------------------------------------- */
 /* c---------------------------------------------------------------------- */
+
+/* every perusal prototype (the GTK-free ones come with it) */
+# include "soloiv_core_gtk_protos.h"
 
 # endif

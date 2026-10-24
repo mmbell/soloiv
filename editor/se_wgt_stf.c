@@ -778,7 +778,7 @@ se_update_list(int list_id)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_nab_files(char *dir, struct solo_list_mgmt *slm, char *type, int nt)
+int se_nab_files(const char *dir, struct solo_list_mgmt *slm, char *type, int nt)
 {
     int ii, jj, nn, mark;
     DIR *dir_ptr;

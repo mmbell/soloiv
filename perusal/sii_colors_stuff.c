@@ -4,24 +4,11 @@
 # include "sii_externals.h"
 # include "sii_utils.h"
 # include "color_tables.h"
-
-void sii_param_add_ctbl(const char **at, int nn);  /* sii_param_widgets.c */
+# include <s2_protos.h>
 
 gboolean Xcolors_flag = no;
 
 /* c---------------------------------------------------------------------- */
-GdkRGBA *normalized_RGB_to_gdk( gfloat f_red, gfloat f_green, gfloat f_blue );
-
-void sii_set_default_colors ();
-
-void put_ascii_color_table( gchar *name, gchar *table );
-
-void set_all_X_named_colors();
-
-GdkRGBA *sii_set_gtk_color(  gchar *color_name
-			       , gfloat f_red, gfloat f_green, gfloat f_blue );
-
-GdkRGBA *tone_down_gdk_color( gchar *name, gfloat attenuation );
 
 
 /* c---------------------------------------------------------------------- */
@@ -327,12 +314,13 @@ void set_all_X_named_colors(void)
 
 /* c---------------------------------------------------------------------- */
 
-void put_ascii_color_table (gchar *name, gchar *table)
+void put_ascii_color_table (const gchar *name, gchar *table)
 {
    int nn;
-   gchar *new_name = name, *aa;
+   gchar *new_name, *aa;
+   gpointer old_key;
 
-   if (!(aa = g_tree_lookup( ascii_color_tables, (gpointer)name ))) {
+   if (!(aa = g_tree_lookup( ascii_color_tables, name ))) {
      new_name = (gchar *)g_malloc0 (strlen (name) +1);
      strcpy( new_name, name );
      color_table_names = g_slist_insert_sorted
@@ -341,6 +329,8 @@ void put_ascii_color_table (gchar *name, gchar *table)
    else {
       /* if the key already exists, it will point to the new table */
       g_free (aa);
+      g_tree_lookup_extended( ascii_color_tables, name, &old_key, NULL );
+      new_name = old_key;	/* the tree keeps its own key anyway */
    }
    g_tree_insert( ascii_color_tables, (gpointer)new_name, (gpointer)table );
    nn = g_tree_nnodes (ascii_color_tables);

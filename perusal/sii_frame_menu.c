@@ -25,24 +25,6 @@ enum {
 
 /* c---------------------------------------------------------------------- */
 
-void frame_menu_widget ( guint frame_num );
-
-void frame_click_data_widget ( guint frame_num );
-
-void show_click_data_widget (guint frame_num);
-
-void show_edit_widget (GtkWidget *text, gpointer data );
-
-void show_exam_widget (GtkWidget *text, gpointer data );
-
-void show_frame_menu (GtkWidget *text, gpointer data );
-
-void show_param_widget (GtkWidget *text, gpointer data );
-
-void show_swpfi_widget (GtkWidget *text, gpointer data );
-
-void show_view_widget (GtkWidget *text, gpointer data );
-
 /* c---------------------------------------------------------------------- */
 
 static SiiFont *edit_font;

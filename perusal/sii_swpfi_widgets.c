@@ -11,6 +11,7 @@
 # include <sed_shared_structs.h>
 # include <seds.h>
 # include <sii_widget_content_structs.h>
+# include <s2_protos.h>
 
 /* Sweepfiles Menu Actions  */
 
@@ -108,26 +109,6 @@ static GSList *radio_group = NULL;
 
 
 /* c---------------------------------------------------------------------- */
-
-void sii_swpfi_menubar2( GtkWidget  *window, GtkWidget **menubar
-		       , guint frame_num);
-void sii_swpfi_menubar( GtkWidget  *window, GtkWidget **menubar
-		       , guint frame_num);
-void sii_swpfi_widget( guint frame_num );
-
-void show_swpfi_widget (GtkWidget *text, gpointer data );
-
-void sii_swpfi_list_widget( guint frame_num );
-
-const gchar *sii_return_swpfi_radar (guint frame_num);
-const gchar *sii_return_swpfi_dir (guint frame_num);
-double sii_return_swpfi_time_stamp (guint frame_num);
-const char *sii_string_from_dtime (double dtime);
-const struct solo_list_mgmt *sii_return_swpfi_list (guint frame_num);
-const gchar *solo_list_entry (const struct solo_list_mgmt *slm, int item_num);
-const gchar *sii_return_swpfi_label (int frame_num);
-gboolean sii_set_swpfi_info (guint frame_num, gint sweep_num);
-double dd_relative_time (const char *str);
 
 /* c---------------------------------------------------------------------- */
 /* c---------------------------------------------------------------------- */
@@ -388,7 +369,7 @@ void sii_swpfi_menu_cb ( GtkWidget *w, gpointer   data )
    GtkWidget *widget, *check_item, *rmi, *entry;
    gint flag;
    const struct solo_list_mgmt *slm;
-   struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+   struct solo_perusal_info *spi;
    GString *gs;
 
 

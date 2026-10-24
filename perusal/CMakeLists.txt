@@ -45,12 +45,15 @@ target_include_directories(soloiv_core PUBLIC
     ${GTK4_INCLUDE_DIRS}
 )
 
-# Legacy C code has many implicit function declarations across files;
-# suppress for now to focus on GTK4 migration errors.
+# Every C function in soloiv_core is prototyped (include/soloiv_core_protos.h
+# and soloiv_core_gtk_protos.h); keep it that way by making a missing
+# prototype or an implicit declaration an error.
+set(SOLOIV_PROTO_FLAGS
+    $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Clang,AppleClang>>:-Werror=deprecated-non-prototype -Werror=implicit-function-declaration -Werror=implicit-int -Werror=strict-prototypes>
+    $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:-Werror=implicit-function-declaration -Werror=implicit-int -Werror=old-style-definition -Werror=strict-prototypes>
+)
 target_compile_options(soloiv_core PRIVATE ${GTK4_CFLAGS_OTHER}
-    -Wno-implicit-function-declaration
-    -Wno-implicit-int
-    -Wno-return-mismatch
+    ${SOLOIV_PROTO_FLAGS}
 )
 
 target_link_directories(soloiv_core PUBLIC ${GTK4_LIBRARY_DIRS})
@@ -81,5 +84,6 @@ endif()
 # Executable: just main() + the core library.
 add_executable(soloiv soloii_main.c)
 target_link_libraries(soloiv PRIVATE soloiv_core)
+target_compile_options(soloiv PRIVATE ${SOLOIV_PROTO_FLAGS})
 
 install(TARGETS soloiv RUNTIME DESTINATION bin)

@@ -239,7 +239,7 @@ void sp_crack_sxmn(void *srs, void *dst, int limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_slmk0(void *srs, void *dst, int limit, int swap_em)
+void sp_crack_slmk0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=56;
    int item_count=9;
@@ -283,7 +283,7 @@ void sp_crack_slmk(void *srs, void *dst, int limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sctr0(void *srs, void *dst, int limit, int swap_em)
+void sp_crack_sctr0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=56;
    int item_count=9;
@@ -327,7 +327,7 @@ void sp_crack_sctr(void *srs, void *dst, int limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sptl0(void *srs, void *dst, int limit, int swap_em)
+void sp_crack_sptl0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=48;
    int item_count=7;
@@ -367,7 +367,7 @@ void sp_crack_sptl(void *srs, void *dst, int limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfi0(void *srs, void *dst, int limit, int swap_em)
+void sp_crack_ssfi0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=400;
    int item_count=25;
@@ -519,7 +519,7 @@ void sp_crack_ssfiLE0(void *srs, void *dst, int limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_spmi0(void *srs, void *dst, int limit, int swap_em)
+void sp_crack_spmi0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=9;
@@ -602,7 +602,7 @@ void sp_crack_spal(void *srs, void *dst, int limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_swvi0(void *srs, void *dst, int limit, int swap_em)
+void sp_crack_swvi0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=220;
    int item_count=39;

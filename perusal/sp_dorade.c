@@ -20,6 +20,7 @@ static char vcid[] = "$Id$";
 # include <dorade_headers.h>
 # include <dd_general_info.h>
 # include <sed_shared_structs.h>
+# include <s2_protos.h>
 
 /*
  * This file contains routines
@@ -29,7 +30,6 @@ static char vcid[] = "$Id$";
  * 
  */
 
-int solo_ensure_cell_capacity();	/* sp_basics.c */
 /* c------------------------------------------------------------------------ */
 
 void solo_cell_lut(int frme)
@@ -40,16 +40,16 @@ void solo_cell_lut(int frme)
      * and the rasterization algorithm needs uniform cell spacing
      */
     int ww, g, i, ii, j, k, n, nc, ng, max_cells;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    WW_PTR wwptr;
+    struct dd_general_info *dgi;
     struct cell_d *celv;
     float f, r, gs, half_gs, rmax;
-    double d, fabs();
+    double d;
     short *lut;
 
     wwptr = solo_return_wwptr(frme);
     ww = wwptr->lead_sweep->window_num;
-    dgi = dd_window_dgi(ww, "");
+    dgi = dd_window_dgi(ww);
 
     celv = dgi->dds->celvc;	/* corrected cell vector */
     nc = celv->number_cells-1;
@@ -126,8 +126,8 @@ void solo_color_cells(int frme)
      */
     int ww, jj, kk, ng;
     register int cn, ii;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    WW_PTR wwptr;
+    struct dd_general_info *dgi;
     short *ss, *clut, *tt, sval;
     int scaled_thr_val, thr_ndx = -1, f_ndx, bad;
     unsigned long *dlut;
@@ -139,7 +139,7 @@ void solo_color_cells(int frme)
 
     wwptr = solo_return_wwptr(frme);
     ww = wwptr->lead_sweep->window_num;
-    dgi = dd_window_dgi(ww, "");
+    dgi = dd_window_dgi(ww);
     /* parameter_num is carried across sweeps and the new sweep may have fewer
      * fields. parm[] is preallocated to MAX_PARMS so a stale index yields a
      * valid pointer to garbage (silent), but qdat_ptrs[] is not preallocated,

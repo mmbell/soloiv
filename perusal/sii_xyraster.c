@@ -28,8 +28,9 @@ static char vcid[] = "$Id$";
 # include "sii_externals.h"
 # include <solo_editor_structs.h>
 # include "xyraster.h"
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <dd_math.h>
 
 static int Num_xyras=0;
@@ -37,26 +38,6 @@ static struct xyras *xyraz[16];
 static double tickle=0.0;
 static double db_ang0=13, db_ang1=21;
 
-
-/* external routines */
-void se_clr_bnd();		/* se_bnd.c */
-void xse_add_bnd_pt();		/* se_bnd.c */
-int xse_find_intxns();		/* se_bnd.c */
-int d_inSector( double ang, double ang1, double ang2);
-gboolean sii_debug_flag();
-
-/* internal routines */
-int frme_intxns();
-void init_xyraster();
-int ray_raster_setup();
-struct xyras *return_xyras();
-double sp_meters_per_pixel();
-void swap_edges ();
-void swap_ends ();
-void x_inner_loop();
-void xx_inner_loop();
-void y_inner_loop();
-void yy_inner_loop();
 
 /* c------------------------------------------------------------------------ */
 
@@ -134,14 +115,14 @@ void init_xyraster(int frme)
      * all coordinates are relative to the radar which is (0,0)
      */
     int ii, jj, nn, mark, *iptr, scan_mode=0;
-    struct solo_click_info *sci, *clear_click_info();
-    struct one_boundary *ob, *se_malloc_one_bnd();
-    double d, sin(), cos(), theta, range, a0, a1, fmod(), fill=1.1;
-    double fabs(), atan2(), trip=44.5, dinc=1., sp_meters_per_pixel();
-    struct xyras *rxy, *return_xyras();
-    WW_PTR wwptr, solo_return_wwptr();
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
-    struct point_in_space *pisp, *solo_return_radar_pisp();
+    struct solo_click_info *sci;
+    struct one_boundary *ob;
+    double d, theta, range, a0, a1, fill=1.1;
+    double trip=44.5, dinc=1.;
+    struct xyras *rxy;
+    WW_PTR wwptr;
+    struct boundary_stuff *sebs;
+    struct point_in_space *pisp;
     struct bnd_point_mgmt *bpm;
 
 
@@ -251,12 +232,10 @@ int ray_raster_setup(int frme, double angle0, double angle1, struct xyras *rxy)
      * no if tests are necessary in the innermost rasterization loops
      */
     char str[256];
-    int sp_diag_flag(), fd;
+    int fd;
     int ii, jj, nn, max, min, nn0, nn1, mark=0;
     register double d, d0, d1, dx0, dy0, dx1, dy1;
-    double fabs(), sin(), cos(), sqrt();
-    WW_PTR wwptr, solo_return_wwptr();
-
+    WW_PTR wwptr;
 
 
 # ifdef obsolete

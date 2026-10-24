@@ -25,21 +25,9 @@ static char vcid[] = "$Id$";
 # include <dd_defines.h>
 # include <solo_window_structs.h>
 # include <dd_general_info.h>
-# include <dgi_func_decl.h>
-# include <function_decl.h>
-
-/* external functions */
-void solo_sort_strings();       /* se_basics.c */
-void solo_message();		/* solo.c */
-
-
-/* internal functions */
-void solo_gen_parameter_list();
-void solo_gen_radar_list();
-void solo_gen_swp_list();
-int solo_get_files();
-struct solo_list_mgmt *solo_return_radar_list();
-struct solo_list_mgmt *solo_return_sweep_list();
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 
 
 /* c------------------------------------------------------------------------ */
@@ -49,13 +37,13 @@ void solo_gen_parameter_list(int frme)
     struct solo_list_mgmt *lm;
     int ww, i, j, n;
     char str[256];
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptr, solo_return_wwptr();
+    struct solo_perusal_info *spi;
+    struct dd_general_info *dgi;
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
     ww = wwptr->lead_sweep->window_num;
-    dgi = dd_window_dgi(ww, "");
+    dgi = dd_window_dgi(ww);
     spi = solo_return_winfo_ptr();
     lm = spi->list_parameters;
 
@@ -71,8 +59,8 @@ void solo_gen_radar_list(int frme)
 {
     struct solo_list_mgmt *lm;
     int i, j, n;
-    char str[256], *mddir_radar_name_v3();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    char str[256];
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     lm = spi->list_radars;
@@ -88,13 +76,13 @@ void solo_gen_radar_list(int frme)
 
 void solo_gen_swp_list(int frme)
 {
-    struct dd_file_name **fnp, **mddir_return_swp_list();
+    struct dd_file_name **fnp;
     struct solo_list_mgmt *lm;
     int i, j, n, num_swps;
-    char str[256], *dts_print();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    WW_PTR wwptr, solo_return_wwptr();
-    DD_TIME dts, *d_unstamp_time();
+    char str[256];
+    struct solo_perusal_info *spi;
+    WW_PTR wwptr;
+    DD_TIME dts;
 
     spi = solo_return_winfo_ptr();
     lm = spi->list_sweeps;
@@ -139,7 +127,7 @@ int solo_get_files(char *dir, struct solo_list_mgmt *lm)
 
 struct solo_list_mgmt *solo_return_radar_list(void)
 {
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     return(spi->list_radars);
@@ -148,7 +136,7 @@ struct solo_list_mgmt *solo_return_radar_list(void)
 
 struct solo_list_mgmt *solo_return_sweep_list(void)
 {
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     return(spi->list_sweeps);

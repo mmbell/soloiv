@@ -6,8 +6,6 @@
 # include <stdlib.h>
 # include <date_stamp.h>
 
-int solo_busy(void);  /* sp_basics.c */
-
 GtkWidget *main_window = NULL;
 GtkWidget *main_vbox = NULL;
 GtkWidget *main_event_box;
@@ -154,37 +152,8 @@ static int ignore_swpfi_info = 0;
 /* c---------------------------------------------------------------------- */
 
 static void print_hello( GtkWidget *w, gpointer   data );
-void show_solo_init();
-void show_solo_image_gen();
-void sii_initialization_widget();
-void sii_image_gen_widget();
-void show_all_click_data_widgets (gboolean really);
-int sii_default_startup (const gchar *swpfi_dir);
-void sii_init_frame_configs();
-void sii_reset_config_cells();
-void soloiv_build_main_menu(GtkWidget *window, GtkWidget *vbox);
-void sii_set_default_colors ();
-void custom_config_cb( GtkWidget *w, gpointer data );
-void zoom_config_cb( GtkWidget *w, gpointer data );
-void zoom_data_cb( GtkWidget *w, gpointer data );
-void center_frame_cb( GtkWidget *w, gpointer   data );
-void config_cb( GtkWidget *w, gpointer data );
-void shape_cb( GtkWidget *w, gpointer data );
-void test_widget( GtkWidget *w, gpointer data );
-void image_cb( GtkWidget *w, gpointer data );
 static void sii_menu_cb( gpointer data );
 
-gboolean sii_frame_key_pressed_cb(GtkEventControllerKey *controller,
-                                  guint keyval, guint keycode,
-                                  GdkModifierType state, gpointer data);
-const GString *sii_return_config_files (const char *dir);
-gchar *sii_get_swpfi_dir (gchar *dir);
-void sp_change_cursor (int normal);
-void solo_save_window_info (const char *dir, const char *a_comment);
-int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpfi);
-gchar *sii_nab_line_from_text (const gchar *txt, guint position );
-void sii_png_image_prep (char *dir);
-gboolean sii_batch (gpointer argu);
 /* c---------------------------------------------------------------------- */
 /* c...events */
 /* c---------------------------------------------------------------------- */
@@ -304,7 +273,7 @@ void show_solo_image_gen (GtkWidget *w, gpointer data)
 
 /* c---------------------------------------------------------------------- */
 
-int sii_initialize_cb (GtkWidget *w, gpointer data)
+void sii_initialize_cb (GtkWidget *w, gpointer data)
 {
    guint task = GPOINTER_TO_UINT (data);
    GtkWidget *entry;
@@ -359,7 +328,7 @@ int sii_initialize_cb (GtkWidget *w, gpointer data)
 	 sii_message (
 "Use Sweepfiles Widget to change directories"
 		      );
-	 return 0;
+	 return;
       }
 
       entry = (GtkWidget *)g_object_get_data
@@ -402,7 +371,7 @@ int sii_initialize_cb (GtkWidget *w, gpointer data)
       sii_png_image_prep (gs_image_dir->str);
       break;
    };
-   return 0;
+   return;
 }
 
 /* c---------------------------------------------------------------------- */
@@ -609,9 +578,6 @@ void soloiv_activate(GtkApplication *app, gpointer user_data)
    without colliding with the test harness's own main(). */
 
 /* c---------------------------------------------------------------------- */
-
-void
-sii_param_colors_filesel (const gchar *str, GtkWidget *fs);
 
 /* c---------------------------------------------------------------------- */
 

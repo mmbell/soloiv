@@ -692,7 +692,7 @@ void sxm_flush_log_stream(void)
 }
 /* c------------------------------------------------------------------------ */
 
-void sxm_set_log_dir(char *dir)
+void sxm_set_log_dir(const char *dir)
 {
   char str[2048];
   sprintf (str, "Setting log directory to: %s\n", dir);

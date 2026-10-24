@@ -1461,7 +1461,7 @@ struct running_avg_que *se_return_ravgs(int nvals)
 }
 /* c------------------------------------------------------------------------ */
 
-char *slash_path(char *dst, char *srs)
+char *slash_path(char *dst, const char *srs)
 {
     int n;
 
@@ -1581,7 +1581,7 @@ void solo_add_list_entry(struct solo_list_mgmt *which, char *entry, int len)
 }
 /* c------------------------------------------------------------------------ */
 
-char *solo_list_entry(struct solo_list_mgmt *which, int entry_num)
+char *solo_list_entry(const struct solo_list_mgmt *which, int entry_num)
 {
     char *c;
 

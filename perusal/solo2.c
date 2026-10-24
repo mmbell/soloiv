@@ -15,8 +15,9 @@
 # include <dd_files.h>
 # include <sed_shared_structs.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 
 # include <stdarg.h>
 # include <errno.h>
@@ -66,34 +67,10 @@ static gboolean debug_flag = FALSE;
 
 # define HIGH_PRF 0
 # define LOW_PRF 1
-const gchar *set_cb_labeling_info (guint frame_num, gdouble *relative_locs);
-void sii_plot_data (guint frame_num, guint plot_function);
-void sii_xfer_images (int frame_num, GdkRectangle *area);
-GdkRGBA *sii_boundary_color (guint frame_num, gint exposed);
-const gchar *sii_param_palette_name (guint frame_num);
-
-gboolean sii_view_tic_info (guint frame_num, gdouble *xinc, gdouble *yinc
-			    , gboolean *xtics, gboolean *ytics
-			    , gboolean *annot);
 
 /* GTK4 draw function signatures for blow-up */
-void sii_blow_up_draw_func (GtkDrawingArea *area, cairo_t *cr,
-			    int width, int height, gpointer data);
-void sii_blow_up_resize_cb (GtkDrawingArea *area, int width, int height,
-			    gpointer data);
 
 /* Event controller callbacks for blow-up */
-gboolean sii_blow_up_key_pressed_cb (GtkEventControllerKey *controller,
-				  guint keyval, guint keycode,
-				  GdkModifierType state, gpointer data);
-void sii_blow_up_mouse_click_cb (GtkGestureClick *gesture, int n_press,
-				 double x, double y, gpointer data);
-
-gint sii_rng_ring_arcs (guint frame_num, gdouble range);
-
-gboolean sii_lmrk_inside (guint frame_num);
-
-gboolean sii_magic_rng_lbls (guint frame_num);
 
 /* c------------------------------------------------------------------------ */
 /* c------------------------------------------------------------------------ */
@@ -229,10 +206,9 @@ void sii_png_image_prep (char *dir)
 {
   char *aa, *bb, fname[256], mne[16];
   WW_PTR wwptr = solo_return_wwptr(0);
-  struct dd_general_info *dgi, *dd_window_dgi();
+  struct dd_general_info *dgi;
   /* Undeclared, this defaulted to returning int and the pointer was cut
    * to 32 bits; sprintf then read a wild address on x86-64 Linux. */
-  char *dd_scan_mode_mne();
 
   dgi = dd_window_dgi(0);
   if (!dir)
@@ -390,71 +366,7 @@ int sii_return_frame_count(void)
 
 /* c------------------------------------------------------------------------ */
 
-struct solo_perusal_info *
-solo_return_winfo_ptr();
-
-void
-sii_set_links_from_solo_struct (int frame_num, int links_id,
-				     long *linked_windows);
-void
-sii_initialize_parameter (guint frame_num, gchar *name);
-
-gchar *
-sii_set_param_names_list (guint frame_num, GString *gs_list, guint count);
-
-void sp_replot_all ();
-int displayq (int click_frme, int command);
-
-void print_fieldvalues(int frame, struct solo_list_mgmt  *slm);
-char *solo_list_entry (struct solo_list_mgmt  *slm, int jj);
-struct dd_general_info *dd_window_dgi(int ww, char *name);
-int solo_worksheet();
-
-void sii_set_geo_coords ( int frame_num, gdouble dx, gdouble dy);
-
-void sp_data_click(int frme, double xpos, double ypos);
-
-double sp_meters_per_pixel ();
-
-void dd_clear_pisp (struct point_in_space *pisp);
-
-const gchar *sii_return_swpfi_dir (guint frame_num);
-const gchar *sii_return_swpfi_radar (guint frame_num);
-
-const struct solo_list_mgmt *sii_return_swpfi_radar_list (guint frame_num);
-const struct solo_list_mgmt *sii_return_swpfi_list (guint frame_num);
-double sii_return_swpfi_time_stamp (guint frame_num);
-
-DD_TIME dts, *d_unstamp_time();
-double d_time_stamp(), dd_relative_time();
-char *dts_print (DD_TIME *dts);
-
-double relative_time (char *aa);
-int dd_crack_datime(char *cc, int nn, DD_TIME *dts);
-
-const GString *sii_slm_to_gs (struct solo_list_mgmt  *slm);
-
-gboolean
-sii_nab_command_set (int frame_num, const char *dir, const char *file);
-
-gboolean
-sii_nab_boundary (int frame_num, const char *dir, const char *file);
-
-struct boundary_stuff *return_se_bnd_struct();
-struct solo_click_info *clear_click_info();
-struct sed_command_files *se_return_cmd_files_struct();
-struct solo_frame_state_files *se_return_state_files_struct();
-struct solo_edit_stuff *return_sed_stuff();
-struct solo_list_mgmt *solo_malloc_list_mgmt (int nn);
-double sii_nearest_file_time (int frame_num, double target_time);
-const gchar *sii_return_swpfi_label (int frame_num);
-void sii_solo_set_filter (int frame_num, int set_it);
-gboolean sii_time_series (guint frame_num, gdouble *tstart, gdouble *tspan);
-
-GdkRGBA *sii_grid_color (guint frame_num, gint exposed);
-GdkRGBA *sii_background_color (guint frame_num, gint exposed);
-GdkRGBA *sii_annotation_color (guint frame_num, gint exposed);
-void sii_do_annotation (guint frame_num, gint exposed, gboolean blow_up, cairo_t *cr);
+DD_TIME dts;
 
 /* c------------------------------------------------------------------------ */
 
@@ -519,7 +431,7 @@ const gchar *sii_return_swpfi_label (int frame_num)
 double sii_nearest_file_time (int frame_num, double target_time)
 {
    WW_PTR wwptr;
-   double d, d_mddir_file_info_v3();
+   double d;
    int nn, rn, vv;
    char str[256], str2[256];
 
@@ -639,7 +551,7 @@ sii_nab_boundary (int frame_num, const char *dir, const char *filename)
 
 double sii_dtime_from_string (char *tstr)
 {
-  double d, d_time_stamp ();
+  double d;
   int jj;
 
   jj = dd_crack_datime(tstr, strlen(tstr), &dts);
@@ -814,7 +726,7 @@ void sp_cell_range_info (int frame_num, gfloat *r0, gfloat *gs, gint *ncells)
 
    ww = wwptr->lead_sweep->window_num;
    ww = 0;
-   dgi = dd_window_dgi(ww, "");
+   dgi = dd_window_dgi(ww);
    *ncells = dgi->dds->celvc->number_cells;
    *r0 = dgi->dds->celvc->dist_cells[0] * .001;
    *gs = (dgi->dds->celvc->dist_cells[1]
@@ -830,7 +742,7 @@ gfloat sp_nyquist_vel (int frame_num)
    int ww;
 
    ww = wwptr->lead_sweep->window_num;
-   dgi = dd_window_dgi(ww, "");
+   dgi = dd_window_dgi(ww);
    return dgi->dds->radd->eff_unamb_vel;
 }
 
@@ -994,9 +906,6 @@ void se_erase_segments (int frame_num, int num_points
  * redraw so the boundary is painted on the next frame. */
 static cairo_t *bnd_draw_cr = NULL;
 
-void se_draw_segments_cairo (cairo_t *cr, int frame_num, int num_points,
-			     struct bnd_point_mgmt *bpm);
-
 /* se_draw_segments: Draw boundary segments.
  * When called from inside the draw function (bnd_draw_cr set), paint the
  * segments with the live cairo_t.  Otherwise (interactive point add) we
@@ -1095,9 +1004,6 @@ void se_draw_segments_cairo (cairo_t *cr, int frame_num, int num_points,
 }
 
 /* c------------------------------------------------------------------------ */
-
-void sii_really_xfer_images
-(int frame_num, GdkRectangle *area, gboolean blow_up);
 
 /* c------------------------------------------------------------------------ */
 
@@ -1294,13 +1200,12 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
   gdouble ppm, ppk;			/* pixels per meter */
   double xtic, ytic, ytica, xtic1, ytic1, xtic2, ytic2, xtici, ytici, tval;
   struct point_in_space pisp, landmark, center, radar;
-  double dd_earthr (double lat);
   SiiPoint *pt, *ptlr, *pt_max;
   gint ticlen = 13;
   gboolean xyannot, xtics, ytics, time_series, inside;
   SiiArc *arc;
   gint iangle, iarc_len, loop_count;
-  struct dd_general_info *dgi, *dd_window_dgi();
+  struct dd_general_info *dgi;
   gint text_width;
 
   /*
@@ -2420,11 +2325,11 @@ int sii_default_startup (const gchar *swpfi_dir)
 {
    int mark = 0, frme, jj, nn, nfiles;
    int param_list[64];
-   struct solo_perusal_info *spi, *solo_return_winfo_ptr ();
-   struct solo_frame_state_files *sfsf, *se_return_state_files_struct();
-   WW_PTR wwptr, wwptrc, solo_return_wwptr();
-   struct dd_general_info *dgi, *dd_window_dgi();
-   char *aa, *mddir_radar_name_v3();
+   struct solo_perusal_info *spi;
+   struct solo_frame_state_files *sfsf;
+   WW_PTR wwptr, wwptrc;
+   struct dd_general_info *dgi;
+   char *aa;
    const gchar *cc;
    GString *gstr = NULL;
 
@@ -2485,7 +2390,7 @@ int sii_default_startup (const gchar *swpfi_dir)
     /*
      * figure out what parameters you are going to plot
      */
-    dgi = dd_window_dgi(0, "");
+    dgi = dd_window_dgi(0);
     solo_def_params(dgi, param_list, SOLO_MAX_WINDOWS);
 
     for(frme=0; frme < SOLO_MAX_WINDOWS; frme++) {
@@ -2531,7 +2436,7 @@ void solo_data_color_lut(int frme)
      * this is a 64K lookup table that works for raw data <= 16-bits
      */
     int i, j, kk, n, nc, min, max;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     double f_inc, f_min, f_max, f_color_num=0;
     float ctr, inc, emin, emax;
 

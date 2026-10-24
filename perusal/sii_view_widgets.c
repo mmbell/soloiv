@@ -10,6 +10,7 @@
 # include <seds.h>
 # include <sii_widget_content_structs.h>
 # include <math.h>
+# include <s2_protos.h>
 
 
 enum {
@@ -160,12 +161,6 @@ typedef struct {
 static ViewData *vdata;
 static GSList *radio_group = NULL;
 
-void sii_view_menubar2( GtkWidget  *window, GtkWidget **menubar
-		       , guint frame_num);
-void sii_view_widget( guint frame_num );
-void sii_update_view_widget (guint frame_num);
-void sii_update_linked_view_widgets (guint frame_num);
-
 /* c---------------------------------------------------------------------- */
 /* c------------------------------------------------------------------------ */
 
@@ -255,7 +250,7 @@ void sii_center_on_clicks (gint num_clicks)
   SiiLinkedList *scq = sii_click_que;
   double minx = 0, maxx = 0, miny = 0, maxy = 0, xx, yy, zz, rr, theta, rotang;
   double lat0, lon0, alt0, lat1, lon1, alt1, R_earth, zero = 0;
-  double dx, dy, factor, ppk, sp_meters_per_pixel();
+  double dx, dy, factor, ppk;
   float f_angle, f_range;
   struct point_in_space radar, *center, pisp;
 
