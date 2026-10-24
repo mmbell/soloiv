@@ -749,7 +749,7 @@ void ufp_stuff_ray(dgi, ufp)
     mark = man->rec_len * sizeof(short);
 
     if( wlen < mark ) {
-	printf("Error during UF write--result: %d  tried: %d\n"
+	printf("Error during UF write--result: %d  tried: %zu\n"
 	       , wlen, man->rec_len * sizeof(short));
 	exit(1);
     }

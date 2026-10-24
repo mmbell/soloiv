@@ -163,7 +163,7 @@ int sp_ts_data_loop(tsLink0, usi)
       sii_update_frame_info(ww);
       tsl->width = tsl->wwptr->view->width_in_pix;
       tsl->height = tsl->wwptr->view->height_in_pix;
-      tsl->frame_image_ptr = (char *)tsl->wwptr->image->data;
+      tsl->frame_image_ptr = (unsigned char *)tsl->wwptr->image->data;
       tsl->type_of_plot = tsl->wwptr->view->type_of_plot;
       /*
        * calculate the starting pixel number, the gate num of this pixel
@@ -714,7 +714,7 @@ int tsDisplay(click_frme, command)
 	    /* get the first ray
 	     */
 	    if(ddswp_next_ray_v3(usi) == END_OF_TIME_SPAN) {
-		sprintf (mess, "Problems reading first ray of %s/%s\n"
+		snprintf (mess, sizeof(mess), "Problems reading first ray of %s/%s\n"
 			  , usi->directory, usi->filename);
 		sii_message (mess);
 		broke = YES;

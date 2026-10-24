@@ -342,7 +342,7 @@ sxm_apply_changez(frme)
 	if(dgi->new_sweep) {
 	  printf ("%s", return_dd_open_info());
 # ifdef obsolete
-	    g_string_sprintfa (gs_complaints, "%s", return_dd_open_info());
+	    g_string_append_printf (gs_complaints, "%s", return_dd_open_info());
 # endif
 	}
 	if(usi->swp_count > usi->num_swps)
@@ -764,7 +764,7 @@ sxm_gen_all_files_list(frme, slm)
     ddir_rescan_urgent(frme);
 
     if((nn = mddir_file_list_v3(frme, wwptr->sweep->directory_name)) < 1 ) {
-	g_string_sprintfa (gs_complaints,"Directory %s contains no sweep files\n"
+	g_string_append_printf (gs_complaints,"Directory %s contains no sweep files\n"
 		  , wwptr->sweep->directory_name);
 	return;
     }
@@ -1014,8 +1014,10 @@ sxm_list_edit_hist(frme)
 
     for(; bb < zz; bb++) {	/* find the next line feed */
 	cc = str;
-	for(aa=bb; bb < zz && *bb != '\n'; *cc++ = *bb++); *cc++ = '\0';
-	if(nn = strlen(str))
+	for(aa=bb; bb < zz && *bb != '\n'; *cc++ = *bb++)
+	    ;
+	*cc++ = '\0';
+	if((nn = strlen(str)))
 	      solo_add_list_entry(slm, str, nn);
 	if(bb >= zz) break;
     }
@@ -1077,7 +1079,7 @@ sxm_open_log_stream()
 	  return;
 
     if(!log_dir_ptr) {
-	if(aa = getenv("LOG_DIRECTORY")) {
+	if((aa = getenv("LOG_DIRECTORY"))) {
 	    strcpy(log_directory, aa);
 	}
 	else {
@@ -1089,9 +1091,9 @@ sxm_open_log_stream()
     aa = str + strlen(str);
     dd_file_name("log", time_now(), "SED_LOG", 0, aa);
     
-    g_string_sprintfa (gs_complaints,"Opening display log file: %s\n", str);
+    g_string_append_printf (gs_complaints,"Opening display log file: %s\n", str);
     if(!(log_stream = fopen(str, "w"))) {
-	g_string_sprintfa (gs_complaints,"**** Unable to open this file! ****\n");
+	g_string_append_printf (gs_complaints,"**** Unable to open this file! ****\n");
 	return;
     }
     strcpy(log_file_name, aa);
@@ -1143,7 +1145,7 @@ sxm_print_list(slm)
     int ii=0;
 
     for(; ii < slm->num_entries; ii++) {
-	g_string_sprintfa (gs_complaints,"%s\n", *(slm->list +ii));
+	g_string_append_printf (gs_complaints,"%s\n", *(slm->list +ii));
     }
 }
 /* c------------------------------------------------------------------------ */
@@ -1164,11 +1166,11 @@ sxm_process_click(sci)
 	  return;
 
     if(!sci) {
-	g_string_sprintfa (gs_complaints,"sxm_process_click...struct solo_click_info *sci=NULL\n");
+	g_string_append_printf (gs_complaints,"sxm_process_click...struct solo_click_info *sci=NULL\n");
 	return;
     }
     else if(sci->frame < 0 || sci->frame > sp_max_frames()) {
-	g_string_sprintfa (gs_complaints,"sxm_process_click...illegal frame number: %d\n"
+	g_string_append_printf (gs_complaints,"sxm_process_click...illegal frame number: %d\n"
 		  , sci->frame);
 	return;
     }
@@ -1282,15 +1284,15 @@ sxm_process_click(sci)
 	if(slms->num_entries) {
 	    slash_path(name, wwptr->lead_sweep->sweep->directory_name);
 	    strcat(name, preservation_file_name);
-	    if(stream = fopen(name, "r")) {
-		for(; aa = fstring(line, 88, stream);) {
+	    if((stream = fopen(name, "r"))) {
+		for(; (aa = fstring(line, 88, stream));) {
 		    solo_add_list_entry(slms, aa, strlen(aa));
 		}
 		fclose(stream);
 		solo_list_sort_file_names(slms);
 		solo_list_remove_dups(slms);
 	    }
-	    if(stream = fopen(name, "w")) {
+	    if((stream = fopen(name, "w"))) {
 		for(ii=0; ii < slms->num_entries; ii++) {
 		    fprintf(stream, "%s\n", *(slms->list +ii));
 		}
@@ -1322,8 +1324,8 @@ sxm_process_click(sci)
 
 	slash_path(name, wwptr->lead_sweep->sweep->directory_name);
 	strcat(name, preservation_file_name);
-	if(stream = fopen(name, "r")) {
-	    for(; aa = fstring(line, 88, stream);) {
+	if((stream = fopen(name, "r"))) {
+	    for(; (aa = fstring(line, 88, stream));) {
 		solo_add_list_entry(slms, aa, strlen(aa));
 	    }
 	    fclose(stream);
@@ -1340,8 +1342,8 @@ sxm_process_click(sci)
 
 	slash_path(name, wwptr->lead_sweep->sweep->directory_name);
 	strcat(name, preservation_file_name);
-	if(stream = fopen(name, "r")) {
-	    for(; aa = fstring(line, 88, stream);) {
+	if((stream = fopen(name, "r"))) {
+	    for(; (aa = fstring(line, 88, stream));) {
 		for(ii=0; ii < slms->num_entries; ii++) {
 		    if(!strcmp(aa, *(slms->list +ii))) {
 			break; /* ignore this file name */
@@ -1352,7 +1354,7 @@ sxm_process_click(sci)
 		}
 	    }
 	    fclose(stream);
-	    if(stream = fopen(name, "w")) {
+	    if((stream = fopen(name, "w"))) {
 		for(ii=0; ii < slmx->num_entries; ii++) {
 		    fprintf(stream, "%s\n", *(slmx->list +ii));
 		}
@@ -1360,7 +1362,7 @@ sxm_process_click(sci)
 	    }
 	}
 	else {
-	    g_string_sprintfa (gs_complaints,"Unable to open preservation file in dir: %s\n"
+	    g_string_append_printf (gs_complaints,"Unable to open preservation file in dir: %s\n"
 		      , wwptr->lead_sweep->sweep->directory_name);
 	}
 	sp_refresh_delete_sweeps();
@@ -1441,7 +1443,7 @@ sxm_process_click(sci)
 	break;
 
     default:
-	g_string_sprintfa (gs_complaints,"sxm_process_click...unused case no: %d\n"
+	g_string_append_printf (gs_complaints,"sxm_process_click...unused case no: %d\n"
 		  , sci->which_widget_button);
 	break;
     }
@@ -1822,7 +1824,7 @@ sxm_ui_cmd(arg, cmds, key)
 	if(ray < ecs->actual_ray_num || ray
 	   >= ecs->actual_ray_num + ecs->actual_ray_count) {
 	    ok = NO;
-	    g_string_sprintfa (gs_complaints,"Ray: %d  out of range of display: %d - %d\n"
+	    g_string_append_printf (gs_complaints,"Ray: %d  out of range of display: %d - %d\n"
 		      , ray+1, ecs->actual_ray_num +1
 		      , ecs->actual_ray_num + ecs->actual_ray_count);
 	}
@@ -1830,14 +1832,14 @@ sxm_ui_cmd(arg, cmds, key)
 	if(cell < ecs->actual_at_cell || cell
 	   >= ecs->actual_at_cell + ecs->actual_num_cells) {
 	    ok = NO;
-	    g_string_sprintfa (gs_complaints,"Cell: %d  out of range of display: %d - %d\n"
+	    g_string_append_printf (gs_complaints,"Cell: %d  out of range of display: %d - %d\n"
 		      , cell+1, ecs->actual_at_cell +1
 		      , ecs->actual_at_cell + ecs->actual_num_cells);
 	}
 	field = (cmdq++)->uc_v.us_v_int -1;
 	if(field < 0 || field >= ecs->actual_num_fields) {
 	    ok = NO;
-	    g_string_sprintfa (gs_complaints,"Field: %d out of range of display: %d - %d\n"
+	    g_string_append_printf (gs_complaints,"Field: %d out of range of display: %d - %d\n"
 		      , field+1, 1, ecs->actual_num_fields);
 	}
 	if(ok) {
@@ -1967,7 +1969,7 @@ sxm_ui_cmd(arg, cmds, key)
 	    if((++cmdq)->uc_ctype != UTT_END) {
 		if(strlen(aa = cmdq->uc_text)) {
 		    if(strchr(aa, '/')) {
-			g_string_sprintfa (gs_complaints,"Setting log directory to: %s\n", aa);
+			g_string_append_printf (gs_complaints,"Setting log directory to: %s\n", aa);
 			slash_path(log_directory, se_unquote_string(aa));
 			log_dir_ptr = log_directory;
 			log_state = LOG_ACTIVE;
@@ -1978,7 +1980,7 @@ sxm_ui_cmd(arg, cmds, key)
 	else {			/* toggle logging */
 	    log_state = log_state == LOG_ACTIVE ? LOG_SUSPENDED : LOG_ACTIVE;
 	    aa = log_state == LOG_ACTIVE ? "log active" : "log suspended";
-	    g_string_sprintfa (gs_complaints,"Toggled log state to: %s!\n", aa);
+	    g_string_append_printf (gs_complaints,"Toggled log state to: %s!\n", aa);
 	}
 	mark = 0;
 	break;
@@ -2024,12 +2026,12 @@ sxm_ui_cmd(arg, cmds, key)
     }
 
 # ifdef obsolete
-    g_string_sprintfa (gs_complaints,"Key: %d\n", key);
+    g_string_append_printf (gs_complaints,"Key: %d\n", key);
 
     for(cmdq=cmds; cmdq->uc_ctype != UTT_END; cmdq++) {
-	g_string_sprintfa (gs_complaints,"%s ", cmdq->uc_text);
+	g_string_append_printf (gs_complaints,"%s ", cmdq->uc_text);
     }
-    g_string_sprintfa (gs_complaints,"\n");
+    g_string_append_printf (gs_complaints,"\n");
 # endif
 }
 /* c------------------------------------------------------------------------ */
@@ -2126,8 +2128,8 @@ sxm_unlink_files_list(slm, dir, frme)
 
     slash_path(name, dir);
     strcat(name, preservation_file_name);
-    if(stream = fopen(name, "r")) {
-	for(; aa = fstring(line, 88, stream);) {
+    if((stream = fopen(name, "r"))) {
+	for(; (aa = fstring(line, 88, stream));) {
 	    solo_add_list_entry(slmx, aa, strlen(aa));
 	}
 	fclose(stream);
@@ -2143,11 +2145,11 @@ sxm_unlink_files_list(slm, dir, frme)
 	}
 	if(ii == slmx->num_entries) {
 	    strcpy(bb, *(slm->list +jj));
-	    g_string_sprintfa (gs_complaints,"Unlinking %s\n", aa);
+	    g_string_append_printf (gs_complaints,"Unlinking %s\n", aa);
 	    nn = unlink(name);
 	}
 	else {
-	    g_string_sprintfa (gs_complaints,"**** %s is in the preserved file list!\n"
+	    g_string_append_printf (gs_complaints,"**** %s is in the preserved file list!\n"
 		      , *(slm->list +jj));
 	}
     }
@@ -2202,7 +2204,7 @@ sxm_ray_list(frme, wgt_btn)
 	}
 	rat = dgi->source_rat;	/* rotation angle table */
 	if(!rat || rat->num_rays < 1)
-	      return;		/* nothing to display from this sweep */
+	      return(0);	/* nothing to display from this sweep */
 
 	if(ecs->ctr_on_click) {
 	    int seek_ndx = dd_rotang_seek(rat, (float)ecs->click_angle);
@@ -2479,7 +2481,7 @@ void sxm_update_examine_data(frme, wgt_btn)
 	slm = spi->list_a_message;
 	solo_reset_list_entries(slm);
 	aa = str;
-	sprintf(aa, "You have %d changes outstanding!"
+	sprintf(aa, "You have %ld changes outstanding!"
 		  , wwptr->examine_info->change_count);
 	solo_add_list_entry(slm, aa, strlen(aa));
 	aa = "You cannot change the display";
@@ -2554,7 +2556,7 @@ void sxm_update_examine_data(frme, wgt_btn)
 	      close(wwptrx->file_id);
 
     if((wwptrx->file_id = open(str, O_RDONLY, 0)) < 0) {
-	g_string_sprintfa (gs_complaints, "Unable to open sweep %s\n", str);
+	g_string_append_printf (gs_complaints, "Unable to open sweep %s\n", str);
 	return;
     }
     slash_path(dgi->directory_name, tssi->directory);
@@ -2564,7 +2566,7 @@ void sxm_update_examine_data(frme, wgt_btn)
     rat = dgi->source_rat;	/* rotation angle table */
     entry1 = dd_return_rotang1(rat); /* first entry in rat */
     if(!rat || !entry1 || rat->num_rays < 1) {
-	g_string_sprintfa (gs_complaints
+	g_string_append_printf (gs_complaints
 			   , "No rotation angle table for sweep %s\n", str);
 	return;
     }
@@ -2695,7 +2697,9 @@ void sxm_update_examine_data(frme, wgt_btn)
     cc = sei->row_annotation ? " " : "KM.";
     mm = strlen(cc);
     aa = bb = ecs->names_header;
-    for(ii=0; ii < nn-mm; ii++, *aa++ = ' '); *aa = '\0';
+    for(ii=0; ii < nn-mm; ii++, *aa++ = ' ')
+	;
+    *aa = '\0';
     strcat(aa, cc);
     strcat(aa, " |");
     aa += strlen(aa);
@@ -2748,7 +2752,9 @@ void sxm_update_examine_data(frme, wgt_btn)
 	 */
 	aa = bb = ecs->rotang_header + strlen(ecs->rotang_header);
 	mm = nn = ecs->actual_num_fields * ecs->num_chars_per_cell -1;
-	for(; mm--; *aa++ = ' '); *aa++ = '|'; *aa++ = '\0';
+	for(; mm--; *aa++ = ' ')
+	    ;
+	*aa++ = '|'; *aa++ = '\0';
 
 	if(sei->col_annotation) {
 	    sprintf(tmp_val, "%d"
@@ -2808,7 +2814,7 @@ void sxm_update_examine_data(frme, wgt_btn)
 		  close(wwptrx->file_id);
 
 	    if((wwptrx->file_id = open(str, O_RDONLY, 0)) < 0) {
-		g_string_sprintfa (gs_complaints, "Unable to open sweep %s\n", str);
+		g_string_append_printf (gs_complaints, "Unable to open sweep %s\n", str);
 		return;
 	    }
 	    slash_path(dgi->directory_name, tssi->directory);
@@ -2857,7 +2863,9 @@ void sxm_update_examine_data(frme, wgt_btn)
 	 */
 	if(sei->row_annotation) {
 	    for(aa=cc=line,jj=0; jj++ < ecs->num_chars_rng_label -2;
-		*cc++ = ' '); *cc++ = '_'; *cc++ = '|'; *cc++ = '\0';
+		*cc++ = ' ')
+	    ;
+	*cc++ = '_'; *cc++ = '|'; *cc++ = '\0';
 	    sprintf(tmp_val, "%4d", cell_num + ecs->actual_at_cell +1);
 	    strncpy(line+1, tmp_val, strlen(tmp_val));
 	}

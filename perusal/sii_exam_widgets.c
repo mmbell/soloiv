@@ -406,11 +406,11 @@ void se_refresh_examine_widgets (int frame_num, struct solo_list_mgmt  *slm)
    }
 
    g_string_append_printf (xmd->orig_txt[EXAM_RAY]
-		      ,"%d", wwptr->examine_info->ray_num);
+		      ,"%ld", wwptr->examine_info->ray_num);
    g_string_append_printf (xmd->orig_txt[EXAM_RAY_COUNT]
-		     ,"%d", wwptr->examine_info->ray_count);
+		     ,"%ld", wwptr->examine_info->ray_count);
    g_string_append_printf (xmd->orig_txt[EXAM_CHANGE_COUNT]
-		      ,"%d", wwptr->examine_info->change_count);
+		      ,"%ld", wwptr->examine_info->change_count);
 
    nn = wwptr->examine_info->at_cell;
    g_string_append_printf(xmd->orig_txt[EXAM_CELL],"%d", nn);
@@ -422,7 +422,7 @@ void se_refresh_examine_widgets (int frame_num, struct solo_list_mgmt  *slm)
      (xmd->orig_txt[EXAM_FIELDS_LIST], wwptr->examine_info->fields_list);
 
    g_string_append_printf(xmd->orig_txt[EXAM_CELL_COUNT]
-		     ,"%d",wwptr->examine_info->cell_count);
+		     ,"%ld",wwptr->examine_info->cell_count);
    g_string_assign
      (xmd->orig_txt[EXAM_FORMAT],wwptr->examine_info->display_format);
 
@@ -931,6 +931,7 @@ guint exam_text_event_cb(GtkWidget *text, GdkEvent *event
   aa = (gchar *)data;
 
   mark = 0;
+  return FALSE;
 }
 
 /* c---------------------------------------------------------------------- */
@@ -1010,7 +1011,7 @@ void sii_exam_widget( guint frame_num )
 
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+widget_id));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+widget_id));
 
   bb = g_strdup_printf ("Frame %d  Examine Menu", frame_num+1 );
 
@@ -1132,7 +1133,7 @@ void sii_exam_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_exam_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   widget_id = EXAM_UNDO;
@@ -1144,7 +1145,7 @@ void sii_exam_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_exam_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   widget_id = EXAM_APPLY_CHANGES;
@@ -1156,7 +1157,7 @@ void sii_exam_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_exam_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   widget_id = EXAM_REFRESH;
@@ -1167,7 +1168,7 @@ void sii_exam_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_exam_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
 
@@ -1179,7 +1180,7 @@ void sii_exam_widget( guint frame_num )
 	g_signal_connect (G_OBJECT(xmdata->data_widget[jj])
 			    ,"activate"
 			    , G_CALLBACK (sii_exam_menu_cb)
-			    , (gpointer)nn );
+			    , GINT_TO_POINTER(nn) );
 	/* paste_clipboard signal removed - not available in GTK4 */
      }
   }
@@ -1210,7 +1211,7 @@ void sii_exam_widget( guint frame_num )
 
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+widget_id));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+widget_id));
 
   nn = frame_num * TASK_MODULO + widget_id;
   {
@@ -1221,7 +1222,7 @@ void sii_exam_widget( guint frame_num )
     GtkEventController *kc = gtk_event_controller_key_new();
     g_signal_connect(kc, "key-pressed",
                      G_CALLBACK(sii_exam_keyboard_event),
-                     (gpointer)nn);
+                     GINT_TO_POINTER(nn));
     gtk_widget_add_controller(window, kc);
   }
 
@@ -1324,10 +1325,10 @@ void sii_exam_widget( guint frame_num )
 
      g_object_set_data (G_OBJECT(label),
 			  "frame_num",
-			  (gpointer)frame_num);
+			  GINT_TO_POINTER(frame_num));
      g_object_set_data (G_OBJECT(label),
 			  "exam_index",
-			  (gpointer)mm);
+			  GINT_TO_POINTER(mm));
   }
   se_refresh_examine_list(frame_num, NULL);
 

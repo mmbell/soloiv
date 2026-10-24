@@ -768,7 +768,9 @@ int dd_input_read_open(iri, dev_name)
 
     if(bb = strrchr(aa, '/')) {	/* nab the directory name */
 	cc = iri->directory_name;
-	for(; aa <= bb; *cc++ = *aa++); *cc++ = '\0';
+	for(; aa <= bb; *cc++ = *aa++)
+	    {}
+	*cc++ = '\0';
 	strcpy(iri->dev_name, dev_name);
     }
     else {
@@ -1359,7 +1361,7 @@ int dd_skip_recs(iri, direction, skip_count)
 		  break;
 	}
 	if(ii) {
-	    sprintf(mess,
+	    snprintf(mess, sizeof(mess),
 		    "Trouble skipping %d blocks on %s\n fid: %d state: %d\n"
 		    , skip_count, iri->dev_name
 		    , iri->fid, iri->top->read_state);

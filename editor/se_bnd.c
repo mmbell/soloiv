@@ -185,7 +185,7 @@ int xse_absorb_bnd()
 # endif
 
     if(!(stream = fopen(str, "r"))) {
-	sprintf(mess, "Unable to open boundary file %s\n", str);
+	snprintf(mess, sizeof(mess), "Unable to open boundary file %s\n", str);
 	sii_message (mess);
 	return(-1);
     }
@@ -196,7 +196,7 @@ int xse_absorb_bnd()
     buf = (char *)malloc(len);
     memset (buf, 0, len);
     if((lenx = fread(buf, sizeof(char), len, stream)) < len) {
-	sprintf(mess, "Unable to read file %s\n", str);
+	snprintf(mess, sizeof(mess), "Unable to read file %s\n", str);
 	sii_message (mess);
 	free(buf);
 	return(-1);
@@ -1211,14 +1211,14 @@ int se_compare_bnds(aa, bb, size)
 	    bha = (struct boundary_header *)aa;
 	    bhb = (struct boundary_header *)bb;
 	    bh.time_stamp = bhb->time_stamp;
-	    if(nn = memcmp(&bh, bb, gda->sizeof_struct))
+	    if((nn = memcmp(&bh, bb, gda->sizeof_struct)))
 		  return(nn);	/* they don't compare */
 	}
 	else if(!strncmp(aa, "PISP", 4)) {
 	    pispa = (struct point_in_space *)aa;
 	    pispb = (struct point_in_space *)bb;
 
-	    if(nn = memcmp(aa, bb, gda->sizeof_struct))
+	    if((nn = memcmp(aa, bb, gda->sizeof_struct)))
 		  return(nn);	/* they don't compare */
 	}
 	aa += gda->sizeof_struct;
@@ -1553,7 +1553,7 @@ void xse_save_bnd ()
     se_refresh_bnd_files_widget(sebs);
 
     if(!(stream = fopen(str, "w"))) {
-	sprintf(mess, "Problem opening %s for writing\n", str);
+	snprintf(mess, sizeof(mess), "Problem opening %s for writing\n", str);
 	solo_message(mess);
 	return;
     }
@@ -1562,7 +1562,7 @@ void xse_save_bnd ()
     a = strstr(str, "bnd.");
     strncpy(a, "asb", 3);	/* change the prefix */
     if(!(ASCIIstream = fopen(str, "w"))) {
-	sprintf(mess, "Problem opening %s for writing\n", str);
+	snprintf(mess, sizeof(mess), "Problem opening %s for writing\n", str);
 	solo_message(mess);
 	return;
     }
@@ -2154,7 +2154,7 @@ char * absorb_zmap_bnd( ifile, skip, nbytes )
     strcpy( str, ifile );
 
     if(!(fs = fopen(str, "r"))) {
-	sprintf(mess, "Unable to open zmap boundary file %s\n", str);
+	snprintf(mess, sizeof(mess), "Unable to open zmap boundary file %s\n", str);
 	solo_message(mess);
 	return(NULL);
     }
@@ -2242,7 +2242,7 @@ int absorb_zmap_pts( top, ifile )
     strcpy( str, ifile );
 
     if(!(fs = fopen(str, "r"))) {
-	sprintf(mess, "Unable to open zmap points file %s\n", str);
+	snprintf(mess, sizeof(mess), "Unable to open zmap points file %s\n", str);
 	solo_message(mess);
 	return(-1);
     }
@@ -2251,7 +2251,7 @@ int absorb_zmap_pts( top, ifile )
 	if( *line == '!' )	/* comment */
 	    { continue; }
 
-	if( aa = strchr( line, '!' )) {
+	if(( aa = strchr( line, '!' ))) {
 	  *aa = '\0';
 	}
 
@@ -2624,6 +2624,7 @@ int list_zmap_values( fname, frame )
 	);
     se_append_string(&seds->h_output, ssm);
     se_histo_output();
+    return(0);
 }
 /* c------------------------------------------------------------------------ */
 

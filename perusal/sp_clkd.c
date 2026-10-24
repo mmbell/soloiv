@@ -287,7 +287,7 @@ void sp_ts_seek_field_vals(frme)
     if(!tsrt || !tsrt->tsri_top) {
 	sprintf (mess, "NULL tsrt in sp_ts_seek_field_vals() for frame %d\n"
 		 , frme);
-	g_message (mess);
+	g_message ("%s", mess);
 	return;
     }
     tlist = tsrt->tsri_list;
@@ -308,7 +308,7 @@ void sp_ts_seek_field_vals(frme)
 	strcat(str, tssi->filename);
 
 	if((wwptr->file_id = open(str, O_RDONLY, 0)) < 0) {
-	    sprintf(mess, "Unable to open sweep %s\n", str);
+	    snprintf(mess, sizeof(mess), "Unable to open sweep %s\n", str);
 	    solo_message(mess);
 	    return;
 	}
@@ -512,7 +512,7 @@ void sp_ts_data_click(frme, xpos, ypos)
     if(!tsrt || !tsrt->tsri_top) {
 	sprintf (mess, "NULL tsri in sp_ts_ray_list() for frame: %d\n"
 		 , frme);
-	g_message (mess);
+	g_message ("%s", mess);
 	return;
     }
     pt = (SiiPoint *)sii_click_que->data;

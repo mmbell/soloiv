@@ -263,14 +263,14 @@ sii_background_color (guint frame_num, gint exposed);
 GdkRGBA *
 sii_boundary_color (guint frame_num, gint exposed);
 
-gchar *
-sii_color_tables_lister ( gpointer name, gpointer data );
+gboolean
+sii_color_tables_lister ( gpointer name, gpointer value, gpointer data );
 
 void
 sii_colorize_image (guint frame_num);
 
-gchar *
-sii_colors_lister ( gpointer name, gpointer data );
+gboolean
+sii_colors_lister ( gpointer name, gpointer value, gpointer data );
 
 void
 sii_ctr_inc_from_min_max (guint ncolors, gfloat *ctr, gfloat *inc,
@@ -486,7 +486,7 @@ void param_entry_widget( guint frame_num, const gchar *prompt, const gchar * dir
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+wid));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+wid));
   bb = g_strdup_printf ("Frame %d  %s", frame_num+1, "Entry Widget" );
   gtk_window_set_title (GTK_WINDOW (window), bb);
   g_free( bb );
@@ -504,7 +504,7 @@ void param_entry_widget( guint frame_num, const gchar *prompt, const gchar * dir
   g_signal_connect (G_OBJECT (entry)
 		      ,"activate"
 		      , G_CALLBACK (sii_param_menu_cb)
-		      , (gpointer)nn );
+		      , GINT_TO_POINTER(nn) );
 
   hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
   gtk_box_append (GTK_BOX (vbox), hbox);
@@ -515,7 +515,7 @@ void param_entry_widget( guint frame_num, const gchar *prompt, const gchar * dir
   g_signal_connect (G_OBJECT (button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_param_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   if (dirroot) {
@@ -525,7 +525,7 @@ void param_entry_widget( guint frame_num, const gchar *prompt, const gchar * dir
      g_signal_connect (G_OBJECT (button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_param_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
      slash_path (str, dirroot);
      g_object_set_data (G_OBJECT (button)
@@ -538,7 +538,7 @@ void param_entry_widget( guint frame_num, const gchar *prompt, const gchar * dir
   g_signal_connect (G_OBJECT (button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_param_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   gtk_widget_set_visible (window, TRUE);
@@ -584,7 +584,7 @@ gboolean sii_param_absorb_ctbl (guint frame_num, const gchar *filename)
   len0 = ftell(stream);	/* how big is the file */
   rewind(stream);
 
-  if (name = strrchr (filename, '/'))
+  if ((name = strrchr (filename, '/')))
     { name++; }
   else
     { name = filename; }
@@ -599,7 +599,7 @@ gboolean sii_param_absorb_ctbl (guint frame_num, const gchar *filename)
   g_string_printf (gen_gs, "colortable %s\n", name);
 
   for (jj=0; jj < nt; jj++) {
-     if (aa = strstr (bptrs[jj], "!"))
+     if ((aa = strstr (bptrs[jj], "!")))
        { *aa = '\0'; }
 
      if (strlen (bptrs[jj]) < 2)
@@ -619,6 +619,7 @@ gboolean sii_param_absorb_ctbl (guint frame_num, const gchar *filename)
   gtk_editable_set_text
     (GTK_EDITABLE (pd->data_widget[PARAM_CLR_TBL_NAME]), name);
   sii_redisplay_list (frame_num, PARAM_CLR_TBL_TEXT);
+  return TRUE;
 }
 
 /* c---------------------------------------------------------------------- */
@@ -736,7 +737,7 @@ static void param_list_widget( guint frame_num, guint widget_id
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+widget_id));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+widget_id));
 
   /* --- Title and border --- */
   bb = g_strdup_printf ("Frame %d  %s", frame_num+1, name );
@@ -755,7 +756,7 @@ static void param_list_widget( guint frame_num, guint widget_id
   g_signal_connect (G_OBJECT (button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_param_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   text = gtk_text_view_new ();
@@ -779,10 +780,10 @@ static void param_list_widget( guint frame_num, guint widget_id
   }
 
   g_object_set_data (G_OBJECT (text),
-		       "frame_num", (gpointer)frame_num);
+		       "frame_num", GINT_TO_POINTER(frame_num));
 
   g_object_set_data (G_OBJECT (text),
-		       "widget_id", (gpointer)text_wid);
+		       "widget_id", GINT_TO_POINTER(text_wid));
 
   {
     GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (text));
@@ -793,7 +794,7 @@ static void param_list_widget( guint frame_num, guint widget_id
   {
     GtkWidget *child = gtk_widget_get_first_child (vbox);
     while (child) {
-      sii_set_widget_frame_num (child, (gpointer)frame_num);
+      sii_set_widget_frame_num (child, GINT_TO_POINTER(frame_num));
       child = gtk_widget_get_next_sibling (child);
     }
   }
@@ -920,7 +921,9 @@ void param_text_event_cb(GtkGestureClick *gesture, int n_press,
 	  }
 
 # ifndef obsolete
-	  for (kk=0,jj=start; jj < end; str[kk++] = aa[jj++]); str[kk] = '\0';
+	  for (kk=0,jj=start; jj < end; str[kk++] = aa[jj++])
+	    ;
+	  str[kk] = '\0';
 	  test_color = (GdkRGBA *)g_hash_table_lookup
 	    (colors_hash, (gpointer)str);
 
@@ -1203,7 +1206,7 @@ GdkRGBA *sii_boundary_color (guint frame_num, gint exposed)
 
 /* c---------------------------------------------------------------------- */
 
-gchar *sii_color_tables_lister ( gpointer name, gpointer data )
+gboolean sii_color_tables_lister ( gpointer name, gpointer value, gpointer data )
 {
    g_string_append_printf (gs_color_table_names, "%s\n", (gchar*)name );
 
@@ -1239,7 +1242,7 @@ void sii_colorize_image (guint frame_num)
 
 /* c---------------------------------------------------------------------- */
 
-gchar *sii_colors_lister ( gpointer name, gpointer data )
+gboolean sii_colors_lister ( gpointer name, gpointer value, gpointer data )
 {
    g_string_append_printf (gs_color_names, "%s\n", (gchar*)name );
 
@@ -1812,18 +1815,18 @@ void sii_initialize_parameter (guint frame_num, gchar *name)
 
    size = 2 * sizeof (gfloat);
 
-   g_memmove (pd->orig_values[PARAM_CTRINC], pal->ctrinc, size);
+   memmove (pd->orig_values[PARAM_CTRINC], pal->ctrinc, size);
    aa = sii_set_string_from_vals (pd->orig_txt[PARAM_CTRINC], 2
 				  , pal->ctrinc[0], pal->ctrinc[1], 3);
 
    sii_min_max_from_ctr_inc (pd->pal->num_colors, &pal->ctrinc[0], &pal->ctrinc[1],
 			     &pal->minmax[0], &pal->minmax[1]);
    
-   g_memmove (pd->orig_values[PARAM_MINMAX], pal->minmax, size);
+   memmove (pd->orig_values[PARAM_MINMAX], pal->minmax, size);
    aa = sii_set_string_from_vals (pd->orig_txt[PARAM_MINMAX], 2
 				  , pal->minmax[0], pal->minmax[1], 3);
 
-   g_memmove (pd->orig_values[PARAM_EMPH_MINMAX], pal->emphasis_zone, size);
+   memmove (pd->orig_values[PARAM_EMPH_MINMAX], pal->emphasis_zone, size);
    aa = sii_set_string_from_vals (pd->orig_txt[PARAM_EMPH_MINMAX], 2
 				  , pal->emphasis_zone[0], pal->emphasis_zone[1], 3);
 
@@ -1886,7 +1889,7 @@ SiiLinkedList *sii_new_palette_for_param (const gchar *p_name, const gchar *name
     * to the usualparams
     */
 
-   if (item = sii_palette_seek (p_name)) {			/* found */
+   if ((item = sii_palette_seek (p_name))) {			/* found */
      sii_ll_remove (&palette_stack, item);
    }
    else {
@@ -1918,8 +1921,8 @@ gchar *sii_new_color_tables_list ()
    }
    g_string_truncate (gs_color_table_names, 0);
 
-   g_tree_traverse ( ascii_color_tables
-		   , (gpointer)sii_color_tables_lister, G_IN_ORDER, 0 );
+   g_tree_foreach ( ascii_color_tables
+		   , sii_color_tables_lister, NULL );
 
    param_color_table_names = gs_color_table_names->str;
    return param_color_table_names;
@@ -1939,8 +1942,8 @@ gchar *sii_new_colors_list ()
    }
    g_string_truncate (gs_color_names, 0);
 
-   g_tree_traverse ( colors_tree
-		   , (gpointer)sii_colors_lister, G_IN_ORDER, 0 );
+   g_tree_foreach ( colors_tree
+		   , sii_colors_lister, NULL );
 
    param_color_names = gs_color_names->str;
    return param_color_names;
@@ -2135,7 +2138,7 @@ void sii_param_dup_opal (struct solo_palette *opal)
 
   if (!bb) {
     strcpy (str, aa);
-    if (bb = strstr (str, ".colors")) {
+    if ((bb = strstr (str, ".colors"))) {
       *bb = '\0';
       aa = str;
       bb = (gchar *)g_tree_lookup( ascii_color_tables, (gpointer)aa);
@@ -2187,7 +2190,7 @@ void sii_param_dup_orig (guint frame_num)
 
        default:
 	 g_string_assign (pd->txt[jj], pd->orig_txt[jj]->str);
-	 g_memmove (pd->values[jj], pd->orig_values[jj], sizeof (*pd->values[jj]));
+	 memmove (pd->values[jj], pd->orig_values[jj], sizeof (*pd->values[jj]));
 	 break;
       };
    }
@@ -2342,7 +2345,7 @@ void sii_param_menu_cb ( GtkWidget *w, gpointer   data )
      dirroot = (gchar *)g_object_get_data (G_OBJECT (w), "dirroot");
      fs = sii_filesel (wid, dirroot);
      g_object_set_data (G_OBJECT (fs)
-			  , "frame_num", (gpointer)frame_num);
+			  , "frame_num", GINT_TO_POINTER(frame_num));
      widget = sii_get_widget_ptr (frame_num, FRAME_PARAM_ENTRY);
      gtk_widget_set_visible (widget, FALSE);
      break;
@@ -3130,7 +3133,7 @@ void sii_param_widget( guint frame_num )
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num * TASK_MODULO + FRAME_PARAMETERS));
+		      GINT_TO_POINTER(frame_num * TASK_MODULO + FRAME_PARAMETERS));
 
   /* --- Title and border --- */
   bb = g_strdup_printf ("Frame %d  Parameter and Colors Widget", frame_num+1 );
@@ -3172,7 +3175,7 @@ void sii_param_widget( guint frame_num )
   g_signal_connect (G_OBJECT (button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_param_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("OK");
@@ -3181,7 +3184,7 @@ void sii_param_widget( guint frame_num )
   g_signal_connect (G_OBJECT (button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_param_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("Cancel");
@@ -3190,7 +3193,7 @@ void sii_param_widget( guint frame_num )
   g_signal_connect (G_OBJECT (button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_param_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
   g_object_set_data (G_OBJECT (button)
 		       , "widget_id", (gpointer)PARAM_CANCEL);
@@ -3232,11 +3235,11 @@ void sii_param_widget( guint frame_num )
 
   g_object_set_data (G_OBJECT (text),
 		       "frame_num",
-		       (gpointer)frame_num);
+		       GINT_TO_POINTER(frame_num));
 
   g_object_set_data (G_OBJECT (text),
 		       "widget_id",
-		       (gpointer)widget_id);
+		       GINT_TO_POINTER(widget_id));
 
   {
     GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (text));
@@ -3375,7 +3378,7 @@ void sii_param_widget( guint frame_num )
   {
     GtkWidget *child = gtk_widget_get_first_child (table);
     while (child) {
-      sii_set_widget_frame_num (child, (gpointer)frame_num);
+      sii_set_widget_frame_num (child, GINT_TO_POINTER(frame_num));
       child = gtk_widget_get_next_sibling (child);
     }
   }
@@ -3392,7 +3395,7 @@ void sii_param_widget( guint frame_num )
 	g_signal_connect (G_OBJECT (pdata->data_widget[jj])
 			    ,"activate"
 			    , G_CALLBACK (sii_param_menu_cb)
-			    , (gpointer)nn );
+			    , GINT_TO_POINTER(nn) );
 	/* paste_clipboard signal removed - not available in GTK4 */
      }
   }
@@ -3533,7 +3536,7 @@ void sii_set_entries_from_palette (guint frame_num, const gchar *name,
 
 
    wid = PARAM_CTRINC;
-   g_memmove (pd->orig_values[wid], pal->ctrinc, sizeof (*pal->ctrinc));
+   memmove (pd->orig_values[wid], pal->ctrinc, sizeof (*pal->ctrinc));
    sii_set_string_from_vals
      (pd->orig_txt[wid], 2, pal->ctrinc[0], pal->ctrinc[1]
       , pd->precision[wid]);
@@ -3542,7 +3545,7 @@ void sii_set_entries_from_palette (guint frame_num, const gchar *name,
    wid = PARAM_MINMAX;
    sii_min_max_from_ctr_inc (pal->num_colors, &pal->ctrinc[0], &pal->ctrinc[1],
 			     &pal->minmax[0], &pal->minmax[1]);
-   g_memmove (pd->orig_values[wid], pal->minmax, sizeof(*pal->minmax));
+   memmove (pd->orig_values[wid], pal->minmax, sizeof(*pal->minmax));
    aa = sii_set_string_from_vals
      (pd->orig_txt[wid], 2, pal->minmax[0], pal->minmax[1]
       , pd->precision[wid]);
@@ -3551,7 +3554,7 @@ void sii_set_entries_from_palette (guint frame_num, const gchar *name,
 		       , pd->orig_txt[wid]->str);
 
    wid = PARAM_EMPH_MINMAX;
-   g_memmove (pd->orig_values[wid], pal->emphasis_zone
+   memmove (pd->orig_values[wid], pal->emphasis_zone
 	      , sizeof (*pal->emphasis_zone));
    sii_set_string_from_vals
      (pd->orig_txt[wid], 2, pal->emphasis_zone[0], pal->emphasis_zone[1]
@@ -3810,7 +3813,7 @@ int solo_hardware_color_table(gint frame_num)
       continue;
     }
     
-    if(aa=strstr(line, "xcolor")) { /* X color name */
+    if ((aa = strstr(line, "xcolor"))) { /* X color name */
       aa += strlen ("xcolor");
       g_strstrip (aa);
       solo_add_list_entry(lm, aa, strlen(aa));

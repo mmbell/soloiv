@@ -697,6 +697,7 @@ zdr_prime( dgi, fn )
     for(; ss < ssEnd; ss++, ssLDRV++, ssLDR++ ) {
 	*ss = (*ssLDRV) - (*ssLDR);
     }
+    return(0);
 }
 /* c------------------------------------------------------------------------ */
 
@@ -735,6 +736,7 @@ thr_ldr( dgi, fn, threshold )
 	if( *ssDX < scaled_thr )
 	    { *ss = bad; }
     }
+    return(0);
 }
 /* c------------------------------------------------------------------------ */
 
@@ -1707,7 +1709,7 @@ int dd_single_prf_vortex_vels(dgi, fn, dname)
 	av_nyq = .25 * wvl * prf;
 	scaled_av_nyq = DD_SCALE( av_nyq, scale, bias );
 
-	for(; ss < zz; *ss++, *tt++ ) {
+	for(; ss < zz; ss++, tt++ ) {
 	    vr = (float)(*tt) * f_err + .5;
 	    *ss = ( vr > scaled_av_nyq ) ? scaled_av_nyq : vr;
 	}
@@ -1894,6 +1896,7 @@ int dd_fix_vortex_vels(dgi, fn, dname)
 	      + d_round;
 	*ss = ((vS + vL) >> 1) + (*(ctr + kk));
     }
+    return(0);
 }
 /* c------------------------------------------------------------------------ */
 

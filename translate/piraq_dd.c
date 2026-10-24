@@ -193,7 +193,7 @@ struct piraq_swp_que {
 };
 # define SX2(x) (sig_swap2((&x)))
 # define SX4(x) (pc_swap4((&x)))
-# define SX4F(x) (pc_swap4f((&x)))
+# define SX4F(x) (pc_swap4f((fourB *)(&x)))
 
 # define         PIRAQ_IO_INDEX 3
 # define         SWEEP_QUE_SIZE 64
@@ -537,7 +537,7 @@ pui_next_block()
     if (!(dwel_record || rhdr_record)) {
       if((illegal_header_count++ % 3) == 0 ) {
 	sprintf(mess, 
-		"Illegal header id: %2x %2x %2x %2x %2x %2x rlen: %d  sizeof_read:  %d %d"
+		"Illegal header id: %2x %2x %2x %2x %2x %2x rlen: %d  sizeof_read:  %ld %d"
 		, (int)gh->desc[0] & 0xff
 		, (int)gh->desc[1] & 0xff
 		, (int)gh->desc[2] & 0xff
@@ -3613,7 +3613,9 @@ piraq_print_rhdr(rhdr, slm)
     zz = bb + strlen(rhdr->text);
 
     for(cc=aa; bb < zz; cc=aa) {
-	for(nn=0; bb < zz && *bb && *bb != '\n'; *cc++ = *bb++, nn++); bb++;
+	for(nn=0; bb < zz && *bb && *bb != '\n'; *cc++ = *bb++, nn++)
+	    {}
+	bb++;
 	if(nn) {
 	    *cc = '\0';
 	    solo_add_list_entry(slm, aa, strlen(aa));
@@ -3794,7 +3796,7 @@ void dualprt(DWELL *dwell, RADAR *radar, float *pptr) {
 		else if(vel >= 57344.0 && vel < 73728.0)
 		    v = (v1 + ratio*v2)/2 + NYQ_COUNT;
 		else 
-		    printf("what the ?%&\n");
+		    printf("what the ?%%&\n");
 	    }
 	if(ratio < 1.6 && ratio > 1.4)                /* 3/2 Ratio */
 	    {
@@ -3809,7 +3811,7 @@ void dualprt(DWELL *dwell, RADAR *radar, float *pptr) {
 		else if(vel >= 49152.0 && vel < 89120.0)
 		    v = (v1 + ratio*v2)/2 + NYQ_COUNT;
 		else 
-		    printf("what the ?%&\n");
+		    printf("what the ?%%&\n");
 	    }
 	if(ratio < 1.4 && ratio > 1.3)               /* 4/3 Ratio */
 	    {
@@ -3828,7 +3830,7 @@ void dualprt(DWELL *dwell, RADAR *radar, float *pptr) {
 		else if(vel >= 54613.0 && vel < 76459.0)
 		    v = (v1 + ratio*v2)/2 + NYQ_COUNT;
 		else 
-		    printf("what the ?%&\n");
+		    printf("what the ?%%&\n");
 	    }
 	f = velconst * v;                   /* velocity in m/s */
 #endif      
@@ -6017,6 +6019,7 @@ piraq_ts_stats()
 	fputs( message, ts_fid );
 	sizeof_ts_fi += sizeof( message );
     }
+    return(0);
 }
 
 // c---------------------------------------------------------------------------
@@ -6350,6 +6353,7 @@ void update_prqxx (PIRAQX *prqx, RADARV *rhdr, HEADERV *dwel)
 
 // c---------------------------------------------------------------------------
 /* c------------------------------------------------------------------------ */
+#undef STARTGATE
 #define STARTGATE       5      /* start gate for power average of all gates */
 /* c------------------------------------------------------------------------ */
 

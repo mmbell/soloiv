@@ -565,7 +565,9 @@ void soloiv_activate(GtkApplication *app, gpointer user_data)
       if (!bb)
 	{ strcpy (swi_dir, "./"); }
       else
-	{ for (cc = swi_dir; aa <= bb; *cc++ = *aa++); *cc = '\0'; }
+	{ for (cc = swi_dir; aa <= bb; *cc++ = *aa++)
+	    ;
+	  *cc = '\0'; }
       jj = solo_absorb_window_info (swi_dir, aa, 0);
 
       if (batch_mode && jj < 0 ) {

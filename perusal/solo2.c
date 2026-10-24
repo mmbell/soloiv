@@ -2474,7 +2474,7 @@ int sii_default_startup (const gchar *swpfi_dir)
     /*
      * nab a radar name
      */
-    if(aa = mddir_radar_name_v3(0,0)) {
+    if((aa = mddir_radar_name_v3(0,0))) {
 	strcpy(wwptr->sweep->radar_name, aa);
     }
     else

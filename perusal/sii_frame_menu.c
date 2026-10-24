@@ -99,19 +99,19 @@ void frame_menu_cb (GtkWidget *frame, gpointer data )
   case FRAME_MENU_SWEEPFILES:
     widget = sii_get_widget_ptr ( frame_num, FRAME_MENU );
     gtk_widget_set_visible (widget, FALSE);
-    show_swpfi_widget (frame, (gpointer)frame_num );
+    show_swpfi_widget (frame, GINT_TO_POINTER(frame_num) );
     break;
 
   case FRAME_MENU_PARAMETERS:
     widget = sii_get_widget_ptr ( frame_num, FRAME_MENU );
     gtk_widget_set_visible (widget, FALSE);
-    show_param_widget (frame, (gpointer)frame_num );
+    show_param_widget (frame, GINT_TO_POINTER(frame_num) );
     break;
 
   case FRAME_MENU_VIEW:
     widget = sii_get_widget_ptr ( frame_num, FRAME_MENU );
     gtk_widget_set_visible (widget, FALSE);
-    show_view_widget (frame, (gpointer)frame_num );
+    show_view_widget (frame, GINT_TO_POINTER(frame_num) );
     break;
 
   case FRAME_MENU_LOCKSTEPS:
@@ -120,13 +120,13 @@ void frame_menu_cb (GtkWidget *frame, gpointer data )
   case FRAME_MENU_EDITOR:
     widget = sii_get_widget_ptr ( frame_num, FRAME_MENU );
     gtk_widget_set_visible (widget, FALSE);
-    show_edit_widget (frame, (gpointer)frame_num );
+    show_edit_widget (frame, GINT_TO_POINTER(frame_num) );
     break;
 
   case FRAME_MENU_EXAMINE:
     widget = sii_get_widget_ptr ( frame_num, FRAME_MENU );
     gtk_widget_set_visible (widget, FALSE);
-    show_exam_widget (frame, (gpointer)frame_num );
+    show_exam_widget (frame, GINT_TO_POINTER(frame_num) );
     break;
 
   case FRAME_MENU_CLICK_DATA:
@@ -259,7 +259,7 @@ void frame_click_data_widget ( guint frame_num )
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num * TASK_MODULO + FRAME_MENU));
+		      GINT_TO_POINTER(frame_num * TASK_MODULO + FRAME_MENU));
 
   /* --- Title and border --- */
   sprintf (str, "Frame %d  Data", frame_num+1 );
@@ -314,7 +314,7 @@ void frame_menu_widget ( guint frame_num )
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num * TASK_MODULO + FRAME_MENU));
+		      GINT_TO_POINTER(frame_num * TASK_MODULO + FRAME_MENU));
 
   /* --- Title and border --- */
   bb = g_strdup_printf ("Frame %d", frame_num+1 );
@@ -333,7 +333,7 @@ void frame_menu_widget ( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (frame_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 # ifdef notyet
   button = gtk_button_new_with_label ("Replot");
@@ -352,7 +352,7 @@ void frame_menu_widget ( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (frame_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label (" Parameters + Colors ");
@@ -362,7 +362,7 @@ void frame_menu_widget ( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (frame_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("View");
@@ -372,7 +372,7 @@ void frame_menu_widget ( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (frame_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 # ifdef obsolete
   button = gtk_button_new_with_label ("Centering");
@@ -388,7 +388,7 @@ void frame_menu_widget ( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (frame_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("Examine");
@@ -398,7 +398,7 @@ void frame_menu_widget ( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (frame_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("Data Widget");
@@ -408,7 +408,7 @@ void frame_menu_widget ( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (frame_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   /* --- Make everything visible --- */

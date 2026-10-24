@@ -2580,7 +2580,7 @@ dd_malloc_radd(dgi, config_name)
 	}
 	if(dds->radar_desc_count) {
 	    /* copy first one to this one */
-	    memcpy(radd, *dds->radd_list, sizeof(struct radar_d *));
+	    memcpy(radd, *dds->radd_list, sizeof(struct radar_d));
 	}
 	else {			/* first one */
 	    strncpy(radd->radar_des, "RADD", 4 );
@@ -2690,7 +2690,7 @@ dor_print_asib(asib, slm)
 
     solo_add_list_entry(slm, " ", 1);
 
-    sprintf(aa, "Contents of the platform descriptor  len: %d"
+    sprintf(aa, "Contents of the platform descriptor  len: %zu"
 	    , sizeof(struct platform_i));
 
     /* c...mark */
@@ -2754,7 +2754,7 @@ dor_print_celv(celv, slm)
 
     solo_add_list_entry(slm, " ", 1);
 
-    sprintf(aa, "Contents of the cell vector descriptor  len: %d"
+    sprintf(aa, "Contents of the cell vector descriptor  len: %zu"
 	    , sizeof(struct cell_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
@@ -2801,7 +2801,7 @@ dor_print_cfac(cfac, slm)
     aa = bstr;
     solo_add_list_entry(slm, " ", 1);
 
-    sprintf(aa, "Contents of the correction descriptor  len: %d\n"
+    sprintf(aa, "Contents of the correction descriptor  len: %zu\n"
 	    , sizeof(struct correction_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
@@ -2860,7 +2860,7 @@ struct solo_list_mgmt *slm;
     /* routine to print the contents of the parameter descriptor */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the parameter descriptor  len: %d"
+    sprintf(aa, "Contents of the parameter descriptor  len: %zu"
 	    , sizeof(struct parameter_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
@@ -2922,7 +2922,7 @@ dor_print_frib(frib, slm)
   
   solo_add_list_entry(slm, " ", 1);
   solo_add_list_entry(slm, " ", 1);
-  sprintf(aa, "Contents of the field radar descriptor  len: %d\n"
+  sprintf(aa, "Contents of the field radar descriptor  len: %zu\n"
 	  , sizeof(struct field_radar_i));
   solo_add_list_entry(slm, aa, strlen(aa));
   sprintf(aa, "field_radar_info[4] %.4s"
@@ -3050,7 +3050,7 @@ dor_print_radd(radd, slm)
     /* routine to print the contents of the descriptor */
     
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the radar descriptor  len: %d"
+    sprintf(aa, "Contents of the radar descriptor  len: %zu"
 	    , sizeof(struct radar_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
@@ -3152,7 +3152,7 @@ dor_print_rktb(rktb, slm)
     /* routine to print the contents of the rotation angle table */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the rotation angle table  len: %d"
+    sprintf(aa, "Contents of the rotation angle table  len: %zu"
 	    , sizeof(struct rot_ang_table));
     solo_add_list_entry(slm, aa, strlen(aa));
 
@@ -3202,7 +3202,7 @@ dor_print_ryib(ryib, slm)
     /* routine to print the contents of the descriptor */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the ray descriptor  len: %d"
+    sprintf(aa, "Contents of the ray descriptor  len: %zu"
 	    , sizeof(struct ray_i));
     solo_add_list_entry(slm, aa, strlen(aa));
 
@@ -3248,7 +3248,7 @@ dor_print_swib(swib, slm)
     aa = bstr;
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the sweep descriptor  len: %d"
+    sprintf(aa, "Contents of the sweep descriptor  len: %zu"
 	    , sizeof(struct sweepinfo_d));
 
     solo_add_list_entry(slm, aa, strlen(aa));
@@ -3292,7 +3292,7 @@ dor_print_sswb(sswb, slm)
     /* routine to print the contents of the volume descriptor */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the super sweepinfo descriptor  len: %d\n"
+    sprintf(aa, "Contents of the super sweepinfo descriptor  len: %zu\n"
 	    , sizeof(struct super_SWIB));
     solo_add_list_entry(slm, aa, strlen(aa));
 
@@ -3377,7 +3377,7 @@ dor_print_vold(vold, slm)
     /* routine to print the contents of the volume descriptor */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the volume descriptor  len: %d"
+    sprintf(aa, "Contents of the volume descriptor  len: %zu"
 	    , sizeof(struct volume_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 

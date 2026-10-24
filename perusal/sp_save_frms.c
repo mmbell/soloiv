@@ -105,7 +105,7 @@ int solo_absorb_window_info (char *dir, char *fname, int ignore_swpfi_info)
     strcat(str, fname);
     
     if(!(stream = fopen(str, "r"))) {
-	sprintf(mess, "Unable to open frame state file %s\n", str);
+	snprintf(mess, sizeof(mess), "Unable to open frame state file %s\n", str);
 	sii_message(mess);
 	return(-1);
     }
@@ -408,7 +408,7 @@ int solo_absorb_window_info (char *dir, char *fname, int ignore_swpfi_info)
 	else if(!strncmp(c, "SXMN", 4)) { /* examine info */
 	    wwptr = solo_return_wwptr(gww);
 	    if(gottaSwap) {
-	       (c, wwptr->examine_info, (int)0);
+	       sp_crack_sxmn(c, wwptr->examine_info, (int)0);
 	    }
 	    else {
 	       memcpy(wwptr->examine_info, c, sizeof(*wwptr->examine_info));
@@ -635,7 +635,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
     }
 
     if(!(stream = fopen(str, "w"))) {
-	sprintf(mess, "Problem opening %s for writing\n", str);
+	snprintf(mess, sizeof(mess), "Problem opening %s for writing\n", str);
 	sii_message(mess);
 	return;
     }

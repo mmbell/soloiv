@@ -596,7 +596,9 @@ int hrd_sync_std(gri)
 		    return(0);
 		}
 		next_tape = b = dd_delimit(a);
-		for(c=str; a < b; *c++ = *a++); *c++ = '\0';
+		for(c=str; a < b; *c++ = *a++)
+		    {}
+		*c++ = '\0';
 		hs->io_type = strstr(str, "/dev") ? PHYSICAL_TAPE : FB_IO;
 
 		printf("Opening P3 standard tape: %s\n", str);
@@ -770,10 +772,12 @@ int hrd_sync_ascii(gri)
 		    return(0);
 		}
 		next_tape = b = dd_delimit(a);
-		for(c=str; a < b; *c++ = *a++); *c++ = '\0';
+		for(c=str; a < b; *c++ = *a++)
+		    {}
+		*c++ = '\0';
 
 		printf("Opening P3 ascii tape: %s\n", str);
-		if(!(hs->stream = fopen(str, "r")) < 0) {
+		if(!(hs->stream = fopen(str, "r"))) {
 		    perror("Unable to open file");
 		    return(0);
 		}

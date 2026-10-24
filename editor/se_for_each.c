@@ -425,7 +425,7 @@ int se_funfold(arg, cmds)	/* #forced-unfolding# */
     if((fn = dd_find_field(dgi, name)) < 0) {
 	/* field not found
 	 */
-	g_string_sprintfa
+	g_string_append_printf
 	  (gs_complaints, "Field to be unfolded: %s not found\n", name);
 	seds->punt = YES;
 	return(-1);
@@ -506,7 +506,7 @@ int se_hard_zap(arg, cmds)		/* #unconditional-delete# */
     if((fn = dd_find_field(dgi, dst_name)) < 0) {	
 	/* field not found
 	 */
-      g_string_sprintfa
+      g_string_append_printf
 	(gs_complaints, "Field to be deleted: %s not found\n", dst_name);
 	seds->punt = YES;
 	return(-1);
@@ -575,7 +575,7 @@ int se_threshold_field(arg, cmds) /* #threshold# */
     if((fthr = dd_find_field(dgi, thr_name)) < 0) {	
 	/* thr field not found
 	 */
-	g_string_sprintfa
+	g_string_append_printf
 	  (gs_complaints, "Threshold field: %s not found\n", thr_name);
 	seds->punt = YES;
 	return(-1);
@@ -592,7 +592,7 @@ int se_threshold_field(arg, cmds) /* #threshold# */
     if((fn = dd_find_field(dgi, dst_name)) < 0) {	
 	/* field not found
 	 */
-	g_string_sprintfa
+	g_string_append_printf
 	  (gs_complaints, "Field to be thresholded: %s not found\n", dst_name);
 	seds->punt = YES;
 	return(-1);

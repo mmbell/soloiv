@@ -1772,7 +1772,7 @@ void dd_print_angle_table(const struct rot_ang_table *rat, FILE *out)
   const long *indexes = (long *)
     ((const char *)rat + rat->angle_table_offset);
   for (ii = 0; ii < rat->ndx_que_size; ii++) {
-    fprintf(out, "    Index[%d]: %d\n", ii, indexes[ii]);
+    fprintf(out, "    Index[%d]: %ld\n", ii, indexes[ii]);
   }
   
   fprintf(out, "\n");

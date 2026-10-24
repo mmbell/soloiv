@@ -72,7 +72,7 @@ int solo_absorb_color_table(frme, dir, file)
     if(!(stream = fopen(str, "r"))) {
        slm = solo_return_winfo_ptr()->list_a_message;
        solo_reset_list_entries(slm);
-       sprintf(mess, "Unable to open color table %s", str);
+       snprintf(mess, sizeof(mess), "Unable to open color table %s", str);
        solo_add_list_entry(slm, mess, strlen(mess));
        slm_list_ui(slm);
        popup_message(slm);
@@ -92,7 +92,7 @@ int solo_absorb_color_table(frme, dir, file)
 	    continue;
 	}
 
-	if(a=strstr(aa, "xcolor")) { /* X color name */
+	if ((a = strstr(aa, "xcolor"))) { /* X color name */
 	    n = strlen(a);
 	    b = a+n;
 	    a += sizeof("xcolor");
@@ -328,7 +328,7 @@ int solo_pixelate_color(theHardwareColor, theColorName)
 	solo_add_list_entry(slm, mess, strlen(mess));
     }
     if(theHardwareColor->pixel > 255) {
-	sprintf(mess, "Pixel value %d exceeds 255 for %s %d %d %d"
+	sprintf(mess, "Pixel value %lu exceeds 255 for %s %d %d %d"
 		, theHardwareColor->pixel
 		, theColorName, theHardwareColor->red
 		, theHardwareColor->green, theHardwareColor->blue);

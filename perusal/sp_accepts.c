@@ -612,7 +612,7 @@ int solo_set_sweep_info(swi)
       dts.hour = dts.minute = dts.second = dts.millisecond = 0;
       cc = swi->start_time_text;
       
-      if(d = dd_relative_time(cc)) {
+      if ((d = dd_relative_time(cc))) {
 	wwptr->d_sweepfile_time_stamp += d;
       }
       else if(dd_crack_datime(cc, strlen(cc), &dts)) {
@@ -641,7 +641,7 @@ int solo_set_sweep_info(swi)
 		   , radar_name, str);
 	   sprintf(mess+strlen(mess), "switching to radar %s\n"
 		   , mddir_radar_name_v3(frme, rn));
-	   g_message (mess);
+	   g_message ("%s", mess);
 	}
 	wwptr->sweep->radar_num = wwptr->ddir_radar_num = rn;
 	strcpy(wwptr->radar->radar_name, mddir_radar_name_v3(frme, rn));
@@ -685,7 +685,7 @@ int solo_set_sweep_info(swi)
 	dts.hour = dts.minute = dts.second = dts.millisecond = 0;
 	cc = swi->start_time_text;
 
-	if(d = dd_relative_time(cc)) {
+	if ((d = dd_relative_time(cc))) {
 	    wwptr->sweep->start_time += d;
 	}
 	else if(dd_crack_datime(cc, strlen(cc), &dts)) {
@@ -699,7 +699,7 @@ int solo_set_sweep_info(swi)
 	dts.hour = dts.minute = dts.second = dts.millisecond = 0;
 	cc = swi->stop_time_text;
 
-	if(d = dd_relative_time(cc)) {
+	if ((d = dd_relative_time(cc))) {
 	    wwptr->sweep->stop_time = wwptr->sweep->start_time + d;
 	}
 	else if(dd_crack_datime(cc, strlen(cc), &dts)) {

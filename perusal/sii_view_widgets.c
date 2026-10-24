@@ -497,7 +497,7 @@ sii_set_view_info (guint frame_num)
 
   vwi.az_annot_at_km = vwi.rng_annot_at_deg = -1;
 
-  if (vd->rng_az_labels = vd->toggle[VIEW_AZRNG_LABELS]) {
+  if ((vd->rng_az_labels = vd->toggle[VIEW_AZRNG_LABELS])) {
     jj = VIEW_AZ_LBL_RNG;
     aa = gtk_editable_get_text( GTK_EDITABLE (vd->data_widget[jj]));
     if (sii_str_values ( aa, 1, &ff, &gg )) {
@@ -836,7 +836,7 @@ void sii_update_view_info (guint frame_num)
 				 , vd->precision[jj]);
 
   jj = VIEW_RADAR_LAT_LON_ALT;
-  g_string_sprintf (vd->orig_txt[jj]
+  g_string_printf (vd->orig_txt[jj]
 		    , "Radar Lat: %.4f  Lon: %.4f  Alt: %.3f"
 		    , wwptr->radar_location->latitude
 		    , wwptr->radar_location->longitude
@@ -1187,7 +1187,7 @@ void sii_initialize_view (guint frame_num)
 
    jj = VIEW_RADAR_LAT_LON_ALT;
    g_string_truncate (vd->orig_txt[jj], 0);
-   g_string_sprintfa (vd->orig_txt[jj]
+   g_string_append_printf (vd->orig_txt[jj]
 		      , "Radar Lat: %.4f  Lon: %.4f  Alt: %.3f"
 		      , lat, lon, alt);
 }
@@ -1215,7 +1215,7 @@ void sii_view_dup_orig (guint frame_num)
 
        default:
 	 g_string_assign (vd->txt[jj], vd->orig_txt[jj]->str);
-	 g_memmove (vd->values[jj], vd->orig_values[jj], sizeof (*vd->values[jj]));
+	 memmove (vd->values[jj], vd->orig_values[jj], sizeof (*vd->values[jj]));
 	 break;
       };
    }
@@ -1288,7 +1288,7 @@ void sii_view_menu_cb ( GtkWidget *w, gpointer   data )
   case VIEW_RNG_ONLY:
     g_return_if_fail (GTK_IS_CHECK_BUTTON(rmi));
 
-    if( active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item)))
+    if ((active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item))))
       { vd->rng_az_state = task; }
 
 # ifdef obsolete
@@ -1305,7 +1305,7 @@ void sii_view_menu_cb ( GtkWidget *w, gpointer   data )
   case VIEW_NO_XY_TICS:
     g_return_if_fail (GTK_IS_CHECK_BUTTON(rmi));
 
-    if( active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item)))
+    if ((active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item))))
       { vd->xy_tics_state = task; }
 
 # ifdef obsolete
@@ -1321,7 +1321,7 @@ void sii_view_menu_cb ( GtkWidget *w, gpointer   data )
   case CENTER_OTHER:
     g_return_if_fail (GTK_IS_CHECK_BUTTON(rmi));
 
-    if( active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item)))
+    if ((active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item))))
       { vd->ctr_state = task; }
 
 # ifdef obsolete
@@ -1337,7 +1337,7 @@ void sii_view_menu_cb ( GtkWidget *w, gpointer   data )
   case LANDMARK_OTHER:
     g_return_if_fail (GTK_IS_CHECK_BUTTON(rmi));
 
-    if( active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item)))
+    if ((active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item))))
       { vd->lmrk_state = task; }
 
 # ifdef obsolete
@@ -1400,7 +1400,7 @@ void sii_view_menu_cb ( GtkWidget *w, gpointer   data )
   case VIEW_TS_RL:
     g_return_if_fail (GTK_IS_CHECK_BUTTON(rmi));
 
-    if( active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item)))
+    if ((active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item))))
       { vd->ts_lr_state = task; }
 
 # ifdef obsolete
@@ -1414,7 +1414,7 @@ void sii_view_menu_cb ( GtkWidget *w, gpointer   data )
   case VIEW_TS_MSL:
     g_return_if_fail (GTK_IS_CHECK_BUTTON(rmi));
 
-    if( active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item)))
+    if ((active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item))))
       { vd->ts_relative_state = task; }
 
 # ifdef obsolete
@@ -1429,7 +1429,7 @@ void sii_view_menu_cb ( GtkWidget *w, gpointer   data )
   case VIEW_TS_AUTO:
     g_return_if_fail (GTK_IS_CHECK_BUTTON(rmi));
 
-    if( active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item)))
+    if ((active = gtk_check_button_get_active(GTK_CHECK_BUTTON(check_item))))
       { vd->ts_point_state = task; }
 
 # ifdef obsolete
@@ -1626,7 +1626,7 @@ void sii_view_widget( guint frame_num )
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num * TASK_MODULO + FRAME_VIEW));
+		      GINT_TO_POINTER(frame_num * TASK_MODULO + FRAME_VIEW));
 
   /* --- Title and border --- */
   bb = g_strdup_printf ("Frame %d  View, Center & Landmark Widget"
@@ -1662,7 +1662,7 @@ void sii_view_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_view_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("OK");
@@ -1671,7 +1671,7 @@ void sii_view_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_view_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("Cancel");
@@ -1680,7 +1680,7 @@ void sii_view_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_view_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
   /*
    * set an hbox to contain two vertical boxes of entries
@@ -1841,7 +1841,7 @@ void sii_view_widget( guint frame_num )
     for (child = gtk_widget_get_first_child (vbox);
          child != NULL;
          child = gtk_widget_get_next_sibling (child)) {
-      sii_set_widget_frame_num (child, (gpointer)frame_num);
+      sii_set_widget_frame_num (child, GINT_TO_POINTER(frame_num));
     }
   }
 
@@ -1852,7 +1852,7 @@ void sii_view_widget( guint frame_num )
 	g_signal_connect (G_OBJECT(vdata->data_widget[jj])
 			    ,"activate"
 			    , G_CALLBACK (sii_view_menu_cb)
-			    , (gpointer)nn );
+			    , GINT_TO_POINTER(nn) );
 	/* paste_clipboard signal removed - not available in GTK4 */
      }
   }

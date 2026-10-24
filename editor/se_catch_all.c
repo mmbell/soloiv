@@ -79,7 +79,7 @@ int se_establish_field(dgi, src_name, dst_name, fns, fnd)
      * find the source field
      */
     if((fnsx = dd_find_field(dgi, src_name)) < 0) {	
-      g_string_sprintfa
+      g_string_append_printf
 	  (gs_complaints, "Source parameter %s not found for establis field\n"
 		  , src_name);
 	return(-1);
@@ -105,7 +105,7 @@ int se_establish_field(dgi, src_name, dst_name, fns, fnd)
 	/* create the new parameter
 	 */
 	if(first_empty < 0) {
-	  g_string_sprintfa
+	  g_string_append_printf
 	    (gs_complaints, "You have exceeded the %d parameter limit!\n"
 	     , (int)MAX_PARMS);
 	    exit(1);
@@ -243,7 +243,7 @@ int se_once_only(arg, cmds)
     else if(strncmp(cmds->uc_text, "omit-source-file-info", 7) == 0) {
 	scf = se_return_cmd_files_struct();
 	scf->omit_source_file_info = !scf->omit_source_file_info;
-	g_string_sprintfa
+	g_string_append_printf
 	  (gs_complaints, "Source file info will be %s\n"
 	   , scf->omit_source_file_info ? "IGNORED" : "USED");
     }
@@ -295,11 +295,11 @@ int se_dir(arg, cmds)
 	se_unquote_string(str, cmdq->uc_text);
 
 	if(strncmp(str, "dorade-directory", 8) == 0) {
-	    if(a=get_tagged_string("DORADE_DIR")) {
+	    if((a=get_tagged_string("DORADE_DIR"))) {
 		slash_path(seds->sfic->directory, a);
 	    }
 	    else {
-	      g_string_sprintfa
+	      g_string_append_printf
 		(gs_complaints,  "DORADE_DIR undefined\n");
 	      slash_path(seds->sfic->directory, cmdq->uc_text);
 	    }
@@ -381,7 +381,7 @@ int se_dir(arg, cmds)
 	    if(!(nn=sscanf(cmdq->uc_text, "%d", &seds->sfic->version))) {
 		/* not a number
 		 */
-	      g_string_sprintfa
+	      g_string_append_printf
 		(gs_complaints, 
 		 "\nCould not interpret version number: %s  Using: %d\n"
 		 , cmdq->uc_text, seds->sfic->version);
@@ -422,7 +422,7 @@ int se_version_change(dir, radar)
 
     ssm = seds->last_radar_stack;
 
-    for(; ssm; ssm->next) {
+    for(; ssm; ssm = ssm->next) {
 	if(strcmp(radar, ssm->at) == 0)
 	      return(YES);
     }

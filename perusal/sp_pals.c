@@ -424,7 +424,7 @@ solo_malloc_palette(name)
     /* use environment variable for Colors directory if it exists;
      * otherwise, use the one created during Solo build
      */
-    if (color_dir = getenv ("SOLO_COLORS_DIR"))
+    if ((color_dir = getenv ("SOLO_COLORS_DIR")))
         strcpy (next->at->color_table_dir, color_dir);
     else
 # ifdef fixme
@@ -606,7 +606,7 @@ void solo_palette_message(frme)
 
     wwptr = solo_return_wwptr(frme);
     half = (float)wwptr->palette->num_colors*.5*wwptr->palette->increment;
-    sprintf(wwptr->palette->message, "%d Colors  %.2f < %.2f     "
+    sprintf(wwptr->palette->message, "%ld Colors  %.2f < %.2f     "
 	    , wwptr->palette->num_colors
 	    , wwptr->palette->center-half+.001
 	    , wwptr->palette->center+half+.001

@@ -114,8 +114,8 @@ void sii_blow_up_draw_func (GtkDrawingArea *area, cairo_t *cr,
    }
 
 # ifdef config_debug
-   sprintf
-     (mess,"bup expose: %s frm:%d gtk:%dx%d sii:%dx%d exp:%dx:%d rc:%d xp:%d"
+   snprintf
+     (mess, sizeof(mess),"bup expose: %s frm:%d gtk:%dx%d sii:%dx%d exp:%dx:%d rc:%d xp:%d"
 	      , str
 	      , frame_num
 	      , alloc_w
@@ -725,7 +725,8 @@ gboolean sii_frame_key_pressed_cb(GtkEventControllerKey *controller,
 # endif
 
 
-  gchar *aa, *bb, *mod = "nomod";
+  const gchar *aa;
+  gchar *bb, *mod = "nomod";
   guint frame_num = GPOINTER_TO_UINT (data), mark, jj;
   guint F_frame_id = 0;
   gboolean modifier_only = FALSE;
@@ -1232,7 +1233,7 @@ void test_widget( GtkWidget *w, gpointer   data )
 
      g_object_set_data (G_OBJECT(button),
 			  "frame_num",
-			  (gpointer)frame_num);
+			  GINT_TO_POINTER(frame_num));
      g_object_set_data (G_OBJECT(button),
 			  "swpfi_index",
 			  GUINT_TO_POINTER(mm));

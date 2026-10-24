@@ -194,7 +194,7 @@ int displayq(click_frme, command)
 	    memset(linked_frames[ii], 0, sizeof(struct linked_frames));
 	}
 	if (1 || batch_mode) {
-	  if (aa = getenv ("BATCH_THRESHOLD")) {
+	  if ((aa = getenv ("BATCH_THRESHOLD"))) {
 	    strcpy (str, aa);
 	    nt = dd_tokens (str, sptrs);
 	    if (nt >= 2) {
@@ -763,7 +763,7 @@ int sp_data_loop(flink0)
 	    ray_raster_setup(ww, angle0, angle1, rxy);
 	    if(rxy->ignore_this_ray) {
 # ifdef obsolete
-	       g_string_sprintfa (gs_complaints, "%d)Ignore (%.2f,%.2f)"
+	       g_string_append_printf (gs_complaints, "%d)Ignore (%.2f,%.2f)"
 				 , loop, ddrc->angle0, ddrc->angle1);
 	       g_message (gs_complaints->str);
 # endif
@@ -1066,7 +1066,7 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
     if((n = mddir_file_list_v3(frme, wwptr->sweep->directory_name)) < 1 ) {
 	sprintf(mess, "Directory %s contains no sweep files\n"
 		  , wwptr->sweep->directory_name);
-	g_message (mess);
+	g_message ("%s", mess);
 	return(NO);
     }
     if((wwptr->sweep->radar_num =
@@ -1074,7 +1074,7 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
 	  {
 	     sprintf(mess, "No sweep files for radar %s\n"
 		     , wwptr->sweep->radar_name);
-	     g_message (mess);
+	     g_message ("%s", mess);
 	     return(NO);
 	  }
 
@@ -1291,12 +1291,12 @@ int solo_parameter_setup(frme)
 	wwptr->parameter->changed = YES;
 	sprintf(mess, "Parameter %s does not exist in this sweep"
 		, wwptr->parameter->parameter_name);
-	g_message (mess);
+	g_message ("%s", mess);
 	if(dgi->num_parms < 1) {
 	    /* nothing to substitute, and the modulo below would divide by
 	     * zero */
 	    sprintf(mess, "Sweep has no fields; cannot plot\n");
-	    g_message (mess);
+	    g_message ("%s", mess);
 	    return(NO);
 	}
 	pnum = (frme < dgi->num_parms) ? frme : frme % dgi->num_parms;
@@ -1305,7 +1305,7 @@ int solo_parameter_setup(frme)
 	       , dgi->dds->parm[pnum]->parameter_name, 8);
 	sprintf(mess, "Substituting %s"
 		, wwptr->parameter->parameter_name);
-	g_message (mess);
+	g_message ("%s", mess);
     }
     
     if(ok && wwptr->parameter->changed) {

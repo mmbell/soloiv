@@ -248,7 +248,9 @@ int craack_ddfn(fn, ddfn)
 	c = ddfn->comment;
 				/* copy only the first 80 characters
 				 * of the comment */
-	for(ii=0; *a && ii < 80; ii++, *c++ = *a++); *c++ = '\0';
+	for(ii=0; *a && ii < 80; ii++, *c++ = *a++)
+	    {}
+	*c++ = '\0';
     }
     else {
 	*ddfn->comment = '\0';
@@ -277,7 +279,9 @@ ddfn_file_info_line(ddfn, str)
 	b = ddfn->comment;
 	if(nn > 24) nn = 24;
 	strcat(str, " ");
-	for(c=str+strlen(str); nn--; *c++ = *b++); *c++ = '\0';
+	for(c=str+strlen(str); nn--; *c++ = *b++)
+	    {}
+	*c++ = '\0';
     }
     return(str);
 }
@@ -671,7 +675,7 @@ int ddir_files_v3(dir_num, dir)
      */
     for(;;) {
 	dp=readdir(dir_ptr);
-        fprintf(stderr, "soloii - dp: %x\n", dp);
+        fprintf(stderr, "soloii - dp: %p\n", (void *)dp);
 	if(dp == NULL ) {
 	    break;
 	}
