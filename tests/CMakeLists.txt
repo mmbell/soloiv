@@ -270,4 +270,11 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     target_include_directories(test_remove_ring_last_gate PRIVATE ${CMAKE_SOURCE_DIR}/translate)
     set_tests_properties(test_remove_ring_last_gate PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/airborne/cf2)
+
+    # An Examine edit must survive Apply Edits. The commit rewrote the sweep
+    # file in place but the refresh re-read it through the stale rio cache,
+    # so the deleted points came back.
+    soloiv_add_test(test_examine_commit_reload)
+    set_tests_properties(test_examine_commit_reload PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/airborne/cf2)
 endif()
