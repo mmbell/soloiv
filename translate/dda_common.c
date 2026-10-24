@@ -87,7 +87,7 @@ static int Max_sweeps_per_volume=0;
 static int Min_sweeps_per_volume=0;
 static int Output_flag=NO;
 static int Catalog_only_flag=NO, print_dd_open_info=YES;
-static char dd_open_info[128];
+static char dd_open_info[384];
 static int Control_C=NO;
 static int solo_flag=0;
 void dd_unlink();
@@ -136,11 +136,9 @@ int dd_control_c()
 }
 /* c------------------------------------------------------------------------ */
 
-#if defined (SYSV) && !defined (SVR4)
+/* a signal handler: returns nothing (it used to be declared int on most
+ * systems and fell off the end) */
 void dd_cchandl()
-#else
-int dd_cchandl()
-#endif
 {
     printf("\nCaught Cntrl-C!\n\n");
     Control_C = YES;
@@ -303,13 +301,8 @@ dd_get_structs(radar_num)
 
 void dd_intset()
 {
-#if defined (SYSV) && !defined (SVR4)
     void dd_cchandl();
     (void) signal (SIGINT, dd_cchandl);
-#else
-    int dd_cchandl();
-    signal (SIGINT, (void *) dd_cchandl);
-#endif
 }
 /* c------------------------------------------------------------------------ */
 
@@ -512,7 +505,7 @@ dd_kill_tdf(fx, fx_count)
 	if(fx == fix) keep_fix = fix;
     }
     if(!keep_fix) {
-	printf("Bogus time dependent fix struct: %d\n", fx);
+	printf("Bogus time dependent fix struct: %p\n", (void *)fx);
 	return(tdf);		/* bogus fix struct */
     }
     *fx_count = 0;
@@ -565,10 +558,10 @@ int dd_open(dir, file_name )
     }
 
     if(a=strrchr(name, '/')) {
-	sprintf(dd_open_info,  " file %s:%d \n", a, i );
+	snprintf(dd_open_info, sizeof(dd_open_info), " file %s:%d \n", a, i );
     }
     else {
-	sprintf(dd_open_info, " file %s:%d \n", name, i );
+	snprintf(dd_open_info, sizeof(dd_open_info), " file %s:%d \n", name, i );
     }
     if(print_dd_open_info)
 	  printf("%s", dd_open_info);

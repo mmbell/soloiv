@@ -65,7 +65,7 @@ int se_absolute_value(arg, cmds) /* #absolute-value# */
     if((fn = dd_find_field(dgi, name)) < 0) {
 	/* field not found
 	 */
-	g_string_sprintfa
+	g_string_append_printf
 	  (gs_complaints, "Field to be abs()'d: %s not found\n", name);
 	seds->punt = YES;
 	return(-1);
@@ -127,7 +127,7 @@ int se_assign_value(arg, cmds)		/* #assign-value# */
     if((fns = dd_find_field(dgi, name)) < 0) {	
 	/* field not found
 	 */
-	g_string_sprintfa
+	g_string_append_printf
 	  (gs_complaints, "Field to be assigned: %s not found\n", name);
 	seds->punt = YES;
 	return(-1);
@@ -272,7 +272,7 @@ int se_add_fields(arg, cmds)
      * find the add field
      */
     if((fn = dd_find_field(dgi, add_name)) < 0) {	
-	g_string_sprintfa
+	g_string_append_printf
 	  (gs_complaints
 	   , "First parameter %s not found for add/sub\n", add_name);
 	seds->punt = YES;
@@ -285,7 +285,7 @@ int se_add_fields(arg, cmds)
 # endif
 
     if((fns = dd_find_field(dgi, src_name)) < 0) {	
-	g_string_sprintfa
+	g_string_append_printf
 	  (gs_complaints, "Second parameter %s not found for add/sub\n", src_name);
 	seds->punt = YES;
 	return(-1);

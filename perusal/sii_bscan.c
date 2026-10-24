@@ -163,7 +163,7 @@ int sp_ts_data_loop(tsLink0, usi)
       sii_update_frame_info(ww);
       tsl->width = tsl->wwptr->view->width_in_pix;
       tsl->height = tsl->wwptr->view->height_in_pix;
-      tsl->frame_image_ptr = (char *)tsl->wwptr->image->data;
+      tsl->frame_image_ptr = (unsigned char *)tsl->wwptr->image->data;
       tsl->type_of_plot = tsl->wwptr->view->type_of_plot;
       /*
        * calculate the starting pixel number, the gate num of this pixel
@@ -477,7 +477,7 @@ int tsDisplay(click_frme, command)
     struct solo_perusal_info *spi, *solo_return_winfo_ptr();
     struct dd_general_info *dgi, *dd_window_dgi();
     char *aa, *bb, *solo_gen_file_info(), *getenv();
-    char mess[256], *get_tagged_string();
+    char mess[512], *get_tagged_string();
     int original_sweep_count, original_sweep_set_count, sset;
     int frame_list[SOLO_MAX_WINDOWS], frame_count=0;
     int checked_off[SOLO_MAX_WINDOWS];
@@ -714,7 +714,7 @@ int tsDisplay(click_frme, command)
 	    /* get the first ray
 	     */
 	    if(ddswp_next_ray_v3(usi) == END_OF_TIME_SPAN) {
-		sprintf (mess, "Problems reading first ray of %s/%s\n"
+		snprintf (mess, sizeof(mess), "Problems reading first ray of %s/%s\n"
 			  , usi->directory, usi->filename);
 		sii_message (mess);
 		broke = YES;

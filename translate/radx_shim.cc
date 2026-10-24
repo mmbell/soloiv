@@ -233,7 +233,7 @@ int rio_vol_field(RioVolH vh, int f, RioField *out)
 }
 
 /* Fetch one ray's data for field index `f` as fl32. Returns 0 and fills
- * *data_out/*ngates_out/*missing_out on success, -1 if the ray lacks the
+ * data_out, ngates_out and missing_out on success, -1 if the ray lacks the
  * field (caller fills all-bad). The pointer remains valid until the next
  * call that mutates the same ray's field or rio_vol_close(). */
 int rio_vol_ray_field_fl32(RioVolH vh, int rayIdx, int f,

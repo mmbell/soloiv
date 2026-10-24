@@ -1618,6 +1618,7 @@ int num_dims, *dims;
   ii = nc_put_att_float( ncid, ncp->id_prf
 			, "_FillValue", NC_FLOAT, 1, &f );
 
+  return(ii);
 }
 
 /* c------------------------------------------------------------------------ */

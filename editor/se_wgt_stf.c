@@ -681,7 +681,9 @@ se_update_list(list_id)
 	 */
 	a = dd_whiteout(seds->sfic->radar_names_text);
 	b = dd_delimit(a);
-	for(c=str; a < b; *c++ = *a++); *c++ = '\0';
+	for(c=str; a < b; *c++ = *a++)
+	    ;
+	*c++ = '\0';
 
 	seds->sfic->radar_num = rn = mddir_radar_num_v3(seds->se_frame, str);
 	if(rn < 0) {

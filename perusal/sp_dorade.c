@@ -61,7 +61,7 @@ void solo_cell_lut(frme)
     rmax = celv->dist_cells[nc];
     f = rmax - celv->dist_cells[0];
 
-    if(gs=wwptr->uniform_cell_spacing) {
+    if ((gs=wwptr->uniform_cell_spacing)) {
     }
     else {
 	/* find an early gate spacing > 0

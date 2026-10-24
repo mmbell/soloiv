@@ -736,7 +736,7 @@ void sii_swpfi_list_widget( guint frame_num )
 
     g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+widget_id));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+widget_id));
 
     /* sii_nullify_widget_cb only clears the widget-pointer table entry. The
      * scrolled window, the layout box and the label array are children of
@@ -911,7 +911,7 @@ void sii_swpfi_widget( guint frame_num )
 
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+FRAME_SWPFI_MENU));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+FRAME_SWPFI_MENU));
 
   /* --- Title and border --- */
   bb = g_strdup_printf ("Frame %d  Sweepfiles Widget", frame_num+1 );

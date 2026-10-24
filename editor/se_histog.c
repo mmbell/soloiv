@@ -63,7 +63,7 @@ int se_histo_output()
 {
    struct solo_str_mgmt *ssm;
    struct solo_edit_stuff *seds, *return_sed_stuff();
-   char str[256], mess[256];
+   char str[256], mess[512];
 
    seds = return_sed_stuff();	/* solo editing struct */
    se_print_ssm_strings(seds->h_output);
@@ -78,7 +78,7 @@ int se_histo_output()
 	    strcat(str, seds->histo_comment);
 	 }
 	 if(!(histo_stream = fopen(str, "w"))) {
-	    sprintf(mess, "Could not open histogram file : %s\n"
+	    snprintf(mess, sizeof(mess), "Could not open histogram file : %s\n"
 		    , str);
 	    sii_message (mess);
 	    return(0);
@@ -740,7 +740,7 @@ int se_histo_ray(arg, cmds)	/* #do-histogram# */
     name = seds->histogram_field;
     if(seds->finish_up) {
 	if(H_BINS SET_IN seds->histo_key) 
-	      se_histo_fin_counts(name);
+	      se_histo_fin_counts();
 	else
 	      se_histo_fin_areas(name);
 	se_histo_output();

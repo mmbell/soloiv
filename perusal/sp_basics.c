@@ -552,14 +552,14 @@ int solo_read_open(wwptr)
   struct solo_window_ptrs *wwptr;
 {
     char str[256];
-    char mess[256];
+    char mess[512];
 
     slash_path(str, wwptr->sweep->directory_name);
     strcat(str, wwptr->sweep->file_name);
     if(wwptr->file_id > 0)
 	  close(wwptr->file_id);
     if((wwptr->file_id = open(str, O_RDONLY, 0)) < 0) {
-	sprintf(mess, "Unable to open sweep %s\n", str);
+	snprintf(mess, sizeof(mess), "Unable to open sweep %s\n", str);
 	solo_message(mess);
     }
     return(wwptr->file_id);
@@ -791,7 +791,7 @@ solo_return_wwptr(ww_num)
     }
     memset(next->xcolors, 0, 256*sizeof(XColor));
     
-    next->data_color_lut = (long *)malloc(K64*sizeof(long));
+    next->data_color_lut = (unsigned long *)malloc(K64*sizeof(long));
     if(!next->data_color_lut) {
 	uii_printf("Unable to malloc next->data_color_lut for frame: %d\n"
 		  , ww_num);

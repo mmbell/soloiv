@@ -60,7 +60,7 @@ int solo_absorb_window_info (char *dir, char *fname, int ignore_swpfi_info)
     unsigned long gdsos, ppsos, gww;
     size_t len, lenx;
     FILE *stream;
-    char *a, *b, *c, *buf, *e, str[256], mess[256], atts[256], *sptrs[32];
+    char *a, *b, *c, *buf, *e, str[256], mess[512], atts[256], *sptrs[32];
     char *cbuf, *aa, *bb, *cc;
     struct solo_generic_window_struct *gws, gwx;
     struct point_in_space pisp;
@@ -105,7 +105,7 @@ int solo_absorb_window_info (char *dir, char *fname, int ignore_swpfi_info)
     strcat(str, fname);
     
     if(!(stream = fopen(str, "r"))) {
-	sprintf(mess, "Unable to open frame state file %s\n", str);
+	snprintf(mess, sizeof(mess), "Unable to open frame state file %s\n", str);
 	sii_message(mess);
 	return(-1);
     }
@@ -408,7 +408,7 @@ int solo_absorb_window_info (char *dir, char *fname, int ignore_swpfi_info)
 	else if(!strncmp(c, "SXMN", 4)) { /* examine info */
 	    wwptr = solo_return_wwptr(gww);
 	    if(gottaSwap) {
-	       (c, wwptr->examine_info, (int)0);
+	       sp_crack_sxmn(c, wwptr->examine_info, (int)0);
 	    }
 	    else {
 	       memcpy(wwptr->examine_info, c, sizeof(*wwptr->examine_info));
@@ -601,7 +601,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
     struct solo_palette_ptr *pal, *solo_topof_palettes();
     
     struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    char mess[256];
+    char mess[512];
     SiiFrameConfig *sfc;
     SiiLinkedList *sps, *top;
 
@@ -635,7 +635,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
     }
 
     if(!(stream = fopen(str, "w"))) {
-	sprintf(mess, "Problem opening %s for writing\n", str);
+	snprintf(mess, sizeof(mess), "Problem opening %s for writing\n", str);
 	sii_message(mess);
 	return;
     }

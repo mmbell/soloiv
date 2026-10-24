@@ -31,7 +31,9 @@ static double trip_time=0;
 
 /* c------------------------------------------------------------------------ */
 
-dd_product_x(dgi)
+void dd_px();
+
+void dd_product_x(dgi)
   DGI_PTR dgi;
 {
     DDS_PTR dds=dgi->dds;
@@ -102,7 +104,7 @@ dd_product_x(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-dd_px( dgi, fid, rn)
+void dd_px( dgi, fid, rn)
   DGI_PTR dgi;
   int fid, rn;
 {

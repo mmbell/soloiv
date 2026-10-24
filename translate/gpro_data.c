@@ -619,7 +619,9 @@ ac_nc_init()
 	/* save the directory name
 	 */
 	cc = nai->file_directory;
-	for(++bb; aa < bb; *cc++ = *aa++); *cc = '\0';
+	for(++bb; aa < bb; *cc++ = *aa++)
+	    {}
+	*cc = '\0';
     }
     strcpy(name, nai->file_directory);
     strcat(name, aa);

@@ -610,7 +610,7 @@ dd_tape_dump( top, sweep_count, out_fid, remove_them, io_type
 	dgi = dd_get_structs(this->radar_num);
 	strcpy(str, dgi->directory_name);
 	strcat(str, this->file_name);
-	printf("Vol Dump %s %d ", str, this->sweep_time_stamp);
+	printf("Vol Dump %s %ld ", str, (long)this->sweep_time_stamp);
 
 	if((swp_fid = open(str,0)) < 1 ) {
 	    printf("\nUnable to open %s status: %d\n", str, swp_fid);
@@ -835,7 +835,7 @@ dd_tape_dump( top, sweep_count, out_fid, remove_them, io_type
 			n = rsize > MAX_REC_SIZE ? ryib_ndx : rsize;
 			if((mark = gp_write(out_fid, tbuf, n, io_type)) < 1 ) {
 			    printf(
-"Write error fid: %d  count: %d  status: %d %d\n"
+"Write error fid: %d  count: %d  status: %d %.0f\n"
 				   , out_fid, count, mark, f_bytes);
 			    exit(1);
 			}
@@ -844,7 +844,7 @@ dd_tape_dump( top, sweep_count, out_fid, remove_them, io_type
 			    if((mark = gp_write(out_fid, tbuf+ryib_ndx
 						, rsize-ryib_ndx, io_type)) < 1 ) {
 				printf(
-"Write err fid: %d count: %d status: %d %d\n"
+"Write err fid: %d count: %d status: %d %.0f\n"
 				       , out_fid, count, mark, f_bytes);
 				exit(1);
 			    }

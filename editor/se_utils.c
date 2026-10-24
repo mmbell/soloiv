@@ -149,7 +149,7 @@ int se_cmd_tokens (char * line, struct ui_cmd_mgmt *ucm)
 
     if( dq ) {			/* first set of double quotes */
 
-      if( dq2 = strstr( dq+1, "\"" )) /* second set? */
+      if(( dq2 = strstr( dq+1, "\"" ))) /* second set? */
 	{ *dq2 = '\0'; }
       else
 	{ dq2 = end_str; }	/* suck up the rest of the line */
@@ -340,8 +340,9 @@ void se_crack_ed_path_name(name, dir, file, comment)
      */
     if(!(*a))
 	  return;
-    if(b = strrchr(name, '/')) {
-	for(b++,c=dir; a < b; *c++ = *a++);
+    if((b = strrchr(name, '/'))) {
+	for(b++,c=dir; a < b; *c++ = *a++)
+	    ;
 	*c++ = '\0';
     }
     else {			/* no directory name in path */
@@ -2333,7 +2334,7 @@ void se_print_ssm_strings(top_ssm)
 	a = str +strlen(str)-1;
 	if(*a == '\n')
 	  { *a = '\0'; }
-       g_message (str);
+       g_message ("%s", str);
     }
 }
 /* c------------------------------------------------------------------------ */

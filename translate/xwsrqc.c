@@ -451,11 +451,11 @@ int nab_wsrqc_stuff(stream, buf, wsp, quit_at, num_occurs)
 	    }
 	}
 	else if(b = strstr(a, "lat")) {
-	    sscanf(a, "%*s %lf", &ws->lat);
+	    sscanf(a, "%*s %f", &ws->lat);
 	    /* "%*s" ignores the string in that position */
 	}
 	else if(b = strstr(a, "lon")) {
-	    sscanf(a, "%*s %lf", &ws->lon);
+	    sscanf(a, "%*s %f", &ws->lon);
 	}
 	else if(b = strstr(a, "horz_beam_w")) {
 	    sscanf(a, "%*s %f", &ws->h_beamwidth);
@@ -464,10 +464,10 @@ int nab_wsrqc_stuff(stream, buf, wsp, quit_at, num_occurs)
 	    sscanf(a, "%*s %f", &ws->v_beamwidth);
 	}
 	else if(b = strstr(a, "site")) {
-	    sscanf(a, "%*s %s", &ws->site);
+	    sscanf(a, "%*s %s", ws->site);
 	}
 	else if(b = strstr(a, "name")) {
-	    sscanf(a, "%*s %s", &ws->radar_name);
+	    sscanf(a, "%*s %s", ws->radar_name);
 	}
 	else if(b = strstr(a, "f_048")) {
 	    sscanf(a, "%*s %f", &ws->dbzoff_048);

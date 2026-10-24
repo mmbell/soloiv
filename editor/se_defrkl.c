@@ -844,7 +844,7 @@ int se_flag_glitches(arg, cmds)	/* #flag-glitches# */
 		 *(flag + ndx_ss - half) = 1; /* flag this gate */
 	      }
 	   }
-	   ndx_qend = ++ndx_qend % que_size;
+	   ndx_qend = (ndx_qend +1) % que_size;
 	}
     }
     return(1);

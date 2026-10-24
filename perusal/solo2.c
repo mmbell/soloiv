@@ -1360,10 +1360,18 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
     if (sfc->colorize_count) {
       stride = sfc->width * 3;
       if (area) {
-	 guchar *area_img = img + area->y * stride + area->x * 3;
-	 sii_cairo_paint_rgb_image (cr, area->x, area->y,
-				    area->width, area->height,
-				    area_img, stride);
+	 /* The expose area is the widget's size, which can exceed the
+	  * image while a layout change is under way; copy only the part
+	  * that lies inside the image. */
+	 x1 = MAX (area->x, 0);
+	 y1 = MAX (area->y, 0);
+	 x2 = MIN (area->x + area->width, (gint)sfc->width);
+	 y2 = MIN (area->y + area->height, (gint)sfc->height);
+	 if (x2 > x1 && y2 > y1) {
+	    guchar *area_img = img + y1 * stride + x1 * 3;
+	    sii_cairo_paint_rgb_image (cr, x1, y1, x2 - x1, y2 - y1,
+				       area_img, stride);
+	 }
       }
       else {
 	sii_cairo_paint_rgb_image (cr, 0, 0,
@@ -2466,7 +2474,7 @@ int sii_default_startup (const gchar *swpfi_dir)
     /*
      * nab a radar name
      */
-    if(aa = mddir_radar_name_v3(0,0)) {
+    if((aa = mddir_radar_name_v3(0,0))) {
 	strcpy(wwptr->sweep->radar_name, aa);
     }
     else

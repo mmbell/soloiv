@@ -259,7 +259,7 @@ void sii_set_widget_frame_num ( GtkWidget *w, gpointer data )
    guint frame_num = GPOINTER_TO_UINT (data);
    g_object_set_data (G_OBJECT(w),
 		      "frame_num",
-		      (gpointer)frame_num);
+		      GINT_TO_POINTER(frame_num));
 }
 
 /* c---------------------------------------------------------------------- */

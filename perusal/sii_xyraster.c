@@ -623,7 +623,7 @@ int ray_raster_setup(frme, angle0, angle1, rxy)
 	rxy->edge1.y_inc *= rxy->pixels_per_meter;
     }
     if (sii_debug_flag()) {
-       g_string_sprintfa (gs_complaints, "a:(%.2f,%.2f)it:(%d,%d)"
+       g_string_append_printf (gs_complaints, "a:(%.2f,%.2f)it:(%d,%d)"
 			 , angle0
 			 , angle1
 			 , rxy->edge0.num_iters
@@ -721,7 +721,7 @@ void xx_inner_loop(rxy)
 
     if (sii_debug_flag()) {
        ii = rxy->edge0.num_iters;
-       g_string_sprintfa (gs_complaints, " xx i:%d %d %d %d %d"
+       g_string_append_printf (gs_complaints, " xx i:%d %d %d %d %d"
 			  , ii
 			  , RXY_INT(gate_num_scaled)
 			  , RXY_INT(x_gate_inc_scaled)
@@ -770,12 +770,12 @@ void xx_inner_loop(rxy)
 	ndx0 -= width;		/* remember image y coords are reversed */
     }
     if (sii_debug_flag()) {
-       g_string_sprintfa (gs_complaints, " hits:%d %d %d"
+       g_string_append_printf (gs_complaints, " hits:%d %d %d"
 			  , hits
 			  , x0_pxl_inc_scaled
 			  , x1_pxl_inc_scaled
 			  );
-       g_message (gs_complaints->str);
+       g_message ("%s", gs_complaints->str);
        g_string_truncate (gs_complaints, 0);
     }
 }
@@ -846,8 +846,8 @@ void yy_inner_loop(rxy)
 	y1_pxl_scaled += y1_pxl_inc_scaled;
     }
     if (sii_debug_flag()) {
-       g_string_sprintfa (gs_complaints, " yy loop ii:%d h:%d", ii, hits);
-       g_message (gs_complaints->str);
+       g_string_append_printf (gs_complaints, " yy loop ii:%d h:%d", ii, hits);
+       g_message ("%s", gs_complaints->str);
        g_string_truncate (gs_complaints, 0);
     }
 }

@@ -171,7 +171,7 @@ void sii_links_widget_cb ( GtkWidget *w, gpointer   data )
       }
 
     case LINKS_CANCEL:
-      if( widget = sii_get_widget_ptr (li->frame_num, li->widget_id))
+      if ((widget = sii_get_widget_ptr (li->frame_num, li->widget_id)))
 	{ gtk_widget_set_visible (widget, FALSE); }
       break;
 
@@ -182,7 +182,7 @@ void sii_links_widget_cb ( GtkWidget *w, gpointer   data )
 	(g_object_get_data (G_OBJECT(button), "table_widget"));
       sii_widget_foreach(table,
 			 sii_links_set_foreach,
-			 (gpointer)active );
+			 GINT_TO_POINTER(active) );
       break;
 
    };
@@ -229,7 +229,7 @@ void sii_links_widget( guint frame_num, guint widget_id, LinksInfo *linkfo )
 
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+widget_id));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+widget_id));
 
   /* --- Title and border --- */
   bb = g_strdup_printf ("Frame %d  %s", frame_num+1, linkfo->name );
@@ -279,7 +279,7 @@ void sii_links_widget( guint frame_num, guint widget_id, LinksInfo *linkfo )
 		      , (gpointer)button
 		      );
 	g_object_set_data (G_OBJECT(button)
-			     , "button_num", (gpointer)(button_num));
+			     , "button_num", GINT_TO_POINTER(button_num));
 	g_object_set_data (G_OBJECT(button)
 			     , "link_info", (gpointer)linkfo);
      }

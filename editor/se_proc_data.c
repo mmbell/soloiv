@@ -210,7 +210,7 @@ void dd_edd(time_series, automatic, down, d_ctr)
       count++;
 
       if(solo_halt_flag()){
-	  g_string_sprintfa (gs_complaints,"HALTING\n");
+	  g_string_append_printf (gs_complaints,"HALTING\n");
 	  stopped = YES;
 	  break;
       } 
@@ -279,7 +279,7 @@ void dd_edd(time_series, automatic, down, d_ctr)
        * no-op when the arrays are already big enough. */
       if(nc+1 > seds->max_gates) {
 	 if(!se_malloc_flagged_arrays(seds, nc+1)) {
-	    g_string_sprintfa (gs_complaints
+	    g_string_append_printf (gs_complaints
 			       , "Unable to size edit arrays for %d gates\n"
 			       , nc+1);
 	    stopped = YES;
@@ -415,7 +415,7 @@ void dd_edd(time_series, automatic, down, d_ctr)
 	    sp_sweep_file_check(usi->directory, usi->filename);
 	 }
 	 if(dgi->new_sweep) {
-	    g_string_sprintfa (gs_complaints,"%s", return_dd_open_info());
+	    g_string_append_printf (gs_complaints,"%s", return_dd_open_info());
 	 }
       }
       dgi->new_sweep = dgi->new_vol = NO;
@@ -593,7 +593,7 @@ int se_gen_sweep_list()
 # endif
     ddir_rescan_urgent(seds->se_frame);
     if((nn=ddir_files_v3(SE_FRAME, sfic->directory)) < 1) {
-	g_string_sprintfa (gs_complaints,"No sweep files in dir: %s\n", sfic->directory);
+	g_string_append_printf (gs_complaints,"No sweep files in dir: %s\n", sfic->directory);
 	seds->punt = YES;
 	return(nn);
     }
@@ -604,7 +604,7 @@ int se_gen_sweep_list()
     se_push_spair_string(ssm);
 
     if((rn = mddir_radar_num_v3(SE_FRAME, sfic->radar_name)) < 0) {
-	g_string_sprintfa (gs_complaints,"No sweep files for radar: %s\n", sfic->radar_name);
+	g_string_append_printf (gs_complaints,"No sweep files for radar: %s\n", sfic->radar_name);
 	seds->punt = YES;
 	return(rn);
     }
@@ -621,7 +621,7 @@ int se_gen_sweep_list()
 
     if((nn=dd_sweepfile_list_v3(usi, sfic->start_time, sfic->stop_time))
        < 0) {
-	g_string_sprintfa (gs_complaints,"Unable to produce sweep file list for radar: %s in %s\n"
+	g_string_append_printf (gs_complaints,"Unable to produce sweep file list for radar: %s in %s\n"
 		  , sfic->radar_name, sfic->directory);
 	seds->punt = YES;
 	return(nn);
@@ -742,7 +742,7 @@ int se_text_to_ssms (char *txt, struct solo_str_mgmt **top_ssm)
   nn = dd_tokenz (buf, lines, "\n");
   
   for (ii=0; ii < nn; ii++) {
-     if (aa = strchr (lines[ii], '!')) /* comment */
+     if ((aa = strchr (lines[ii], '!'))) /* comment */
 	{ *aa = '\0'; }
 
      strcpy (str, lines[ii]);
@@ -948,7 +948,7 @@ int se_process_data(arg, cmds, time_series, automatic, down, d_ctr, frame_num)
 
     se_push_all_ssms(&seds->fer_cmds); 
     fer_count = 0;
-    if (nc = se_text_to_ssms (seds->fer_lines, &seds->fer_cmds)) {
+    if ((nc = se_text_to_ssms (seds->fer_lines, &seds->fer_cmds))) {
        if (!se_interpret_commands (seds->fer_cmds, seds->first_fer_cmd
 				   , &fer_count))
 	 { fer_count = 0; }
@@ -965,7 +965,7 @@ int se_process_data(arg, cmds, time_series, automatic, down, d_ctr, frame_num)
 
     se_push_all_ssms(&seds->once_cmds); 
     oto_count = 0;
-    if (nc = se_text_to_ssms (seds->oto_lines, &seds->once_cmds)) {
+    if ((nc = se_text_to_ssms (seds->oto_lines, &seds->once_cmds))) {
        if (!se_interpret_commands (seds->once_cmds, seds->first_oto_cmd
 				, &oto_count)) {
 	  seds->punt = YES;
@@ -1332,7 +1332,9 @@ void se_write_sed_cmds()
     else if(strlen(sfic->radar_names_text)) {
 	a = dd_whiteout(sfic->radar_names_text);
 	b = dd_delimit(a);
-	for(c=radar_name; a < b; *c++ = *a++); *c++ = '\0';
+	for(c=radar_name; a < b; *c++ = *a++)
+	    ;
+	*c++ = '\0';
     }
     else {
 	strcpy(radar_name, "UNK");
@@ -1349,7 +1351,7 @@ void se_write_sed_cmds()
     se_refresh_sed_files_widget(scf);
 
     if(!(stream = fopen(str, "w"))) {
-	g_string_sprintfa (gs_complaints,"Unable to save editor commands to %s\n", str);
+	g_string_append_printf (gs_complaints,"Unable to save editor commands to %s\n", str);
 	return;
     }
 

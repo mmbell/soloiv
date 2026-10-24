@@ -426,7 +426,7 @@ void put_edit_cmds_help (gchar *name, GString *words);
 
 void sii_cmds_help_event (GtkGestureClick *gesture, int n_press,
 			  double x, double y, gpointer data );
-gboolean set_edit_help_items( gpointer a_str, gpointer words );
+gboolean set_edit_help_items( gpointer a_str, gpointer words, gpointer data );
 void edit_cmds_help_widget (guint frame_num );
 void show_edit_cmd_help_widget (guint frame_num);
 void sii_edit_reset_times (guint frame_num);
@@ -1353,7 +1353,7 @@ void edit_files_widget (guint frame_num )
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+FRAME_EDIT_FILES));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+FRAME_EDIT_FILES));
   bb = g_strdup_printf ("Frame %d  Edit Command and Boundary Files"
 			, frame_num+1 );
   gtk_window_set_title (GTK_WINDOW (window), bb);
@@ -1381,7 +1381,7 @@ void edit_files_widget (guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("Save Boundary");
@@ -1391,7 +1391,7 @@ void edit_files_widget (guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("Cancel");
@@ -1401,7 +1401,7 @@ void edit_files_widget (guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   label = gtk_label_new ( "Editor Command Files" );
@@ -1427,7 +1427,7 @@ void edit_files_widget (guint frame_num )
   g_signal_connect (G_OBJECT(entry)
 		      ,"activate"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn);
+		      , GINT_TO_POINTER(nn));
 
   row++;
   label = gtk_label_new ( "Comment" );
@@ -1447,7 +1447,7 @@ void edit_files_widget (guint frame_num )
   g_signal_connect (G_OBJECT(entry)
 		      ,"activate"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn);
+		      , GINT_TO_POINTER(nn));
 
 
   cc = edd->orig_txt[EDIT_CMD_DIR]->str;
@@ -1503,7 +1503,7 @@ void edit_files_widget (guint frame_num )
   g_signal_connect (G_OBJECT(entry)
 		      ,"activate"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn);
+		      , GINT_TO_POINTER(nn));
 
   row++;
   label = gtk_label_new ( "Comment" );
@@ -1523,7 +1523,7 @@ void edit_files_widget (guint frame_num )
   g_signal_connect (G_OBJECT(entry)
 		      ,"activate"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn);
+		      , GINT_TO_POINTER(nn));
 
   row++;
 
@@ -1578,7 +1578,7 @@ void edit_files_widget (guint frame_num )
   g_signal_connect (G_OBJECT(entry)
 		      ,"activate"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn);
+		      , GINT_TO_POINTER(nn));
 
   row++;
   cc = edd->orig_txt[EDIT_LLB_DIR]->str;
@@ -1628,7 +1628,7 @@ gboolean sii_edit_keyboard_event (GtkEventControllerKey *controller,
 
   if ((state & GDK_CONTROL_MASK) &&
       (keyval == GDK_KEY_z || keyval == GDK_KEY_Z)) {
-    sii_edit_menu_cb (NULL, (gpointer)(frame_num * TASK_MODULO + EDIT_UNDO));
+    sii_edit_menu_cb (NULL, GINT_TO_POINTER(frame_num * TASK_MODULO + EDIT_UNDO));
     return TRUE;
   }
   return FALSE;
@@ -1745,14 +1745,14 @@ void main_edit_widget( guint frame_num )
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num * TASK_MODULO + FRAME_EDITOR));
+		      GINT_TO_POINTER(frame_num * TASK_MODULO + FRAME_EDITOR));
 
   /* Ctrl+Z on the edit window undoes the most recent edit (issue #7). */
   {
     GtkEventController *kc = gtk_event_controller_key_new();
     g_signal_connect (kc, "key-pressed",
 		      G_CALLBACK(sii_edit_keyboard_event),
-		      (gpointer)(frame_num * TASK_MODULO));
+		      GINT_TO_POINTER(frame_num * TASK_MODULO));
     gtk_widget_add_controller (window, kc);
   }
 
@@ -1797,7 +1797,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label ("OK Do It!");
@@ -1810,7 +1810,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label (" Undo ");
@@ -1822,7 +1822,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 # ifdef obsolete
   button = gtk_button_new_with_label ("Redraw Bnd");
@@ -1848,7 +1848,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   button = gtk_button_new_with_label (" Prev Bnd Set ");
@@ -1860,7 +1860,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   /* commands for each ray */
@@ -1890,7 +1890,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   edata->data_widget[EDIT_FER_TEXT] = text = gtk_text_view_new ();
@@ -1914,7 +1914,7 @@ void main_edit_widget( guint frame_num )
 
   g_object_set_data (G_OBJECT(text),
 		       "frame_num",
-		       (gpointer)frame_num);
+		       GINT_TO_POINTER(frame_num));
 
   g_object_set_data (G_OBJECT(text),
 		       "cmds_dest",
@@ -1963,7 +1963,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
 
@@ -1988,7 +1988,7 @@ void main_edit_widget( guint frame_num )
 
   g_object_set_data (G_OBJECT(text),
 		       "frame_num",
-		       (gpointer)frame_num);
+		       GINT_TO_POINTER(frame_num));
   g_object_set_data (G_OBJECT(text),
 		       "cmds_dest",
 		       (gpointer)edata->data_widget[EDIT_OTO_TEXT]);
@@ -2035,7 +2035,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(entry)
 		      ,"activate"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
   wid = EDIT_FIRST_SWP;
   button = gtk_button_new_with_label ("First Sweep");
@@ -2046,7 +2046,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   row++;
@@ -2064,7 +2064,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(entry)
 		      ,"activate"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
   wid = EDIT_LAST_SWP;
   button = gtk_button_new_with_label ("Last Sweep");
@@ -2075,7 +2075,7 @@ void main_edit_widget( guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   sii_edit_reset_times (frame_num);
@@ -2085,7 +2085,7 @@ void main_edit_widget( guint frame_num )
   {
     GtkWidget *child = gtk_widget_get_first_child (vbox);
     while (child) {
-      sii_set_widget_frame_num (child, (gpointer)frame_num);
+      sii_set_widget_frame_num (child, GINT_TO_POINTER(frame_num));
       child = gtk_widget_get_next_sibling (child);
     }
   }
@@ -2349,7 +2349,7 @@ void edit_cmds_help_widget (guint frame_num )
 		      &window);
   g_signal_connect (G_OBJECT (window), "destroy",
 		      G_CALLBACK(sii_nullify_widget_cb),
-		      (gpointer)(frame_num*TASK_MODULO+FRAME_EDIT_CMDS_HELP));
+		      GINT_TO_POINTER(frame_num*TASK_MODULO+FRAME_EDIT_CMDS_HELP));
 
   bb = g_strdup_printf ("Frame %d  Edit Commands Help List"
 			, frame_num+1 );
@@ -2370,7 +2370,7 @@ void edit_cmds_help_widget (guint frame_num )
   g_signal_connect (G_OBJECT(button)
 		      ,"clicked"
 		      , G_CALLBACK (sii_edit_menu_cb)
-		      , (gpointer)nn
+		      , GINT_TO_POINTER(nn)
 		      );
 
   nn = sizeof (BB_ac_unfolding)/sizeof (char *);
@@ -2555,15 +2555,15 @@ void edit_cmds_help_widget (guint frame_num )
   put_edit_cmds_help ("xy-listing", (gpointer)xy_listing);
 # endif
 
-  g_tree_traverse ( edit_cmds_help
-		   , (gpointer)set_edit_help_items, G_IN_ORDER, 0 );
+  g_tree_foreach ( edit_cmds_help
+		   , set_edit_help_items, NULL );
   gtk_widget_set_visible (window, TRUE);
 
 }
 
 /* c---------------------------------------------------------------------- */
 
-gboolean set_edit_help_items( gpointer a_str, gpointer words )
+gboolean set_edit_help_items( gpointer a_str, gpointer words, gpointer data )
 {
   GtkWidget *label;
 

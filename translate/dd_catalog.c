@@ -429,7 +429,7 @@ void cat_volume( dgi, cii, current_time, finish )
     sprintf(arg1, "%.2f", (float)cii->prev_MB_count);
     cat_cat_att( "MB_to_Vol", 1, arglist, cat );
 
-    sprintf(arg1, "%d", current_time );
+    sprintf(arg1, "%ld", (long)current_time );
     cat_cat_att( "Unix_time_stamp", 1, arglist, cat );
 
     cat_cat_att( "Start_date", 1, cat_date(current_time, arglist), cat );
