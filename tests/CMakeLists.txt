@@ -83,6 +83,12 @@ soloiv_add_test(test_param_minmax_round_trip)
 # crash). Hammer measurement + draw and check widths stay correct.
 soloiv_add_test(test_font_cache)
 
+# Painting a frame must stay inside its image: the draw callback passes the
+# widget's size, which can exceed the image during a layout change, and the
+# copy read past the image buffer (caught by ASan in test_multi_frame_layout).
+soloiv_add_test(test_xfer_area_clip)
+set_tests_properties(test_xfer_area_clip PROPERTIES WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
 # These GUI tests open data-dependent widgets, so they need a loaded sweep:
 # run them with cwd = a committed fixture sweep dir. (Previously they relied
 # on sweeps sitting at test_data/ root, which no longer holds any after the
