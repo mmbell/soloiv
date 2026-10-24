@@ -12,3 +12,12 @@ build-*/
 # Sample data and scratch dirs (kept locally, not tracked)
 test_data/
 tmp/
+
+# In-source CMake output (a `cmake .` run from the repo root); out-of-source
+# builds go in build*/ above
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+/perusal/soloiv
