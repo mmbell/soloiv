@@ -2,29 +2,12 @@
 # Only build objects needed by the GUI; drop translator executables and Fortran
 
 set(S2LIB_SOURCES
-    ddin.c
-    ddout.c
-    dd_uf.c
-    dd_ncdf.c
     gneric_dd.c
-    hrd_dd.c
     sigm_dd.c
-    uf_dd.c
-    nex_dd.c
-    toga_dd.c
-    elda_dd.c
-    eldb_dd.c
     gpro_data.c
-    ground_echo.c
     stdhrd.c
     xwsrqc.c
-    fof_dd.c
     piraq_dd.c
-    tdwr_dd.c
-    etl_dd.c
-    cimm_dd.c
-    nc_dd.c
-    piraqx_dd.c
     by_products.c
     dd_catalog.c
     gecho.c
@@ -37,7 +20,6 @@ set(S2LIB_SOURCES
     shane.c
     dd_crackers.c
     dorade_ncdf.c
-    dd_swpfi.c
     dd_files.c
     dda_common.c
     ddb_common.c
@@ -45,7 +27,6 @@ set(S2LIB_SOURCES
     dd_time.c
     swp_file_acc.c
     dd_io_mgmt.c
-    dap_common.c
 )
 
 # Radx I/O shim (C++17) + pure-C dispatch layer: only compiled when the radx
