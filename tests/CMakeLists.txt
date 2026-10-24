@@ -248,4 +248,11 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     soloiv_add_test(test_last_gate_raster)
     set_tests_properties(test_last_gate_raster PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
+    # The data widget lists slant range, matching the display and the editor.
+    # It used to scale by cos(tilt), so an airborne tail radar's ranges read
+    # several km short.
+    soloiv_add_test(test_examine_slant_range)
+    set_tests_properties(test_examine_slant_range PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/airborne/cf2)
 endif()

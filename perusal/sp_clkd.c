@@ -77,7 +77,7 @@ void solo_new_list_field_vals(frme)
     struct solo_list_mgmt *slm;
     char str[256];
     double sin(), cos(), dd_earth_radius(), dlat, dlon, dalt, daz, del;
-    double fabs(), drng, drng1, drng2, drng3, dcost;
+    double fabs(), drng, drng1, drng2, drng3;
     double d, x, y, z;
     int ii, jj, kk, hilite=YES, mark, ctr_val, entry_num=0, ts;
     char *aa, *bb, *dts_print(), tmp_str[32];
@@ -116,14 +116,6 @@ void solo_new_list_field_vals(frme)
     
     solo_add_list_entry(slm, str, strlen(str));
 
-    switch(wwptr->lead_sweep->scan_mode) {
-    case RHI:
-	dcost = cos(fabs(RADIANS(sfv->next->el)));
-	break;
-    default:
-	dcost = cos(fabs(RADIANS(sfv->next->tilt)));
-	break;
-    }
     d = ts ? sfv->next->alt :
 	  sfv->next->agl + (clicked.altitude - radar.altitude);
 
@@ -157,9 +149,11 @@ void solo_new_list_field_vals(frme)
     solo_add_list_entry(slm, str, strlen(str));
 
     for(ii=0; ii < sfv->num_vals; ii++) {
+	/* slant range: what the display plots and what editor commands
+	 * such as remove-ring take. This used to be scaled by cos(tilt)
+	 * (cos(el) for RHI), so for an airborne tail radar the listed
+	 * ranges disagreed with both. */
 	d = M_TO_KM(sfv->ranges[ii]);
-	if(!ts)
-	      d *= dcost;
 
 	sprintf(str, "%7.2fkm.%7.2f %7.2f %7.2f\n"
 		, d
