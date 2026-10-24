@@ -241,4 +241,11 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     soloiv_add_test(test_plot_buffers_wide)
     set_tests_properties(test_plot_buffers_wide PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ship/cf1)
+
+    # The rasterizer must paint the outermost gate. It used to end each ray
+    # at the center of the last cell and then trim past it, so the last gate
+    # of every sweep was never drawn (an airborne last-gate ring was invisible).
+    soloiv_add_test(test_last_gate_raster)
+    set_tests_properties(test_last_gate_raster PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 endif()

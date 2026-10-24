@@ -212,6 +212,14 @@ void solo_color_cells(frme)
                 dgi->dds->parm[wwptr->parameter_num]->parameter_name);
         solo_message(msg);
     }
+    /* The rasterizer runs each ray to the outer edge of the last cell, and
+     * the across-scanline gate increment can carry an edge pixel just past
+     * it; the inner loops clamp such pixels to cell ng. Pad with the
+     * background so they land on background rather than on a stale color
+     * from a wider sweep. */
+    cc = wwptr->cell_colors +ng;
+    for(ii=ng; ii < ng+2 && ii < wwptr->cell_capacity; ii++)
+	  *cc++ = wwptr->background_color_num;
 }
 /* c------------------------------------------------------------------------ */
 

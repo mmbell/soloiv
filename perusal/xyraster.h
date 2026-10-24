@@ -12,6 +12,10 @@
 # define IFIX(x) ((int)((x)+.5))
 # define RXY_SCALE(x) ((long)((x)*65536 +.5))
 # define rxy_SCALE(x) (((x)*65536))
+/* integer part of a 16.16 value. This used to be read through a short
+ * pointer into the int, which is an aliasing violation: optimized builds
+ * kept the int in a register and the short read saw stale memory. */
+# define RXY_INT(x) ((x) >> 16)
 # define RXY_FUDGE 8		/* makes the view this much bigger on
 				 * each side so the jaggies will
 				 * not be visible
@@ -62,7 +66,7 @@ struct xyras {
     struct rxy_coords center;
 
     double r0;			/* center of first gate in meters */
-    double r1;			/* center of last gate in meters */
+    double r1;			/* outer edge of last gate in meters */
     double gs;			/* gate spacing in meters */
     double rcp_gs;
     double sin_corner;
