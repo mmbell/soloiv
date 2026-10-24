@@ -4307,24 +4307,25 @@ dd_uniform_cell_spacing(src_cells, num_cells, cell_spacing, cell_lut
      * source_cell_num = *(cell_lut + uniform_cell_num);
      */
     int ii=0, gg=0;
-    float rr, d1, d2;
+    float rr;
     int *lut=cell_lut;
 
     if(cell_spacing <=0)
 	  return;
     rr = r0;
-    d1 = src_cells[0];
-    d2 = src_cells[1];
-
-    for(--nuc; ii < nuc; ++ii, ++lut, rr += cell_spacing) {
-
-	if(FABS(rr - d1) > .5 * FABS(d2 - d1)) {
-	    d1 = d2;
-	    d2 = src_cells[++gg];
-	}
+    /*
+     * each uniform cell takes the nearest source cell: move on to the
+     * next source cell once rr is past the midpoint between them.
+     * This used to carry the pair of source ranges one cell behind gg
+     * and stamp the last entry outside the loop, so it got the
+     * second-to-last cell and no range could reach the last one.
+     */
+    for(; ii < nuc; ++ii, ++lut, rr += cell_spacing) {
+	while(gg < num_cells-1 &&
+	      rr - src_cells[gg] > .5 * (src_cells[gg+1] - src_cells[gg]))
+	      gg++;
 	*lut = gg;
     }
-    *lut = gg;
     return;
 }
 /* c------------------------------------------------------------------------ */

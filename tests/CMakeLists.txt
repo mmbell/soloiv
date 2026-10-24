@@ -262,4 +262,12 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     soloiv_add_test(test_examine_slant_range)
     set_tests_properties(test_examine_slant_range PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/airborne/cf2)
+
+    # remove-ring must reach the last gate. The range->gate table behind
+    # dd_cell_num mapped its final entry to the second-to-last gate, so no
+    # range could select the outermost one.
+    soloiv_add_test(test_remove_ring_last_gate)
+    target_include_directories(test_remove_ring_last_gate PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_remove_ring_last_gate PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/airborne/cf2)
 endif()
