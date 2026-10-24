@@ -24,6 +24,9 @@ find_library(RADX_LIBRARY   NAMES Radx   HINTS ${_lrose_lib_hints})
 find_library(NCXX_LIBRARY   NAMES Ncxx   HINTS ${_lrose_lib_hints})
 # libRadx pulls a handful of C utilities (STRncopy etc.) from libtoolsa.
 find_library(TOOLSA_LIBRARY NAMES toolsa HINTS ${_lrose_lib_hints})
+# ... and its byte-order helpers (BE_*) from libdataport. The Linux shared
+# libRadx leaves them undefined without recording the dependency.
+find_library(DATAPORT_LIBRARY NAMES dataport HINTS ${_lrose_lib_hints})
 
 # Dependency libraries (Homebrew on Apple Silicon, but allow system locations;
 # Debian/Ubuntu keep the serial HDF5 libraries in an hdf5/serial subdirectory).
@@ -55,6 +58,11 @@ if(Radx_FOUND AND NOT TARGET Radx::Radx)
     "${RADX_LIBRARY}"
     "${NCXX_LIBRARY}"
     "${TOOLSA_LIBRARY}"
+  )
+  if(DATAPORT_LIBRARY)
+    list(APPEND _radx_link "${DATAPORT_LIBRARY}")
+  endif()
+  list(APPEND _radx_link
     "${HDF5_CPP_LIBRARY}"
     "${HDF5_LIBRARY}"
     "${NETCDF_LIBRARY}"
