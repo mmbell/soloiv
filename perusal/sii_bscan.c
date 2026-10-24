@@ -111,6 +111,7 @@ void sp_ts_line();
 int tsDisplay();
 void ts_ray_clone();
 void sp_tsYpixel_info();
+void sp_ts_column();
 
 
 /* c------------------------------------------------------------------------ */
@@ -423,7 +424,7 @@ void sp_ts_line(tsl, top_down)
      */
     int ii=0, fw;
     unsigned long *cell_color = tsl->wwptr->cell_colors;
-    int nn = tsl->py_count;
+    int nn = tsl->py_count, last = tsl->wwptr->number_cells -1;
     double cn = tsl->cell_num, cinc = tsl->cells_per_pixel;
     unsigned char *at = tsl->at;
 
@@ -431,8 +432,38 @@ void sp_ts_line(tsl, top_down)
 
     for(; nn--; at += fw, cn += cinc) {
 	ii = (int)cn;
+	/* sp_tsYpixel_info keeps cn in [0, number_cells); this only
+	 * guards against rounding in the running sum */
+	if(ii < 0) ii = 0;
+	else if(ii > last) ii = last;
 	*at = (unsigned char)(*(cell_color +ii));
     }
+}
+/* c------------------------------------------------------------------------ */
+
+void sp_ts_column(frme, image, x_pxl, top_down)
+  int frme, x_pxl, top_down;
+  unsigned char *image;
+{
+    /* paint one time-series column of frame "frme" into "image" with
+     * the frame's current cell colors, as sp_ts_data_loop does for each
+     * frame and ray. Lets the tests drive the range geometry without
+     * a time-series data loop.
+     */
+    struct ts_linked_frames tsl;
+    WW_PTR solo_return_wwptr();
+
+    memset(&tsl, 0, sizeof(tsl));
+    tsl.wwptr = solo_return_wwptr(frme);
+    tsl.lead_sweep = tsl.wwptr->lead_sweep;
+    tsl.width = tsl.wwptr->view->width_in_pix;
+    tsl.height = tsl.wwptr->view->height_in_pix;
+    tsl.type_of_plot = tsl.wwptr->view->type_of_plot;
+    tsl.frame_image_ptr = image;
+
+    sp_tsYpixel_info(&tsl, top_down);
+    tsl.at = tsl.frame_image_ptr + x_pxl + tsl.py0 * tsl.width;
+    sp_ts_line(&tsl, top_down);
 }
 /* c------------------------------------------------------------------------ */
 
@@ -775,81 +806,93 @@ void sp_tsYpixel_info(tsLink, top_down)
   struct ts_linked_frames *tsLink;
   int top_down;
 {
-    int ii, jj, nc, ww, pn, ymax, mark, ucc;
+    int ymax, ncells;
     struct ts_linked_frames *tsl=tsLink;
     struct dd_general_info *dgi, *dd_window_dgi();
-    double d, h, rmax, rmin, gs, rcp_gs, sp_meters_per_pixel();
-    double rloc, rctr, rbottom, d_y0, ppm, mpp, rtop, dd_altitude();
+    double d, d0, d1, rmin, gs, rcp_gs, sp_meters_per_pixel();
+    double rloc, rctr, rbottom, ppm, mpp, rtop, dd_altitude();
     char mess[256];
 
     /* first pretend that (0,0) is in the lower left corner and
      * we are plotting increasing range from bottom to top
      */
     dgi = dd_window_dgi(tsl->lead_sweep->window_num, "UNKNOWN");
-    nc = tsl->wwptr->number_cells -1;
+    ncells = tsl->wwptr->number_cells;
     gs = tsl->wwptr->uniform_cell_spacing;
-    rcp_gs = 1./gs;
     rmin = tsl->wwptr->uniform_cell_one;
-    rmax = rmin + nc * gs;
+    ymax = tsl->height -1;
+    tsl->py0 = 0;
+    tsl->py_count = 0;
+    tsl->cell_num = 0;
+    tsl->cells_per_pixel = 0;
+
+    if(ncells < 1 || gs <= 0 || ymax < 0)
+	  return;		/* degenerate geometry; plot nothing */
+
+    rcp_gs = 1./gs;
     mpp = sp_meters_per_pixel()/tsl->wwptr->view->ts_magnification;
     ppm = 1./mpp;
     rctr = KM_TO_M(tsl->wwptr->view->ts_ctr_km);
     tsl->cells_per_pixel = mpp * rcp_gs;
-    tsl->py_count = tsl->height;
-    rbottom = rctr - .5 * (double)(tsl->py_count-1) * mpp;
-    rtop = rctr + .5 * (double)(tsl->py_count-1) * mpp;
-    ymax = tsl->height -1;
+    rbottom = rctr - .5 * (double)ymax * mpp;
+    rtop = rctr + .5 * (double)ymax * mpp;
 
-
+    /* "rloc" is where the center of the first cell (range rmin) lands
+     * in display coordinates. The click and edit code take the display
+     * coordinate to be the range itself plotting up, 2*ctr - range
+     * plotting down, and altitude +/- range when MSL relative.
+     * The non MSL case used to put the first cell at zero range.
+     */
     if(tsl->type_of_plot & TS_MSL_RELATIVE) {
 	d = KM_TO_M(dd_altitude(dgi));
 	rloc = top_down ? d - rmin : d + rmin;
     }
     else {
-	rloc = top_down ? 2. * rctr : 0;
+	rloc = top_down ? 2. * rctr - rmin : rmin;
     }
-
+    /*
+     * Cell k covers [k-.5, k+.5) cells from rloc, i.e. the pixel whose
+     * center is "cn -.5" cells out is in cell (int)cn. Paint only the
+     * pixels with 0 <= cn < ncells: from the inner edge of the first
+     * cell to the outer edge of the last. (This used to stop at the
+     * center of the last cell, with rmin counted a second time.)
+     */
     if(top_down) {
-	if((d = rtop - rloc) > 0) {
-	    /* data starts below the top pixel
-	     */
-	    tsl->py0 = (int)(d * ppm);
-	    tsl->py_count -= tsl->py0 +1;
-	    tsl->cell_num = 0.5;
-	}
-	else {
-	    tsl->py0 = 0;
-	    tsl->cell_num = (rloc - rtop) * rcp_gs +.5;
-	}
-	if((d = (rloc - rmax) - rbottom) > 0) {	/* data stops before bottom */
-	    tsl->py_count -= (int)(d * ppm +.5);
-	}
+	/* pixel p (0 at the top) is at rtop - p*mpp
+	 * and cn = (rloc - rtop + p*mpp)/gs +.5
+	 */
+	d0 = ceil((rtop - rloc - .5 * gs) * ppm);
+	d1 = ceil((rtop - rloc + (ncells -.5) * gs) * ppm) -1;
+	if(d0 < 0) d0 = 0;
+	if(d1 > ymax) d1 = ymax;
+	if(d1 < d0)
+	      return;
+	tsl->py0 = (int)d0;
+	tsl->py_count = (int)(d1 - d0) +1;
+	tsl->cell_num = (rloc - rtop + d0 * mpp) * rcp_gs +.5;
     }
     else {			/* bottom up...reverse y coord */
-	if((d = rloc - rbottom) > 0) {
-	    /* data starts above the bottom pixel
-	     */
-	    ii = d * ppm;
-	    tsl->py0 = ymax -ii;
-	    tsl->py_count -= ii +1;
-	    tsl->cell_num = 0.5;
-	}
-	else {
-	    tsl->py0 = ymax;
-	    tsl->cell_num = (rbottom -rloc) * rcp_gs +.5;
-	}
-	if((d = rtop - (rloc + rmax)) > 0) {
-	    tsl->py_count -= (int)(d * ppm +.5);
-	}
+	/* pixel j up from the bottom (image row ymax -j) is at
+	 * rbottom + j*mpp and cn = (rbottom + j*mpp - rloc)/gs +.5
+	 */
+	d0 = ceil((rloc - .5 * gs - rbottom) * ppm);
+	d1 = ceil((rloc + (ncells -.5) * gs - rbottom) * ppm) -1;
+	if(d0 < 0) d0 = 0;
+	if(d1 > ymax) d1 = ymax;
+	if(d1 < d0)
+	      return;
+	tsl->py0 = ymax - (int)d0;
+	tsl->py_count = (int)(d1 - d0) +1;
+	tsl->cell_num = (rbottom + d0 * mpp - rloc) * rcp_gs +.5;
     }
 
     if(tsl->py_count < 0 || tsl->py0 < 0 || tsl->py0 > ymax) {
-	sprintf (mess, "tsl->py_count < 0 : %d %.3f %.3f %.3f %.3f\n"
+	sprintf (mess, "tsl->py_count < 0 : %d %.3f %.3f %.3f\n"
 		  , tsl->py_count, dd_altitude(dgi)
-		  , rmin, rmax, rloc);
+		  , rmin, rloc);
 	uii_printf (mess);
+	tsl->py0 = 0;
 	tsl->py_count = 0;
-	mark = 0;
     }
 }
 /* c------------------------------------------------------------------------ */

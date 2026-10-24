@@ -249,6 +249,13 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     set_tests_properties(test_last_gate_raster PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 
+    # The time-series display drew the first gate at range 0 rather than its
+    # true range and cut the column at the last gate's center (with rmin
+    # counted twice), so gates were misplaced and the outermost one lost.
+    soloiv_add_test(test_bscan_last_gate)
+    set_tests_properties(test_bscan_last_gate PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
     # The data widget lists slant range, matching the display and the editor.
     # It used to scale by cos(tilt), so an airborne tail radar's ranges read
     # several km short.
