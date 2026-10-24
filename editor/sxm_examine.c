@@ -805,8 +805,9 @@ void sxm_get_widget_info(int frme)
 	for(; *aa && !isdigit(*aa); aa++);
 	if((ii = sscanf(aa, "%d.%d", &width, &frac)) == 2) {
 	    if(frac >= 0 && width > frac +2) {
-		sprintf(wwptr->examine_info->display_format
-			, "%d.%df", width, frac);
+		snprintf(wwptr->examine_info->display_format
+			 , sizeof(wwptr->examine_info->display_format)
+			 , "%d.%df", width, frac);
 	    }
 	}
     }
@@ -1797,8 +1798,9 @@ void sxm_ui_cmd(int arg, struct ui_command *cmds, int key)
 	for(; *aa && !isdigit(*aa); aa++);
 	if(*aa && (ii = sscanf(aa, "%d.%d", &width, &frac)) == 2) {
 	    if(frac >= 0 && width > frac +2) {
-		sprintf(wwptr->examine_info->display_format
-			, "%d.%df", width, frac);
+		snprintf(wwptr->examine_info->display_format
+			 , sizeof(wwptr->examine_info->display_format)
+			 , "%d.%df", width, frac);
 	    }
 	}
 	sxm_update_examine_data(focus_frame, 0L);
