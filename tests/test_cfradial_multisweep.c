@@ -22,10 +22,12 @@
 #include "dd_general_info.h"
 #include "radar_io.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define VOL_FILE "cfrad.20240903_120049.313_to_20240903_120613.852_SEAPOL_SUR.nc"
 
-struct dd_general_info *dd_window_dgi();
 
 /* The 14 fixed angles in the volume (from ncdump), low to high. */
 static const double expected_angle[] = {
@@ -49,7 +51,7 @@ static void multisweep_action(GtkWidget *main_window, gpointer user_data)
     (void)main_window;
     (void)user_data;
 
-    dgi = dd_window_dgi(4, "");
+    dgi = dd_window_dgi(4);
     g_strlcpy(dgi->directory_name, "./", sizeof(dgi->directory_name));
     g_strlcpy(dgi->sweep_file_name, VOL_FILE, sizeof(dgi->sweep_file_name));
     dgi->source_fmt = CFRADIAL_FMT;

@@ -28,10 +28,12 @@
 #include "dorade_headers.h"
 #include "dd_defines.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define CFRAD_FILE "cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
 
-struct dd_general_info *dd_window_dgi();
 
 static int count_present(struct dd_general_info *dgi)
 {
@@ -50,7 +52,7 @@ static void reset_action(GtkWidget *main_window, gpointer user_data)
     (void)main_window;
     (void)user_data;
 
-    dgi = dd_window_dgi(win, "");
+    dgi = dd_window_dgi(win);
     g_assert_nonnull(dgi);
     g_strlcpy(dgi->directory_name, "./", sizeof(dgi->directory_name));
     g_strlcpy(dgi->sweep_file_name, CFRAD_FILE, sizeof(dgi->sweep_file_name));

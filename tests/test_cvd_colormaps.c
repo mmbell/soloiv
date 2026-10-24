@@ -21,9 +21,11 @@
 #include "test_app_runner.h"
 #include "soloii.h"
 #include "sii_externals.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 /* From solo2.c */
-void sii_png_image_prep (char *dir);
 
 #define CHASE_SPECTRAL_OUT_DIR "/tmp/soloiv_chase_spectral"
 

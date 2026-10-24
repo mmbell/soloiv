@@ -52,6 +52,8 @@ set(SOLOIV_PROTO_FLAGS
     $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Clang,AppleClang>>:-Werror=deprecated-non-prototype -Werror=implicit-function-declaration -Werror=implicit-int -Werror=strict-prototypes>
     $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:-Werror=implicit-function-declaration -Werror=implicit-int -Werror=old-style-definition -Werror=strict-prototypes>
 )
+# Also used by tests/ (added after this directory).
+set(SOLOIV_PROTO_FLAGS ${SOLOIV_PROTO_FLAGS} PARENT_SCOPE)
 target_compile_options(soloiv_core PRIVATE ${GTK4_CFLAGS_OTHER}
     ${SOLOIV_PROTO_FLAGS}
 )

@@ -67,7 +67,7 @@ jobs:
           sudo ldconfig
 
       - name: Configure
-        run: cmake --preset ${{ matrix.preset }} -DLROSE_PREFIX=/usr/local/lrose
+        run: cmake --preset ${{ matrix.preset }} -DLROSE_PREFIX=/usr/local/lrose -DSOLOIV_WERROR=ON
 
       - name: Build
         run: cmake --build --preset ${{ matrix.preset }} -j "$(nproc)"

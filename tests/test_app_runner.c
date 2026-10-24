@@ -3,9 +3,11 @@
 #include "test_app_runner.h"
 
 #include "sii_log_handler.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 extern GtkWidget *main_window;        /* soloii.c */
-void soloiv_activate(GtkApplication *app, gpointer user_data); /* soloii.c */
 
 typedef struct {
     GtkApplication       *app;

@@ -23,8 +23,10 @@
 #include "sii_log_handler.h"
 #include "test_app_runner.h"
 #include "soloii.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-void show_param_widget (GtkWidget *text, gpointer data);
 
 typedef struct {
     int    sim_ok;

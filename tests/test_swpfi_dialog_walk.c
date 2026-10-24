@@ -13,8 +13,10 @@
 #include "widget_walker.h"
 #include "soloii.h"     /* FRAME_SWPFI_MENU */
 #include "sii_utils.h"  /* sii_get_widget_ptr */
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-void show_swpfi_widget(GtkWidget *text, gpointer data);
 
 typedef struct {
     guint baseline;

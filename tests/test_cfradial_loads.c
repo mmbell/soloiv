@@ -24,14 +24,11 @@
 #include "dorade_headers.h"
 #include "dd_defines.h"
 #include "test_app_runner.h"
+#include "radar_io.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-struct dd_general_info *dd_window_dgi();
-int dd_givfld();
-int dd_cell_num();
-int dd_absorb_ray_info();
-int dd_absorb_header_info();
-int dgi_buf_rewind();
-struct rot_table_entry *dd_return_rotang1();
 
 static void cfradial_action(GtkWidget *main_window, gpointer user_data)
 {
@@ -45,7 +42,7 @@ static void cfradial_action(GtkWidget *main_window, gpointer user_data)
 
     test_app_runner_pump(20);
 
-    dgi = dd_window_dgi(0, "");
+    dgi = dd_window_dgi(0);
     g_assert_nonnull(dgi);
 
     /* Loaded through the Radx CfRadial backend. */

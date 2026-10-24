@@ -60,6 +60,13 @@ find_library(MATH_LIBRARY m)
 # Include directory for project headers
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+# Treat compiler warnings as errors (CI turns this on). All sources compiled
+# here are project code; there is no third-party code built in-tree.
+option(SOLOIV_WERROR "Treat compiler warnings as errors" OFF)
+if(SOLOIV_WERROR)
+  add_compile_options($<$<COMPILE_LANGUAGE:C,CXX>:-Werror>)
+endif()
+
 add_subdirectory(translate)
 add_subdirectory(editor)
 add_subdirectory(perusal)

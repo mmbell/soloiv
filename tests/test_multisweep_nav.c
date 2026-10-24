@@ -21,9 +21,10 @@
 #include "dd_general_info.h"
 #include "radar_io.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-struct dd_general_info *dd_window_dgi();
-int solo_nab_next_file();
 
 #define NSWEEPS 14
 
@@ -38,7 +39,7 @@ static void nav_action(GtkWidget *main_window, gpointer user_data)
 
     test_app_runner_pump(20);
 
-    dgi = dd_window_dgi(0, "");
+    dgi = dd_window_dgi(0);
     g_assert_nonnull(dgi);
     g_assert_cmpint(dgi->source_fmt, ==, CFRADIAL_FMT);
     g_assert_cmpint(rio_volume_nsweeps(dgi), ==, NSWEEPS);

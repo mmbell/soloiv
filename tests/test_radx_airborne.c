@@ -23,11 +23,10 @@
 #include "dorade_headers.h"
 #include "dd_defines.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-struct dd_general_info *dd_window_dgi();
-int dd_givfld();
-int dd_absorb_ray_info();
-int dd_absorb_header_info();
 
 /* DORADE field names sometimes substitute '-' for '_'; normalize before
  * matching a field to its twin. */
@@ -48,7 +47,7 @@ static void normalize_name(char *s)
 static struct dd_general_info *load_via_radx(int win, const char *dir,
                                              const char *fname, int *nr)
 {
-    struct dd_general_info *dgi = dd_window_dgi(win, "");
+    struct dd_general_info *dgi = dd_window_dgi(win);
     int n, r;
 
     g_strlcpy(dgi->directory_name, dir, sizeof(dgi->directory_name));

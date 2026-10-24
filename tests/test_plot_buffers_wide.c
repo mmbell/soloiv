@@ -40,17 +40,15 @@
 #include "dd_defines.h"
 #include "solo_window_structs.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 /* Wide enough to blow past both historical limits: the 1024 real slots in
  * cell_colors and the 4096 entries in data_cell_lut. */
 #define WIDE_GATES   5000
 #define GATE_SPACING 100.0f     /* metres */
 
-struct dd_general_info *dd_window_dgi();
-WW_PTR solo_return_wwptr();
-void solo_cell_lut();
-void solo_color_cells();
-int dd_alloc_data_field();
 
 /* Re-describe the loaded sweep with WIDE_GATES uniformly spaced gates, and
  * resize the per-field data buffers to match so the color loop reads real
@@ -89,7 +87,7 @@ static void wide_action(GtkWidget *main_window, gpointer user_data)
 
     wwptr = solo_return_wwptr(0);
     g_assert_nonnull(wwptr);
-    dgi = dd_window_dgi(wwptr->lead_sweep->window_num, "");
+    dgi = dd_window_dgi(wwptr->lead_sweep->window_num);
     g_assert_nonnull(dgi);
     g_assert_cmpint(dgi->source_fmt, ==, CFRADIAL_FMT);
 

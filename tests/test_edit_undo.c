@@ -24,13 +24,12 @@
 #include "dd_defines.h"
 #include "dd_general_info.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define CFRAD_FILE "cf2/cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
 
-struct dd_general_info *dd_window_dgi();
-int se_undo_push();          /* gboolean */
-int se_undo_pop_restore();   /* gboolean */
-void se_undo_discard_top();
 
 /* Read an entire file; caller g_free()s *buf. */
 static gboolean slurp(const char *path, gchar **buf, gsize *len)
@@ -86,7 +85,7 @@ static void undo_action(GtkWidget *main_window, gpointer user_data)
     }
 
     /* Point a frame's dgi at the copy (what se_undo_push snapshots). */
-    dgi = dd_window_dgi(win, "");
+    dgi = dd_window_dgi(win);
     g_snprintf(dgi->directory_name, sizeof(dgi->directory_name), "%s/", tmpdir);
     g_strlcpy(dgi->sweep_file_name, "sweep.nc", sizeof(dgi->sweep_file_name));
 

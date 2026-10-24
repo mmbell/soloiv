@@ -17,9 +17,10 @@
 #include <stdlib.h>
 
 #include "sii_log_handler.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-void soloiv_activate(GtkApplication *app, gpointer user_data);
-void show_exam_widget(GtkWidget *text, gpointer data);
 
 static GtkApplication *g_app = NULL;
 static guint g_baseline_complaints = 0;

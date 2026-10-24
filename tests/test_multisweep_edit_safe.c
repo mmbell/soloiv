@@ -23,12 +23,12 @@
 #include "dd_general_info.h"
 #include "radar_io.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define VOL_FILE "cfrad.20240903_120049.313_to_20240903_120613.852_SEAPOL_SUR.nc"
 
-struct dd_general_info *dd_window_dgi();
-int rio_write_ray();
-int rio_write_sweep_end();
 
 static gboolean slurp(const char *path, gchar **buf, gsize *len)
 {
@@ -62,7 +62,7 @@ static void edit_safe_action(GtkWidget *main_window, gpointer user_data)
     g_assert_true(slurp(volcopy, &vol_before, &before_len));
 
     /* load sweep 3 of the volume */
-    dgi = dd_window_dgi(6, "");
+    dgi = dd_window_dgi(6);
     g_snprintf(dgi->directory_name, sizeof(dgi->directory_name), "%s/", tmpdir);
     g_strlcpy(dgi->sweep_file_name, VOL_FILE, sizeof(dgi->sweep_file_name));
     dgi->source_fmt = CFRADIAL_FMT;

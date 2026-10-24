@@ -31,19 +31,13 @@
 #include "solo_editor_structs.h"
 #include "radar_io.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define VOL_FILE "cfrad.20240903_120049.313_to_20240903_120613.852_SEAPOL_SUR.nc"
 #define EDIT_SWEEP 3
 
-struct dd_general_info *dd_window_dgi();
-struct solo_edit_stuff *return_sed_stuff();
-WW_PTR solo_return_wwptr();
-gboolean se_point_frame_at_written();
-void se_invalidate_read_caches();
-int rio_write_ray();
-int rio_write_sweep_end();
-int mddir_file_list_v3();
-int mddir_radar_num_v3();
 
 /* Copy the volume fixture into a private writable directory. */
 static char *private_copy(char *volpath, gsize cap)
@@ -98,7 +92,7 @@ static void refresh_action(GtkWidget *main_window, gpointer user_data)
      * dgi se_point_frame_at_written consults for the written path.          */
     seds = return_sed_stuff();
     g_assert_nonnull(seds);
-    edgi = dd_window_dgi(seds->se_frame, "");
+    edgi = dd_window_dgi(seds->se_frame);
     g_assert_nonnull(edgi);
     g_strlcpy(edgi->directory_name, dirslash, sizeof(edgi->directory_name));
     g_strlcpy(edgi->sweep_file_name, VOL_FILE, sizeof(edgi->sweep_file_name));
@@ -134,7 +128,7 @@ static void refresh_action(GtkWidget *main_window, gpointer user_data)
      * onto the new catalog entry too, or the frame snaps back to the volume. */
     g_assert_cmpfloat(wwptr->d_sweepfile_time_stamp, !=, before_stamp);
     /* The written file holds just the one sweep. */
-    g_assert_cmpint(dd_window_dgi(0, "")->rio_req_sweep, ==, 0);
+    g_assert_cmpint(dd_window_dgi(0)->rio_req_sweep, ==, 0);
 
     /* Calling it again is a no-op: the frame is already on the written file. */
     g_assert_false(se_point_frame_at_written(0));
