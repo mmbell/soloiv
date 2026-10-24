@@ -39,18 +39,22 @@ int dd_get_scan_mode();		/* ../translate/ddb_common.c */
 
 /* c------------------------------------------------------------------------ */
 
-int se_for_each_ray(arg, cmds)		/* #for-each-ray# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_for_each_ray (		/* #for-each-ray# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     int mark=0;
     return(1);
 }
 /* c------------------------------------------------------------------------ */
 
-int se_header_value(arg, cmds)	/* #header-value# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_header_value (	/* #header-value# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
@@ -176,9 +180,11 @@ int se_header_value(arg, cmds)	/* #header-value# */
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_rewrite(arg, cmds)	/* #rewrite# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_rewrite (	/* #rewrite# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
   /* trigger a rewrite of this ray even though no other editing 
    * is taking place
@@ -195,9 +201,11 @@ int se_rewrite(arg, cmds)	/* #rewrite# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_remove_field(arg, cmds)	/* #ignore-field# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_remove_field (	/* #ignore-field# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
     struct dd_general_info *dgi, *dd_window_dgi();
@@ -220,9 +228,7 @@ int se_remove_field(arg, cmds)	/* #ignore-field# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_cpy_field(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_cpy_field(int arg, struct ui_command *cmds)	
 {
     /*
      * #duplicate#
@@ -389,9 +395,7 @@ int se_cpy_field(arg, cmds)
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_funfold(arg, cmds)	/* #forced-unfolding# */
-  int arg;
-  struct ui_command *cmds;	
+int se_funfold(int arg, struct ui_command *cmds) /* #forced-unfolding# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
@@ -469,9 +473,7 @@ int se_funfold(arg, cmds)	/* #forced-unfolding# */
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_hard_zap(arg, cmds)		/* #unconditional-delete# */
-  int arg;
-  struct ui_command *cmds;	
+int se_hard_zap(int arg, struct ui_command *cmds) /* #unconditional-delete# */
 {
     int below;			
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
@@ -531,9 +533,7 @@ int se_hard_zap(arg, cmds)		/* #unconditional-delete# */
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_threshold_field(arg, cmds) /* #threshold# */
-  int arg;
-  struct ui_command *cmds;	
+int se_threshold_field(int arg, struct ui_command *cmds) /* #threshold# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
@@ -653,9 +653,7 @@ int se_threshold_field(arg, cmds) /* #threshold# */
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_radial_shear(arg, cmds)	/* #radial-shear# */
-  int arg;
-  struct ui_command *cmds;	
+int se_radial_shear(int arg, struct ui_command *cmds) /* #radial-shear# */
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
     struct solo_edit_stuff *seds, *return_sed_stuff();

@@ -44,8 +44,7 @@ struct solo_list_mgmt *solo_return_sweep_list();
 
 /* c------------------------------------------------------------------------ */
 
-void solo_gen_parameter_list(frme)
-  int frme;
+void solo_gen_parameter_list(int frme)
 {
     struct solo_list_mgmt *lm;
     int ww, i, j, n;
@@ -68,8 +67,7 @@ void solo_gen_parameter_list(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_gen_radar_list(frme)
-  int frme;
+void solo_gen_radar_list(int frme)
 {
     struct solo_list_mgmt *lm;
     int i, j, n;
@@ -88,8 +86,7 @@ void solo_gen_radar_list(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_gen_swp_list(frme)
-  int frme;
+void solo_gen_swp_list(int frme)
 {
     struct dd_file_name **fnp, **mddir_return_swp_list();
     struct solo_list_mgmt *lm;
@@ -107,9 +104,7 @@ void solo_gen_swp_list(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_get_files(dir, lm)
-  char *dir;
-  struct solo_list_mgmt *lm;
+int solo_get_files(char *dir, struct solo_list_mgmt *lm)
 {
     /* tries to create a list of files in a directory
      */
@@ -142,7 +137,7 @@ int solo_get_files(dir, lm)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_list_mgmt *solo_return_radar_list()
+struct solo_list_mgmt *solo_return_radar_list(void)
 {
     struct solo_perusal_info *spi, *solo_return_winfo_ptr();
 
@@ -151,7 +146,7 @@ struct solo_list_mgmt *solo_return_radar_list()
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_list_mgmt *solo_return_sweep_list()
+struct solo_list_mgmt *solo_return_sweep_list(void)
 {
     struct solo_perusal_info *spi, *solo_return_winfo_ptr();
 

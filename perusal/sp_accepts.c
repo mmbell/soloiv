@@ -74,8 +74,7 @@ int solo_set_view_info();
 
 /* c------------------------------------------------------------------------ */
 
-void sp_cpy_lmrk_info(src_frme, dst_frme)
-  int dst_frme, src_frme;
+void sp_cpy_lmrk_info(int src_frme, int dst_frme)
 {
     WW_PTR wwptrs, wwptrd, solo_return_wwptr();
 
@@ -95,8 +94,7 @@ void sp_cpy_lmrk_info(src_frme, dst_frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_cpy_ctr_info(src_frme, dst_frme)
-  int dst_frme, src_frme;
+void sp_cpy_ctr_info(int src_frme, int dst_frme)
 {
     WW_PTR wwptrs, wwptrd, solo_return_wwptr();
 
@@ -116,8 +114,7 @@ void sp_cpy_ctr_info(src_frme, dst_frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_cpy_lock_info(src_frme, dst_frme)
-  int dst_frme, src_frme;
+void solo_cpy_lock_info(int src_frme, int dst_frme)
 {
     WW_PTR wwptrs, wwptrd, solo_return_wwptr();
 
@@ -132,8 +129,7 @@ void solo_cpy_lock_info(src_frme, dst_frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_cpy_parameter_info(src_frme, dst_frme)
-  int dst_frme, src_frme;
+void solo_cpy_parameter_info(int src_frme, int dst_frme)
 {
     WW_PTR wwptrs, wwptrd, solo_return_wwptr();
 
@@ -153,8 +149,7 @@ void solo_cpy_parameter_info(src_frme, dst_frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_cpy_sweep_info(src_frme, dst_frme)
-  int dst_frme, src_frme;
+void solo_cpy_sweep_info(int src_frme, int dst_frme)
 {
     WW_PTR wwptrs, wwptrd, solo_return_wwptr();
 
@@ -185,8 +180,7 @@ void solo_cpy_sweep_info(src_frme, dst_frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_cpy_view_info(src_frme, dst_frme)
-  int dst_frme, src_frme;
+void solo_cpy_view_info(int src_frme, int dst_frme)
 {
     WW_PTR wwptrs, wwptrd, solo_return_wwptr();
 
@@ -204,8 +198,7 @@ void solo_cpy_view_info(src_frme, dst_frme)
 }
 /* c------------------------------------------------------------------------ */
 
-char *solo_gen_file_info(frme)
-  int frme;
+char *solo_gen_file_info(int frme)
 {
     WW_PTR wwptr, solo_return_wwptr();
 
@@ -214,8 +207,7 @@ char *solo_gen_file_info(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_set_lock_info(swi)
-  struct sweep_widget_info *swi;
+int solo_set_lock_info(struct sweep_widget_info *swi)
 {
     /* this routine examines the info from the lock widget
      *
@@ -282,8 +274,7 @@ int solo_set_lock_info(swi)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_set_parameter_info(pwi)
-  struct parameter_widget_info *pwi;
+int solo_set_parameter_info(struct parameter_widget_info *pwi)
 {
     /* this routine examines the info from the parameter and
      * palette widgets and
@@ -556,8 +547,7 @@ int solo_set_parameter_info(pwi)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_set_sweep_info(swi)
-  struct sweep_widget_info *swi;
+int solo_set_sweep_info(struct sweep_widget_info *swi)
 {
     /* this routine examines the info from the sweep widget and
      * updates the window sweep info if it is ok
@@ -771,8 +761,7 @@ int solo_set_sweep_info(swi)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_set_landmark_info(lwi)
-  struct landmark_widget_info *lwi;
+void sp_set_landmark_info(struct landmark_widget_info *lwi)
 {
     /* this routine examines the info from the view widget
      *
@@ -841,9 +830,7 @@ void sp_set_landmark_info(lwi)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_set_center_of_view_info(pvi, cwi)
-  struct view_widget_info *pvi;
-  struct centering_widget_info *cwi;
+void sp_set_center_of_view_info(struct view_widget_info *pvi, struct centering_widget_info *cwi)
 {
     /* this routine examines the info from the view widget
      *
@@ -999,10 +986,7 @@ void sp_set_center_of_view_info(pvi, cwi)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_set_view_info(pvi, lwi, cwi)
-  struct view_widget_info *pvi;
-  struct centering_widget_info *cwi;
-  struct landmark_widget_info *lwi;
+int solo_set_view_info(struct view_widget_info *pvi, struct landmark_widget_info *lwi, struct centering_widget_info *cwi)
 {
     /* this routine examines the info from the view widget
      *

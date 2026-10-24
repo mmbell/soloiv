@@ -615,7 +615,7 @@ sii_param_colors_filesel (const gchar *str, GtkWidget *fs);
 
 /* c---------------------------------------------------------------------- */
 
-int sii_return_colors_filesel_wid() { return (SII_MAIN_COLORS_FILESEL); }
+int sii_return_colors_filesel_wid(void) { return (SII_MAIN_COLORS_FILESEL); }
 
 /* c---------------------------------------------------------------------- */
 
@@ -624,7 +624,7 @@ int sii_return_colors_filesel_wid() { return (SII_MAIN_COLORS_FILESEL); }
 
 /* c---------------------------------------------------------------------- */
 
-void sii_initialization_widget()
+void sii_initialization_widget(void)
 {
   GtkWidget *window;
 
@@ -800,7 +800,7 @@ void sii_initialization_widget()
 
 /* c---------------------------------------------------------------------- */
 
-void sii_image_gen_widget()
+void sii_image_gen_widget(void)
 {
   GtkWidget *window;
   GtkWidget *vbox0;

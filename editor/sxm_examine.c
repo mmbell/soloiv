@@ -126,9 +126,7 @@ char *fstring();		/* dorade_share.c */
 
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_apply_changez(frme)
-  int frme;
+void sxm_apply_changez(int frme)
 {
     static int count=0;
     int ii, nn, pn, sn_first_change, sn_last_change, mark, ignore_it=NO;
@@ -373,10 +371,7 @@ sxm_apply_changez(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-sxm_append_to_log_stream(stuff, nchar)
-  char *stuff;
-  int nchar;
+int sxm_append_to_log_stream(char *stuff, int nchar)
 {
     int nn;
 
@@ -397,11 +392,7 @@ sxm_append_to_log_stream(stuff, nchar)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_change_cell_in_list(chz, data_row_num, val)
-  struct se_changez *chz;
-  int data_row_num;
-  float val;
+void sxm_change_cell_in_list(struct se_changez *chz, int data_row_num, double val)
 {
     int entry_num, nn;
     int col=chz->col_num, cell=chz->row_num;
@@ -438,9 +429,7 @@ sxm_change_cell_in_list(chz, data_row_num, val)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_clear_changes(frme)
-  int frme;
+void sxm_clear_changes(int frme)
 {
     WW_PTR wwptr, solo_return_wwptr();
 
@@ -452,9 +441,7 @@ sxm_clear_changes(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_click_in_data(sci)
-  struct solo_click_info *sci;
+void sxm_click_in_data(struct solo_click_info *sci)
 {
     WW_PTR wwptr, solo_return_wwptr();
     double x=sci->x, y=sci->y, theta, range;
@@ -472,9 +459,7 @@ sxm_click_in_data(sci)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_click_in_list(sci)
-  struct solo_click_info *sci;
+void sxm_click_in_list(struct solo_click_info *sci)
 {
     /* this routine is called when there is a
      * EX_CLICK_IN_LIST
@@ -688,8 +673,7 @@ sxm_click_in_list(sci)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_close_log_stream()
+void sxm_close_log_stream(void)
 {
     if(!log_stream)
 	  return;
@@ -698,8 +682,7 @@ sxm_close_log_stream()
 }
 /* c------------------------------------------------------------------------ */
 
-void 
-sxm_flush_log_stream()
+void sxm_flush_log_stream(void)
 {
     if(!log_stream){
 	printf("sxm_flush_log_stream: log_stream is NULL\n");
@@ -709,9 +692,7 @@ sxm_flush_log_stream()
 }
 /* c------------------------------------------------------------------------ */
 
-void 
-sxm_set_log_dir (dir)
-     char *dir;
+void sxm_set_log_dir(char *dir)
 {
   char str[2048];
   sprintf (str, "Setting log directory to: %s\n", dir);
@@ -724,9 +705,7 @@ sxm_set_log_dir (dir)
 
 /* c------------------------------------------------------------------------ */
 
-void 
-sxm_set_tmp_nyq_vel (nyqvel)
-     float nyqvel;
+void sxm_set_tmp_nyq_vel(double nyqvel)
 {
   struct solo_edit_stuff *seds, *return_sed_stuff();
   seds = return_sed_stuff();
@@ -736,9 +715,7 @@ sxm_set_tmp_nyq_vel (nyqvel)
 
 /* c------------------------------------------------------------------------ */
 
-void 
-sxm_toggle_log_dir (active)
-     int active;
+void sxm_toggle_log_dir(int active)
 {
   char str[2048];
   log_state = (active) ? LOG_ACTIVE : LOG_SUSPENDED;
@@ -750,10 +727,7 @@ sxm_toggle_log_dir (active)
 
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_gen_all_files_list(frme, slm)
-  int frme;
-  struct solo_list_mgmt *slm;
+void sxm_gen_all_files_list(int frme, struct solo_list_mgmt *slm)
 {
     int nn, full_file_name=YES;
     WW_PTR wwptr, solo_return_wwptr();
@@ -773,9 +747,7 @@ sxm_gen_all_files_list(frme, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_gen_delete_lists(sci)
-  struct solo_click_info *sci;
+void sxm_gen_delete_lists(struct solo_click_info *sci)
 {
     int ii, jj, kk, nn, full_file_name=YES;
     WW_PTR wwptr, wwptrx, solo_return_wwptr();
@@ -824,9 +796,7 @@ sxm_gen_delete_lists(sci)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_get_widget_info(frme)
-  int frme;
+void sxm_get_widget_info(int frme)
 {
     int ii, width, frac;
     char *aa, *bb, *cc, str[2048];
@@ -908,9 +878,7 @@ sxm_get_widget_info(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_list_beams(frme)
-  int frme;
+void sxm_list_beams(int frme)
 {
     int nn;
     struct solo_list_mgmt *slm;
@@ -953,9 +921,7 @@ sxm_list_beams(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_list_descriptors(frme)
-  int frme;
+void sxm_list_descriptors(int frme)
 {
     int pn;
     struct solo_list_mgmt *slm;
@@ -985,9 +951,7 @@ sxm_list_descriptors(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_list_edit_hist(frme)
-  int frme;
+void sxm_list_edit_hist(int frme)
 {
     int ii, nn;
     struct solo_list_mgmt *slm;
@@ -1025,10 +989,7 @@ sxm_list_edit_hist(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_list_to_log(slm, entry, num)
-  struct solo_list_mgmt *slm;
-  int entry, num;
+void sxm_list_to_log(struct solo_list_mgmt *slm, int entry, int num)
 {
     int nn = entry + num;
 
@@ -1052,9 +1013,7 @@ sxm_list_to_log(slm, entry, num)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_log_stat_line(dgi)
-     struct dd_general_info *dgi;
+void sxm_log_stat_line(struct dd_general_info *dgi)
 {
     char str[2048];
 
@@ -1069,8 +1028,7 @@ sxm_log_stat_line(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_open_log_stream()
+void sxm_open_log_stream(void)
 {
     char str[2048], *aa, *getenv();
     long time_now();
@@ -1100,9 +1058,7 @@ sxm_open_log_stream()
 }
 /* c------------------------------------------------------------------------ */
 
-struct se_changez *
-sxm_pop_change(topptr)
-  struct se_changez **topptr;
+struct se_changez *sxm_pop_change(struct se_changez **topptr)
 {
     /* pops a change struct off a stack
      */
@@ -1119,8 +1075,7 @@ sxm_pop_change(topptr)
 }
 /* c------------------------------------------------------------------------ */
 
-struct se_changez *
-sxm_pop_spair_change()
+struct se_changez *sxm_pop_spair_change(void)
 {
     /* pops a changez struct off the spairs stack
      */
@@ -1138,9 +1093,7 @@ sxm_pop_spair_change()
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_print_list(slm)
-  struct solo_list_mgmt *slm;
+void sxm_print_list(struct solo_list_mgmt *slm)
 {
     int ii=0;
 
@@ -1150,9 +1103,7 @@ sxm_print_list(slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_process_click(sci)
-  struct solo_click_info *sci;
+void sxm_process_click(struct solo_click_info *sci)
 {
     int ii, jj, kk, nd, nn, mark, full_file_name=YES;
     int sp_max_frames();
@@ -1452,9 +1403,7 @@ sxm_process_click(sci)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_push_change(chz, topptr)
-  struct se_changez *chz, **topptr;
+void sxm_push_change(struct se_changez *chz, struct se_changez **topptr)
 {
     struct se_changez *top=(*topptr);
 
@@ -1475,9 +1424,7 @@ sxm_push_change(chz, topptr)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_push_spair_change(chz)
-  struct se_changez *chz;
+void sxm_push_spair_change(struct se_changez *chz)
 {
     /* pushes an individual struct on to the spairs stack
      */
@@ -1489,9 +1436,7 @@ sxm_push_spair_change(chz)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_refresh_list(sci)
-  struct solo_click_info *sci;
+void sxm_refresh_list(struct solo_click_info *sci)
 {
     WW_PTR wwptr, solo_return_wwptr();
 
@@ -1518,10 +1463,7 @@ sxm_refresh_list(sci)
 }
 /* c------------------------------------------------------------------------ */
 
-struct se_changez *
-sxm_remove_change(topptr, this)
-  struct se_changez **topptr;
-  struct se_changez *this;
+struct se_changez *sxm_remove_change(struct se_changez **topptr, struct se_changez *this)
 {
     /* pops a change struct off a stack
      */
@@ -1549,9 +1491,7 @@ sxm_remove_change(topptr, this)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_scroll_list(sci)
-  struct solo_click_info *sci;
+void sxm_scroll_list(struct solo_click_info *sci)
 {
     int wig_but, frme;
     struct examine_control *ecs;
@@ -1603,10 +1543,7 @@ sxm_scroll_list(sci)
 }
 /* c------------------------------------------------------------------------ */
 
-void 
-sxm_set_click_frame(frme, theta, range)
-  int frme;
-  float theta, range;
+void sxm_set_click_frame(int frme, double theta, double range)
 {
     WW_PTR wwptr, solo_return_wwptr();
     struct solo_edit_stuff *seds, *return_sed_stuff();
@@ -1627,9 +1564,7 @@ sxm_set_click_frame(frme, theta, range)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_stack_spair_change(topptr)
-  struct se_changez **topptr;
+void sxm_stack_spair_change(struct se_changez **topptr)
 {
     /* pushes a stack of changes onto the spairs stack
      */
@@ -1644,11 +1579,7 @@ sxm_stack_spair_change(topptr)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_stat_line(dgi, verbosity, preamble, postamble, line)
-  struct dd_general_info *dgi;
-  int verbosity;
-  char *preamble, *postamble, *line;
+void sxm_stat_line(struct dd_general_info *dgi, int verbosity, char *preamble, char *postamble, char *line)
 {
     /* 
      * passing in the swib is necessary because there is more than
@@ -1742,11 +1673,7 @@ sxm_stat_line(dgi, verbosity, preamble, postamble, line)
 }
 /* c------------------------------------------------------------------------ */
 
-void 
-sxm_ui_cmd(arg, cmds, key)
-  int arg;
-  struct ui_command *cmds;	
-  int key;
+void sxm_ui_cmd(int arg, struct ui_command *cmds, int key)
 {
     int ii, jj, ok=YES, col, ray, cell, field, width, frac, mark;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
@@ -2036,8 +1963,7 @@ sxm_ui_cmd(arg, cmds, key)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_undo_last(frme)
+void sxm_undo_last(int frme)
 {
     int ii, jj, kk, nn, col, cell, rn, pn;
     struct se_changez *chz, *sxm_pop_change();
@@ -2103,11 +2029,7 @@ sxm_undo_last(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sxm_unlink_files_list(slm, dir, frme)
-  struct solo_list_mgmt *slm;
-  char *dir;
-  int frme;
+void sxm_unlink_files_list(struct solo_list_mgmt *slm, char *dir, int frme)
 {
     /* removes the files listed
      */
@@ -2157,9 +2079,7 @@ sxm_unlink_files_list(slm, dir, frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-sxm_ray_list(frme, wgt_btn)
-  int frme, wgt_btn;
+int sxm_ray_list(int frme, int wgt_btn)
 {
     /* assemble a list of ts_ray_info structs representing
      * the requisit number of rays to be displayed
@@ -2431,8 +2351,7 @@ sxm_ray_list(frme, wgt_btn)
 }
 /* c------------------------------------------------------------------------ */
 
-void sxm_update_examine_data(frme, wgt_btn)
-  int frme, wgt_btn;
+void sxm_update_examine_data(int frme, int wgt_btn)
 {
     int max_char_per_line = 256, fw;
     int ii, jj, kk, rc, pn, ww, mm, nn, nt, dd_tokens(), col, ncol, entry_num;

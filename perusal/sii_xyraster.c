@@ -60,9 +60,7 @@ void yy_inner_loop();
 
 /* c------------------------------------------------------------------------ */
 
-int frme_intxns(rxy, edge)
-  struct xyras *rxy;
-  struct line_segment *edge;
+int frme_intxns(struct xyras *rxy, struct line_segment *edge)
 {
     int ii, nn;
     struct bnd_point_mgmt *bpmx;
@@ -126,8 +124,7 @@ int frme_intxns(rxy, edge)
 }
 /* c------------------------------------------------------------------------ */
 
-void init_xyraster(frme)
-  int frme;
+void init_xyraster(int frme)
 {
     /* routine to initialize rasterization parameters at the beginning
      * of each sweep
@@ -245,10 +242,7 @@ void init_xyraster(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int ray_raster_setup(frme, angle0, angle1, rxy)
-  int frme;
-  double angle0, angle1;
-  struct xyras *rxy;
+int ray_raster_setup(int frme, double angle0, double angle1, struct xyras *rxy)
 {
 
     /* this routine does calculation of the intersections for both
@@ -641,8 +635,7 @@ int ray_raster_setup(frme, angle0, angle1, rxy)
 }
 /* c------------------------------------------------------------------------ */
 
-struct xyras *return_xyras(frme)
-  int frme;
+struct xyras *return_xyras(int frme)
 {
     int ii=0;
 
@@ -661,14 +654,13 @@ struct xyras *return_xyras(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-double sp_meters_per_pixel()
+double sp_meters_per_pixel(void)
 {
     return((double)300.);
 }
 /* c------------------------------------------------------------------------ */
 
-void swap_edges(edge0, edge1)
-  struct line_segment *edge0, *edge1;
+void swap_edges(struct line_segment *edge0, struct line_segment *edge1)
 {
     int sl=sizeof(struct line_segment);
     struct line_segment edge_tmp;
@@ -679,8 +671,7 @@ void swap_edges(edge0, edge1)
 }
 /* c------------------------------------------------------------------------ */
 
-void swap_ends(edge)
-  struct line_segment *edge;
+void swap_ends(struct line_segment *edge)
 {
     int sxy=sizeof(struct rxy_coords);
     struct rxy_coords xy_tmp;
@@ -691,8 +682,7 @@ void swap_ends(edge)
 }
 /* c------------------------------------------------------------------------ */
 
-void xx_inner_loop(rxy)
-  struct xyras *rxy;
+void xx_inner_loop(struct xyras *rxy)
 {
     /* c...mark */
     int ii, jj, nn,  x_col, y_row, width, mark, max;
@@ -781,8 +771,7 @@ void xx_inner_loop(rxy)
 }
 /* c------------------------------------------------------------------------ */
 
-void yy_inner_loop(rxy)
-  struct xyras *rxy;
+void yy_inner_loop(struct xyras *rxy)
 {
     /* c...mark */
     int ii, jj, nn,  x_col, y_row, width, flipit=rxy->image_height-1;

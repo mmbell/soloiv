@@ -10,7 +10,7 @@ static gint nlines = 0;
 
 /* c---------------------------------------------------------------------- */
 
-void sii_dump_debug_stuff ()
+void sii_dump_debug_stuff(void)
 {
    if (dbgs && dbgs->len > 0) {
       printf ("%s", dbgs->str);
@@ -140,14 +140,14 @@ int sii_absorb_zeb_map (gchar *path_name, siiOverlay *overlay)
 
 /* c---------------------------------------------------------------------- */
 
-guint sii_inc_master_seq_num ()
+guint sii_inc_master_seq_num(void)
 {
    return ++sii_seq_num;
 }
 
 /* c---------------------------------------------------------------------- */
 
-guint sii_get_master_seq_num ()
+guint sii_get_master_seq_num(void)
 {
    return sii_seq_num;
 }
@@ -473,7 +473,7 @@ SiiLinkedList *sii_init_linked_list (guint length)
 
 /* c---------------------------------------------------------------------- */
 
-SiiLinkedList *sii_ll_malloc_item ()
+SiiLinkedList *sii_ll_malloc_item(void)
 {
    SiiLinkedList *item = (SiiLinkedList *)g_malloc0 (sizeof (SiiLinkedList));;
    return item;
@@ -527,8 +527,7 @@ SiiLinkedList *insert_clicks_que ( SiiPoint *click )
 /* c------------------------------------------------------------------------ */
 /* c---------------------------------------------------------------------- */
 
-gchar *
-sii_item_delims ()
+gchar *sii_item_delims(void)
 {
   return " \t\n,";
 }

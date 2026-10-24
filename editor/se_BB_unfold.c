@@ -25,10 +25,7 @@ extern GString *gs_complaints;
 
 /* c------------------------------------------------------------------------ */
 
-int alt_gecho (dgi, min_grad, zmax_cell)
-  DGI_PTR dgi;
-  double min_grad;
-  int *zmax_cell;
+int alt_gecho(DGI_PTR dgi, double min_grad, int *zmax_cell)
 {
     DDS_PTR dds=dgi->dds;
     int pn, ii, jj, kk, mm, nn, mark, zmax = 0, ival;
@@ -94,9 +91,7 @@ int alt_gecho (dgi, min_grad, zmax_cell)
 
 /* c------------------------------------------------------------------------ */
 
-int se_ac_surface_tweak(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_ac_surface_tweak(int arg, struct ui_command *cmds)	
 {
     /* 
      * #remove-surface#
@@ -228,9 +223,11 @@ int se_ac_surface_tweak(arg, cmds)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_BB_ac_unfold(arg, cmds)	/* #BB-unfolding# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_BB_ac_unfold (	/* #BB-unfolding# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* 
      * 
@@ -384,9 +381,7 @@ int se_BB_ac_unfold(arg, cmds)	/* #BB-unfolding# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_BB_setup(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_BB_setup(int arg, struct ui_command *cmds)
 {
     /*
      * #BB-gates-averaged#
@@ -435,9 +430,7 @@ int se_BB_setup(arg, cmds)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_remove_ac_motion(arg, cmds)	/* #remove-aircraft-motion# */
-  int arg;
-  struct ui_command *cmds;	
+int se_remove_ac_motion(int arg, struct ui_command *cmds) /* #remove-aircraft-motion# */
 {
     /* remove the aircraft motion from velocities
      */
@@ -509,9 +502,7 @@ int se_remove_ac_motion(arg, cmds)	/* #remove-aircraft-motion# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_remove_storm_motion(arg, cmds)	/* #remove-storm-motion# */
-  int arg;
-  struct ui_command *cmds;	
+int se_remove_storm_motion(int arg, struct ui_command *cmds) /* #remove-storm-motion# */
 {
     /* remove the aircraft motion from velocities
      */

@@ -184,7 +184,7 @@ void produce_shanes_data();
 
 /* c------------------------------------------------------------------------ */
 
-void dd_shane_conv()
+void dd_shane_conv(void)
 {
     static int count=0;
     int ii, rn, flush=NO, ok;
@@ -247,8 +247,7 @@ void dd_shane_conv()
 }
 /* c------------------------------------------------------------------------ */
 
-void produce_shanes_data(dgi)
-  DGI_PTR dgi;
+void produce_shanes_data(DGI_PTR dgi)
 {
     /* produce a set of lidar profiles in Shane Mayers format
      */
@@ -401,11 +400,7 @@ void produce_shanes_data(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-static void
-stuff_shanes_hsk(dgi, hsk, fm)
-  DGI_PTR dgi;
-  float *hsk;
-  struct field_mgmt *fm;
+static void stuff_shanes_hsk(DGI_PTR dgi, float *hsk, struct field_mgmt *fm)
 {
     int ii, id, point, field;
     int pn = fm->parm_num;

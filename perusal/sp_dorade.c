@@ -32,8 +32,7 @@ static char vcid[] = "$Id$";
 int solo_ensure_cell_capacity();	/* sp_basics.c */
 /* c------------------------------------------------------------------------ */
 
-void solo_cell_lut(frme)
-  int frme;
+void solo_cell_lut(int frme)
 {
     /* this routine creates a lookup table of source data cell numbers
      * corresponding to a cell number based on uniform cell spacing
@@ -120,8 +119,7 @@ void solo_cell_lut(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_color_cells(frme)
-  int frme;
+void solo_color_cells(int frme)
 {
     /* associate a color number with each data cell value for the
      * the particular parameter for this ray

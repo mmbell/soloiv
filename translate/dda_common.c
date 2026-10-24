@@ -96,13 +96,13 @@ void dd_unlink();
 
 /* c------------------------------------------------------------------------ */
 
-void solo_set_halt_flag()
+void solo_set_halt_flag(void)
 {
     Solo_state |= SOLO_HALT;
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_clear_halt_flag()
+void solo_clear_halt_flag(void)
 {
     int ii=~SOLO_HALT;
     Solo_state &= ii;
@@ -110,27 +110,27 @@ void solo_clear_halt_flag()
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_halt_flag()
+int solo_halt_flag(void)
 {
     return(SOLO_HALT SET_IN Solo_state);
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_set_control_c()
+void dd_set_control_c(void)
 {
     Control_C = YES;
     return;
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_reset_control_c()
+void dd_reset_control_c(void)
 {
     Control_C = NO;
     return;
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_control_c()
+int dd_control_c(void)
 {
     return(Control_C);
 }
@@ -138,7 +138,7 @@ int dd_control_c()
 
 /* a signal handler: returns nothing (it used to be declared int on most
  * systems and fell off the end) */
-void dd_cchandl()
+void dd_cchandl(int sig)
 {
     printf("\nCaught Cntrl-C!\n\n");
     Control_C = YES;
@@ -154,13 +154,13 @@ void dd_cchandl()
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_catalog_only_flag()
+int dd_catalog_only_flag(void)
 {
     return(Catalog_only_flag);
 }
 /* c---------------------------------------------------------------------- */
 
-struct dd_stats *dd_stats_reset()
+struct dd_stats *dd_stats_reset(void)
 {
    if(!dd_stats) {
       return(dd_return_stats_ptr());
@@ -170,8 +170,7 @@ struct dd_stats *dd_stats_reset()
 }
 /* c---------------------------------------------------------------------- */
 
-char * 
-dd_stats_sprintf()
+char *dd_stats_sprintf(void)
 {
     static char stats[88];
 
@@ -187,21 +186,19 @@ dd_stats_sprintf()
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_solo_flag()
+int dd_solo_flag(void)
 {
     return(solo_flag);
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_set_solo_flag(val)
-  int val;
+int dd_set_solo_flag(int val)
 {
     return(solo_flag = val);
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_assign_radar_num(radar_name)
-  char *radar_name;
+int dd_assign_radar_num(char *radar_name)
 {
     int i, rn;
     struct dd_general_info *dd_ini();
@@ -230,9 +227,7 @@ int dd_assign_radar_num(radar_name)
 }
 /* c------------------------------------------------------------------------ */
 
-struct time_dependent_fixes *
-dd_clean_tdfs(fx_count)
-  int *fx_count;
+struct time_dependent_fixes *dd_clean_tdfs(int *fx_count)
 {
     int nn=0;
     struct time_dependent_fixes *fix, *dd_kill_tdf();
@@ -259,8 +254,7 @@ dd_clean_tdfs(fx_count)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_close( fid )
-  int fid;
+void dd_close(int fid)
 {
     int mark;
 
@@ -271,16 +265,13 @@ void dd_close( fid )
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_comm_info *
-dd_first_comment()
+struct dd_comm_info *dd_first_comment(void)
 {
     return(first_comment);
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_general_info *
-dd_get_structs(radar_num)
-  int radar_num;
+struct dd_general_info *dd_get_structs(int radar_num)
 {
     /*
      * return the set of structures associated with
@@ -299,15 +290,14 @@ dd_get_structs(radar_num)
  * Keyboard interrupt handling.
  */
 
-void dd_intset()
+void dd_intset(void)
 {
-    void dd_cchandl();
+    void dd_cchandl(int sig);
     (void) signal (SIGINT, dd_cchandl);
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_comm_info *
-dd_last_comment()
+struct dd_comm_info *dd_last_comment(void)
 {
     if(first_comment)
 	  return(first_comment->last);
@@ -315,8 +305,7 @@ dd_last_comment()
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_min_rays_per_sweep()
+int dd_min_rays_per_sweep(void)
 {
     char *aa, *get_tagged_string();
     int ii;
@@ -340,8 +329,7 @@ dd_min_rays_per_sweep()
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_max_rays_per_sweep()
+int dd_max_rays_per_sweep(void)
 {
     char *aa, *get_tagged_string();
     int ii;
@@ -360,8 +348,7 @@ dd_max_rays_per_sweep()
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_max_sweeps_per_volume()
+int dd_max_sweeps_per_volume(void)
 {
     char *aa, *get_tagged_string();
     int ii;
@@ -380,8 +367,7 @@ dd_max_sweeps_per_volume()
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_min_sweeps_per_volume()
+int dd_min_sweeps_per_volume(void)
 {
     char *aa, *get_tagged_string();
     int ii;
@@ -400,9 +386,7 @@ dd_min_sweeps_per_volume()
 }
 /* c------------------------------------------------------------------------ */
 
-struct comment_d *
-dd_return_comment(num)
-  int num;
+struct comment_d *dd_return_comment(int num)
 {
     int ii;
     struct dd_comm_info *this = first_comment;
@@ -415,8 +399,7 @@ dd_return_comment(num)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_return_num_comments()
+int dd_return_num_comments(void)
 {
     if(first_comment) {
 	return(first_comment->num_comments);
@@ -425,8 +408,7 @@ dd_return_num_comments()
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dd_reset_comments()
+void dd_reset_comments(void)
 {
     if(first_comment) {
 	first_comment->num_comments = 0;
@@ -434,9 +416,7 @@ dd_reset_comments()
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_comm_info *
-dd_next_comment(comm, little_endian)
-  struct comment_d *comm;
+struct dd_comm_info *dd_next_comment(struct comment_d *comm, int little_endian)
 {
     /* returns a pointer to the next comment info struct
      * this routine expects the calling routine to malloc space for
@@ -485,10 +465,7 @@ dd_next_comment(comm, little_endian)
 }
 /* c------------------------------------------------------------------------ */
 
-struct time_dependent_fixes *
-dd_kill_tdf(fx, fx_count)
-  struct time_dependent_fixes *fx;
-  int *fx_count;
+struct time_dependent_fixes *dd_kill_tdf(struct time_dependent_fixes *fx, int *fx_count)
 {
     /* remove this fix struct and returns the number of fixes left
      */
@@ -536,14 +513,13 @@ dd_kill_tdf(fx, fx_count)
 }
 /* c------------------------------------------------------------------------*/
 
-int dd_num_radars()
+int dd_num_radars(void)
 {
     return(Num_radars);
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_open(dir, file_name )
-  char *dir, *file_name;
+int dd_open(char *dir, char *file_name)
 {
     int i = -99, mark;
     char name[256], *a;
@@ -569,8 +545,7 @@ int dd_open(dir, file_name )
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_output_flag( val )
-  int val;
+int dd_output_flag(int val)
 {
     if( val != EMPTY_FLAG )
 	  Output_flag = val ? YES : NO;
@@ -579,8 +554,7 @@ int dd_output_flag( val )
 /* c------------------------------------------------------------------------ */
 # define FROM_BOF 0
 
-int dd_position( fid, offset )
-  int fid, offset;
+int dd_position(int fid, int offset)
 {
     int i=-2;
     if( Output_flag)
@@ -589,8 +563,7 @@ int dd_position( fid, offset )
 }
 /* c------------------------------------------------------------------------*/
 
-void dd_rename_swp_file(dgi)
-  struct dd_general_info *dgi;
+void dd_rename_swp_file(struct dd_general_info *dgi)
 {
     char *aa, *bb, str[256], str2[256], *qq=dgi->file_qualifier;
     char file_name[88], scan_mode_mne[16], *cc, *sptrs[32];
@@ -643,8 +616,7 @@ void dd_rename_swp_file(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_input_filters *
-dd_return_difs_ptr()
+struct dd_input_filters *dd_return_difs_ptr(void)
 {
     if(!keep_difs) {
 	keep_difs = (struct dd_input_filters *)
@@ -656,8 +628,7 @@ dd_return_difs_ptr()
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_return_radar_num(radar_name)
-  char *radar_name;
+int dd_return_radar_num(char *radar_name)
 {
     /* see if a dgi struct has been established for this radar
      * and return the number if it has
@@ -677,8 +648,7 @@ int dd_return_radar_num(radar_name)
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_stats *
-dd_return_stats_ptr()
+struct dd_stats *dd_return_stats_ptr(void)
 {
     if(!dd_stats) {
 	dd_stats = (struct dd_stats *)malloc(sizeof(struct dd_stats));
@@ -688,9 +658,7 @@ dd_return_stats_ptr()
 }
 /* c------------------------------------------------------------------------ */
 
-struct time_dependent_fixes *
-dd_time_dependent_fixes(fx_count)
-  int *fx_count;
+struct time_dependent_fixes *dd_time_dependent_fixes(int *fx_count)
 {
     int ii, jj, kk, nn, nt, arg_num=0, dd_tokens(), node_num=0;
     char *aa, *bb, *cc, *dd,  *get_tagged_string(), last_char=' ';
@@ -894,8 +862,7 @@ dd_time_dependent_fixes(fx_count)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_unlink(full_path_name)
-  char *full_path_name;
+void dd_unlink(char *full_path_name)
 {
     int nn;
     if(Output_flag && strlen(full_path_name))
@@ -903,9 +870,7 @@ void dd_unlink(full_path_name)
 }
 /* c------------------------------------------------------------------------ */
 
-DGI_PTR 
-dd_window_dgi(window_num)
-  int window_num;
+DGI_PTR dd_window_dgi(int window_num)
 {
     /* returns the dgi struct pointer for the requested window
      */
@@ -934,9 +899,7 @@ dd_window_dgi(window_num)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_write( fid, buf, size )
-  int fid, size;
-  char *buf;
+void dd_write(int fid, char *buf, int size)
 {
     static int err_count=0;
     int i;
@@ -953,17 +916,14 @@ void dd_write( fid, buf, size )
 }
 /* c------------------------------------------------------------------------ */
 
-DGI_PTR dgi_last()
+DGI_PTR dgi_last(void)
 {
     return(last_dgi);
 }
 # ifdef obsolete
 /* c------------------------------------------------------------------------ */
 
-void difs_terminators(dgi, difs, dd_stats)
-  DGI_PTR dgi;
-  struct dd_input_filters *difs;
-  struct dd_stats *dd_stats;
+void difs_terminators(DGI_PTR dgi, struct dd_input_filters *difs, struct dd_stats *dd_stats)
 {
     int i, mark;
     double d, ddir_free();
@@ -976,20 +936,19 @@ void difs_terminators(dgi, difs, dd_stats)
 # endif
 /* c------------------------------------------------------------------------ */
 
-void do_print_dd_open_info()
+void do_print_dd_open_info(void)
 {
     print_dd_open_info = YES;
 }
 /* c------------------------------------------------------------------------ */
 
-void dont_print_dd_open_info()
+void dont_print_dd_open_info(void)
 {
     print_dd_open_info = NO;
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-return_dd_open_info()
+char *return_dd_open_info(void)
 {
     return(dd_open_info);
 }

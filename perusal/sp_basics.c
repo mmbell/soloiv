@@ -87,9 +87,7 @@ int solo_ensure_cell_capacity (WW_PTR wwptr, int ncells)
 /* c------------------------------------------------------------------------ */
 /* c------------------------------------------------------------------------ */
 
-char *sp_ts_ascii_time(frme, xpos, atime)
-  int frme, xpos;
-  char *atime;
+char *sp_ts_ascii_time(int frme, int xpos, char *atime)
 {
     int width;
     char *aa, str[32], *dts_print();
@@ -112,9 +110,7 @@ char *sp_ts_ascii_time(frme, xpos, atime)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_ui_plot_cmds(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+void sp_ui_plot_cmds(int arg, struct ui_command *cmds)	
 {
 # ifndef notyet
     /* "^" is the exclusive or symbol
@@ -277,9 +273,7 @@ void sp_ui_plot_cmds(arg, cmds)
 }
 /* c------------------------------------------------------------------------ */
 
-int sp_ts_service(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int sp_ts_service(int arg, struct ui_command *cmds)	
 {
 # ifdef notyet
     /* "^" is the exclusive or symbol
@@ -433,19 +427,19 @@ int sp_ts_service(arg, cmds)
 }  
 /* c------------------------------------------------------------------------ */
 
-void solo_clear_busy_signal()
+void solo_clear_busy_signal(void)
 {
     Solo_Busy_Signal = NO;
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_set_busy_signal()
+void solo_set_busy_signal(void)
 {
     Solo_Busy_Signal = YES;
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_busy()
+int solo_busy(void)
 {
     int ii;
     ii = Solo_Busy_Signal ? YES : NO;
@@ -455,9 +449,7 @@ int solo_busy()
 
 /* c------------------------------------------------------------------------ */
 
-void solo_return_radar_name(frme, name)
-  int frme;
-  char *name;
+void solo_return_radar_name(int frme, char *name)
 {
     WW_PTR wwptr, solo_return_wwptr();
 
@@ -466,9 +458,7 @@ void solo_return_radar_name(frme, name)
 }
 /* c------------------------------------------------------------------------ */
 
-struct point_in_space *
-solo_return_radar_pisp(frme)
-  int frme;
+struct point_in_space *solo_return_radar_pisp(int frme)
 {
     WW_PTR wwptr, solo_return_wwptr();
 
@@ -477,8 +467,7 @@ solo_return_radar_pisp(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_activate_frame(dst_frme)
-  int dst_frme;
+void solo_activate_frame(int dst_frme)
 {
     /* current thinking is just to clone the last active window
      */
@@ -548,8 +537,7 @@ void solo_activate_frame(dst_frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_read_open(wwptr)
-  struct solo_window_ptrs *wwptr;
+int solo_read_open(struct solo_window_ptrs *wwptr)
 {
     char str[256];
     char mess[512];
@@ -566,14 +554,13 @@ int solo_read_open(wwptr)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_return_state()
+int solo_return_state(void)
 {
     return(Solo_state);
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_perusal_info *
-solo_return_winfo_ptr()
+struct solo_perusal_info *solo_return_winfo_ptr(void)
 {
     struct solo_list_mgmt *solo_malloc_list_mgmt();
     struct solo_perusal_info *next;
@@ -629,8 +616,7 @@ solo_return_winfo_ptr()
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_copy_tsri(a, b)
-  struct ts_ray_info *a, *b;
+void sp_copy_tsri(struct ts_ray_info *a, struct ts_ray_info *b)
 {
     if(a && b) {
 	b->ray_num = a->ray_num;
@@ -640,9 +626,7 @@ void sp_copy_tsri(a, b)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_window_ptrs *
-solo_return_wwptr(ww_num)
-  int ww_num;
+struct solo_window_ptrs *solo_return_wwptr(int ww_num)
 {
     int i, j, mm;
     struct solo_window_ptrs *next;
@@ -875,8 +859,7 @@ solo_return_wwptr(ww_num)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_set_sfic_from_frame(frme)
-  int frme;
+void se_set_sfic_from_frame(int frme)
 {
     /* this routine nabs the sweep info from the frame info
      * this routine is called when the editor widget is popped up
@@ -945,15 +928,13 @@ void se_set_sfic_from_frame(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_set_state(new_state)
-  int new_state;
+int solo_set_state(int new_state)
 {
     return(Solo_state = new_state);
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_trigger_dir_rescans(dir)
-  char *dir;
+void solo_trigger_dir_rescans(char *dir)
 {
     int ii, nn, ww, mark;
     char *a, *b, dirx[128], diry[128];
@@ -975,7 +956,7 @@ void solo_trigger_dir_rescans(dir)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_update_active_info()
+void solo_update_active_info(void)
 {
     int ii, jj, ww, frme;
     WW_PTR wwptr, wwptrc, solo_return_wwptr();
@@ -999,8 +980,7 @@ void solo_update_active_info()
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_ww_top_line(frme)
-  int frme;
+void solo_ww_top_line(int frme)
 {
     int ww;
     struct dd_general_info *dgi, *dd_window_dgi();
@@ -1039,7 +1019,7 @@ void solo_ww_top_line(frme)
 
 /* c------------------------------------------------------------------------ */
 
-int sp_max_frames()
+int sp_max_frames(void)
 {
     return(SOLO_MAX_WINDOWS);
 }

@@ -31,9 +31,11 @@ static char mess[256];
 
 /* c------------------------------------------------------------------------ */
 
-int se_absolute_value(arg, cmds) /* #absolute-value# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_absolute_value ( /* #absolute-value# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
@@ -90,10 +92,12 @@ int se_absolute_value(arg, cmds) /* #absolute-value# */
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_assign_value(arg, cmds)		/* #assign-value# */
+int 
+se_assign_value (		/* #assign-value# */
 				/* flagged-assign */
-  int arg;
-  struct ui_command *cmds;	
+    int arg,
+    struct ui_command *cmds
+)	
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
     struct solo_edit_stuff *seds, *return_sed_stuff();
@@ -166,9 +170,11 @@ int se_assign_value(arg, cmds)		/* #assign-value# */
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_add_const(arg, cmds)	/* #add-value# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_add_const (	/* #add-value# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
     struct solo_edit_stuff *seds, *return_sed_stuff();
@@ -228,9 +234,7 @@ int se_add_const(arg, cmds)	/* #add-value# */
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_add_fields(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_add_fields(int arg, struct ui_command *cmds)	
 {
     /*
      * #add-field#
@@ -464,9 +468,7 @@ int se_add_fields(arg, cmds)
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_mult_const(arg, cmds)	
-  int arg;
-  struct ui_command *cmds;	
+int se_mult_const(int arg, struct ui_command *cmds)	
 {
    /* #multiply#
     * #rain-rate#
@@ -598,9 +600,7 @@ int se_mult_const(arg, cmds)
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_mangle_field(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_mangle_field(int arg, struct ui_command *cmds)	
 {
     /*
      * #z-linearize#
