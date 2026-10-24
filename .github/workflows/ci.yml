@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Fork PRs run with a read-only token and no secrets.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  LROSE_RELEASE: lrose-core-20261006
+  LROSE_DEB: lrose-core-20261006.ubuntu_24.04.amd64.deb
+
+jobs:
+  test:
+    name: test (${{ matrix.preset }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        preset: [default, debug-asan]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake pkg-config \
+            libgtk-4-dev libnetcdf-dev libhdf5-dev libudunits2-dev \
+            libbz2-dev zlib1g-dev libcurl4-openssl-dev \
+            xvfb xauth dbus dbus-x11
+
+      - name: Cache LROSE package
+        id: lrose-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/lrose-deb
+          key: ${{ env.LROSE_DEB }}
+
+      - name: Download LROSE package
+        if: steps.lrose-cache.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p ~/lrose-deb
+          gh release download "$LROSE_RELEASE" -R NCAR/lrose-core \
+            -p "$LROSE_DEB" -D ~/lrose-deb
+
+      # libRadx/libNcxx/libtoolsa only need the C/C++ runtime; soloiv links
+      # netCDF/HDF5 itself. Unpack rather than apt-install the package, whose
+      # dependency list (Qt6, OpenMPI, ...) is for the full LROSE toolset.
+      - name: Install LROSE (libRadx)
+        run: |
+          sudo dpkg -x ~/lrose-deb/"$LROSE_DEB" /
+          echo /usr/local/lrose/lib | sudo tee /etc/ld.so.conf.d/lrose.conf
+          sudo ldconfig
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }} -DLROSE_PREFIX=/usr/local/lrose
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }} -j "$(nproc)"
+
+      # The tests start the real GTK4 app, so give them an X display and a
+      # session bus, and use the software renderer.
+      - name: Test
+        env:
+          GSK_RENDERER: cairo
+          GDK_BACKEND: x11
+          NO_AT_BRIDGE: "1"
+        run: |
+          dbus-run-session -- xvfb-run -a -s "-screen 0 1600x1200x24" \
+            ctest --preset ${{ matrix.preset }}
+
+      - name: Upload test log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctest-log-${{ matrix.preset }}
+          path: build*/Testing/Temporary/LastTest.log
+          if-no-files-found: ignore
