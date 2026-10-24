@@ -324,7 +324,7 @@ void dd_derived_fields(dgi)
 	   aa = dont_use_wind_info == USE_PREV_RAY
 	     ? "Using first good gate from previous ray."
 	       : "Using first good gate in ray.";
-	    printf("Not using wind information to initialize\n%s\n");
+	    printf("Not using wind information to initialize\n%s\n", aa);
 	}
 	if((a=get_tagged_string("INCLUDE_DH_DP"))) {
 	    Include_dH_dP = YES;

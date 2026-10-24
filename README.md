@@ -1,5 +1,7 @@
 # soloiv
 
+[![CI](https://github.com/mmbell/soloiv/actions/workflows/ci.yml/badge.svg)](https://github.com/mmbell/soloiv/actions/workflows/ci.yml)
+
 soloiv is a GTK4-based radar data display and editing tool for DORADE sweep files.
 
 It is a modernized derivative of [soloii](https://github.com/NCAR/lrose-soloii),
@@ -32,8 +34,11 @@ sudo apt install libgtk-4-dev cmake build-essential \
 All sweep I/O — DORADE **and** CfRadial (netCDF v1/v2) — is routed through the
 maintained LROSE `libRadx` C++ library via a thin `extern "C"` shim
 (`translate/radx_shim.cc`, `translate/radar_io.c`). The build expects an LROSE
-install providing `libRadx.a` / `libNcxx.a` / `libtoolsa.a` and the `Radx/`
-headers. By default it looks in `/Users/mmbell/lrose`; override with:
+install providing `libRadx` / `libNcxx` / `libtoolsa` (static or shared) and
+the `Radx/` headers. By default it looks in `~/lrose` (an lrose-core source
+install) and `/usr/local/lrose` (the Linux binary packages from the
+[lrose-core releases](https://github.com/NCAR/lrose-core/releases)); override
+with:
 ```
 cmake -B build -S . -DLROSE_PREFIX=/path/to/lrose
 ```
@@ -53,6 +58,22 @@ cmake --build build
 ```
 
 The executable will be at `build/perusal/soloiv`.
+
+### Tests
+
+The CMake presets build with the test suite on: `default` (Debug) and
+`debug-asan` (Debug + AddressSanitizer/UBSan).
+```
+cmake --preset default
+cmake --build --preset default
+ctest --preset default
+```
+The tests read only the committed fixtures in `tests/fixtures/`. Many start
+the real GTK app, so on a headless Linux machine run them under
+`xvfb-run -a` with `GTK_A11Y=none`.
+
+GitHub Actions runs both presets on Ubuntu 24.04 for every pull request and
+every push to `main`; see [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
 See [BUILD_AND_RUN.md](BUILD_AND_RUN.md) for conda setup, NCAR display notes,
 and troubleshooting.

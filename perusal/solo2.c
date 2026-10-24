@@ -230,6 +230,9 @@ void sii_png_image_prep (char *dir)
   char *aa, *bb, fname[256], mne[16];
   WW_PTR wwptr = solo_return_wwptr(0);
   struct dd_general_info *dgi, *dd_window_dgi();
+  /* Undeclared, this defaulted to returning int and the pointer was cut
+   * to 32 bits; sprintf then read a wild address on x86-64 Linux. */
+  char *dd_scan_mode_mne();
 
   dgi = dd_window_dgi(0);
   if (!dir)

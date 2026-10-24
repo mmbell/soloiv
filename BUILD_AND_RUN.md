@@ -156,6 +156,26 @@ cmake -B build -S .
 cmake --build build
 ```
 
+## Known issues
+
+### Legacy DORADE byte parser rejects Radx-written DORADE
+
+The in-tree DORADE byte parser (`translate/swp_file_acc.c`) rejects
+Radx-written DORADE as "Current sweep file is garbage!" — it trips the block
+`sizeof_struct` range check (`dd_defines.h: MAX_REC_SIZE`) somewhere in the
+block loop. Genuine archival DORADE is little-endian, `SSWB`-first; Radx (and
+soloiv's own Editor save, which goes through Radx) writes big-endian,
+`COMM`-first sweeps. The parser's byte-swap path handles the first block but
+still fails later.
+
+Impact: the legacy parser can only read original archival DORADE, not anything
+the modern stack writes. This is why no trimming tool can produce a small
+legacy-readable DORADE, and why `test_radx_airborne` was switched to read all
+formats through Radx. Since DORADE is being phased out (pipe old data through
+`RadxConvert` first), this is low priority — but pinning the exact offending
+block would let the legacy parser read modern DORADE if ever needed. Fits the
+DORADE-robustness bug class.
+
 ## Related documentation
 
 - [README.md](README.md) — project overview
