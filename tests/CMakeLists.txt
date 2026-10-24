@@ -241,4 +241,40 @@ if(SOLOIV_IO_BACKEND STREQUAL "radx")
     soloiv_add_test(test_plot_buffers_wide)
     set_tests_properties(test_plot_buffers_wide PROPERTIES
         WORKING_DIRECTORY ${FIXTURES}/ship/cf1)
+
+    # The rasterizer must paint the outermost gate. It used to end each ray
+    # at the center of the last cell and then trim past it, so the last gate
+    # of every sweep was never drawn (an airborne last-gate ring was invisible).
+    soloiv_add_test(test_last_gate_raster)
+    set_tests_properties(test_last_gate_raster PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
+    # The time-series display drew the first gate at range 0 rather than its
+    # true range and cut the column at the last gate's center (with rmin
+    # counted twice), so gates were misplaced and the outermost one lost.
+    soloiv_add_test(test_bscan_last_gate)
+    set_tests_properties(test_bscan_last_gate PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
+    # The data widget lists slant range, matching the display and the editor.
+    # It used to scale by cos(tilt), so an airborne tail radar's ranges read
+    # several km short.
+    soloiv_add_test(test_examine_slant_range)
+    set_tests_properties(test_examine_slant_range PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/airborne/cf2)
+
+    # remove-ring must reach the last gate. The range->gate table behind
+    # dd_cell_num mapped its final entry to the second-to-last gate, so no
+    # range could select the outermost one.
+    soloiv_add_test(test_remove_ring_last_gate)
+    target_include_directories(test_remove_ring_last_gate PRIVATE ${CMAKE_SOURCE_DIR}/translate)
+    set_tests_properties(test_remove_ring_last_gate PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/airborne/cf2)
+
+    # An Examine edit must survive Apply Edits. The commit rewrote the sweep
+    # file in place but the refresh re-read it through the stale rio cache,
+    # so the deleted points came back.
+    soloiv_add_test(test_examine_commit_reload)
+    set_tests_properties(test_examine_commit_reload PROPERTIES
+        WORKING_DIRECTORY ${FIXTURES}/airborne/cf2)
 endif()

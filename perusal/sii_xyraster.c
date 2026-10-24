@@ -35,7 +35,6 @@ static char vcid[] = "$Id$";
 static int Num_xyras=0;
 static struct xyras *xyraz[16];
 static double tickle=0.0;
-extern int LittleEndian;
 static double db_ang0=13, db_ang1=21;
 
 
@@ -288,7 +287,9 @@ int ray_raster_setup(frme, angle0, angle1, rxy)
     rxy->rcp_gs = 1./rxy->gs;
     rxy->r0 = wwptr->uniform_cell_one;
     rxy->max_gate = wwptr->number_cells-1;
-    rxy->r1 = rxy->r0 +rxy->max_gate *rxy->gs;
+    /* end the ray at the outer edge of the last cell, not its center,
+     * or the outermost gate is never drawn */
+    rxy->r1 = rxy->r0 +(rxy->max_gate +.5) *rxy->gs;
     rxy->colors = wwptr->cell_colors;
     /*
      * calculate the intersections of the two edges with
@@ -407,12 +408,14 @@ int ray_raster_setup(frme, angle0, angle1, rxy)
 	 * now adjust things so the gate numbers are reasonable
 	 */
 	if(rxy->edge0.major_gate_inc < 0) {
-	    if(rxy->edge0.p0.gate_num > rxy->max_gate ||
-	       rxy->edge1.p0.gate_num > rxy->max_gate) {
-		d0 = rxy->edge0.p0.gate_num -rxy->max_gate;
-		d1 = rxy->edge1.p0.gate_num -rxy->max_gate;
+	    if(rxy->edge0.p0.gate_num >= rxy->max_gate +1 ||
+	       rxy->edge1.p0.gate_num >= rxy->max_gate +1) {
+		/* gate numbers are truncated, so the last cell owns
+		 * [max_gate, max_gate+1); skip only the rows past it */
+		d0 = rxy->edge0.p0.gate_num -(rxy->max_gate +1);
+		d1 = rxy->edge1.p0.gate_num -(rxy->max_gate +1);
 		d = d0 > d1 ? d0 : d1;
-		nn = -d/rxy->edge0.major_gate_inc +1.;
+		nn = floor(-d/rxy->edge0.major_gate_inc) +1.;
 		/*
 		 * adjusting the max gate number
 		 */
@@ -449,12 +452,16 @@ int ray_raster_setup(frme, angle0, angle1, rxy)
 		rxy->edge0.num_iters -= nn;
 		
 	    }
-	    if(rxy->edge0.p1.gate_num > rxy->max_gate ||
-	       rxy->edge1.p1.gate_num > rxy->max_gate) {
-		d0 = rxy->edge0.p1.gate_num -rxy->max_gate;
-		d1 = rxy->edge1.p1.gate_num -rxy->max_gate;
+	    if(rxy->edge0.p1.gate_num > rxy->max_gate +1 ||
+	       rxy->edge1.p1.gate_num > rxy->max_gate +1) {
+		/* the last cell owns [max_gate, max_gate+1); p1 lies at
+		 * least one row past the last row iterated, so dropping
+		 * floor(d/inc) rows removes everything beyond the last cell
+		 * and nothing in it */
+		d0 = rxy->edge0.p1.gate_num -(rxy->max_gate +1);
+		d1 = rxy->edge1.p1.gate_num -(rxy->max_gate +1);
 		d = d0 > d1 ? d0 : d1;
-		nn = d/rxy->edge0.major_gate_inc +1.;
+		nn = floor(d/rxy->edge0.major_gate_inc);
 		/*
 		 * adjusting the max gate number
 		 */
@@ -559,12 +566,14 @@ int ray_raster_setup(frme, angle0, angle1, rxy)
 	 * now adjust things so the min and max gate numbers are reasonable
 	 */
 	if(rxy->edge0.major_gate_inc < 0) {
-	    if(rxy->edge0.p0.gate_num > rxy->max_gate ||
-	       rxy->edge1.p0.gate_num > rxy->max_gate) {
-		d0 = rxy->edge0.p0.gate_num -rxy->max_gate;
-		d1 = rxy->edge1.p0.gate_num -rxy->max_gate;
+	    if(rxy->edge0.p0.gate_num >= rxy->max_gate +1 ||
+	       rxy->edge1.p0.gate_num >= rxy->max_gate +1) {
+		/* gate numbers are truncated, so the last cell owns
+		 * [max_gate, max_gate+1); skip only the rows past it */
+		d0 = rxy->edge0.p0.gate_num -(rxy->max_gate +1);
+		d1 = rxy->edge1.p0.gate_num -(rxy->max_gate +1);
 		d = d0 > d1 ? d0 : d1;
-		nn = -d/rxy->edge0.major_gate_inc +1.;
+		nn = floor(-d/rxy->edge0.major_gate_inc) +1.;
 		rxy->edge0.p0.gate_num += nn*rxy->edge0.major_gate_inc;
 		rxy->edge0.p0.y += nn*rxy->edge0.y_inc;
 		rxy->edge1.p0.y += nn*rxy->edge1.y_inc;
@@ -591,12 +600,16 @@ int ray_raster_setup(frme, angle0, angle1, rxy)
 		rxy->edge0.p0.x += nn*rxy->meters_per_pixel;
 		rxy->edge0.num_iters -= nn;
 	    }
-	    if(rxy->edge0.p1.gate_num > rxy->max_gate ||
-	       rxy->edge1.p1.gate_num > rxy->max_gate) {
-		d0 = rxy->edge0.p1.gate_num -rxy->max_gate;
-		d1 = rxy->edge1.p1.gate_num -rxy->max_gate;
+	    if(rxy->edge0.p1.gate_num > rxy->max_gate +1 ||
+	       rxy->edge1.p1.gate_num > rxy->max_gate +1) {
+		/* the last cell owns [max_gate, max_gate+1); p1 lies at
+		 * least one row past the last row iterated, so dropping
+		 * floor(d/inc) rows removes everything beyond the last cell
+		 * and nothing in it */
+		d0 = rxy->edge0.p1.gate_num -(rxy->max_gate +1);
+		d1 = rxy->edge1.p1.gate_num -(rxy->max_gate +1);
 		d = d0 > d1 ? d0 : d1;
-		nn = d/rxy->edge0.major_gate_inc +1.;
+		nn = floor(d/rxy->edge0.major_gate_inc);
 		rxy->edge0.num_iters -= nn;
 	    }
 	}
@@ -699,35 +712,21 @@ void xx_inner_loop(rxy)
     int x0_pxl_scaled = RXY_SCALE(rxy->edge0.p0.x);
     int x1_pxl_scaled = RXY_SCALE(rxy->edge1.p0.x);
     int hits = 0;
-
-    register short *gate_num;
-    register short *x_gate_inc;
-    register short *x0_pxl;
-    register short *x1_pxl;
-
+    int gg, pad = rxy->max_gate +1;
 
     if((jj = rxy->edge0.num_iters) < 1)
 	  return;
 
     if(x0_pxl_scaled < 0) x0_pxl_scaled = 0;
 
-    gate_num = LittleEndian
-      ? (short *)&gate_num_scaled +1 : (short *)&gate_num_scaled;
-    x_gate_inc = LittleEndian
-      ? (short *)&x_gate_inc_scaled +1 : (short *)&x_gate_inc_scaled;
-    x0_pxl = LittleEndian
-      ? (short *)&x0_pxl_scaled +1 : (short *)&x0_pxl_scaled;
-    x1_pxl = LittleEndian
-      ? (short *)&x1_pxl_scaled +1 : (short *)&x1_pxl_scaled;
-
     if (sii_debug_flag()) {
        ii = rxy->edge0.num_iters;
        g_string_sprintfa (gs_complaints, " xx i:%d %d %d %d %d"
 			  , ii
-			  , *gate_num
-			  , *x_gate_inc
-			  , *x0_pxl
-			  , *x1_pxl
+			  , RXY_INT(gate_num_scaled)
+			  , RXY_INT(x_gate_inc_scaled)
+			  , RXY_INT(x0_pxl_scaled)
+			  , RXY_INT(x1_pxl_scaled)
 
 			  );
     }
@@ -742,8 +741,8 @@ void xx_inner_loop(rxy)
 
 
     for(; jj--;) {
-	ndx = ndx0 +(*x0_pxl);
-	ii = *x1_pxl -(*x0_pxl) +1;
+	ndx = ndx0 +RXY_INT(x0_pxl_scaled);
+	ii = RXY_INT(x1_pxl_scaled) -RXY_INT(x0_pxl_scaled) +1;
 	gate_num_scaled = start_gate_num_scaled;
 
 	for(; ii-- > 0; ndx++) {
@@ -753,7 +752,14 @@ void xx_inner_loop(rxy)
 		*deep6 = 1;
 	    }
 # endif
-	    *(image +ndx) = *(colors +(*gate_num));
+	    gg = RXY_INT(gate_num_scaled);
+	    /* the across-scanline increment only approximates the far
+	     * edge, so it can step just outside the cells: below 0 near
+	     * the radar, past max_gate at the end of the ray, where
+	     * solo_color_cells leaves a background pad */
+	    if(gg < 0) gg = 0;
+	    else if(gg > pad) gg = pad;
+	    *(image +ndx) = *(colors +gg);
 	    gate_num_scaled += x_gate_inc_scaled;
 	    hits++;
 	}
@@ -795,11 +801,7 @@ void yy_inner_loop(rxy)
     int y0_pxl_scaled = RXY_SCALE(rxy->edge0.p0.y);
     int y1_pxl_scaled = RXY_SCALE(rxy->edge1.p0.y);
     int hits = 0;
-
-    register short *gate_num;
-    register short *y_gate_inc;
-    register short *y0_pxl;
-    register short *y1_pxl;
+    int gg, pad = rxy->max_gate +1;
 
     ii = rxy->edge0.num_iters;
 
@@ -807,15 +809,6 @@ void yy_inner_loop(rxy)
        return;
     }
     if(y0_pxl_scaled < 0) y0_pxl_scaled = 0;
-
-    gate_num = LittleEndian
-      ? (short *)&gate_num_scaled +1 : (short *)&gate_num_scaled;
-    y_gate_inc = LittleEndian
-      ? (short *)&y_gate_inc_scaled +1 : (short *)&y_gate_inc_scaled;
-    y0_pxl = LittleEndian
-      ? (short *)&y0_pxl_scaled +1 : (short *)&y0_pxl_scaled;
-    y1_pxl = LittleEndian
-      ? (short *)&y1_pxl_scaled +1 : (short *)&y1_pxl_scaled;
 
     max = rxy->image_width * rxy->image_height -1;
     width = rxy->image_width;
@@ -825,8 +818,8 @@ void yy_inner_loop(rxy)
      * remember...image y coords are reversed!
      */
     for(; ii--; ndx0++) {
-	ndx = ndx0 +(flipit -(*y0_pxl)) * width;
-	jj = *y1_pxl -(*y0_pxl) +1;
+	ndx = ndx0 +(flipit -RXY_INT(y0_pxl_scaled)) * width;
+	jj = RXY_INT(y1_pxl_scaled) -RXY_INT(y0_pxl_scaled) +1;
 	gate_num_scaled = start_gate_num_scaled;
 
 	for(; jj-- > 0; ndx-=width) {
@@ -836,7 +829,14 @@ void yy_inner_loop(rxy)
 		*deep6 = 1;
 	    }
 # endif
-	    *(image +ndx) = *(colors +(*gate_num));
+	    gg = RXY_INT(gate_num_scaled);
+	    /* the across-scanline increment only approximates the far
+	     * edge, so it can step just outside the cells: below 0 near
+	     * the radar, past max_gate at the end of the ray, where
+	     * solo_color_cells leaves a background pad */
+	    if(gg < 0) gg = 0;
+	    else if(gg > pad) gg = pad;
+	    *(image +ndx) = *(colors +gg);
 	    gate_num_scaled += y_gate_inc_scaled;
 	    hits++;
 	}

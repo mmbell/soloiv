@@ -54,6 +54,10 @@ static struct solo_click_info last_click;
 static int click_frame=0, focus_frame=0;
 static struct se_changez *sxm_spair_changez=NULL;
 static struct examine_widget_info *ewi=NULL;
+#ifdef SOLOIV_IO_BACKEND_RADX
+int se_point_frame_at_written();	/* sii_edit_widgets.c */
+void se_invalidate_read_caches();
+#endif
 /*
  * routines present in this file
  */
@@ -347,9 +351,18 @@ sxm_apply_changez(frme)
 	   dgi->new_sweep = dgi->new_vol = NO;
 	}
     }
-    dd_flush(usi->radar_num);	 
+    dd_flush(usi->radar_num);
     seds->time_modified = time_now();
+#ifdef SOLOIV_IO_BACKEND_RADX
+    /* As after an edit Do It: follow the edit to the file it was written
+     * to, and drop the rio read cache, which is keyed on the path. The
+     * sweep is usually rewritten in place, so without this the refresh
+     * re-reads the unedited data and the changes appear to revert. */
+    se_point_frame_at_written(frme);
+    se_invalidate_read_caches(frme);
+#endif
     wwptr->lead_sweep->sweep_file_modified = YES;
+    wwptr->sweep_file_modified = YES;
     dis->editing = NO;
     printf("Finished!\n");
     if (strlen (gs_complaints->str))
