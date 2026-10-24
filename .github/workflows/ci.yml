@@ -73,9 +73,11 @@ jobs:
         run: cmake --build --preset ${{ matrix.preset }} -j "$(nproc)"
 
       # The tests start the real GTK4 app, so give them an X display and a
-      # session bus, and use the software renderer.
+      # session bus, and use the software renderer. g_test_init makes GTK
+      # warnings fatal, so turn off accessibility, whose bus the runner lacks.
       - name: Test
         env:
+          GTK_A11Y: none
           GSK_RENDERER: cairo
           GDK_BACKEND: x11
           NO_AT_BRIDGE: "1"

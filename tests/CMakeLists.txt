@@ -5,9 +5,9 @@
 #   - soloiv_test_support   shared test helpers (this directory)
 #
 # Each test is its own executable so a crash in one does not kill the
-# others. Each test runs with cwd = test_data/ (set on the CTest
-# property, not at process start) so the binary picks up the sample
-# DORADE sweeps the same way the user does manually.
+# others. Each test runs with cwd = tests/fixtures/ (set on the CTest
+# property, not at process start), which holds no sweeps at its top level;
+# tests that need a loaded sweep override it with a fixture sweep dir below.
 
 # --- Shared test helpers ----------------------------------------------------
 
@@ -57,7 +57,7 @@ function(soloiv_add_test name)
     # complaints introduced by the action under test.
     set_tests_properties(${name} PROPERTIES
         TIMEOUT 60
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/test_data
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests/fixtures
     )
 endfunction()
 
