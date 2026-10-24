@@ -16,8 +16,9 @@ static char vcid[] = "$Id$";
 # include <dd_files.h>
 # include <ui.h>
 # include <ui_error.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -28,25 +29,13 @@ extern GString *gs_complaints;
  *  
  */
 
-/* external functions */
-void se_crack_ed_path_name();	/* se_utils.c */
-int se_really_readin_cmds();	/* se_proc_data.c */
-void se_push_all_ssms();	/* se_utils.c */
-void se_append_string();	/* se_utils.c */
-int dcdatime();			/* dorade_share.c */
-
-/* internal functions */
-
-
-/* c------------------------------------------------------------------------ */
-
 /* c------------------------------------------------------------------------ */
 
 int se_readin_cmds(int arg, struct ui_command *cmds)	
 {
-    struct sed_command_files *scf, *se_return_cmd_files_struct();
+    struct sed_command_files *scf;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    char str[256], *se_unquote_string();
+    char str[256];
 
     se_unquote_string(str, cmdq->uc_text); /* full path name */
     scf = se_return_cmd_files_struct();
@@ -62,7 +51,7 @@ int se_establish_field(struct dd_general_info *dgi, char *src_name, char *dst_na
     /* established a possible new field but does not copy the
      * data from the source field into the new field
      */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
     struct dds_structs *dds;
     int ii, jj, fn, fnsx, fndx, size=0, mark, ns, nd, nc, first_empty;
     int ncopy;
@@ -162,17 +151,17 @@ int se_once_only(int arg, struct ui_command *cmds)
      * ##
      */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct sed_command_files *scf, *se_return_cmd_files_struct();
+    struct sed_command_files *scf;
     int ii, nn, mark;
     short yy, mon, dd, hh, mm, ss, ms;
-    double d, d_time_stamp();
+    double d;
     DD_TIME dts;
-    char *aa, *get_tagged_string(), str[128], *se_unquote_string();
+    char *aa, str[128];
 
     struct swp_file_input_control *sfic;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
 
 
@@ -270,13 +259,13 @@ int se_dir(int arg, struct ui_command *cmds)
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
     int ii, nn, mark;
     short yy, mon, dd, hh, mm, ss, ms;
-    double d, d_time_stamp();
+    double d;
     DD_TIME dts;
-    char *a, *get_tagged_string(), str[128], *se_unquote_string();
+    char *a, str[128];
 
     struct swp_file_input_control *sfic;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
 
 
     seds = return_sed_stuff();
@@ -400,7 +389,7 @@ int se_version_change(char *dir, char *radar)
      */
     char dirx[128];
     struct solo_str_mgmt *ssm;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     if(!seds->last_new_version_flag)

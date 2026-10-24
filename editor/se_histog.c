@@ -24,8 +24,9 @@ static char vcid[] = "$Id$";
 # include <ui.h>
 # include <ui_error.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -41,28 +42,12 @@ static FILE *x_y_stream;
 static double areaXval;
 
 
-/* external routines */
-void se_print_ssm_strings();	/* se_utils.c */
-void se_fix_comment();		/* se_utils.c */
-void se_append_string();	/* se_utils.c */
-void se_push_all_ssms();	/* se_utils.c */
-
-/* internal routines */
-int se_histo_output();
-void se_histo_fin_irreg_areas();
-void se_histo_fin_irreg_counts();
-void se_histo_fin_areas();
-void se_histo_fin_counts();
-void se_histo_init();
-int  se_histog_setup();
-
-
 /* c------------------------------------------------------------------------ */
 
 int se_histo_output(void)
 {
    struct solo_str_mgmt *ssm;
-   struct solo_edit_stuff *seds, *return_sed_stuff();
+   struct solo_edit_stuff *seds;
    char str[256], mess[512];
 
    seds = return_sed_stuff();	/* solo editing struct */
@@ -105,11 +90,11 @@ void se_histo_fin_irreg_areas(void)
     int ii, nn, mark, min, max;
     float f, f_val, f_sum=0, rcp_inc, f_min, f_max, f_mode, f_median;
     float f_mean, f_sdev, f_sum2, f_inc;
-    double d, sqrt();
+    double d;
     char *a, *b, *c, *e, H='H', str[88], number[16];
     struct se_pairs *pair;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();	/* solo editing struct */
     f_inc = seds->histo_increment;
@@ -217,11 +202,11 @@ void se_histo_fin_irreg_counts(void)
     int ii, kk, mm, nn=0, mark, min, max, med;
     float f, f_val, f_sum, ff_sum, f_inc, rcp_inc, f_mode, f_mean, f_sdev;
     float f_median;
-    double d, sqrt();
+    double d;
     char *a, *b, *c, *e, H='H', str[88], number[16];
     struct se_pairs *pair;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();	/* solo editing struct */
 
@@ -307,13 +292,12 @@ void se_histo_fin_areas(char *name)
     int ii, nn, mark, min, max;
     float f, f_val, f_sum, rcp_inc, f_min, f_max, f_mode, f_median;
     float f_mean, f_sdev, f_sum2, f_inc;
-    char *dts_print();
-    DD_TIME dts, *d_unstamp_time();
-    double d, sqrt();
+    DD_TIME dts;
+    double d;
     char *a, *b, *c, *e, H='H', str[88], number[16];
     struct se_pairs *pair;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();	/* solo editing struct */
 
@@ -485,13 +469,12 @@ void se_histo_fin_counts(void)
     int ii, kk, mm, nn=0, mark, min, max, med;
     float f, f_val, f_sum, ff_sum, f_inc, rcp_inc, f_mode, f_mean, f_sdev;
     float f_median;
-    char *dts_print();
-    DD_TIME dts, *d_unstamp_time();
-    double d, sqrt();
+    DD_TIME dts;
+    double d;
     char *a, *b, *c, *e, H='H', str[88], number[16];
     struct se_pairs *pair;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();	/* solo editing struct */
 
@@ -717,18 +700,17 @@ se_histo_ray (	/* #do-histogram# */
     int ii, jj, kk, mm, nn, pn, sn, bad, mark;
     int nc, ndx_ss;
     double d, dr, r1, r2;
-    struct dd_ray_sector *ddrc, *dd_ray_coverage();
+    struct dd_ray_sector *ddrc;
     float rcp_inc;
     float scale, rcp_scale, bias, area, *rr;
     float *low_area, *high_area, *between_area;
     int *low_counts, *high_counts, *between_counts;
     int scaled_low, scaled_high, scaled_inc;
-    char *name, radar[12], *str_terminate(), histo_title[88];
-    char *dd_radar_namec();
+    char *name, radar[12], histo_title[88];
     static char file_name[128];
 
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
 
     short *ss, *zz, *bnd, xx;
@@ -899,13 +881,13 @@ int se_histog_setup(int arg, struct ui_command *cmds)
 
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
     int ii, nn, mark, size, ww, skip;
-    char *a, *bb, *gg, *get_tagged_string(), str[256], *se_unquote_string();
+    char *a, *bb, *gg, str[256];
     static char gauge_dir[256], *gauge_file;
-    char *buf, *absorb_zmap_bnd(), *slash_path();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    char *buf;
+    struct solo_edit_stuff *seds;
     float f, f_low, f_high, f_inc;
     struct se_pairs *hp, *hpn;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
+    struct solo_str_mgmt *ssm;
     struct zmap_points *zmpc;
     static int site_list_count = 0;
 
@@ -1069,8 +1051,8 @@ int se_xy_stuff(int arg, struct ui_command *cmds)
      *
      */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     char *src_name, *dst_name;
     struct dds_structs *dds;
     int ii, jj, fn, fns, fnd, size=0, mark, ns, nd, nc, bad, rescale=NO;

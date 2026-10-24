@@ -14,8 +14,9 @@ static char vcid[] = "$Id$";
 # include <ui_error.h>
 # include <errno.h>
 # include <dirent.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -26,61 +27,6 @@ extern GString *gs_complaints;
  * 
  *  
  */
-
-/* Sherrie's functions */
-void solo_refresh_list();
-void se_refresh_sed_files_widget();
-void config_from_frame_states_file();
-void solo_refresh_command_buffer();
-void se_dump_sfic_widget();
-void se_refresh_sfic_widget();
-void se_dump_bnd_files_widget();
-void se_refresh_bnd_files_widget();
-void se_dump_sed_files_widget();
-void se_dump_state_widget();
-void popup_message();
-
-
-/* external functions */
-void xse_add_bnd_pt();		/* se_bnd.c */
-void se_draw_bnd();		/* se_bnd.c */
-struct bnd_point_mgmt *se_zap_last_bpm(); /* se_bnd.c */
-void se_clr_all_bnds();		/* se_bnd.c */
-void se_clr_current_bnd();	/* se_bnd.c */
-void se_cycle_bnd();		/* se_bnd.c */
-void se_erase_all_bnds();	/* se_bnd.c */
-void se_redraw_all_bnds();	/* se_bnd.c */
-void xse_save_bnd();		/* se_bnd.c */
-void se_write_sed_cmds();	/* se_proc_data.c */
-void se_prev_bnd_set();		/* se_bnd.c */
-void solo_save_window_info();	/* sp_save_frms.c */
-int se_absorb_strings();	/* se_for_each.c */
-void se_push_all_ssms();	/* se_utils.c */
-int se_crack_ed_file_name();	/* se_utils.c */
-int xse_absorb_bnd();		/* se_bnd.c */
-int solo_absorb_window_info();	/* sp_save_frms.c */
-void se_push_spair_string();	/* se_utils.c */
-void se_append_string();	/* se_utils.c */
-void se_insert_ssm_string();	/* se_utils.c */
-void se_process_data();		/* se_proc_data.c */
-void solo_add_list_entry();	/* dorade_share.c */
-
-void se_really_readin_cmds();	/* se_for_each.c */
-void solo_sort_strings();	/* se_basics.c */
-void solo_message();		/* solo.c */
-
-void     ddir_rescan_urgent();	/* dd_files.c */
-int      mddir_file_list_v3();	/* dd_files.c */
-int      mddir_num_radars_v3();
-int      mddir_radar_num_v3();
-int      mddir_gen_swp_list_v3();
-
-
-/* internal files */
-void se_process_click();
-struct solo_list_mgmt *se_update_list();
-int se_nab_files();
-int se_nab_all_files();
 
 static struct solo_str_mgmt *help_items = NULL;
 static char * default_help_file = "hlp.";
@@ -94,24 +40,21 @@ void se_process_click(struct solo_click_info *sci)
     struct ui_command *cmds=NULL;
     int ii, nn, vv, mark, id, entry, mouse, wig_but;
     int time_series=NO, automatic, down;
-    int sp_max_frames();
     long lnn;
-    double d, d_ctr, dtime, ddfnp_list_entry();
-    char *a, *b, *c, *e, str[256], line[88], *dd_whiteout(), *dd_delimit();
+    double d, d_ctr, dtime;
+    char *a, *b, *c, *e, str[256], line[88];
     char string_space[256], *str_ptrs[16];
-    char *dir, ts[24], *se_string_time(), *se_return_example_dir();
-    struct sed_command_files *scf, *se_return_cmd_files_struct();
-    struct solo_frame_state_files *sfsf, *se_return_state_files_struct();
-    struct bnd_point_mgmt *bpm, *se_pop_bpms();
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    char *dir, ts[24];
+    struct sed_command_files *scf;
+    struct solo_frame_state_files *sfsf;
+    struct bnd_point_mgmt *bpm;
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
-    struct solo_list_mgmt *solo_malloc_list_mgmt(), *slm
-	  , *se_update_list();
+    struct solo_list_mgmt *slm;
     static struct solo_list_mgmt *slm_keeper=NULL;
-    struct solo_str_mgmt *ssm, *ssmx, *ssmy, *se_remove_ssm_string()
-	  , *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    WW_PTR wwptr, solo_return_wwptr();
+    struct solo_str_mgmt *ssm, *ssmx, *ssmy;
+    struct solo_edit_stuff *seds;
+    WW_PTR wwptr;
 
 
     if(!sci) {
@@ -183,7 +126,7 @@ void se_process_click(struct solo_click_info *sci)
 	xse_save_bnd();
     }
     else if(wig_but == SAVE_SED_CMD_FILES) {
-	se_write_sed_cmds();
+	se_write_sed_cmds(arg, cmds);
 	sebs->last_operation = BND_OTHER;
     }
     else if(wig_but == PREV_BND_SET) {
@@ -191,7 +134,8 @@ void se_process_click(struct solo_click_info *sci)
 	sebs->last_operation = PREV_BND_SET;
     }
     else if(wig_but == SAVE_FRAME_STATES) {
-	solo_save_window_info();
+	sfsf = se_return_state_files_struct();
+	solo_save_window_info(sfsf->directory_text, sfsf->comment_text);
 	sebs->last_operation = BND_OTHER;
     }
     else if(wig_but == IGNORE_SWEEP_INFO) {
@@ -253,6 +197,7 @@ void se_process_click(struct solo_click_info *sci)
     else if(id == SED_CMD_FILES_LIST) {
 	sebs->last_operation = BND_OTHER;
 	slm = seds->list_ed_cmd_files;
+	scf = se_return_cmd_files_struct();
 # ifdef obsolete
 	if(entry < 0 ||
 	   entry >= slm->num_entries) {
@@ -260,7 +205,6 @@ void se_process_click(struct solo_click_info *sci)
 	}
 	/* nab this entry and put it in the command buffer
 	 */
-	scf = se_return_cmd_files_struct();
 	a = *(slm->list +entry);
 	se_crack_ed_file_name(a, scf->file_name_text, scf->comment_text);
 # endif
@@ -289,15 +233,18 @@ void se_process_click(struct solo_click_info *sci)
     }
     else if(id == FRAME_STATES_LIST) {
 	sebs->last_operation = BND_OTHER;
+	sfsf = se_return_state_files_struct();
+# ifdef obsolete
 	slm = seds->list_winfo_files;
 	if(entry < 0 ||
 	   entry >= slm->num_entries) {
 	    return;
 	}
 	a = *(slm->list +entry);
-	sfsf = se_return_state_files_struct();
 	se_crack_ed_file_name(a, sfsf->file_name_text, sfsf->comment_text);
-	if(solo_absorb_window_info() > 0) {
+# endif
+	if(solo_absorb_window_info(sfsf->directory_text, sfsf->file_name_text
+				   , sfsf->omit_sweep_info) > 0) {
 	    config_from_frame_states_file();
 	}
     }
@@ -390,7 +337,7 @@ void se_process_click(struct solo_click_info *sci)
     }
     else if(id == RADARS_LIST) {
 	sebs->last_operation = BND_OTHER;
-	se_dump_sfic_widget(seds->sfic);
+	se_dump_sfic_widget(seds->sfic, sci->frame);
 	slm = seds->list_radars;
 	a = *(slm->list +entry);
 	b = seds->sfic->radar_names_text;
@@ -479,7 +426,8 @@ void se_process_click(struct solo_click_info *sci)
 	down = wwptr->view->type_of_plot & TS_PLOT_DOWN;
 	d_ctr = wwptr->view->ts_ctr_km;
 
-	se_process_data(arg, cmds, time_series, automatic, down, d_ctr);
+	se_process_data(arg, cmds, time_series, automatic, down, d_ctr
+			, sci->frame);
     }
     else if(wig_but == REWRITE_SAME_VERSION) {
 	sebs->last_operation = BND_OTHER;
@@ -526,19 +474,19 @@ se_update_list(int list_id)
     int ii, nn, mark, rn;
     FILE *stream;
     char *dir;
-    char *a, *b, *c, *e, str[128], *dd_whiteout(), *dd_delimit();
+    char *a, *b, *c, *e, str[128];
     char command[256];
-    char *fgetz(), *strrchr(), mess[256], *mddir_radar_name_v3();
-    char *se_return_help_dir(), *se_return_example_dir(), cmd_name[64];
-    struct sed_command_files *scf, *se_return_cmd_files_struct();
-    struct solo_frame_state_files *sfsf, *se_return_state_files_struct();
-    struct bnd_point_mgmt *bpm, *se_pop_bpms();
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    char mess[256];
+    char cmd_name[64];
+    struct sed_command_files *scf;
+    struct solo_frame_state_files *sfsf;
+    struct bnd_point_mgmt *bpm;
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
-    struct solo_click_info *sci, *return_solo_click_ptr();
-    struct solo_list_mgmt *solo_malloc_list_mgmt(), *slm=NULL;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_click_info *sci;
+    struct solo_list_mgmt *slm=NULL;
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
     double d, d_x, d_y;
 
     seds = return_sed_stuff();
@@ -636,7 +584,7 @@ se_update_list(int list_id)
     }
     else if(list_id == RADARS_LIST) {
 	slm = seds->list_radars;
-	se_dump_sfic_widget(seds->sfic);
+	se_dump_sfic_widget(seds->sfic, seds->popup_frame);
 	if(!slm) {
 	    slm = solo_malloc_list_mgmt(SE_MAX_STRING);
 	    seds->list_radars = slm;
@@ -664,7 +612,7 @@ se_update_list(int list_id)
 	    slm = solo_malloc_list_mgmt(SE_MAX_STRING);
 	    seds->list_sweeps = slm;
 	}
-	se_dump_sfic_widget(seds->sfic);
+	se_dump_sfic_widget(seds->sfic, seds->popup_frame);
 	slash_path(str, seds->sfic->directory_text);
 	ddir_rescan_urgent(seds->se_frame);
 

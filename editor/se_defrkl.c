@@ -11,8 +11,9 @@ static char vcid[] = "$Id$";
 # include <ui.h>
 # include <ui_error.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -26,7 +27,6 @@ extern GString *gs_complaints;
  *  
  */
 
-void se_do_clear_bad_flags_array();
 
 /* c------------------------------------------------------------------------ */
 
@@ -39,8 +39,8 @@ se_rescale_field (		/* #rescale-field# */
     /* routine to remove a ring of data; e.g. a test pulse
      */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
 
     char *dst_name;
@@ -112,8 +112,8 @@ se_ring_zap (		/* #remove-ring# */
     /* routine to remove a ring of data; e.g. a test pulse
      */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
 
     char *dst_name;
@@ -195,8 +195,8 @@ se_fix_vortex_vels ( /* #fix-vortex-velocities# */
     int fn_vl, fn_vs;
     float *fptr, *ipptr, X, Y, scale, bias, rcp_scale;
 
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     struct radar_d *radd;
     struct parameter_d *parm;
@@ -386,11 +386,10 @@ se_defrekl (	/* #do-defreckling# */
     double rcp_ngts;
     char *name;
 
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     static struct running_avg_que *raq0, *raq1;
-    struct running_avg_que *se_return_ravgs();
     struct que_val *qv0, *qv1;
 
     short *ss, xx, ref0, ref1;
@@ -563,11 +562,10 @@ se_flag_freckles (	/* #flag-freckles# */
     double rcp_ngts;
     char *name;
 
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     static struct running_avg_que *raq0, *raq1;
-    struct running_avg_que *se_return_ravgs();
     struct que_val *qv0, *qv1;
 
     short *ss, xx, ref0, ref1;
@@ -748,8 +746,8 @@ se_flag_glitches (	/* #flag-glitches# */
     static int que_size = 0;
     static int *que, *qctr;
 
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
 
     short *ss;
@@ -871,8 +869,8 @@ se_despeckle (		/* #despeckle# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *dst_name;
 

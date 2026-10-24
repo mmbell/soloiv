@@ -21,7 +21,7 @@
  *   - Prototypes take only GTK-free types; structs are forward-declared
  *     below so this header needs nothing but dd_defines.h, dd_time.h
  *     and the C library.  It also includes the C library headers that
- *     function_decl.h used to supply (stdio, stdlib, string, unistd...);
+ *     the old function_decl.h supplied (stdio, stdlib, string, unistd...);
  *     <math.h> is not among them, include it where it is needed.
  *
  * The s2 target builds with -Werror=deprecated-non-prototype,
@@ -32,14 +32,14 @@
  * -DLITTLENDIAN -DNETCDF -DSOLOIV_IO_BACKEND_RADX
  * -DSOLOIV_DORADE_VIA_RADX file.c) and can be checked the same way.
  *
- * function_decl.h and dgi_func_decl.h are the old K&R declaration
- * lists; translate/ no longer includes them.
+ * function_decl.h and dgi_func_decl.h, the old K&R declaration
+ * lists, have been removed; these headers replace them.
  */
 
 #ifndef INCs2_protosh
 #define INCs2_protosh
 
-/* the C library headers function_decl.h used to supply */
+/* the C library headers the old function_decl.h supplied */
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <fcntl.h>

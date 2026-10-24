@@ -17,8 +17,9 @@ static char vcid[] = "$Id$";
 # include <dd_files.h>
 # include <ui.h>
 # include <ui_error.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -55,74 +56,10 @@ static int click_frame=0, focus_frame=0;
 static struct se_changez *sxm_spair_changez=NULL;
 static struct examine_widget_info *ewi=NULL;
 #ifdef SOLOIV_IO_BACKEND_RADX
-int se_point_frame_at_written();	/* sii_edit_widgets.c */
-void se_invalidate_read_caches();
 #endif
 /*
  * routines present in this file
  */
-void sxm_apply_changez();
-int sxm_append_to_log_stream();
-void sxm_change_cell_in_list();
-void sxm_clear_changes();
-void sxm_click_in_data();
-void sxm_click_in_list();
-void sxm_close_log_stream();
-void sxm_flush_log_stream();
-void sxm_gen_all_files_list();
-void sxm_gen_delete_lists();
-void sxm_get_widget_info();
-void sxm_list_beams();
-void sxm_list_descriptors();
-void sxm_list_edit_hist();
-void sxm_list_to_log();
-void sxm_log_stat_line();
-void sxm_open_log_stream();
-struct se_changez *sxm_pop_change();
-struct se_changez *sxm_pop_spair_change();
-void sxm_print_list();
-void sxm_process_click();
-void sxm_push_change();
-void sxm_push_spair_change();
-void sxm_refresh_list();
-struct se_changez *sxm_remove_change();
-void sxm_scroll_list();
-void sxm_set_click_frame();
-void sxm_stack_spair_change();
-void sxm_stat_line();
-void sxm_ui_cmd();
-void sxm_undo_last();
-void sxm_unlink_files_list();
-void sxm_update_examine_data();
-
-/* Sherrie's routines  */
-void sp_change_cursor();
-void se_dump_examine_widget();
-void se_refresh_examine_widgets();
-void sp_refresh_delete_sweeps();
-void popup_message();
-
-/*
- * external function declarations
- */
-
-void se_set_sfic_from_frame();	/* sp_basics.c */
-void se_setup_input_cmds();
-void sp_sweep_file_check();	/* sp_clkd.c */
-int se_gen_sweep_list();	/* se_proc_data.c */
-int solo_nab_next_file();	/* solo_perusal.c */
-void solo_list_sort_file_names(); /* dorade_share.c */
-void solo_list_remove_dups();	/* dorade_share.c */
-void solo_list_remove_entry();	/* dorade_share.c */
-char *solo_modify_list_entry();	/* dorade_share.c */
-void se_process_click();	/* se_wgt_stf.c */
-int sp_ts_ray_list();		/* sp_clkd.c */
-void sp_copy_tsri();		/* sp_basics.c */
-void solo_set_busy_signal();	/* sp_basics.c */
-void solo_clear_busy_signal();	/* sp_basics.c */
-int solo_busy();		/* sp_basics.c */
-char *fstring();		/* dorade_share.c */
-/* c------------------------------------------------------------------------ */
 
 /* c------------------------------------------------------------------------ */
 
@@ -132,20 +69,19 @@ void sxm_apply_changez(int frme)
     int ii, nn, pn, sn_first_change, sn_last_change, mark, ignore_it=NO;
     int time_series, vv, ival, bad, sweep_list_state=0, ignore_count = 0;
     int loop_count = 0;
-    long time_now();
     short *ss, *zz;
     struct se_changez *chz;
     struct examine_control *ecs;
     struct cell_d *celv;
-    WW_PTR wwptr, wwptrx, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+    WW_PTR wwptr, wwptrx;
+    struct dd_general_info *dgi;
+    struct solo_edit_stuff *seds;
+    struct dd_input_sweepfiles_v3 *dis;
     struct unique_sweepfile_info_v3 *usi;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
+    struct solo_str_mgmt *ssm;
     struct ts_ray_table *tsrt;
     struct ts_ray_info *tsri;
-    double d_start, d_stop, dd_ts_start();
+    double d_start, d_stop;
     char file_info[88], file_name[88];
 
 
@@ -207,7 +143,7 @@ void sxm_apply_changez(int frme)
 	return;
     }
     usi = dis->usi_top;
-    dgi = dd_window_dgi(usi->radar_num, "UNK");
+    dgi = dd_window_dgi(usi->radar_num);
     celv = dgi->dds->celvc;
     dgi->compression_scheme = HRD_COMPRESSION;
     dgi->disk_output = YES;
@@ -397,9 +333,9 @@ void sxm_change_cell_in_list(struct se_changez *chz, int data_row_num, double va
     int entry_num, nn;
     int col=chz->col_num, cell=chz->row_num;
     struct examine_control *ecs;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     struct solo_list_mgmt *slm;
-    char *aa, *bb, *line, tmp_val[16], *solo_list_entry();
+    char *aa, *bb, *line, tmp_val[16];
 
 
     wwptr = solo_return_wwptr(chz->window_num);
@@ -431,7 +367,7 @@ void sxm_change_cell_in_list(struct se_changez *chz, int data_row_num, double va
 
 void sxm_clear_changes(int frme)
 {
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
 
@@ -443,7 +379,7 @@ void sxm_clear_changes(int frme)
 
 void sxm_click_in_data(struct solo_click_info *sci)
 {
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     double x=sci->x, y=sci->y, theta, range;
 
     wwptr = solo_return_wwptr(sci->frame);
@@ -468,17 +404,17 @@ void sxm_click_in_list(struct solo_click_info *sci)
     int ival, cell, rn, col, entry_num, itsa_run=NO, row_num;
     int undo_it, rrn;
     short *ss;
-    struct se_changez *chz, *sxm_pop_change();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct se_changez *chz;
+    struct solo_edit_stuff *seds;
     struct examine_control *ecs;
-    WW_PTR wwptr, wwptrx, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    WW_PTR wwptr, wwptrx;
+    struct dd_general_info *dgi;
     float *fptr, val, nyq_interval;
     struct solo_list_mgmt *slm;
     struct ts_ray_table *tsrt;
     struct ts_sweep_info *tssi;
     struct ts_ray_info *tsri;
-    char *aa, *bb, *line, tmp_val[16], *solo_list_entry();
+    char *aa, *bb, *line, tmp_val[16];
     double d, nyqv;
 
 
@@ -707,7 +643,7 @@ void sxm_set_log_dir(const char *dir)
 
 void sxm_set_tmp_nyq_vel(double nyqvel)
 {
-  struct solo_edit_stuff *seds, *return_sed_stuff();
+  struct solo_edit_stuff *seds;
   seds = return_sed_stuff();
   if (nyqvel >= 0)
     { seds->nyquist_velocity = nyqvel; }
@@ -730,7 +666,7 @@ void sxm_toggle_log_dir(int active)
 void sxm_gen_all_files_list(int frme, struct solo_list_mgmt *slm)
 {
     int nn, full_file_name=YES;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
     frme = wwptr->lead_sweep->window_num;
@@ -750,9 +686,9 @@ void sxm_gen_all_files_list(int frme, struct solo_list_mgmt *slm)
 void sxm_gen_delete_lists(struct solo_click_info *sci)
 {
     int ii, jj, kk, nn, full_file_name=YES;
-    WW_PTR wwptr, wwptrx, solo_return_wwptr();
+    WW_PTR wwptr, wwptrx;
     struct solo_list_mgmt *slm, *slms;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     char *aa;
 
     wwptr = solo_return_wwptr(sci->frame);
@@ -801,7 +737,7 @@ void sxm_get_widget_info(int frme)
     int ii, width, frac;
     char *aa, *bb, *cc, str[2048];
     float f;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     struct examine_control *ecs;
 
     if(!ewi) {
@@ -882,8 +818,8 @@ void sxm_list_beams(int frme)
 {
     int nn;
     struct solo_list_mgmt *slm;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    WW_PTR wwptr;
+    struct dd_general_info *dgi;
     int file_action=TIME_NEAREST, version=LATEST_VERSION;
     int sweep_skip=1, replot=YES, nr;
     char *aa, str[2048];
@@ -925,8 +861,8 @@ void sxm_list_descriptors(int frme)
 {
     int pn;
     struct solo_list_mgmt *slm;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    WW_PTR wwptr;
+    struct dd_general_info *dgi;
 
     wwptr = solo_return_wwptr(frme);
     dgi = dd_window_dgi(wwptr->lead_sweep->window_num);
@@ -955,8 +891,8 @@ void sxm_list_edit_hist(int frme)
 {
     int ii, nn;
     struct solo_list_mgmt *slm;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    WW_PTR wwptr;
+    struct dd_general_info *dgi;
     char *aa, *bb, *cc, *zz, str[2048];
 
     wwptr = solo_return_wwptr(frme);
@@ -1030,8 +966,7 @@ void sxm_log_stat_line(struct dd_general_info *dgi)
 
 void sxm_open_log_stream(void)
 {
-    char str[2048], *aa, *getenv();
-    long time_now();
+    char str[2048], *aa;
 
     if(log_stream)
 	  return;
@@ -1106,10 +1041,9 @@ void sxm_print_list(struct solo_list_mgmt *slm)
 void sxm_process_click(struct solo_click_info *sci)
 {
     int ii, jj, kk, nd, nn, mark, full_file_name=YES;
-    int sp_max_frames();
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     struct solo_list_mgmt *slm, *slms, *slmx;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     char *aa, *bb, line[256], name[256], *keep;
     FILE *stream;
 
@@ -1438,7 +1372,7 @@ void sxm_push_spair_change(struct se_changez *chz)
 
 void sxm_refresh_list(struct solo_click_info *sci)
 {
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(sci->frame);
 
@@ -1495,7 +1429,7 @@ void sxm_scroll_list(struct solo_click_info *sci)
 {
     int wig_but, frme;
     struct examine_control *ecs;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     struct solo_examine_info *sei;
     
     wwptr = solo_return_wwptr(sci->frame);
@@ -1545,8 +1479,8 @@ void sxm_scroll_list(struct solo_click_info *sci)
 
 void sxm_set_click_frame(int frme, double theta, double range)
 {
-    WW_PTR wwptr, solo_return_wwptr();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    WW_PTR wwptr;
+    struct solo_edit_stuff *seds;
     struct solo_list_mgmt *slm;
     char *aa, str[2048];
 
@@ -1587,15 +1521,12 @@ void sxm_stat_line(struct dd_general_info *dgi, int verbosity, char *preamble, c
      * other front ends such as UF output from sweep files.
      */
     int ii, jj, nn;
-    char str[2048], *a, *dts_print(), *str_terminate(), radar_name[12];
-    DD_TIME *d_unstamp_time();
+    char str[2048], *a, radar_name[12];
     struct dds_structs *dds=dgi->dds;
     struct sweepinfo_d *swib=dgi->dds->swib;
     struct platform_i *asib=dgi->dds->asib;
     struct ray_i *ryib=dgi->dds->ryib;
     char *aa=line, *bb, *cc;
-    double dd_elevation_angle(), dd_azimuth_angle(), dd_roll(), dd_pitch();
-    double dd_heading();
 
     *aa = '\0';
 
@@ -1677,13 +1608,13 @@ void sxm_ui_cmd(int arg, struct ui_command *cmds, int key)
 {
     int ii, jj, ok=YES, col, ray, cell, field, width, frac, mark;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    WW_PTR wwptr, solo_return_wwptr();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptr;
+    struct solo_edit_stuff *seds;
+    struct solo_perusal_info *spi;
     struct examine_control *ecs;
     struct solo_examine_info *sei;
     struct solo_list_mgmt *slm;
-    char *aa, *bb, tmp_str[2048], *strstr(), *se_unquote_string();
+    char *aa, *bb, tmp_str[2048];
 
 
     last_click.which_widget_button = key;
@@ -1897,7 +1828,7 @@ void sxm_ui_cmd(int arg, struct ui_command *cmds, int key)
 		if(strlen(aa = cmdq->uc_text)) {
 		    if(strchr(aa, '/')) {
 			g_string_append_printf (gs_complaints,"Setting log directory to: %s\n", aa);
-			slash_path(log_directory, se_unquote_string(aa));
+			slash_path(log_directory, se_unquote_string(tmp_str, aa));
 			log_dir_ptr = log_directory;
 			log_state = LOG_ACTIVE;
 		    }
@@ -1966,13 +1897,13 @@ void sxm_ui_cmd(int arg, struct ui_command *cmds, int key)
 void sxm_undo_last(int frme)
 {
     int ii, jj, kk, nn, col, cell, rn, pn;
-    struct se_changez *chz, *sxm_pop_change();
+    struct se_changez *chz;
     struct examine_control *ecs;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    WW_PTR wwptr;
+    struct dd_general_info *dgi;
     float *fptr, val;
     struct solo_list_mgmt *slm;
-    char *aa, *bb, *line, tmp_val[16], *solo_list_entry();
+    char *aa, *bb, *line, tmp_val[16];
 
 
     wwptr = solo_return_wwptr(frme);
@@ -2036,7 +1967,7 @@ void sxm_unlink_files_list(struct solo_list_mgmt *slm, char *dir, int frme)
     int ii, jj, nn;
     char *aa, *bb, name[256], line[256];
     struct solo_list_mgmt *slmx;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     FILE *stream;
 
     if((nn = slm->num_entries) <= 0 || !dir || !strlen(dir))
@@ -2086,9 +2017,9 @@ int sxm_ray_list(int frme, int wgt_btn)
      */
     int ii, jj, kk, mm, nn, mark, time_series, nurl=0, nurr=0, blip=0;
     int offset, incre, sweep_num, ray_num;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
-    struct rot_table_entry *entry1, *dd_return_rotang1();
+    WW_PTR wwptr;
+    struct dd_general_info *dgi;
+    struct rot_table_entry *entry1;
     struct rot_ang_table *rat;
     struct ts_ray_table *tsrt;
     struct ts_sweep_info *tssi;
@@ -2354,17 +2285,17 @@ int sxm_ray_list(int frme, int wgt_btn)
 void sxm_update_examine_data(int frme, int wgt_btn)
 {
     int max_char_per_line = 256, fw;
-    int ii, jj, kk, rc, pn, ww, mm, nn, nt, dd_tokens(), col, ncol, entry_num;
+    int ii, jj, kk, rc, pn, ww, mm, nn, nt, col, ncol, entry_num;
     int ndx, g1, ray_num, cell_num, ncells, data_ndx, nb, time_series;
     int incre, roff;
     struct examine_widget_info *ewi;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
     struct examine_control *ecs;
     struct solo_examine_info *sei;
     struct solo_list_mgmt *slm, *slmx;
-    WW_PTR wwptr, wwptrx, solo_return_wwptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
-    struct rot_table_entry *entry1, *dd_return_rotang1();
+    WW_PTR wwptr, wwptrx;
+    struct dd_general_info *dgi;
+    struct rot_table_entry *entry1;
     struct rot_ang_table *rat;
     struct ts_ray_table *tsrt;
     struct ts_sweep_info *tssi;
@@ -2372,11 +2303,10 @@ void sxm_update_examine_data(int frme, int wgt_btn)
     int file_action=TIME_NEAREST, version=LATEST_VERSION;
     int sweep_skip=1, replot=YES;
     char *aa, *bb, *cc, *ee, *line, tmp_val[32];
-    char *str_terminate(), tmp_flds[32], str[2048];
-    double d, d_start, et, dd_rotation_angle(), dd_ac_vel();
-    double dd_elevation_angle();
+    char tmp_flds[32], str[2048];
+    double d, d_start, et;
     float bad_val, val, *fptr;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
 

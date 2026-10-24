@@ -36,8 +36,9 @@ static char vcid[] = "$Id$";
 # include <dorade_headers.h>
 # include <input_sweepfiles.h>
 # include <solo_editor_structs.h>
-# include <dgi_func_decl.h>
-# include <function_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -47,64 +48,6 @@ static struct solo_edit_stuff *seds=NULL;
 static struct sed_command_files *scf=NULL;
 static struct solo_frame_state_files *sfsf=NULL;
 
-/* Sherrie's functions */
-void yes_exit();
-
-/* internally used functions */
-void se_all_fer_cmds();
-void se_all_other_commands();
-void se_insert_ssm_string();
-void se_push_all_ssms();
-void se_append_string();
-int dd_tokens();
-
-int se_BB_setup();
-int se_BB_ac_unfold();
-int se_absolute_value();
-int se_ac_surface_tweak();
-int se_add_fields();
-int se_add_const();
-int se_assert_bad_flags();
-int se_assign_value();
-int se_bad_flags_logic();
-int se_clear_bad_flags();
-int se_clr_current_bnd();
-int se_copy_bad_flags();
-int se_cpy_field();
-int se_despeckle();
-int se_dir();
-int se_fix_vortex_vels();
-int se_flag_freckles();
-int se_flagged_add();
-int se_for_each_ray();
-int se_funfold();
-int se_hard_zap();
-int se_header_value();
-int se_histo_ray();
-int se_histog_setup();
-int se_mult_const();
-int se_once_only();
-int se_radial_shear();
-int se_readin_cmds();
-int se_remove_ac_motion();
-int se_remove_storm_motion();
-int se_remove_field();
-int se_rescale_field();
-int se_ring_zap();
-int se_rewrite();
-int se_set_bad_flags();
-int se_threshold_field();
-int se_use_bnd();
-int se_write_sed_cmds();
-int se_xy_stuff();
-struct ui_cmd_mgmt *se_malloc_ucm();
-char *solo_list_entry (struct solo_list_mgmt  *slm, int jj);
-void se_all_input_commands(struct solo_list_mgmt  *slm);
-
-# ifdef notyet
-int ();
-int ();
-# endif
 
 static char * syn_sugar =
 " to of in with from by put-in is scale bias when and gates on km. degrees deg. deg mps m. low high increment around milliseconds meters-per-second";
@@ -173,7 +116,7 @@ int se_cmd_tokens (char * line, struct ui_cmd_mgmt *ucm)
 
 struct ui_cmd_mgmt *ok_cmd( char * line, struct ui_cmd_mgmt *the_ucm )
 {
-  struct solo_edit_stuff *seds, *return_sed_stuff();
+  struct solo_edit_stuff *seds;
   struct ui_cmd_mgmt *ucm, *ucm_save = NULL;
   struct ui_command *cmd;
   int ii, mm, nn, nt, hits = 0, nk;
@@ -240,8 +183,8 @@ struct ui_cmd_mgmt *ok_cmd( char * line, struct ui_cmd_mgmt *the_ucm )
 int se_absorb_strings(char *path_name, struct solo_str_mgmt **top_ssm)
 {
     int ii, nn, mark;
-    char *a, str[256], *fgetz();
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
+    char *a, str[256];
+    struct solo_str_mgmt *ssm;
     FILE *stream;
 
 
@@ -284,8 +227,8 @@ void se_fix_comment(char *comment)
 
 int se_crack_ed_file_name(char *name, char *file, char *comment)
 {
-    int ii, jj=0, kk=0, nn, mark, nt, dd_tokenz();
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    int ii, jj=0, kk=0, nn, mark, nt;
+    struct boundary_stuff *sebs;
     char string_space[256], *str_ptrs[32];
 
     sebs = return_se_bnd_struct();
@@ -327,8 +270,8 @@ int se_crack_ed_file_name(char *name, char *file, char *comment)
 void se_crack_ed_path_name(char *name, char *dir, char *file, char *comment)
 {
     int ii, nn, mark;
-    char *a=name, *b, *c, *e, *strrchr();
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    char *a=name, *b, *c, *e;
+    struct boundary_stuff *sebs;
 
     sebs = return_se_bnd_struct();
     /* get the directory
@@ -350,9 +293,9 @@ void se_crack_ed_path_name(char *name, char *dir, char *file, char *comment)
 
 struct sed_command_files *se_return_cmd_files_struct(void)
 {
-    int nt, dd_tokens();
+    int nt;
     char *aa, string_space[88], *strptrs[16];
-    struct swp_file_input_control *sfic, *return_swp_fi_in_cntrl();
+    struct swp_file_input_control *sfic;
 
 
     if(!scf) {
@@ -383,8 +326,8 @@ struct solo_frame_state_files *se_return_state_files_struct(void)
 
 char *se_string_time(double t, char *str)
 {
-    double d, d_time_stamp();
-    DD_TIME dts, *d_unstamp_time();
+    double d;
+    DD_TIME dts;
 
     dts.time_stamp = t;
     d_unstamp_time(&dts);
@@ -407,7 +350,7 @@ char *se_string_time(double t, char *str)
 
 struct solo_click_info *clear_click_info(void)
 {
-    struct solo_click_info *sci, *return_solo_click_ptr();
+    struct solo_click_info *sci;
 
     sci = return_solo_click_ptr();
     memset(sci, 0, sizeof(struct solo_click_info));
@@ -438,7 +381,7 @@ fgetz(char *aa, int nn, FILE *stream)
 
 struct solo_click_info *return_solo_click_ptr(void)
 {
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     if(!seds->click) {
@@ -521,8 +464,8 @@ struct ui_cmd_mgmt *malloc_cmd_mgmt(void)
 struct solo_edit_stuff *return_sed_stuff(void)
 {
     int ii, jj, mm, nn, llen;
-    struct solo_list_mgmt *slm, *solo_malloc_list_mgmt();
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
+    struct solo_list_mgmt *slm;
+    struct solo_str_mgmt *ssm;
     struct ui_cmd_mgmt *ucm, *ucm_prev;
     struct ui_command *cmd;
     static char *a, b, *deep6=0;
@@ -1395,6 +1338,15 @@ struct solo_edit_stuff *return_sed_stuff(void)
 	ucm_prev = ucm;
 
 # ifdef notyet
+	/*
+	 * Not compiled.  These entries set ucm->key, which struct
+	 * ui_cmd_mgmt does not have, and register sp_ui_plot_cmds and
+	 * sxm_ui_cmd, which do not match cmd_proc: sp_ui_plot_cmds
+	 * returns void, and sxm_ui_cmd needs the entry's key (EX_RADAR_DATA
+	 * etc.) as a third argument that se_perform_cmds does not pass.
+	 * Enabling them needs a key member and handlers of the form
+	 * int (*)(int arg, struct ui_command *cmds) that supply it.
+	 */
 
 	ucm = malloc_cmd_mgmt();
 
@@ -1795,7 +1747,7 @@ struct solo_edit_stuff *return_sed_stuff(void)
 
 struct swp_file_input_control *return_swp_fi_in_cntrl(void)
 {
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     return(seds->sfic);
@@ -2183,7 +2135,7 @@ void se_append_string(struct solo_str_mgmt **top_ssm, struct solo_str_mgmt *ssm)
 struct solo_str_mgmt *se_bracket_procedure(struct solo_str_mgmt **top_ssm, char *name, int *ncmds, int *item_num)
 {
     int ii, nn=0;
-    struct solo_str_mgmt *ssmx=*top_ssm, *ssm=NULL, *se_pop_spair_string();
+    struct solo_str_mgmt *ssmx=*top_ssm, *ssm=NULL;
 
     *ncmds = *item_num = 0;
 
@@ -2225,7 +2177,7 @@ struct solo_str_mgmt *se_bracket_procedure(struct solo_str_mgmt **top_ssm, char 
 
 struct solo_str_mgmt *se_clone_ssm(struct solo_str_mgmt *ssm)
 {
-    struct solo_str_mgmt *ssmx, *se_pop_spair_string();
+    struct solo_str_mgmt *ssmx;
 
     ssmx = se_pop_spair_string();
     strcpy(ssmx->at, ssm->at);
@@ -2391,7 +2343,7 @@ void se_replace_prcdr_items(struct solo_str_mgmt **ssma, struct solo_str_mgmt **
      */
     int ii, mm, nn;
     struct solo_str_mgmt *ssmx, *ssmy=(*ssmb), *ssmz;
-    char *a, *b, *c, *dd_whiteout(), *dd_delimit();
+    char *a, *b, *c;
 
     for(; ssmy; ssmy=ssmy->next) {
 	c = a = dd_whiteout(ssmy->at);
@@ -2436,7 +2388,6 @@ char *se_unquote_string(char *uqs, char *qs)
 	  if(*qs != '"') *a++ = *qs;
     *a = '\0';
 # else
-    char *dd_unquote_string();
 
     dd_unquote_string(uqs, qs);
 # endif
