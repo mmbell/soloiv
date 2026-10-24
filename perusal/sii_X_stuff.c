@@ -79,7 +79,7 @@ sii_render_frame_to_surface (cairo_t *cr, int frame_num,
 int sii_png_image (char *fname)
 {
   static int err_count = 0;
-  char mess[256], png_fname[512];
+  char *mess, png_fname[512];
   SiiFrameConfig *sfc0 = frame_configs[0];
   guint fc, ncols, nrows, fw, fh, total_w, total_h;
   guint row, col, fn;
@@ -143,9 +143,10 @@ int sii_png_image (char *fname)
 
     /* cairo write failed - report and try fallback */
     if (++err_count == 1) {
-      sprintf (mess, "Cairo PNG write failed for %s: %s",
-	       png_fname, cairo_status_to_string (status));
+      mess = g_strdup_printf ("Cairo PNG write failed for %s: %s",
+			      png_fname, cairo_status_to_string (status));
       sii_message (mess);
+      g_free (mess);
     }
     goto fallback;
   }
@@ -155,26 +156,29 @@ int sii_png_image (char *fname)
 fallback:
   /* Platform-specific screenshot fallback */
   {
-    char command[512];
+    char *command;
     int ii;
 
 #ifdef __APPLE__
     /* macOS: screencapture -w captures the front window */
-    sprintf (command, "screencapture -w \"%s\" 2>/dev/null", png_fname);
+    command = g_strdup_printf ("screencapture -w \"%s\" 2>/dev/null",
+			       png_fname);
 #else
     /* Linux: try gnome-screenshot, then import (ImageMagick) */
-    sprintf (command,
-	     "gnome-screenshot -w -f \"%s\" 2>/dev/null || "
-	     "import -window root \"%s\" 2>/dev/null",
-	     png_fname, png_fname);
+    command = g_strdup_printf
+      ("gnome-screenshot -w -f \"%s\" 2>/dev/null || "
+       "import -window root \"%s\" 2>/dev/null",
+       png_fname, png_fname);
 #endif
 
     ii = system (command);
+    g_free (command);
     if (ii && ++err_count == 1) {
-      sprintf (mess,
-	       "Unable to write %s - no image data and screenshot tool failed",
-	       png_fname);
+      mess = g_strdup_printf
+	("Unable to write %s - no image data and screenshot tool failed",
+	 png_fname);
       sii_message (mess);
+      g_free (mess);
     }
     else if (!ii) {
       err_count = 0;
