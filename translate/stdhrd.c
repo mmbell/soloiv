@@ -279,8 +279,7 @@ int fb_read();
 
 /* c------------------------------------------------------------------------ */
 
-int
-hrd_ascii_read()
+int hrd_ascii_read(void)
 {
     int ii, jj;
     float value_of[NUM_ASCII_VALUES];
@@ -347,8 +346,7 @@ hrd_ascii_read()
 }
 /* c------------------------------------------------------------------------ */
 
-int hrd_merge_std(gri)
-  struct generic_radar_info *gri;
+int hrd_merge_std(struct generic_radar_info *gri)
 {
     static int count=0,  merge_it=YES;
     int ii, mark;
@@ -391,7 +389,7 @@ int hrd_merge_std(gri)
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_std_init()
+void hrd_std_init(void)
 {
     
     int ii, jj, mark;
@@ -531,8 +529,7 @@ void hrd_std_init()
 }
 /* c------------------------------------------------------------------------ */
 
-int hrd_sync_std(gri)
-  struct generic_radar_info *gri;
+int hrd_sync_std(struct generic_radar_info *gri)
 {
     /* c...mark */
     int ii, jj, nn, mark, gotta_type4=NO, gotta_type5=NO;
@@ -711,8 +708,7 @@ c  with a few exceptions of some raw (type 4) data.
 }
 /* c------------------------------------------------------------------------ */
 
-int hrd_sync_ascii(gri)
-  struct generic_radar_info *gri;
+int hrd_sync_ascii(struct generic_radar_info *gri)
 {
     /* c...mark */
     int ii, jj, nn, mark, gotta_type4=NO, gotta_type5=NO;
@@ -804,9 +800,7 @@ int hrd_sync_ascii(gri)
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_dmp_std(t5s, gri)
-  struct type5_stuff *t5s;
-  struct generic_radar_info *gri;
+void hrd_dmp_std(struct type5_stuff *t5s, struct generic_radar_info *gri)
 {
     double d1, d2;
     DD_TIME *d_unstamp_time();
@@ -843,8 +837,7 @@ void hrd_dmp_std(t5s, gri)
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_ac_update_std(gri)
-  struct generic_radar_info *gri;
+void hrd_ac_update_std(struct generic_radar_info *gri)
 {
     /* c...mark */
     static int count=0;
@@ -997,7 +990,7 @@ void hrd_ac_update_std(gri)
 }
 /* c------------------------------------------------------------------------ */
 
-void type4_new()
+void type4_new(void)
 {
     int ii, jj, kk, mark;
     static int count=0;
@@ -1110,7 +1103,7 @@ void type4_new()
 }
 /* c------------------------------------------------------------------------ */
 
-void type5_new()
+void type5_new(void)
 {
     int ii, jj, nn, mark;
     static int count=0;
@@ -1180,9 +1173,7 @@ void type5_new()
 }
 /* c------------------------------------------------------------------------ */
 
-double
-cvt_hp1000fp(at)
-  char *at;
+double cvt_hp1000fp(char *at)
 {
 # define  MASK23 0x7fffff
 # define   MASK7 0x7f
@@ -1228,9 +1219,7 @@ cvt_hp1000fp(at)
 
 /* c------------------------------------------------------------------------ */
 
-int hrdstd_read(fid, buf, size, io_type)
-  int fid, size, io_type;
-  char *buf;
+int hrdstd_read(int fid, char *buf, int size, int io_type)
 {
     static int count=0, t_count=0, std_fid=-1;
     int ii, nn, mark;
@@ -1307,7 +1296,7 @@ int hrdstd_read(fid, buf, size, io_type)
 # ifdef obsolete
 /* c------------------------------------------------------------------------ */
 
-main()
+int main(void)
 {
     struct generic_radar_info *gri, *return_gri_ptr();
 

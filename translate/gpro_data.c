@@ -165,11 +165,7 @@ struct ads_raw_data_que *gpro_initialize();
 
 /* c----------------------------------------------------------------------- */
 
-char *
-eld_nimbus_fix_asib(dts, asib, options, radar_num)
-  DD_TIME *dts;
-  struct platform_i *asib;
-  int options, radar_num;
+char *eld_nimbus_fix_asib(DD_TIME *dts, struct platform_i *asib, int options, int radar_num)
 
 {
     /*
@@ -284,8 +280,7 @@ eld_nimbus_fix_asib(dts, asib, options, radar_num)
 
 /* c----------------------------------------------------------------------- */
 
-void 
-ac_nc_nab_this_time_step()
+void ac_nc_nab_this_time_step(void)
 {
     int ii, ival;
     float fval;
@@ -332,11 +327,7 @@ ac_nc_nab_this_time_step()
 }
 /* c----------------------------------------------------------------------- */
 
-void
-ac_nc_apply_fixes(dts, asib, options, ndx)
-  DD_TIME *dts;
-  struct platform_i *asib;
-  int options;
+void ac_nc_apply_fixes(DD_TIME *dts, struct platform_i *asib, int options, int ndx)
 {
     double frac, d, x, y, attack, track, residue;
     struct ac_vals *acv;
@@ -416,9 +407,7 @@ ac_nc_apply_fixes(dts, asib, options, ndx)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-ac_nc_find_tag(tag)
-  char *tag;
+int ac_nc_find_tag(char *tag)
 {
     int jj;
 
@@ -431,8 +420,7 @@ ac_nc_find_tag(tag)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-ac_nc_init()
+int ac_nc_init(void)
 {
     struct nc_var_info *ncvi, *ncvi_last;
     struct ac_vals *acv, *last_acv;
@@ -705,7 +693,7 @@ ac_nc_init()
 
 # ifdef notyet
 
-main() {
+int main(void) {
     int i, j, k, n, fid, mark, status, count=0, trip=1234;
     int ads_max_eofs=2, doit=NO, loopcount;
     double d, time;
@@ -820,10 +808,7 @@ main() {
 # endif
 /* c------------------------------------------------------------------------ */
 
-void eld_gpro_fix_asib(dts, asib, options)
-  DD_TIME *dts;
-  struct platform_i *asib;
-  int options;
+void eld_gpro_fix_asib(DD_TIME *dts, struct platform_i *asib, int options)
 {
     static int count=0, trip_count=500;
     char *get_tagged_string(), *gpro_next_rec();
@@ -900,10 +885,7 @@ void eld_gpro_fix_asib(dts, asib, options)
 }
 /* c------------------------------------------------------------------------ */
 
-void gpro_assemble_vals(rdq, adsd, pct)
-  struct ads_raw_data_que *rdq;
-  float pct;
-  struct ads_data *adsd;
+void gpro_assemble_vals(struct ads_raw_data_que *rdq, struct ads_data *adsd, double pct)
 {
     int hr, min, sec;
     double d, track, gpro_decode(), d_time_stamp();
@@ -989,7 +971,7 @@ void gpro_assemble_vals(rdq, adsd, pct)
 }
 /* c------------------------------------------------------------------------ */
 
-void setup_ltvi()
+void setup_ltvi(void)
 {
 
     char *a, *gp_arg_ptr();
@@ -1216,7 +1198,7 @@ void setup_ltvi()
 }
 /* c------------------------------------------------------------------------ */
 
-int gpro_mount_raw()
+int gpro_mount_raw(void)
 {
     int n;
     char *a, *b, *c, *dd_whiteout(), *dd_delimit(), str[256];
@@ -1242,8 +1224,7 @@ int gpro_mount_raw()
 }
 /* c------------------------------------------------------------------------ */
 
-void gp_header( buf )
-  char *buf;
+void gp_header(char *buf)
 {
     char *a, *s=buf, *gp_arg_ptr();
     char tmp[88];
@@ -1356,8 +1337,7 @@ void gp_header( buf )
 }
  /* c---------------------------------------------------------------------- */
 
-int is_gp_var( name )
-  char *name;
+int is_gp_var(char *name)
 {
     /* is this variable in the input */
     int i, k;
@@ -1376,8 +1356,7 @@ int is_gp_var( name )
 }
 /* c------------------------------------------------------------------------ */
 
-int len_arg( a, b )
-  char *a, *b;
+int len_arg(char *a, char *b)
 {
     /*
      * determine the length of the argument beginning at "a"
@@ -1400,8 +1379,10 @@ int len_arg( a, b )
 }
 /* c------------------------------------------------------------------------ */
 
-int gp_get_line( s )			/* CRAY version */
-  char *s;
+int 
+gp_get_line (			/* CRAY version */
+    char *s
+)
 {
     int i, n, rlen=LINE_LEN;
 
@@ -1410,9 +1391,7 @@ int gp_get_line( s )			/* CRAY version */
 }
 /* c------------------------------------------------------------------------ */
 
-void gp_date( s, year, mon, day )
-  char *s;
-  int *year, *mon, *day;
+void gp_date(char *s, int *year, int *mon, int *day)
 {
     /*
      * unpack the genpro date
@@ -1438,8 +1417,7 @@ void gp_date( s, year, mon, day )
 }
 /* c------------------------------------------------------------------------ */
 
-float gp_time( s )
-  char *s;
+float gp_time(char *s)
 {
     /*
      * unpack the genpro time
@@ -1464,9 +1442,7 @@ float gp_time( s )
 }
 /* c------------------------------------------------------------------------ */
 
-char *gp_arg_ptr( s, nth )
-  char *s;
-  int nth;
+char *gp_arg_ptr(char *s, int nth)
 {
     /*
      * return a pointer to the nth argument
@@ -1496,11 +1472,7 @@ char *gp_arg_ptr( s, nth )
 }
 /* c------------------------------------------------------------------------ */
 
-double
-gpro_decode(this, pct_samp, at)
-  struct letvar_info *this;
-  float pct_samp;
-  long *at;
+double gpro_decode(struct letvar_info *this, double pct_samp, long *at)
 {
     int sample=this->sample*pct_samp;
     double d;
@@ -1510,10 +1482,7 @@ gpro_decode(this, pct_samp, at)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-gpro_next_rec(rdq, status)
-  struct ads_raw_data_que *rdq;
-  int *status;
+char *gpro_next_rec(struct ads_raw_data_que *rdq, int *status)
 {
     /* This routine returns a pointer to the start of then next
      * logical record of ads data
@@ -1543,8 +1512,7 @@ gpro_next_rec(rdq, status)
 }
 /* c------------------------------------------------------------------------ */
 
-void gpro_position_err(adsd)
-  struct ads_data *adsd;
+void gpro_position_err(struct ads_data *adsd)
 {
     /* keep the average error in lat/lon by
      * keeping a running average of n seconds of non-sever roll data
@@ -1573,9 +1541,7 @@ void gpro_position_err(adsd)
 }
 /* c------------------------------------------------------------------------ */
 
-struct ads_raw_data_que *
-gpro_sync(time)
-  double time;
+struct ads_raw_data_que *gpro_sync(double time)
 {
     /* c...mark */
     struct ads_raw_data_que *this;
@@ -1642,9 +1608,7 @@ gpro_sync(time)
 }
 /* c----------------------------------------------------------------------- */
 
-struct ads_raw_data_que *
-gpro_initialize(adsd_at)
-  struct ads_data **adsd_at;
+struct ads_raw_data_que *gpro_initialize(struct ads_data **adsd_at)
 {
     char *get_tagged_string();
 

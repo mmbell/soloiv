@@ -30,9 +30,11 @@ void se_do_clear_bad_flags_array();
 
 /* c------------------------------------------------------------------------ */
 
-int se_rescale_field(arg, cmds)		/* #rescale-field# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_rescale_field (		/* #rescale-field# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* routine to remove a ring of data; e.g. a test pulse
      */
@@ -101,9 +103,11 @@ int se_rescale_field(arg, cmds)		/* #rescale-field# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_ring_zap(arg, cmds)		/* #remove-ring# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_ring_zap (		/* #remove-ring# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* routine to remove a ring of data; e.g. a test pulse
      */
@@ -168,9 +172,11 @@ int se_ring_zap(arg, cmds)		/* #remove-ring# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_fix_vortex_vels(arg, cmds) /* #fix-vortex-velocities# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_fix_vortex_vels ( /* #fix-vortex-velocities# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* routine to remove discountinuities (freckles) from the data
      * such as birds and radio towers by comparing a particular
@@ -362,9 +368,11 @@ int se_fix_vortex_vels(arg, cmds) /* #fix-vortex-velocities# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_defrekl(arg, cmds)	/* #do-defreckling# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_defrekl (	/* #do-defreckling# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* routine to remove discountinuities (freckles) from the data
      * such as birds and radio towers by comparing a particular
@@ -537,9 +545,11 @@ int se_defrekl(arg, cmds)	/* #do-defreckling# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_flag_freckles(arg, cmds)	/* #flag-freckles# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_flag_freckles (	/* #flag-freckles# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* routine to remove discountinuities (freckles) from the data
      * such as birds and radio towers by comparing a particular
@@ -717,9 +727,11 @@ int se_flag_freckles(arg, cmds)	/* #flag-freckles# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_flag_glitches(arg, cmds)	/* #flag-glitches# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_flag_glitches (	/* #flag-glitches# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* routine to remove discountinuities (freckles) from the data
      * such as birds and radio towers by comparing a particular
@@ -851,9 +863,11 @@ int se_flag_glitches(arg, cmds)	/* #flag-glitches# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_despeckle(arg, cmds)		/* #despeckle# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_despeckle (		/* #despeckle# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */

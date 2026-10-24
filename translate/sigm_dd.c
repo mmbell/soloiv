@@ -63,7 +63,7 @@ int dd_src_fid();
 
 /* c------------------------------------------------------------------------ */
 
-void sigmet_dd_conv()
+void sigmet_dd_conv(void)
 {
     int i, n, count=0, mark;
  
@@ -103,7 +103,7 @@ void sigmet_dd_conv()
 }
 /* c------------------------------------------------------------------------ */
 
-void sigmet_ini()
+void sigmet_ini(void)
 {
     int i, n, mark;
     char *a, *get_tagged_string();
@@ -194,7 +194,7 @@ void sigmet_ini()
 }
 /* c------------------------------------------------------------------------ */
 
-void sigmet_nab_data()
+void sigmet_nab_data(void)
 {
     /* unpack and scale the raw data */
     int i, j, n, fld;
@@ -234,7 +234,7 @@ void sigmet_nab_data()
 }
 /* c------------------------------------------------------------------------ */
 
-void sigmet_nab_info()
+void sigmet_nab_info(void)
 {
     /*
      * stash all the useful generic info in a struct
@@ -328,7 +328,7 @@ void sigmet_nab_info()
 }
 /* c------------------------------------------------------------------------ */
 
-int sigmet_next_ray()
+int sigmet_next_ray(void)
 {
     /*  read in the next ray */
     /* c...mark */
@@ -557,7 +557,7 @@ int sigmet_next_ray()
 }
 /* c------------------------------------------------------------------------ */
 
-int sigmet_select_ray()
+int sigmet_select_ray(void)
 {
     int i, mark;
     int ok;
@@ -611,8 +611,7 @@ int sigmet_select_ray()
 }
 /* c------------------------------------------------------------------------ */
 
-void sigmet_print_stat_line(count)
-  int count;
+void sigmet_print_stat_line(int count)
 {
     time_t i;
     double d;
@@ -632,8 +631,7 @@ void sigmet_print_stat_line(count)
 }
 /* c------------------------------------------------------------------------ */
 
-int ingest_ingest_headers(tbuf)
-  char *tbuf;
+int ingest_ingest_headers(char *tbuf)
 {
     /* routine to absorb all the ingest data headers
      * and generate lookup tables and scaling info
@@ -838,8 +836,7 @@ int ingest_ingest_headers(tbuf)
 }
 /* c------------------------------------------------------------------------ */
 
-void grab_summary_header(buf)
-  char *buf;
+void grab_summary_header(char *buf)
 {
     int i, j, k, mark;
     static int count=0;
@@ -965,9 +962,7 @@ void grab_summary_header(buf)
 }
 /* c------------------------------------------------------------------------ */
 
-int sig_read( fid, buf, size )
-  int fid, size;
-  char *buf;
+int sig_read(int fid, char *buf, int size)
 {
     int n;
 
@@ -981,8 +976,10 @@ int sig_read( fid, buf, size )
 }
 /* c------------------------------------------------------------------------ */
 
-short sig_swap2( ov )		/* swap integer*2 */
-  twob *ov;
+short 
+sig_swap2 (		/* swap integer*2 */
+    twob *ov
+)
 {
     union {
 	short newval;
@@ -993,8 +990,10 @@ short sig_swap2( ov )		/* swap integer*2 */
 }
 /* c------------------------------------------------------------------------ */
 
-long sig_swap4( ov )		/* swap integer*4 */
-  fourb *ov;
+long 
+sig_swap4 (		/* swap integer*4 */
+    fourb *ov
+)
 {
     union {
 	long newval;

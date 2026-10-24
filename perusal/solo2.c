@@ -251,7 +251,7 @@ void sii_png_image_prep (char *dir)
 
 /* c------------------------------------------------------------------------ */
 
-gboolean sii_reset_frame_sizes ()
+gboolean sii_reset_frame_sizes(void)
 {
   SiiFrameConfig *sfc = frame_configs[0];
   GtkWidget *widget;
@@ -332,7 +332,7 @@ void sii_set_debug_flag(gint flag)
 
 /* c------------------------------------------------------------------------ */
 
-gboolean sii_debug_flag()
+gboolean sii_debug_flag(void)
 {
    return debug_flag;
 # ifdef never
@@ -377,7 +377,7 @@ int se_dump_sfic_widget(struct swp_file_input_control *sfic, int frame_num)
 
 /* c------------------------------------------------------------------------ */
 
-void sii_check_colors ()
+void sii_check_colors(void)
 {
   GdkRGBA *gcolor;
   gcolor = (GdkRGBA *)g_tree_lookup( colors_tree, (gpointer)"midnightblue" );
@@ -385,7 +385,7 @@ void sii_check_colors ()
 
 /* c------------------------------------------------------------------------ */
 
-int sii_return_frame_count ()
+int sii_return_frame_count(void)
 { return sii_frame_count; }
 
 /* c------------------------------------------------------------------------ */
@@ -876,7 +876,7 @@ void popup_message (struct solo_list_mgmt *slm)
 /* c------------------------------------------------------------------------ */
 /* c------------------------------------------------------------------------ */
 
-void yes_exit() {
+void yes_exit(void) {
   /* In GTK4, quit via the application */
   g_application_quit (g_application_get_default ());
 }
@@ -2280,7 +2280,7 @@ void sii_plot_data2 (guint frame_num, guint plot_function)
 
 /* c------------------------------------------------------------------------ */
 
-void sii_recalc_default_frame ()
+void sii_recalc_default_frame(void)
 {
    gint fn, mm, nn, ndx;
    gdouble d, multiple, mx_x_change = 0, mx_y_change = 0;
@@ -2376,10 +2376,7 @@ void solo_message(char *message, ...)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_def_params(dgi, list, num_parms)
-  struct dd_general_info *dgi;
-  int *list;
-  int num_parms;
+void solo_def_params(struct dd_general_info *dgi, int *list, int num_parms)
 {
     static int count=0;
     int ii, jj, mark;
@@ -2526,8 +2523,7 @@ int sii_default_startup (const gchar *swpfi_dir)
 
 /* c------------------------------------------------------------------------ */
 
-void solo_data_color_lut(frme)
-  int frme;
+void solo_data_color_lut(int frme)
 {
     /* create the data coloration lookup table
      * this is the master lookup table that is in effect

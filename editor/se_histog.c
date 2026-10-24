@@ -59,7 +59,7 @@ int  se_histog_setup();
 
 /* c------------------------------------------------------------------------ */
 
-int se_histo_output()
+int se_histo_output(void)
 {
    struct solo_str_mgmt *ssm;
    struct solo_edit_stuff *seds, *return_sed_stuff();
@@ -100,7 +100,7 @@ int se_histo_output()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_histo_fin_irreg_areas()
+void se_histo_fin_irreg_areas(void)
 {
     int ii, nn, mark, min, max;
     float f, f_val, f_sum=0, rcp_inc, f_min, f_max, f_mode, f_median;
@@ -212,7 +212,7 @@ void se_histo_fin_irreg_areas()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_histo_fin_irreg_counts()
+void se_histo_fin_irreg_counts(void)
 {
     int ii, kk, mm, nn=0, mark, min, max, med;
     float f, f_val, f_sum, ff_sum, f_inc, rcp_inc, f_mode, f_mean, f_sdev;
@@ -302,8 +302,7 @@ void se_histo_fin_irreg_counts()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_histo_fin_areas(name)
-  char *name;
+void se_histo_fin_areas(char *name)
 {
     int ii, nn, mark, min, max;
     float f, f_val, f_sum, rcp_inc, f_min, f_max, f_mode, f_median;
@@ -481,7 +480,7 @@ void se_histo_fin_areas(name)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_histo_fin_counts()
+void se_histo_fin_counts(void)
 {
     int ii, kk, mm, nn=0, mark, min, max, med;
     float f, f_val, f_sum, ff_sum, f_inc, rcp_inc, f_mode, f_mean, f_sdev;
@@ -645,8 +644,7 @@ void se_histo_fin_counts()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_histo_init(seds)
-  struct solo_edit_stuff *seds;
+void se_histo_init(struct solo_edit_stuff *seds)
 {
     int nb;
     struct se_pairs *pair;
@@ -702,9 +700,11 @@ void se_histo_init(seds)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_histo_ray(arg, cmds)	/* #do-histogram# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_histo_ray (	/* #do-histogram# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* 
      * this routine does a histogram for this pass
@@ -877,9 +877,7 @@ int se_histo_ray(arg, cmds)	/* #do-histogram# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_histog_setup(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_histog_setup(int arg, struct ui_command *cmds)	
 {
     /* #area-histogram# */
     /* #count-histogram# */
@@ -1065,9 +1063,7 @@ int se_histog_setup(arg, cmds)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_xy_stuff(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_xy_stuff(int arg, struct ui_command *cmds)	
 {
     /*
      *

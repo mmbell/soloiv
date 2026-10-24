@@ -40,29 +40,27 @@ void dd_tape();
 
 /* c------------------------------------------------------------------------ */
 
-void dd_set_unique_vol_id()
+void dd_set_unique_vol_id(void)
 {
    unique_vol_id = YES;
 }
 
 /* c------------------------------------------------------------------------ */
 
-int dd_sizeof_prev_file()
+int dd_sizeof_prev_file(void)
 {
   return( sizeof_prev_file );
 }
 
 /* c------------------------------------------------------------------------ */
 
-void dd_dump_headers(dgi)
-  struct dd_general_info *dgi;
+void dd_dump_headers(struct dd_general_info *dgi)
 {
     dd_new_vol(dgi);
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_dump_ray(dgi)
-  struct dd_general_info *dgi;
+void dd_dump_ray(struct dd_general_info *dgi)
 {
     char *aa, *b, *c;
     int bytes, pn, n, num_short, rlen=0, mark, ncopy;
@@ -225,8 +223,7 @@ void dd_dump_ray(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_flush(flush_radar_num)
-  int flush_radar_num;
+void dd_flush(int flush_radar_num)
 {
     /*
      * dump out the partially filled buffer for the current
@@ -356,8 +353,7 @@ void dd_flush(flush_radar_num)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_insert_headers(dgi)
-  struct dd_general_info *dgi;
+void dd_insert_headers(struct dd_general_info *dgi)
 {
     struct dds_structs *dds=dgi->dds;
     int ii, np, nn, bsize=0, ncomm, ssize;
@@ -523,8 +519,7 @@ void dd_insert_headers(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_new_vol(dgi)
-  struct dd_general_info *dgi;
+void dd_new_vol(struct dd_general_info *dgi)
 {
     int ii;
     struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();

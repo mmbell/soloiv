@@ -130,8 +130,7 @@ struct bnd_point_mgmt *se_zap_last_bpm();
 
 /* c------------------------------------------------------------------------ */
 
-struct boundary_stuff *
-return_se_bnd_struct()
+struct boundary_stuff *return_se_bnd_struct(void)
 {
     /* return the solo editor boundary struct
      */
@@ -161,7 +160,7 @@ return_se_bnd_struct()
 }
 /* c------------------------------------------------------------------------ */
 
-int xse_absorb_bnd()
+int xse_absorb_bnd(void)
 {
     int ii, nn, mark, len, lenx, count=0;
     FILE *stream;
@@ -210,9 +209,7 @@ int xse_absorb_bnd()
 }
 /* c------------------------------------------------------------------------ */
 
-void xse_add_bnd_pt(sci, ob)
-  struct solo_click_info *sci;
-  struct one_boundary *ob;
+void xse_add_bnd_pt(struct solo_click_info *sci, struct one_boundary *ob)
 {
     /* add a point to the boundary based on the x & y coordinates
      * in the click struct
@@ -306,8 +303,7 @@ void xse_add_bnd_pt(sci, ob)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_append_bpm(top_bpm, bpm)
-  struct bnd_point_mgmt **top_bpm, *bpm;
+void se_append_bpm(struct bnd_point_mgmt **top_bpm, struct bnd_point_mgmt *bpm)
 {
     /* append this point to the list of boundary points
      * (*top_bpm)->last always points to the last point appended
@@ -331,10 +327,7 @@ void se_append_bpm(top_bpm, bpm)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_ascii_bnd(stream, num, pisp)
-  FILE *stream;
-  int num;
-  struct point_in_space *pisp;
+void se_ascii_bnd(FILE *stream, int num, struct point_in_space *pisp)
 {
     fprintf(stream
 	    , "bnd:%3d; lon:%.4f; lat:%.4f; alt:%.4f; "
@@ -349,8 +342,7 @@ void se_ascii_bnd(stream, num, pisp)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_bnd_pt_atts(bpm)
-  struct bnd_point_mgmt *bpm;
+void se_bnd_pt_atts(struct bnd_point_mgmt *bpm)
 {
 
     if(bpm->pisp->state & PISP_TIME_SERIES) {
@@ -380,8 +372,7 @@ void se_bnd_pt_atts(bpm)
 }
 /* c------------------------------------------------------------------------ */
 
-int xse_ccw(x0, y0, x1, y1)
-  double x0, y0, x1, y1;
+int xse_ccw(double x0, double y0, double x1, double y1)
 {
     /* is point 0 left or right of a line between the origin and point 1
      * form a line between the origin and point 0 called line 0
@@ -401,8 +392,7 @@ int xse_ccw(x0, y0, x1, y1)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_ccw(x0, y0, x1, y1)
-  long x0, y0, x1, y1;
+int se_ccw(long x0, long y0, long x1, long y1)
 {
     /* is point 0 left or right of a line between the origin and point 1
      * form a line between the origin and point 0 called line 0
@@ -422,7 +412,7 @@ int se_ccw(x0, y0, x1, y1)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_clr_all_bnds()
+void se_clr_all_bnds(void)
 {
     int ww;
     struct boundary_stuff *sebs, *return_se_bnd_struct();
@@ -447,8 +437,7 @@ void se_clr_all_bnds()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_clr_bnd(ob)
-  struct one_boundary *ob;
+void se_clr_bnd(struct one_boundary *ob)
 {
     struct solo_edit_stuff *seds, *return_sed_stuff();
 
@@ -459,7 +448,7 @@ void se_clr_bnd(ob)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_clr_current_bnd()
+void se_clr_current_bnd(void)
 {
     struct boundary_stuff *sebs, *return_se_bnd_struct();
     struct one_boundary *ob;
@@ -481,7 +470,7 @@ void se_clr_current_bnd()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_cycle_bnd()
+void se_cycle_bnd(void)
 {
     /* the purpose of this routine is to move between boundaries
      * the first move from a boundary with two or more points in it
@@ -545,8 +534,7 @@ void se_cycle_bnd()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_delete_bnd_pt(bpm)
-  struct bnd_point_mgmt *bpm;
+void se_delete_bnd_pt(struct bnd_point_mgmt *bpm)
 {
     /* remove this point from the boundary
      * remember to recalculate mins, maxs, slopes and deltas
@@ -592,9 +580,7 @@ void se_delete_bnd_pt(bpm)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_draw_bnd_for_frame(frame_num, bpm, num, erase)
-     struct bnd_point_mgmt *bpm;
-     int frame_num, num, erase;
+void se_draw_bnd_for_frame(int frame_num, struct bnd_point_mgmt *bpm, int num, int erase)
 {
   /* draw or erase the requisite number of points in the active windows
    * see "se_shift_bnd()" for similar logic
@@ -714,9 +700,7 @@ void se_draw_bnd_for_frame(frame_num, bpm, num, erase)
 
 /* c------------------------------------------------------------------------ */
 
-void se_draw_bnd(bpm, num, erase)
-  struct bnd_point_mgmt *bpm;
-  int num, erase;
+void se_draw_bnd(struct bnd_point_mgmt *bpm, int num, int erase)
 {
     /* draw or erase the requisite number of points in the active windows
      * see "se_shift_bnd()" for similar logic
@@ -859,11 +843,14 @@ void se_erase_all_bnds()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_ts_find_intxns(radar_alt, d_max_range, ob, d_time, d_pointing
-		       , automatic, down, d_ctr)
-  double radar_alt, d_max_range, d_time, d_pointing, d_ctr;
-  struct one_boundary *ob;
-  int down, automatic;
+void se_ts_find_intxns(double radar_alt,
+                       double d_max_range,
+                       struct one_boundary *ob,
+                       double d_time,
+                       double d_pointing,
+                       int automatic,
+                       int down,
+                       double d_ctr)
 {
    int mm;
    struct bnd_point_mgmt *bpm, *bpmx, *bpma, *bpmb;
@@ -928,9 +915,7 @@ void se_ts_find_intxns(radar_alt, d_max_range, ob, d_time, d_pointing
 }
 /* c------------------------------------------------------------------------ */
 
-int se_merge_intxn(bpm, ob)
-  struct bnd_point_mgmt *bpm;
-  struct one_boundary *ob;
+int se_merge_intxn(struct bnd_point_mgmt *bpm, struct one_boundary *ob)
 {
     struct bnd_point_mgmt *bpmx;
 
@@ -963,9 +948,7 @@ int se_merge_intxn(bpm, ob)
 }
 /* c------------------------------------------------------------------------ */
 
-int xse_find_intxns(angle, range, ob)
-  double angle, range;
-  struct one_boundary *ob;
+int xse_find_intxns(double angle, double range, struct one_boundary *ob)
 {
     /* this routine creates a list of endpoints of lines that
      * intersect the current ray
@@ -1072,9 +1055,7 @@ struct one_boundary *se_malloc_one_bnd()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_mid_insert(bpm, ob)
-  struct bnd_point_mgmt *bpm;
-  struct one_boundary *ob;
+void se_mid_insert(struct bnd_point_mgmt *bpm, struct one_boundary *ob)
 {
     int ii, nn, mark;
     struct bnd_point_mgmt *bpmx;
@@ -1095,10 +1076,7 @@ void se_mid_insert(bpm, ob)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_nab_segment(num, r0, r1, ob)
-  int num;
-  double *r0, *r1;
-  struct one_boundary *ob;
+void se_nab_segment(int num, double *r0, double *r1, struct one_boundary *ob)
 {
     /* this routine returns the start and stop range of the
      * requested segment
@@ -1128,8 +1106,7 @@ void se_nab_segment(num, r0, r1, ob)
 }
 /* c------------------------------------------------------------------------ */
 
-int xse_num_segments(ob)
-  struct one_boundary *ob;
+int xse_num_segments(struct one_boundary *ob)
 {
     /* calculate the number of segments and set up
      * the first segment
@@ -1188,9 +1165,7 @@ int xse_num_segments(ob)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_compare_bnds(aa, bb, size)
-  char *aa, *bb;
-  int size;
+int se_compare_bnds(char *aa, char *bb, int size)
 {
     int nn;
     struct boundary_header bh, *bha, *bhb;
@@ -1228,8 +1203,7 @@ int se_compare_bnds(aa, bb, size)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_pack_bnd_set(buf)
-  char *buf;
+void se_pack_bnd_set(char *buf)
 {
     int size=0;
     struct one_boundary *ob;
@@ -1331,8 +1305,7 @@ void se_prev_bnd_set()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_push_all_bpms(bpmptr)
-  struct bnd_point_mgmt **bpmptr;
+void se_push_all_bpms(struct bnd_point_mgmt **bpmptr)
 {
     struct bnd_point_mgmt *bpm=(*bpmptr);
 
@@ -1345,8 +1318,7 @@ void se_push_all_bpms(bpmptr)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_push_bpm(bpm)
-  struct bnd_point_mgmt *bpm;
+void se_push_bpm(struct bnd_point_mgmt *bpm)
 {
     bpm->next = bpm_spairs;
     bpm_spairs = bpm;
@@ -1354,8 +1326,7 @@ void se_push_bpm(bpm)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_radar_inside_bnd(ob)
-  struct one_boundary *ob;
+int se_radar_inside_bnd(struct one_boundary *ob)
 {
     /* determine if the radar is inside or outside the boundary
      */
@@ -1442,8 +1413,7 @@ void se_redraw_all_bnds()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_redraw_all_bnds_for_frame(frame_num)
-     int frame_num;
+void se_redraw_all_bnds_for_frame(int frame_num)
 {
     int ii, nn, ww, mark;
     struct boundary_stuff *sebs, *return_se_bnd_struct();
@@ -1689,11 +1659,11 @@ xse_set_intxn(x, y, slope, bpm, ob)
 # else
 /* c------------------------------------------------------------------------ */
 
-int xse_set_intxn(x, y, slope, bpm, ob)
-  double x, y;
-  double slope;
-  struct bnd_point_mgmt *bpm;
-  struct one_boundary *ob;
+int xse_set_intxn(double x,
+                  double y,
+                  double slope,
+                  struct bnd_point_mgmt *bpm,
+                  struct one_boundary *ob)
 {
     /* compute the intersection of a ray and a boundary segment
      * x & y are the endpoints of the ray and "slope" is
@@ -1779,10 +1749,11 @@ int xse_set_intxn(x, y, slope, bpm, ob)
 # endif
 /* c------------------------------------------------------------------------ */
 
-void se_shift_bnd(ob, boundary_radar, current_radar, scan_mode, current_tilt)
-  struct one_boundary *ob;
-  struct point_in_space *boundary_radar, *current_radar;
-  double current_tilt;
+void se_shift_bnd(struct one_boundary *ob,
+                  struct point_in_space *boundary_radar,
+                  struct point_in_space *current_radar,
+                  int scan_mode,
+                  double current_tilt)
 {
     /* shift this boundary's points so as to be relative to
      * the current radar represented by "usi"
@@ -1863,9 +1834,7 @@ int se_sizeof_bnd_set()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_unpack_bnd_buf(buf, size)
-  char *buf;
-  int size;
+void se_unpack_bnd_buf(char *buf, int size)
 {
     int len, gottaSwap=NO;
     unsigned int gdsos;
@@ -1950,9 +1919,7 @@ void se_unpack_bnd_buf(buf, size)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_use_bnd(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+void se_use_bnd(int arg, struct ui_command *cmds)
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
     struct solo_edit_stuff *seds, *return_sed_stuff();
@@ -1972,9 +1939,7 @@ void se_use_bnd(arg, cmds)
 }  
 /* c------------------------------------------------------------------------ */
 
-void xse_x_insert(bpm, ob)
-  struct bnd_point_mgmt *bpm;
-  struct one_boundary *ob;
+void xse_x_insert(struct bnd_point_mgmt *bpm, struct one_boundary *ob)
 {
     /* insert sort of x coorinates of the midpoints of the line
      */
@@ -2036,9 +2001,7 @@ void xse_x_insert(bpm, ob)
 }
 /* c------------------------------------------------------------------------ */
 
-void xse_y_insert(bpm, ob)
-  struct bnd_point_mgmt *bpm;
-  struct one_boundary *ob;
+void xse_y_insert(struct bnd_point_mgmt *bpm, struct one_boundary *ob)
 {
     /* insert sort of x coorinates of the midpoints of the line
      */
@@ -2100,8 +2063,7 @@ void xse_y_insert(bpm, ob)
 }
 /* c------------------------------------------------------------------------ */
 
-struct bnd_point_mgmt *se_zap_last_bpm(top_bpm)
-  struct bnd_point_mgmt **top_bpm;
+struct bnd_point_mgmt *se_zap_last_bpm(struct bnd_point_mgmt **top_bpm)
 {
     /* remove the last points from the list of boundary points
      */
@@ -2125,9 +2087,7 @@ struct bnd_point_mgmt *se_zap_last_bpm(top_bpm)
 }
 /* c------------------------------------------------------------------------ */
 
-char * absorb_zmap_bnd( ifile, skip, nbytes )
-    char * ifile;
-    int skip, *nbytes;
+char * absorb_zmap_bnd(char *ifile, int skip, int *nbytes)
 {
     /* routine to read in a zmap file and convert it to a boundary
      */
@@ -2222,9 +2182,7 @@ char * absorb_zmap_bnd( ifile, skip, nbytes )
 }
 /* c------------------------------------------------------------------------ */
 
-int absorb_zmap_pts( top, ifile )
-    struct zmap_points **top;
-    char * ifile;
+int absorb_zmap_pts(struct zmap_points **top, char *ifile)
 {
   /* This version nabs the Florida Precip98 gauges */
   /* This routine is called in se_histog_setup() in se_histog.c */
@@ -2302,8 +2260,7 @@ int absorb_zmap_pts( top, ifile )
 
 /* c------------------------------------------------------------------------ */
 
-int se_rain_gauge_info( dlat, dlon )
-     double dlat, dlon;
+int se_rain_gauge_info(double dlat, double dlon)
 {
   /* This routine lists all the rain gauges within a given radius
    * of the input lat/lon
@@ -2496,9 +2453,7 @@ int xabsorb_zmap_pts( top, ifile )
 # endif
 /* c------------------------------------------------------------------------ */
 
-int list_zmap_values( fname, frame )
-    char * fname;
-    int frame;
+int list_zmap_values(char *fname, int frame)
 {
     int ii, jj, kk, nn, pn, gate, one=1, point_count = 0;
     int numRatios = 0;

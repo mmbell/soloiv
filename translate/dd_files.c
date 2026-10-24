@@ -176,9 +176,7 @@ double d_time_stamp();
 /* new stuff */
 /* c------------------------------------------------------------------------ */
 
-int craack_ddfn(fn, ddfn)
-  char *fn;
-  struct dd_file_name_v3 *ddfn;
+int craack_ddfn(char *fn, struct dd_file_name_v3 *ddfn)
 {
     char *delim=DD_NAME_DELIMITER;
     char *sptr[4];
@@ -259,10 +257,7 @@ int craack_ddfn(fn, ddfn)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-ddfn_file_info_line(ddfn, str)
-  struct dd_file_name_v3 *ddfn;
-  char *str;
+char *ddfn_file_info_line(struct dd_file_name_v3 *ddfn, char *str)
 {
     /* c...mark */
     int ii, nn, mark;
@@ -287,9 +282,7 @@ ddfn_file_info_line(ddfn, str)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddfn_file_name(ddfn, name)
-  struct dd_file_name_v3 *ddfn;
-  char *name;
+void ddfn_file_name(struct dd_file_name_v3 *ddfn, char *name)
 {
     int v;
 
@@ -311,8 +304,7 @@ void ddfn_file_name(ddfn, name)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddfn_list_versions(this)
-  struct dd_file_name_v3 *this;
+void ddfn_list_versions(struct dd_file_name_v3 *this)
 {
     if(!this)
 	  return;
@@ -323,8 +315,7 @@ void ddfn_list_versions(this)
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_file_name_v3 *
-ddfn_pop_spair()
+struct dd_file_name_v3 *ddfn_pop_spair(void)
 {
     struct dd_file_name_v3 *ddfns=ddfn_spairs;
 
@@ -344,9 +335,7 @@ ddfn_pop_spair()
 }
 /* c------------------------------------------------------------------------ */
 
-void ddfn_ptr_list(this, list_type)
-  struct dd_file_name_v3 *this;
-  int list_type;  
+void ddfn_ptr_list(struct dd_file_name_v3 *this, int list_type)  
 {
     if(!this)
 	  return;
@@ -364,8 +353,7 @@ void ddfn_ptr_list(this, list_type)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddfn_push_spair(ddfns)
-struct dd_file_name_v3 *ddfns;
+void ddfn_push_spair(struct dd_file_name_v3 *ddfns)
 {
     ddfns->next = ddfn_spairs;
     ddfn_spairs = ddfns;
@@ -373,10 +361,7 @@ struct dd_file_name_v3 *ddfns;
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_file_name_v3 *
-ddfn_search(dir_num, radar_num, d_target_time, req_type, version)
-  double d_target_time;
-  int dir_num, radar_num, req_type, version;
+struct dd_file_name_v3 *ddfn_search(int dir_num, int radar_num, double d_target_time, int req_type, int version)
 {
     int ii, mark, equal=NO;
 				/*
@@ -500,9 +485,7 @@ ddfn_search(dir_num, radar_num, d_target_time, req_type, version)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddfn_sort_insert(rni, ddfn)
-  struct dd_radar_name_info_v3 *rni;
-  struct dd_file_name_v3 *ddfn;
+void ddfn_sort_insert(struct dd_radar_name_info_v3 *rni, struct dd_file_name_v3 *ddfn)
 {
     int ii, mark, mode;
     struct dd_file_name_v3 *this=rni->h_node, *last;
@@ -552,9 +535,7 @@ void ddfn_sort_insert(rni, ddfn)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-ddfn_time(ddfn)
-  struct dd_file_name_v3 *ddfn;
+double ddfn_time(struct dd_file_name_v3 *ddfn)
 {
     /* returns a double precision time stamp from the file name
     double d = (double)ddfn->time_stamp +.001 * ddfn->milliseconds;
@@ -564,8 +545,7 @@ ddfn_time(ddfn)
 }
 /* c------------------------------------------------------------------------ */
 
-int ddfnp_list(dir_num, radar_num, list_type)
-  int dir_num, radar_num, list_type;
+int ddfnp_list(int dir_num, int radar_num, int list_type)
 {
     /* routine to create a sequential list of pointers to all
      * the file structs for this radar
@@ -610,9 +590,7 @@ int ddfnp_list(dir_num, radar_num, list_type)
 }
 /* c------------------------------------------------------------------------ */
 
-int ddir_files_v3(dir_num, dir)
-  char *dir;
-  int dir_num;
+int ddir_files_v3(int dir_num, char *dir)
 {
     /* The purpose of this routine is to provide info
      * on dorade files in the directory
@@ -769,9 +747,7 @@ int ddir_files_v3(dir_num, dir)
 }
 /* c------------------------------------------------------------------------ */
 
-int ddir_radar_num_v3(dir_num, radar_name)
-  int dir_num;
-  char *radar_name;
+int ddir_radar_num_v3(int dir_num, char *radar_name)
 {
     int ii, rn;
     struct ddir_info_v3 *ddir, *return_ddir();
@@ -788,8 +764,7 @@ int ddir_radar_num_v3(dir_num, radar_name)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddir_rescan_urgent(dir_num)
-  int dir_num;
+void ddir_rescan_urgent(int dir_num)
 {
     struct ddir_info_v3 *ddir, *return_ddir();
     if(!(ddir = return_ddir(dir_num)))
@@ -799,11 +774,14 @@ void ddir_rescan_urgent(dir_num)
 /* c------------------------------------------------------------------------ */
 
 double
-d_mddir_file_info_v3(dir_num, radar_num, target_time, req_type, version
-		, true_version_num, info_line, file_name)
-  double target_time;
-  int dir_num, radar_num, req_type, version, *true_version_num;
-  char *info_line, *file_name;
+d_mddir_file_info_v3(int dir_num,
+                     int radar_num,
+                     double target_time,
+                     int req_type,
+                     int version,
+                     int *true_version_num,
+                     char *info_line,
+                     char *file_name)
 {
     int v;
     struct dd_file_name_v3 *ddfn, *ddfn_search();
@@ -834,8 +812,7 @@ d_mddir_file_info_v3(dir_num, radar_num, target_time, req_type, version
 /* c------------------------------------------------------------------------ */
 
 struct dd_file_name_v3 **
-mddir_entire_list_v3(dir_num, radar_num, num_swps)
-  int dir_num, radar_num, *num_swps;
+mddir_entire_list_v3(int dir_num, int radar_num, int *num_swps)
 {
     struct ddir_info_v3 *ddir, *return_ddir();
 
@@ -852,11 +829,14 @@ mddir_entire_list_v3(dir_num, radar_num, num_swps)
 /* c------------------------------------------------------------------------ */
 
 long
-mddir_file_info_v3(dir_num, radar_num, target_time, req_type, version
-		, true_version_num, info_line, file_name)
-  long target_time;
-  int dir_num, radar_num, req_type, version, *true_version_num;
-  char *info_line, *file_name;
+mddir_file_info_v3(int dir_num,
+                   int radar_num,
+                   long target_time,
+                   int req_type,
+                   int version,
+                   int *true_version_num,
+                   char *info_line,
+                   char *file_name)
 {
     double d_mddir_file_info_v3();
 
@@ -866,18 +846,14 @@ mddir_file_info_v3(dir_num, radar_num, target_time, req_type, version
 }
 /* c------------------------------------------------------------------------ */
 
-int mddir_file_list_v3(dir_num, dir)
-  int dir_num;
-  char *dir;
+int mddir_file_list_v3(int dir_num, char *dir)
 {
     int nn = ddir_files_v3(dir_num, dir);
     return(nn);
 }
 /* c------------------------------------------------------------------------ */
 
-int mddir_gen_swp_list_v3(dir_num, radar_num, lm)
-  int dir_num, radar_num;
-  struct solo_list_mgmt *lm;
+int mddir_gen_swp_list_v3(int dir_num, int radar_num, struct solo_list_mgmt *lm)
 {
     /* just get the info list
      */
@@ -885,9 +861,10 @@ int mddir_gen_swp_list_v3(dir_num, radar_num, lm)
 }
 /* c------------------------------------------------------------------------ */
 
-int mddir_gen_swp_str_list_v3(dir_num, radar_num, full_file_name, lm)
-  int dir_num, radar_num, full_file_name;
-  struct solo_list_mgmt *lm;
+int mddir_gen_swp_str_list_v3(int dir_num,
+                              int radar_num,
+                              int full_file_name,
+                              struct solo_list_mgmt *lm)
 {
     /* generate a list of file names or lines of file info
      */
@@ -927,8 +904,7 @@ int mddir_gen_swp_str_list_v3(dir_num, radar_num, full_file_name, lm)
 }
 /* c------------------------------------------------------------------------ */
 
-int mddir_num_radars_v3(dir_num)
-  int dir_num;
+int mddir_num_radars_v3(int dir_num)
 {
     struct ddir_info_v3 *ddir, *return_ddir();
 
@@ -939,8 +915,7 @@ int mddir_num_radars_v3(dir_num)
 /* c------------------------------------------------------------------------ */
 
 char *
-mddir_radar_name_v3(dir_num, radar_num)
-  int dir_num,  radar_num;
+mddir_radar_name_v3(int dir_num, int radar_num)
 {
     struct ddir_info_v3 *ddir, *return_ddir();
 
@@ -955,9 +930,7 @@ mddir_radar_name_v3(dir_num, radar_num)
 }
 /* c------------------------------------------------------------------------ */
 
-int mddir_radar_num_v3(dir_num, radar_name)
-  int dir_num;
-  char *radar_name;
+int mddir_radar_num_v3(int dir_num, char *radar_name)
 {
     int ii, rn;
     struct ddir_info_v3 *ddir, *return_ddir();
@@ -975,8 +948,7 @@ int mddir_radar_num_v3(dir_num, radar_name)
 /* c------------------------------------------------------------------------ */
 
 struct dd_file_name_v3 **
-mddir_return_swp_list_v3(dir_num, radar_num, num_swps)
-  int dir_num, radar_num, *num_swps;
+mddir_return_swp_list_v3(int dir_num, int radar_num, int *num_swps)
 {
     struct ddir_info_v3 *ddir, *return_ddir();
 
@@ -993,9 +965,7 @@ mddir_return_swp_list_v3(dir_num, radar_num, num_swps)
 /* c------------------------------------------------------------------------ */
 
 double
-ddfnp_list_entry(dir_num, radar_num, ent_num, version, line, file_name)
-  int dir_num, radar_num, ent_num, *version;
-  char *line, *file_name;
+ddfnp_list_entry(int dir_num, int radar_num, int ent_num, int *version, char *line, char *file_name)
 {
     /* return the time stamp and the name from the sweep list
      */
@@ -1030,8 +1000,7 @@ ddfnp_list_entry(dir_num, radar_num, ent_num, version, line, file_name)
 /* c------------------------------------------------------------------------ */
 
 struct ddir_info_v3 *
-return_ddir(dir_num)
-  int dir_num;
+return_ddir(int dir_num)
 {
     int ii;
     struct ddir_info_v3 *this;

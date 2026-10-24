@@ -43,9 +43,7 @@ void dd_gecho_intxn();
 
 /* c------------------------------------------------------------------------ */
 
-void
-dd_gecho(dgi)
-  DGI_PTR dgi;
+void dd_gecho(DGI_PTR dgi)
 {
     int i, jj, mark, rn=dgi->radar_num;
     char *a, *get_tagged_string(),  str[256], name[12], *str_terminate();
@@ -202,17 +200,7 @@ dd_gecho(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dd_gecho_intxn( dgi, fid
-		, min_rot_angle, max_rot_angle
-		, earth_radius, min_gates, min_gatex
-		, reasonable_gecho
-		, gecho_refl, gecho_vel, radar_num, gecho_ncp
-	       )
-  DGI_PTR dgi;
-  int fid, min_gates, min_gatex, radar_num;
-  float min_rot_angle, max_rot_angle, earth_radius, reasonable_gecho;
-  char *gecho_refl, *gecho_vel, *gecho_ncp;
+void dd_gecho_intxn(DGI_PTR dgi, int fid, double min_rot_angle, double max_rot_angle, double earth_radius, int min_gates, int min_gatex, double reasonable_gecho, char *gecho_refl, char *gecho_vel, int radar_num, char *gecho_ncp)
 {
     /* 
      * routine to generate a gecho file

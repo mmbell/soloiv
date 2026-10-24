@@ -42,9 +42,7 @@ int dcdatime();			/* dorade_share.c */
 
 /* c------------------------------------------------------------------------ */
 
-int se_readin_cmds(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_readin_cmds(int arg, struct ui_command *cmds)	
 {
     struct sed_command_files *scf, *se_return_cmd_files_struct();
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
@@ -59,10 +57,7 @@ int se_readin_cmds(arg, cmds)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_establish_field(dgi, src_name, dst_name, fns, fnd)
-  struct dd_general_info *dgi;
-  char *dst_name, *src_name;
-  int *fns, *fnd;
+int se_establish_field(struct dd_general_info *dgi, char *src_name, char *dst_name, int *fns, int *fnd)
 {
     /* established a possible new field but does not copy the
      * data from the source field into the new field
@@ -140,9 +135,7 @@ int se_establish_field(dgi, src_name, dst_name, fns, fnd)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_once_only(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_once_only(int arg, struct ui_command *cmds)	
 {
     /*
      * #a-speckle#
@@ -268,9 +261,7 @@ int se_once_only(arg, cmds)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_dir(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_dir(int arg, struct ui_command *cmds)	
 {
     /* this routine will process all commands associated with
      * the setup-input procedure. It also updates the sfic texts
@@ -400,8 +391,7 @@ int se_dir(arg, cmds)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_version_change(dir, radar)
-  char *dir, *radar;
+int se_version_change(char *dir, char *radar)
 {
     /* this routine returns a non-zero value if the last pass
      * of the created a new version of some data for this radar

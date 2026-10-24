@@ -38,7 +38,7 @@ SiiLinkedList *sii_init_linked_list (guint length);
 
 /* c---------------------------------------------------------------------- */
 
-void sii_check_for_illegal_shrink ()
+void sii_check_for_illegal_shrink(void)
 {
   SiiFrameConfig *sfc = frame_configs[0];
   sii_table_parameters *stp;
@@ -59,7 +59,7 @@ void sii_check_for_illegal_shrink ()
 
 /* c---------------------------------------------------------------------- */
 
-void sii_check_def_widget_sizes ()
+void sii_check_def_widget_sizes(void)
 {
   int nn;
 
@@ -78,7 +78,7 @@ void sii_check_def_widget_sizes ()
 
 /* c---------------------------------------------------------------------- */
 
-void sii_init_frame_configs()
+void sii_init_frame_configs(void)
 {
   int fn, jj, kk;
   GString *gstr = NULL;
@@ -107,7 +107,7 @@ void sii_init_frame_configs()
 
 /* c---------------------------------------------------------------------- */
 
-void sii_reset_config_cells()
+void sii_reset_config_cells(void)
 {
   int cn;
 
@@ -133,7 +133,7 @@ void sii_reset_config_cells()
 
 /* c---------------------------------------------------------------------- */
 
-void sii_new_frames ()
+void sii_new_frames(void)
 {
    int fn, jj, kk, mm, nn, width, height;
    gboolean nonhomogeneous = FALSE, homogeneous = TRUE;
@@ -245,7 +245,7 @@ void sii_new_frames ()
 
 /* c---------------------------------------------------------------------- */
 
-gboolean sii_set_config()
+gboolean sii_set_config(void)
 {
   int cll, cll2, jj, kk, ll, mm, nn, mark, frame, row, col;
   int row2, col2, ncols = 1, nrows = 1;

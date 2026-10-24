@@ -74,10 +74,7 @@ void solo_zap_usual_parm();
 
 /* c------------------------------------------------------------------------ */
 
-struct solo_palette_ptr *
-solo_palette_insert(this, here, before)
-  struct solo_palette_ptr *this, *here;
-  int before;
+struct solo_palette_ptr *solo_palette_insert(struct solo_palette_ptr *this, struct solo_palette_ptr *here, int before)
 {
     if(!this)
 	  return(this);
@@ -114,8 +111,7 @@ solo_palette_insert(this, here, before)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_free_palette(this)
-  struct solo_palette_ptr *this;
+void solo_free_palette(struct solo_palette_ptr *this)
 {
     struct solo_palette_ptr *next;
 
@@ -127,7 +123,7 @@ void solo_free_palette(this)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_gen_palette_list()
+void solo_gen_palette_list(void)
 {
     struct solo_list_mgmt *lm;
     int i, j, n;
@@ -156,10 +152,7 @@ void solo_gen_palette_list()
 /* c------------------------------------------------------------------------ */
 
 
-struct solo_palette_ptr *
-xsolo_get_palette(name, frme)
-  char *name;
-  int frme;
+struct solo_palette_ptr *xsolo_get_palette(char *name, int frme)
 {
     int i, j, n, mark;
     struct solo_palette_ptr        *pal=NULL, *top
@@ -199,7 +192,7 @@ xsolo_get_palette(name, frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_init_palette()
+void solo_init_palette(void)
 {
     struct solo_palette_ptr *next, *last, *solo_malloc_palette();
     struct solo_palette_ptr *solo_push_palette();
@@ -390,9 +383,7 @@ void solo_init_palette()
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_palette_ptr *
-solo_malloc_palette(name)
-  char *name;
+struct solo_palette_ptr *solo_malloc_palette(char *name)
 {
     /* this routine generates a set of palette pointers and
      * a generic palette
@@ -447,8 +438,7 @@ solo_malloc_palette(name)
 
 /* c------------------------------------------------------------------------ */
 
-struct solo_palette *
-solo_malloc_old_palette()
+struct solo_palette *solo_malloc_old_palette(void)
 {
     /* this routine generates a set of palette pointers and
      * a generic palette
@@ -466,9 +456,7 @@ solo_malloc_old_palette()
 
 /* c------------------------------------------------------------------------ */
 
-void solo_merge_usual_parm(this, name)
-  struct solo_palette_ptr *this;
-  char *name;
+void solo_merge_usual_parm(struct solo_palette_ptr *this, char *name)
 {
     char *a, *aa, *b, *c, *e, *f, str[256], *strstr();
     int i, j, n, nn, mark, prepend=NO;
@@ -522,8 +510,7 @@ void solo_merge_usual_parm(this, name)
 }
 /* c------------------------------------------------------------------------ */
 
-int xsolo_palette_color_numbers(frme)
-  int frme;
+int xsolo_palette_color_numbers(int frme)
 {
     /* this routine assumes that all the color names have been checked
      */
@@ -598,8 +585,7 @@ int xsolo_palette_color_numbers(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_palette_message(frme)
-  int frme;
+void solo_palette_message(int frme)
 {
     WW_PTR wwptr, solo_return_wwptr();
     float half;
@@ -614,9 +600,7 @@ void solo_palette_message(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_palette_ptr *
-solo_palette_remove(this)
-  struct solo_palette_ptr *this;
+struct solo_palette_ptr *solo_palette_remove(struct solo_palette_ptr *this)
 {
     struct solo_palette_ptr *next;
 
@@ -638,9 +622,7 @@ solo_palette_remove(this)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_palette_ptr *
-solo_push_palette(this)
-  struct solo_palette_ptr *this;
+struct solo_palette_ptr *solo_push_palette(struct solo_palette_ptr *this)
 {
     struct solo_palette_ptr *solo_palette_insert(), *next, *that;
     struct solo_palette_ptr *solo_palette_remove();
@@ -676,8 +658,7 @@ solo_push_palette(this)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_same_palette(this, that)
-  struct solo_palette *this, *that;
+int solo_same_palette(struct solo_palette *this, struct solo_palette *that)
 {
     if(strcmp(this->palette_name, that->palette_name))
 	  return(NO);
@@ -691,10 +672,7 @@ int solo_same_palette(this, that)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_subscribe_palette(frme, this, parameter_name)
-  int frme;
-  struct solo_palette_ptr *this;
-  char *parameter_name;
+void solo_subscribe_palette(int frme, struct solo_palette_ptr *this, char *parameter_name)
 {
     char str[256];
     int i, j, n, mark;
@@ -719,9 +697,7 @@ void solo_subscribe_palette(frme, this, parameter_name)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_check_zap_parms(name, except)
-  char *name;
-  struct solo_palette_ptr *except;
+void solo_check_zap_parms(char *name, struct solo_palette_ptr *except)
 {
     struct solo_palette_ptr *top, *pal
 	  , *solo_topof_palettes();
@@ -747,9 +723,7 @@ void solo_check_zap_parms(name, except)
 /* c------------------------------------------------------------------------ */
 
 struct solo_palette_ptr *
-solo_this_palette(name, next)
-  char *name;
-  struct solo_palette_ptr *next;
+solo_this_palette(char *name, struct solo_palette_ptr *next)
 {
     struct solo_palette_ptr *last;
 
@@ -763,9 +737,7 @@ solo_this_palette(name, next)
 /* c------------------------------------------------------------------------ */
 
 struct solo_palette_ptr *
-solo_usual_parms(name, next)
-  char *name;
-  struct solo_palette_ptr *next;
+solo_usual_parms(char *name, struct solo_palette_ptr *next)
 {
     struct solo_palette_ptr *last;
 
@@ -784,9 +756,7 @@ solo_topof_palettes()
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_zap_usual_parm(this, name)
-  struct solo_palette_ptr *this;
-  char *name;
+void solo_zap_usual_parm(struct solo_palette_ptr *this, char *name)
 {
     char *a, *b, *c, *e, str[256], *strstr();
     int i, j, n, mark;

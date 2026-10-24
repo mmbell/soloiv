@@ -505,7 +505,7 @@ stati int ();
 
 /* c------------------------------------------------------------------------ */
 
-static char * horiz_fields_list()
+static char *horiz_fields_list(void)
 {
   static char list[256];
 
@@ -517,7 +517,7 @@ static char * horiz_fields_list()
 
 /* c------------------------------------------------------------------------ */
 
-static char * vert_fields_list()
+static char *vert_fields_list(void)
 {
   static char list[256];
 
@@ -528,7 +528,7 @@ static char * vert_fields_list()
 
 /* c------------------------------------------------------------------------ */
 
-static char * horiz_and_vert_fields_list()
+static char *horiz_and_vert_fields_list(void)
 {
   static char list[256];
 
@@ -541,8 +541,7 @@ static char * horiz_and_vert_fields_list()
 
 /* c------------------------------------------------------------------------ */
 
-static int in_list( name, list )
-char *name, *list;
+static int in_list(char *name, char *list)
 {
     char str[256], * sptrs[64], *aa, *bb, *cc;
     int ii, jj, kk, mm, nn, nt, ndx;
@@ -565,9 +564,7 @@ char *name, *list;
 
 /* c------------------------------------------------------------------------ */
 
-void produce_ncdf( dgi, finish )
-  struct dd_general_info *dgi;
-  int finish;
+void produce_ncdf(struct dd_general_info *dgi, int finish)
 {
 
     struct ncdf_production *ncp;
@@ -671,8 +668,7 @@ void produce_ncdf( dgi, finish )
 
 /* c------------------------------------------------------------------------ */
 
-void ncdf_finish( ncp )
-  struct ncdf_production *ncp;
+static void ncdf_finish(struct ncdf_production *ncp)
 {
   char str[256], str2[256], *aa, ii;
 
@@ -694,9 +690,7 @@ void ncdf_finish( ncp )
 }
 /* c------------------------------------------------------------------------ */
 
-void ncdf_init_sweep(dgi, ncp)
-  struct dd_general_info *dgi;
-  struct ncdf_production *ncp;
+static void ncdf_init_sweep(struct dd_general_info *dgi, struct ncdf_production *ncp)
 {
    struct dds_structs *dds=dgi->dds;
    struct radar_d *radd=dds->radd;
@@ -1291,9 +1285,7 @@ strcat( str, "defined in segments of constant cell spacing");
 }
 /* c------------------------------------------------------------------------ */
 
-static int dd_setFxdR1GsEtc( ncp, num_dims, dims )
-struct ncdf_production *ncp;
-int num_dims, *dims;
+static int dd_setFxdR1GsEtc(struct ncdf_production *ncp, int num_dims, int *dims)
 {
   char str[256], *aa, *bb, *cc;
   int ii, jj, mark, nn;
@@ -1372,9 +1364,7 @@ int num_dims, *dims;
 
 /* c------------------------------------------------------------------------ */
 
-static int dd_setRcvrXmtrStuff( ncp, num_dims, dims )
-struct ncdf_production *ncp;
-int num_dims, *dims;
+static int dd_setRcvrXmtrStuff(struct ncdf_production *ncp, int num_dims, int *dims)
 {
   char str[256], *aa, *bb, *cc;
   int ii, jj, mark, nn;
@@ -1623,9 +1613,7 @@ int num_dims, *dims;
 
 /* c------------------------------------------------------------------------ */
 
-static int dd_setLatLonAlt( ncp, num_dims, dims )
-struct ncdf_production *ncp;
-int num_dims, *dims;
+static int dd_setLatLonAlt(struct ncdf_production *ncp, int num_dims, int *dims)
 
 {
   char str[256], *aa, *bb, *cc;
@@ -1698,9 +1686,7 @@ int num_dims, *dims;
 
 /* c------------------------------------------------------------------------ */
 
-static int dd_setAzEl( ncp, num_dims, dims )
-struct ncdf_production *ncp;
-int num_dims, *dims;
+static int dd_setAzEl(struct ncdf_production *ncp, int num_dims, int *dims)
 {
   char str[256], *aa, *bb, *cc;
   int ii, jj, mark, nn, i_vals[8];
@@ -1773,10 +1759,7 @@ int num_dims, *dims;
 
 /* c------------------------------------------------------------------------ */
 
-static int dd_setACparams( dgi, ncp, num_dims, dims )
-     struct dd_general_info *dgi;
-     struct ncdf_production *ncp;
-     int num_dims, *dims;
+static int dd_setACparams(struct dd_general_info *dgi, struct ncdf_production *ncp, int num_dims, int *dims)
 {
   char str[256], *aa, *bb, *cc;
   int ii, jj, mark, nn;
@@ -2369,9 +2352,7 @@ static int dd_setACparams( dgi, ncp, num_dims, dims )
 
 /* c------------------------------------------------------------------------ */
 
-void ncp_stuff_ray(dgi, ncp)
-  struct dd_general_info *dgi;
-  struct ncdf_production *ncp;
+static void ncp_stuff_ray(struct dd_general_info *dgi, struct ncdf_production *ncp)
 {
   struct dds_structs *dds=dgi->dds;
   struct radar_d *radd=dds->radd;

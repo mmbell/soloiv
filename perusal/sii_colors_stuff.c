@@ -117,7 +117,7 @@ void sii_print_hash_str( gpointer key, gpointer value, gpointer user_data )
 
 /* c---------------------------------------------------------------------- */
 
-void sii_set_default_colors ()
+void sii_set_default_colors(void)
 {
   GdkRGBA *gcolor;
   GdkRGBA *gcolor2;
@@ -295,7 +295,7 @@ void sii_set_default_colors ()
 
 /* c---------------------------------------------------------------------- */
 
-void set_all_X_named_colors()
+void set_all_X_named_colors(void)
 {
    char *aa, *bb, *cc;
    char str[80], *sptrs[16], name[32];

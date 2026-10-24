@@ -63,8 +63,7 @@ int ufp_write();
 
 /* c------------------------------------------------------------------------ */
 
-void produce_uf( dgi )
-  struct dd_general_info *dgi;
+void produce_uf(struct dd_general_info *dgi)
 {
     struct field_name_aliases *fna, *prev_fna;
     struct uf_production *ufp;
@@ -213,8 +212,7 @@ void produce_uf( dgi )
 }
 /* c------------------------------------------------------------------------ */
 
-int ufp_check_media( ufp )
-    struct uf_production *ufp;
+int ufp_check_media(struct uf_production *ufp)
 {
     int ii;
     char str[256], command[256];
@@ -296,9 +294,7 @@ int ufp_check_media( ufp )
 }
 /* c------------------------------------------------------------------------ */
 
-void ufp_init(dgi, ufp)
-  struct dd_general_info *dgi;
-  struct uf_production *ufp;
+void ufp_init(struct dd_general_info *dgi, struct uf_production *ufp)
 {
     /*
      * initialize uf structures
@@ -434,9 +430,7 @@ void ufp_init(dgi, ufp)
 }
 /* c------------------------------------------------------------------------ */
 
-void ufp_stuff_ray(dgi, ufp)
-  struct dd_general_info *dgi;
-  struct uf_production *ufp;
+void ufp_stuff_ray(struct dd_general_info *dgi, struct uf_production *ufp)
 {
     struct dds_structs *dds=dgi->dds;
     struct radar_d *radd=dds->radd;
@@ -756,9 +750,7 @@ void ufp_stuff_ray(dgi, ufp)
 }
  /* c----------------------------------------------------------------------- */
 
-void ufp_uf_stuff(dgi, ufp)
-  struct dd_general_info *dgi;
-  struct uf_production *ufp;
+void ufp_uf_stuff(struct dd_general_info *dgi, struct uf_production *ufp)
 {
     /*
      * Application specific UF stuff
@@ -854,9 +846,7 @@ void ufp_uf_stuff(dgi, ufp)
 }
 /* c------------------------------------------------------------------------ */
 
-int ufp_write( ufp, size )
-  struct uf_production *ufp;
-  int size;
+int ufp_write(struct uf_production *ufp, int size)
 {
     int ii, jj, nn;
     static short *le_buf=NULL;

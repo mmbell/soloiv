@@ -127,9 +127,7 @@ char *put_tagged_string();
 
 /* c------------------------------------------------------------------------ */
 
-int
-dd_get_scan_mode(mne)
-  char *mne;
+int dd_get_scan_mode(char *mne)
 {
     int jj;
     
@@ -142,8 +140,7 @@ dd_get_scan_mode(mne)
 }
 /* c------------------------------------------------------------------------ */
 
-struct cfac_wrap *dd_absorb_cfacs(list, radar_name )
-  char *list, *radar_name;
+struct cfac_wrap *dd_absorb_cfacs(char *list, char *radar_name)
 {
     char *aa=list;
     char *dd_link_dev_name();
@@ -205,9 +202,7 @@ struct cfac_wrap *dd_absorb_cfacs(list, radar_name )
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_absorb_cfac( list, radar_name, cfac)
-  char *list, *radar_name;
-  struct correction_d *cfac;
+void dd_absorb_cfac(char *list, char *radar_name, struct correction_d *cfac)
 {
     char *a=list;
     char *dd_link_dev_name();
@@ -241,10 +236,7 @@ void dd_absorb_cfac( list, radar_name, cfac)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-dd_align_structs(c, n)
-  char *c;
-  int n;
+char *dd_align_structs(char *c, int n)
 {
     /* pass back a pointer aligned to the next 8 byte boundary */
     int i, sod=sizeof(double);
@@ -255,9 +247,7 @@ dd_align_structs(c, n)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_altitude(dgi)
-  struct dd_general_info *dgi;
+double dd_altitude(struct dd_general_info *dgi)
 {
     double d=dgi->dds->asib->altitude_msl;
     if(dd_isnanf(d))
@@ -267,9 +257,7 @@ dd_altitude(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_altitude_agl(dgi)
-  struct dd_general_info *dgi;
+double dd_altitude_agl(struct dd_general_info *dgi)
 {
     double d=dgi->dds->asib->altitude_agl;
     if(dd_isnanf(d))
@@ -279,10 +267,7 @@ dd_altitude_agl(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dd_alloc_data_field(dgi, pn)
-  DGI_PTR dgi;
-  int pn;
+void dd_alloc_data_field(DGI_PTR dgi, int pn)
 {
     int mm;
     DDS_PTR dds = dgi->dds;
@@ -315,9 +300,7 @@ dd_alloc_data_field(dgi, pn)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_azimuth_angle(dgi)
-  struct dd_general_info *dgi;
+double dd_azimuth_angle(struct dd_general_info *dgi)
 {
     double d_rot;
 
@@ -347,11 +330,7 @@ dd_azimuth_angle(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_cell_num(dds, parameter_num, range)
-  struct dds_structs *dds;
-  int parameter_num;
-  float range;
+int dd_cell_num(struct dds_structs *dds, int parameter_num, double range)
 {
     /* find the cell corresponding to this range using the
      * uniform spacing lookup table
@@ -375,8 +354,7 @@ dd_cell_num(dds, parameter_num, range)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_clear_pisp(pisp)
-  struct point_in_space *pisp;
+void dd_clear_pisp(struct point_in_space *pisp)
 {
     int nn=sizeof (*pisp);
     memset(pisp, 0, nn);
@@ -385,11 +363,14 @@ void dd_clear_pisp(pisp)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_clip_gate(dgi, elev, alt, lower, upper)
-  DGI_PTR dgi;
-  float elev;			/* assume elev in radians */
-  float alt;			/* assume alt in km */
-  double lower, upper;
+int 
+dd_clip_gate (
+    DGI_PTR dgi,
+    double elev,			/* assume elev in radians */
+    double alt,			/* assume alt in km */
+    double lower,
+    double upper
+)
 {
     struct platform_i *asib=dgi->dds->asib;
     struct correction_d *cfac=dgi->dds->cfac;
@@ -428,9 +409,7 @@ int dd_clip_gate(dgi, elev, alt, lower, upper)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_compress( src, dst, flag, n )
-  unsigned short *src, *dst, flag;
-  int n;
+int dd_compress(unsigned short *src, unsigned short *dst, int flag, int n)
 {
     /* implement hrd compression of 16-bit values
      * and return the number of 16-bit words of compressed data
@@ -522,15 +501,13 @@ int dd_compress( src, dst, flag, n )
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_copy_pisp(p0, p1)
-  struct point_in_space *p0, *p1;
+void dd_copy_pisp(struct point_in_space *p0, struct point_in_space *p1)
 {
     memcpy(p1, p0, p0->sizeof_struct);
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_datum_size(binary_format)
-  int binary_format;
+int dd_datum_size(int binary_format)
 {
     if(binary_format == DD_8_BITS) return(1);
     if(binary_format == DD_16_BITS) return(2);
@@ -541,8 +518,7 @@ int dd_datum_size(binary_format)
 }
 /* c------------------------------------------------------------------------ */
 
-char *dd_delimit(c)
-  char *c;
+char *dd_delimit(char *c)
 {
     /* advance to next delimiter */
     for(;*c != ' ' && *c != '\t' && *c != '\n' &&
@@ -551,9 +527,7 @@ char *dd_delimit(c)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_drift(dgi)
-  struct dd_general_info *dgi;
+double dd_drift(struct dd_general_info *dgi)
 {
     double d=dgi->dds->asib->drift_angle;
     if(dd_isnanf(d))
@@ -563,9 +537,7 @@ dd_drift(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_earthr(lat)
-  double lat;
+double dd_earthr(double lat)
 {
     static double *earth_r=NULL;
 
@@ -595,9 +567,7 @@ dd_earthr(lat)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_elevation_angle(dgi)
-  struct dd_general_info *dgi;
+double dd_elevation_angle(struct dd_general_info *dgi)
 {
     int mark;
     double d, d_rot;
@@ -659,8 +629,7 @@ dd_elevation_angle(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-char *dd_find_desc(a, b, desc)
-  char *a, *b, *desc;
+char *dd_find_desc(char *a, char *b, char *desc)
 {
     struct generic_descriptor *gd;
     while(a < b) {
@@ -673,10 +642,7 @@ char *dd_find_desc(a, b, desc)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_find_field(dgi, name)
-  struct dd_general_info *dgi;
-  char *name;
+int dd_find_field(struct dd_general_info *dgi, char *name)
 {
     int ii=0, nc, nx;
     struct dds_structs *dds=dgi->dds;
@@ -703,9 +669,7 @@ dd_find_field(dgi, name)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_get_cfac(stream, cfac)
-  FILE *stream;
-  struct correction_d *cfac;
+void dd_get_cfac(FILE *stream, struct correction_d *cfac)
 {
     /* routine to absorb an ascii version of the cfac info and
      * stuff it into the cfac struct
@@ -785,8 +749,7 @@ void dd_get_cfac(stream, cfac)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_get_difs(difs)
-  struct dd_input_filters *difs;
+void dd_get_difs(struct dd_input_filters *difs)
 {
     int ii, jj, kk, nn, nt, sizeof_env=K64, num_ptrs=999;
     char *a, *bb, *get_tagged_string(), str[2048], *str_ptrs[99];
@@ -1003,10 +966,7 @@ void dd_get_difs(difs)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_get_lims(str_ptrs, ii, nt, dlims)
-  char *str_ptrs[];
-  int ii, nt;
-  struct d_limits **dlims;
+void dd_get_lims(char *str_ptrs[], int ii, int nt, struct d_limits **dlims)
 {
     /* extract the next set of limits
      * either two numbers seperated by a string like "<" or "-" or
@@ -1032,10 +992,7 @@ void dd_get_lims(str_ptrs, ii, nt, dlims)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_givfld( dgi, ndx, g1, n, dd, badval )
-  DGI_PTR dgi;
-  int *ndx, *g1, *n;
-  float *dd, *badval;
+int dd_givfld(DGI_PTR dgi, int *ndx, int *g1, int *n, float *dd, float *badval)
 {
     /*
      * dgi: dd_general_info struct
@@ -1104,9 +1061,7 @@ int dd_givfld( dgi, ndx, g1, n, dd, badval )
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_heading(dgi)
-  struct dd_general_info *dgi;
+double dd_heading(struct dd_general_info *dgi)
 {
     double d=dgi->dds->asib->heading;
     if(dd_isnanf(d))
@@ -1116,10 +1071,7 @@ dd_heading(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_general_info *
-dd_ini(rn, radar_name)
-  int rn;
-  char *radar_name;
+struct dd_general_info *dd_ini(int rn, char *radar_name)
 {
     /*
      * the purpose of this routine is to initialize
@@ -1543,7 +1495,7 @@ dd_ini(rn, radar_name)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_input_strings()
+void dd_input_strings(void)
 {
     char *a, *getenv(), *put_tagged_strings();
 
@@ -2236,11 +2188,7 @@ void dd_input_strings()
 }
 /* c------------------------------------------------------------------------ */
 
-void dgi_interest_really(dgi, verbosity, preamble, postamble, swib)
-  struct dd_general_info *dgi;
-  int verbosity;
-  char *preamble, *postamble;
-  struct sweepinfo_d *swib;
+void dgi_interest_really(struct dd_general_info *dgi, int verbosity, char *preamble, char *postamble, struct sweepinfo_d *swib)
 {
     /* 
      * passing in the swib is necessary because there is more than
@@ -2303,8 +2251,7 @@ void dgi_interest_really(dgi, verbosity, preamble, postamble, swib)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_itsa_physical_dev(s)
-  char *s;
+int dd_itsa_physical_dev(char *s)
 {
     /* check the string to see if it contains a physical device name */
     if(strstr(s, "/dev/"))
@@ -2313,9 +2260,7 @@ int dd_itsa_physical_dev(s)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_latitude(dgi)
-  struct dd_general_info *dgi;
+double dd_latitude(struct dd_general_info *dgi)
 {
     double d=dgi->dds->asib->latitude;
     if(dd_isnanf(d))
@@ -2325,8 +2270,7 @@ dd_latitude(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_latlon_relative(p0, p1)
-  struct point_in_space *p0, *p1;
+void dd_latlon_relative(struct point_in_space *p0, struct point_in_space *p1)
 {
     /* routine to calculate (x,y,z) for p1 so as to line up
      * with (0,0,0) for p0
@@ -2345,11 +2289,7 @@ void dd_latlon_relative(p0, p1)
 }
 /*c----------------------------------------------------------------------*/
 
-int loop_ll2xy_v3( plat, plon, palt, x, y, z, olat, olon, oalt
-		   , R_earth, num_pts )
-    double *plat, *plon, *palt, olat, olon, oalt, R_earth;
-    double *x, *y, *z;
-    int num_pts;
+int loop_ll2xy_v3(double *plat, double *plon, double *palt, double *x, double *y, double *z, double olat, double olon, double oalt, double R_earth, int num_pts)
 {
     /* calculate (x,y,z) of (plat,plon) relative to (olat,olon) */
     /* all dimensions in km. */
@@ -2411,8 +2351,7 @@ int loop_ll2xy_v3( plat, plon, palt, x, y, z, olat, olon, oalt
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_latlon_shift(p0, p1)
-  struct point_in_space *p0, *p1;
+void dd_latlon_shift(struct point_in_space *p0, struct point_in_space *p1)
 {
     /* routine to calculate lat/lon/alt for p1 so as to line up
      * with (x,y,z) for p0
@@ -2430,11 +2369,7 @@ void dd_latlon_shift(p0, p1)
 }
 /*c----------------------------------------------------------------------*/
 
-int loop_xy2ll_v3( plat, plon, palt, x, y, z, olat, olon, oalt
-		   , R_earth, num_pts )
-    double *plat, *plon, *palt, olat, olon, oalt, R_earth;
-    double *x, *y, *z;
-    int num_pts;
+int loop_xy2ll_v3(double *plat, double *plon, double *palt, double *x, double *y, double *z, double olat, double olon, double oalt, double R_earth, int num_pts)
 {
     /* calculate (plat,plon) of a point at (x,y) relative to (olat,olon) */
     /* all dimensions in km. */
@@ -2492,8 +2427,7 @@ int loop_xy2ll_v3( plat, plon, palt, x, y, z, olat, olon, oalt
 }
 /* c------------------------------------------------------------------------ */
 
-char *dd_link_dev_name(radar_name, dev_links, str)
-  char *radar_name, *dev_links, *str;
+char *dd_link_dev_name(char *radar_name, char *dev_links, char *str)
 {
     /* this routine is looking for pairs of the form
      * "TA > /dev/nrst0 TF > /dev/nrst1"
@@ -2520,9 +2454,7 @@ char *dd_link_dev_name(radar_name, dev_links, str)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_longitude(dgi)
-  struct dd_general_info *dgi;
+double dd_longitude(struct dd_general_info *dgi)
 {
     double d=dgi->dds->asib->longitude;
     if(dd_isnanf(d))
@@ -2532,10 +2464,7 @@ dd_longitude(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-struct radar_d *
-dd_malloc_radd(dgi, config_name)
-  DGI_PTR dgi;
-  char *config_name;
+struct radar_d *dd_malloc_radd(DGI_PTR dgi, char *config_name)
 {
     /* return a pointer to the radar descriptor with the
      * corresponding config_name or establish a new one
@@ -2593,9 +2522,7 @@ dd_malloc_radd(dgi, config_name)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_nav_rotation_angle(dgi)
-  struct dd_general_info *dgi;
+double dd_nav_rotation_angle(struct dd_general_info *dgi)
 {
     double d_rot, dd_azimuth_angle();
 
@@ -2626,9 +2553,7 @@ dd_nav_rotation_angle(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_nav_tilt_angle(dgi)
-  struct dd_general_info *dgi;
+double dd_nav_tilt_angle(struct dd_general_info *dgi)
 {
     double d_rot;
 
@@ -2651,9 +2576,7 @@ dd_nav_tilt_angle(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_ndx_name(dgi, name2)
-  DGI_PTR dgi;
-  char *name2;
+int dd_ndx_name(DGI_PTR dgi, char *name2)
 {
     DDS_PTR dds=dgi->dds;
     int ii, n=strlen(name2);
@@ -2666,9 +2589,7 @@ int dd_ndx_name(dgi, name2)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_pitch(dgi)
-  struct dd_general_info *dgi;
+double dd_pitch(struct dd_general_info *dgi)
 {
     double d=dgi->dds->asib->pitch;
     if(dd_isnanf(d))
@@ -2678,10 +2599,7 @@ dd_pitch(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_asib(asib, slm)
-  struct platform_i *asib;
-  struct solo_list_mgmt *slm;
+void dor_print_asib(struct platform_i *asib, struct solo_list_mgmt *slm)
 {
     char *aa, bstr[128];
 
@@ -2741,10 +2659,7 @@ dor_print_asib(asib, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_celv(celv, slm)
-  struct cell_d *celv;
-  struct solo_list_mgmt *slm;
+void dor_print_celv(struct cell_d *celv, struct solo_list_mgmt *slm)
 {
     int ii;
     double d, delta1=1.e6, delta2;
@@ -2789,10 +2704,7 @@ dor_print_celv(celv, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_cfac(cfac, slm)
-  struct correction_d *cfac;
-  struct solo_list_mgmt *slm;
+void dor_print_cfac(struct correction_d *cfac, struct solo_list_mgmt *slm)
 {
     char str[64], *str_terminate();
     char *aa, bstr[128];
@@ -2846,10 +2758,7 @@ dor_print_cfac(cfac, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_parm(parm, slm)
-  struct parameter_d *parm;
-struct solo_list_mgmt *slm;
+void dor_print_parm(struct parameter_d *parm, struct solo_list_mgmt *slm)
 {
     char str[64], *str_terminate();
     char *aa, bstr[128];
@@ -2911,10 +2820,7 @@ struct solo_list_mgmt *slm;
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_frib(frib, slm)
-  struct field_radar_i *frib;
-  struct solo_list_mgmt *slm;
+void dor_print_frib(struct field_radar_i *frib, struct solo_list_mgmt *slm)
 {
   char *sptrs[128], str[512], mess[256];
   int i, jj, nn;
@@ -3038,10 +2944,7 @@ dor_print_frib(frib, slm)
 
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_radd(radd, slm)
-  struct radar_d *radd;
-  struct solo_list_mgmt *slm;
+void dor_print_radd(struct radar_d *radd, struct solo_list_mgmt *slm)
 {
     char str[128], *str_terminate();
     char *aa, bstr[128];
@@ -3138,10 +3041,7 @@ dor_print_radd(radd, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_rktb(rktb, slm)
-  struct rot_ang_table *rktb;	
-  struct solo_list_mgmt *slm;
+void dor_print_rktb(struct rot_ang_table *rktb, struct solo_list_mgmt *slm)
 {
     char *aa, *bb, bstr[128];
     int ii;
@@ -3190,10 +3090,7 @@ dor_print_rktb(rktb, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_ryib(ryib, slm)
-  struct ray_i *ryib;
-  struct solo_list_mgmt *slm;
+void dor_print_ryib(struct ray_i *ryib, struct solo_list_mgmt *slm)
 {
     char *aa, bstr[128];
 
@@ -3237,10 +3134,7 @@ dor_print_ryib(ryib, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_swib(swib, slm)
-  struct sweepinfo_d *swib;
-  struct solo_list_mgmt *slm;
+void dor_print_swib(struct sweepinfo_d *swib, struct solo_list_mgmt *slm)
 {
     char *str_terminate();
     char *aa, bstr[128];
@@ -3275,10 +3169,7 @@ dor_print_swib(swib, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_sswb(sswb, slm)
-  struct super_SWIB *sswb;
-  struct solo_list_mgmt *slm;
+void dor_print_sswb(struct super_SWIB *sswb, struct solo_list_mgmt *slm)
 {
     int ii;
     char str[128], *str_terminate();
@@ -3364,10 +3255,7 @@ dor_print_sswb(sswb, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dor_print_vold(vold, slm)
-  struct volume_d *vold;
-  struct solo_list_mgmt *slm;
+void dor_print_vold(struct volume_d *vold, struct solo_list_mgmt *slm)
 {
     char str[128], *str_terminate();
     char *aa, bstr[128];
@@ -3425,11 +3313,7 @@ dor_print_vold(vold, slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_radar_angles( asib, cfac, ra, dgi )
-  struct platform_i *asib;
-  struct correction_d *cfac;
-  struct radar_angles *ra;
-  struct dd_general_info *dgi;
+void dd_radar_angles(struct platform_i *asib, struct correction_d *cfac, struct radar_angles *ra, struct dd_general_info *dgi)
 {
     /* compute the true azimuth, elevation, etc. from platform
      * parameters using Testud's equations with their different
@@ -3622,8 +3506,7 @@ void dd_radar_angles( asib, cfac, ra, dgi )
 }
 /* c------------------------------------------------------------------------ */
 
-char *dd_radar_name(dds)
-  struct dds_structs *dds;
+char *dd_radar_name(struct dds_structs *dds)
 {
     int i;
     static char name[12];
@@ -3645,8 +3528,7 @@ char *dd_radar_name(dds)
 }
 /* c------------------------------------------------------------------------ */
 
-char *dd_radar_namec(name0)
-  char *name0;
+char *dd_radar_namec(char *name0)
 {
     /* try and cleanup the radar name
      */
@@ -3668,10 +3550,7 @@ char *dd_radar_namec(name0)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_radar_selected( radar_name, radar_num, difs)
-  char *radar_name;
-  int radar_num;
-  struct dd_input_filters *difs;
+void dd_radar_selected(char *radar_name, int radar_num, struct dd_input_filters *difs)
 {
     int ii, jj, kk, nt;
     char *a, *b, *c, str[256], *get_tagged_string(), radar[16];
@@ -3712,10 +3591,7 @@ void dd_radar_selected( radar_name, radar_num, difs)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_range_gate( dgi, req_range, gate, val )
-  DGI_PTR dgi;
-  int *gate;
-  float *req_range, *val;
+void dd_range_gate(DGI_PTR dgi, float *req_range, int *gate, float *val)
 {
     /* return the gate and range of the gate nearest the requested range
      */
@@ -3748,11 +3624,12 @@ void dd_range_gate( dgi, req_range, gate, val )
 /* c------------------------------------------------------------------------ */
 
 struct dd_ray_sector *
-dd_ray_coverage(dgi, rat, rn, expansion)
-  DGI_PTR dgi;
-  struct rot_ang_table *rat;
-  int rn;			/* ray number (starts at 1) */
-  float expansion;
+dd_ray_coverage (
+    DGI_PTR dgi,
+    struct rot_ang_table *rat,
+    int rn,			/* ray number (starts at 1) */
+    double expansion
+)
 {
     /* this routine returns the sector in degrees covered by
      * the request ray
@@ -3805,8 +3682,7 @@ dd_ray_coverage(dgi, rat, rn, expansion)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_razel_to_xyz(p0)
-  struct point_in_space *p0;
+void dd_razel_to_xyz(struct point_in_space *p0)
 {
     /* routine to calculate (x,y,z) (from az,el,rng)
      *
@@ -3822,8 +3698,7 @@ void dd_razel_to_xyz(p0)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_reset_d_limits(at)
-  struct d_limits **at;
+void dd_reset_d_limits(struct d_limits **at)
 {
     if(!(*at)) {
 	*at = (struct d_limits *)malloc(sizeof(struct d_limits));
@@ -3834,8 +3709,7 @@ void dd_reset_d_limits(at)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_return_id_num(name)
-  char *name;
+int dd_return_id_num(char *name)
 {
     char *a, *b, str[16], *str_terminate();
 
@@ -3885,9 +3759,7 @@ int dd_return_id_num(name)
 }
 /* c------------------------------------------------------------------------ */
 
-struct rot_table_entry *
-dd_return_rotang1(rat)
-  struct rot_ang_table *rat;
+struct rot_table_entry *dd_return_rotang1(struct rot_ang_table *rat)
 {
     struct rot_table_entry *ray1;
 
@@ -3896,9 +3768,7 @@ dd_return_rotang1(rat)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_roll(dgi)
-  struct dd_general_info *dgi;
+double dd_roll(struct dd_general_info *dgi)
 {
     double d=dgi->dds->asib->roll;
     if(dd_isnanf(d))
@@ -3908,9 +3778,7 @@ dd_roll(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_rotang_seek(rat, rotang)
-  struct rot_ang_table *rat;
-  float rotang;
+int dd_rotang_seek(struct rot_ang_table *rat, double rotang)
 {
     /* returns the index of the ray closest to the requested
      * rotation angle
@@ -3975,9 +3843,7 @@ int dd_rotang_seek(rat, rotang)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_rotang_table(dgi, func)
-  DGI_PTR dgi;
-  int func;
+void dd_rotang_table(DGI_PTR dgi, int func)
 {
     struct rot_ang_table *rat=dgi->rat;
     struct rot_table_entry *next;
@@ -4068,9 +3934,7 @@ void dd_rotang_table(dgi, func)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_rotation_angle(dgi)
-  struct dd_general_info *dgi;
+double dd_rotation_angle(struct dd_general_info *dgi)
 {
 # define Not_Track_Relative
 
@@ -4109,10 +3973,7 @@ dd_rotation_angle(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_rng_info( dgi,  g1, m, rngs, ng )
-  DGI_PTR dgi;
-  int *g1, *m, *ng;
-  float *rngs;
+void dd_rng_info(DGI_PTR dgi, int *g1, int *m, float *rngs, int *ng)
 {
     DDS_PTR dds=dgi->dds;
     /* routine to return "m" range values */
@@ -4131,9 +3992,7 @@ void dd_rng_info( dgi,  g1, m, rngs, ng )
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dd_set_uniform_cells(dds)
-  struct dds_structs *dds;
+void dd_set_uniform_cells(struct dds_structs *dds)
 {
     /* set up to do quick calculation of a cell number for a given range
      * the assumption here is that the original cell vector contains
@@ -4196,8 +4055,7 @@ dd_set_uniform_cells(dds)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_site_name(proj_name, site_name)
-  char *proj_name, *site_name;
+void dd_site_name(char *proj_name, char *site_name)
 {
     /* add the site name to the end of the project name */
 
@@ -4218,8 +4076,7 @@ void dd_site_name(proj_name, site_name)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_src_fid(io_type)
-  int *io_type;
+int dd_src_fid(int *io_type)
 {
     char *a, *get_tagged_string();
     int fid;
@@ -4245,9 +4102,7 @@ int dd_src_fid(io_type)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_tilt_angle(dgi)
-  struct dd_general_info *dgi;
+double dd_tilt_angle(struct dd_general_info *dgi)
 {
     double d_rot;
 
@@ -4270,8 +4125,7 @@ dd_tilt_angle(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_tokens(att, str_ptrs)
-  char *att, *str_ptrs[];
+int dd_tokens(char *att, char *str_ptrs[])
 {
     int nargs=0;
     char *b=att, *dlims=" \t\n"; /* blank, tab, and new line */
@@ -4284,8 +4138,12 @@ int dd_tokens(att, str_ptrs)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_tokenz(att, str_ptrs, dlims)
-  char *att, *str_ptrs[], *dlims; /* token delimiters */
+int 
+dd_tokenz (
+    char *att,
+    char *str_ptrs[],
+    char *dlims /* token delimiters */
+)
 {
     int nargs=0;
     char *b=att;
@@ -4298,11 +4156,7 @@ int dd_tokenz(att, str_ptrs, dlims)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dd_uniform_cell_spacing(src_cells, num_cells, cell_spacing, cell_lut
-			, r0, nuc)
-  float src_cells[], cell_spacing, r0;
-  int num_cells, *cell_lut, nuc;
+void dd_uniform_cell_spacing(float src_cells[], int num_cells, double cell_spacing, int *cell_lut, double r0, int nuc)
 {
     /* create a lookup table that facilitates getting from a range
      * in meters to a cell number quickly
@@ -4334,8 +4188,7 @@ dd_uniform_cell_spacing(src_cells, num_cells, cell_spacing, cell_lut
 }
 /* c------------------------------------------------------------------------ */
 
-char *dd_whiteout(c)
-  char *c;
+char *dd_whiteout(char *c)
 {
     /* advance beyond whitespace */
     for(; c && (*c == ' ' || *c == '\t' || *c == '\n'); c++ );
@@ -4343,8 +4196,7 @@ char *dd_whiteout(c)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_xy_plane_horizontal(dgi)
-  struct dd_general_info *dgi;
+int dd_xy_plane_horizontal(struct dd_general_info *dgi)
 {
     int ii, nn;
     
@@ -4353,9 +4205,7 @@ int dd_xy_plane_horizontal(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int fp_bin_search( f, nf, val )
-  float *f, val;
-  int nf;
+int fp_bin_search(float *f, int nf, double val)
 {
     /* returns the offset to the nearest value
      */
@@ -4378,8 +4228,7 @@ int fp_bin_search( f, nf, val )
 }
 /* c------------------------------------------------------------------------ */
 
-int dgi_buf_rewind(dgi)
-    DGI_PTR dgi;
+int dgi_buf_rewind(DGI_PTR dgi)
 {
     int mark;
 
@@ -4411,9 +4260,7 @@ int dgi_buf_rewind(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int HRD_recompress( src, dst, flag, n, compression )
-  unsigned short *src, *dst, flag;
-  int n, compression;
+int HRD_recompress(unsigned short *src, unsigned short *dst, int flag, int n, int compression)
 {
     /* implement hrd compression of 16-bit values
      * and return the number of 16-bit words of compressed data
@@ -4438,9 +4285,7 @@ int HRD_recompress( src, dst, flag, n, compression )
 }
 /* c------------------------------------------------------------------------ */
 
-int RDP_compress_bytes( src, dst, flag, n, compression )
-  unsigned char *src, *dst, flag;
-  int n, compression;
+int RDP_compress_bytes(unsigned char *src, unsigned char *dst, int flag, int n, int compression)
 {
 # define MAX_BYTE_COMPRESSION 127
     /* implement hrd compression of bytes values
@@ -4536,8 +4381,10 @@ int RDP_compress_bytes( src, dst, flag, n, compression )
 }
 /* c------------------------------------------------------------------------ */
 
-short swap2( ov )		/* swap integer*2 */
-  char *ov;
+short 
+swap2 (		/* swap integer*2 */
+    char *ov
+)
 {
     union {
 	short newval;
@@ -4548,8 +4395,10 @@ short swap2( ov )		/* swap integer*2 */
 }
 /* c------------------------------------------------------------------------ */
 
-long swap4( ov )		/* swap integer*4 */
-  char *ov;
+long 
+swap4 (		/* swap integer*4 */
+    char *ov
+)
 {
     union {
 	long newval;
@@ -4560,8 +4409,11 @@ long swap4( ov )		/* swap integer*4 */
 }
 /* c------------------------------------------------------------------------ */
 
-long xswap4( v_lower, v_upper ) /* assemble an integer*4 variable */
-  char *v_lower, *v_upper;
+long 
+xswap4 ( /* assemble an integer*4 variable */
+    char *v_lower,
+    char *v_upper
+)
 {
     union {
 	long newval;

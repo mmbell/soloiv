@@ -16,9 +16,7 @@ void produce_shanes_data();
 
 /* c------------------------------------------------------------------------ */
 
-void by_products(dgi, ztime)
-  struct dd_general_info *dgi;
-  time_t ztime;
+void by_products(struct dd_general_info *dgi, time_t ztime)
 {
     dd_derived_fields(dgi);
     dd_pct_stats(dgi);		/* this routine is in the same file with

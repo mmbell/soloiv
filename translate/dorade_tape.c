@@ -77,12 +77,7 @@ static void dd_tape_dump();
 
 /* c------------------------------------------------------------------------ */
 
-static struct dd_sweep_list_entries
-*dd_sweep_listit (dgi, swp_que, this, sweep_count)
-  DGI_PTR dgi;
-  struct prev_swps *swp_que;
-  struct dd_sweep_list_entries *this;
-  int *sweep_count;
+static struct dd_sweep_list_entries *dd_sweep_listit(DGI_PTR dgi, struct prev_swps *swp_que, struct dd_sweep_list_entries *this, int *sweep_count)
 {
     /* enter this sweep in the sweep list.
      * this sweep should have been written out at this point
@@ -152,9 +147,7 @@ static struct dd_sweep_list_entries
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_tape(dgi, flush)
-  DGI_PTR dgi;
-  int flush;
+void dd_tape(DGI_PTR dgi, int flush)
 {
     /* this routine controls the output of DORADE tape format data
      * by assembling a list of sweeps that constitute a volume
@@ -433,11 +426,7 @@ void dd_tape(dgi, flush)
 }
 /* c------------------------------------------------------------------------ */
 
-static void
-dd_tape_dump( top, sweep_count, out_fid, remove_them, io_type
-	     , vol_num, swp_list)
-  struct dd_sweep_list_entries *top, **swp_list;
-  int sweep_count, out_fid, remove_them, io_type, vol_num;
+static void dd_tape_dump(struct dd_sweep_list_entries *top, int sweep_count, int out_fid, int remove_them, int io_type, int vol_num, struct dd_sweep_list_entries **swp_list)
 {
     static char *vtbuf, *tbuf, *sbuf, *swap_buf;
     static int first=YES, count=0, trip=11820;

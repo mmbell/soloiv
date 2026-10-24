@@ -437,7 +437,7 @@ char *absorb_zmap_bnd (char *, int, int *);
 
 /* c---------------------------------------------------------------------- */
 
-void sii_edit_zap_last_bnd_point()
+void sii_edit_zap_last_bnd_point(void)
 {
   struct solo_edit_stuff *seds, *return_sed_stuff();
   struct one_boundary *ob;

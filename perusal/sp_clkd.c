@@ -66,8 +66,7 @@ void sii_exam_click_in_data (guint frame_num);
 
 /* c------------------------------------------------------------------------ */
 
-void solo_new_list_field_vals(frme)
-  int frme;
+void solo_new_list_field_vals(int frme)
 {
     static int count=0;
     long *boom=NULL;
@@ -167,11 +166,7 @@ void solo_new_list_field_vals(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_put_field_vals(dgi, param_num, angle, range, sfv, state)
-  struct dd_general_info *dgi;
-  struct solo_field_vals *sfv;
-  int param_num, state; 
-  float angle, range;
+void solo_put_field_vals(struct dd_general_info *dgi, int param_num, double angle, double range, struct solo_field_vals *sfv, int state)
 {
     long *boom=NULL;
     struct radar_angles *ra=dgi->dds->ra;
@@ -230,8 +225,7 @@ void solo_put_field_vals(dgi, param_num, angle, range, sfv, state)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_sweep_file_check(dir, file)
-  char *dir, *file;
+void sp_sweep_file_check(char *dir, char *file)
 {
     /* the purpose of this routine is to determine if this file is being
      * used in any of the windows and set a flag that says it might
@@ -257,8 +251,7 @@ void sp_sweep_file_check(dir, file)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_ts_seek_field_vals(frme)
-  int frme;
+void sp_ts_seek_field_vals(int frme)
 {
     /* 
      * routine to printout relevent field values corresponding to
@@ -388,8 +381,7 @@ void sp_ts_seek_field_vals(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int sp_ts_ray_list(frme, xpos, nr)
-  int frme, xpos, nr;
+int sp_ts_ray_list(int frme, int xpos, int nr)
 {
     /* construct a list of "nr" rays of time series data
      * centered on xpos.
@@ -490,8 +482,7 @@ int sp_ts_ray_list(frme, xpos, nr)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_ts_data_click(frme, xpos, ypos)
-  int frme, xpos, ypos;
+void sp_ts_data_click(int frme, int xpos, int ypos)
 {
     int ii, mm, nn, ww, width, x_pxl, checked_off[SOLO_MAX_WINDOWS];
     int last_sweep_num=-1, nr;
@@ -665,9 +656,7 @@ void sp_data_click(int frme, double x, double y)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_locate_this_point(sci, bpm)
-  struct solo_click_info *sci;
-  struct bnd_point_mgmt *bpm;
+void sp_locate_this_point(struct solo_click_info *sci, struct bnd_point_mgmt *bpm)
 {
     /* this routine loads up a pisp struct with all the positioning
      * info for this boundary point
@@ -825,9 +814,7 @@ void sp_locate_this_point(sci, bpm)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_rtheta_screen_to_xyz(frme, radar, pisp)
-  int frme;
-    struct point_in_space *radar, *pisp;
+void sp_rtheta_screen_to_xyz(int frme, struct point_in_space *radar, struct point_in_space *pisp)
 {
     /* calculate absolute (x,y,z) relative to the radar
      * for the point on the screen
@@ -877,8 +864,7 @@ void sp_rtheta_screen_to_xyz(frme, radar, pisp)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_seek_field_vals(frme)
-  int frme;
+void sp_seek_field_vals(int frme)
 {
     /* 
      * routine to printout relevent field values corresponding to
@@ -962,10 +948,7 @@ void sp_seek_field_vals(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-sp_xyz_to_rtheta_screen(frme, radar, pisp)
-  int frme;
-  struct point_in_space *radar, *pisp;
+void sp_xyz_to_rtheta_screen(int frme, struct point_in_space *radar, struct point_in_space *pisp)
 {
     /* calculate r & theta for the point of the screen
      * relative to the radar

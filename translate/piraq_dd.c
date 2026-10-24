@@ -355,13 +355,10 @@ char *eld_nimbus_fix_asib();
 
 
 /* c------------------------------------------------------------------------ */
-struct input_read_info *return_pir_irq() { return(irq); }
+struct input_read_info *return_pir_irq(void) { return(irq); }
 /* c------------------------------------------------------------------------ */
 
-static void do_Noise_lut12( noise, scale2ln, lut )
-    double noise;
-    double scale2ln;
-    float * lut;
+static void do_Noise_lut12(double noise, double scale2ln, float *lut)
 {
     int ii;
     double xx;
@@ -373,10 +370,7 @@ static void do_Noise_lut12( noise, scale2ln, lut )
 }
 /* c------------------------------------------------------------------------ */
 
-static void do_Noise_lut15( noise, scale2ln, lut )
-    double noise;
-    double scale2ln;
-    float * lut;
+static void do_Noise_lut15(double noise, double scale2ln, float *lut)
 {
     int ii;
     double xx;
@@ -389,9 +383,7 @@ static void do_Noise_lut15( noise, scale2ln, lut )
 }
 /* c------------------------------------------------------------------------ */
 
-static void do_Noise_lut( noise, scale2ln )
-    double noise;
-    double scale2ln;
+static void do_Noise_lut(double noise, double scale2ln)
 {
     int ii;
     double xx;
@@ -417,8 +409,7 @@ static void do_Noise_lut( noise, scale2ln )
 
 /* c------------------------------------------------------------------------ */
 
-int
-pui_next_block()
+int pui_next_block(void)
 {
   /* returns a pointer to the next block of piraq data
    * which in the case of CD-ROMs may block several rays in a record
@@ -632,9 +623,7 @@ pui_next_block()
 }
 /* c------------------------------------------------------------------------ */
 
-void
-piraq_dd_conv(interactive_mode)
-  int interactive_mode;
+void piraq_dd_conv(int interactive_mode)
 {
     static int count=0, count_break=99, nok_count=0;
     int mark, nn;
@@ -713,8 +702,7 @@ piraq_dd_conv(interactive_mode)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-piraq_isa_new_vol()
+int piraq_isa_new_vol(void)
 {
     int new = NO;
     struct piraq_ray_que *rq = pui->ray_que;
@@ -755,8 +743,7 @@ piraq_isa_new_vol()
 }
 /* c------------------------------------------------------------------------ */
 
-int
-piraq_isa_new_sweep()
+int piraq_isa_new_sweep(void)
 {
     static int ebug = 0;
     int ii, nn, new = NO, az_turnaround, el_turnaround;
@@ -994,8 +981,7 @@ piraq_isa_new_sweep()
 }
 /* c------------------------------------------------------------------------ */
 
-int
-piraq_select_ray()
+int piraq_select_ray(void)
 {
     int ii, jj, ok=YES, mark;
     static int select = 0, reject = 0;
@@ -1112,9 +1098,7 @@ piraq_select_ray()
 }
 /* c------------------------------------------------------------------------ */
 
-void
-piraq_print_stat_line(count)
-  int count;
+void piraq_print_stat_line(int count)
 {
     DD_TIME *dts=gri->dts, *d_unstamp_time();
     char *dts_print();
@@ -1131,7 +1115,7 @@ piraq_print_stat_line(count)
 }
 /* c------------------------------------------------------------------------ */
 
-void piraq_reset()
+void piraq_reset(void)
 {
     struct piraq_ray_que *rq=pui->ray_que;
     int nn = pui->short_rq_len;
@@ -1186,8 +1170,7 @@ void piraq_reset()
 }
 /* c------------------------------------------------------------------------ */
 
-static void
-piraq_ini()
+static void piraq_ini(void)
 {
     int ii, jj, nn, nt;
     CHAR_PTR aa, bb, put_tagged_string(), get_tagged_string();
@@ -1540,9 +1523,7 @@ piraq_ini()
 }
 /* c------------------------------------------------------------------------ */
 
-void piraq_name_replace(name, top)
-  char *name;
-  struct rename_str *top;
+void piraq_name_replace(char *name, struct rename_str *top)
 {
     struct rename_str *this=top;
 
@@ -1555,9 +1536,7 @@ void piraq_name_replace(name, top)
 }
 /* c------------------------------------------------------------------------ */
 
-void piraq_name_aliases(aliases, top)
-  char *aliases;
-  struct rename_str **top;
+void piraq_name_aliases(char *aliases, struct rename_str **top)
 {
     /* routine to construct the list of aliases */
     struct rename_str *this, *last;
@@ -1590,8 +1569,7 @@ void piraq_name_aliases(aliases, top)
 }
 /* c------------------------------------------------------------------------ */
 
-static int
-piraq_next_ray()
+static int piraq_next_ray(void)
 {
     static int whats_left=0;
     struct io_packet *dd_return_next_packet(), *dp, *dpx;
@@ -1968,9 +1946,7 @@ piraq_next_ray()
 }
 /* c------------------------------------------------------------------------ */
 
-static void
-piraq_backwards_reset(modest)
-  int modest;
+static void piraq_backwards_reset(int modest)
 {
     if(!modest) {
 	pui->skipped_backwards = YES;
@@ -1986,10 +1962,7 @@ piraq_backwards_reset(modest)
 }
 /* c------------------------------------------------------------------------ */
 
-static void
-piraq_map_hdr(aa, gotta_header)
-  char *aa;
-  int gotta_header;
+static void piraq_map_hdr(char *aa, int gotta_header)
 {
     static int count=0;
     int jj, nn, mark, new_vol = NO;
@@ -2251,8 +2224,7 @@ piraq_map_hdr(aa, gotta_header)
 }
 /* c------------------------------------------------------------------------ */
 
-static void
-piraq_header()
+static void piraq_header(void)
 {
     int ii, pn=0, nbins;
     float scale = 100., bias = 0, r, gs;
@@ -2397,8 +2369,7 @@ piraq_header()
 # else
 /* c------------------------------------------------------------------------ */
 
-static void
-piraq_fields()
+static void piraq_fields(void)
 {
     int ii, pn=0, nbins;
     float scale = 100., bias = 0, r, gs;
@@ -2988,9 +2959,10 @@ simplepp16(DWELL *dwell, RADARV *radar, float *prods)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-pc_swap4f(ov)		/* swap real*4 */
-  fourB *ov;
+double 
+pc_swap4f (		/* swap real*4 */
+    fourB *ov
+)
 {
     double d;
     union {
@@ -3007,9 +2979,10 @@ pc_swap4f(ov)		/* swap real*4 */
 }
 /* c------------------------------------------------------------------------ */
 
-long
-pc_swap4(ov)		/* swap real*4 */
-  fourB *ov;
+long 
+pc_swap4 (		/* swap real*4 */
+    fourB *ov
+)
 {
     double d;
     union {
@@ -3026,7 +2999,7 @@ pc_swap4(ov)		/* swap real*4 */
 }
 /* c------------------------------------------------------------------------ */
 
-void piraq_positioning()
+void piraq_positioning(void)
 {
     int ii, jj, kk, mm, mark, direction;
     int nn, ival;
@@ -3338,8 +3311,7 @@ Option = "
 }
 /* c------------------------------------------------------------------------ */
 
-int piraq_inventory(irq)
-  struct input_read_info *irq;
+int piraq_inventory(struct input_read_info *irq)
 {
     /* the purpose of this routine is to facilitate a more detailed
      * examination of the data
@@ -3373,9 +3345,7 @@ int piraq_inventory(irq)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-piraq_dump_this_ray(slm)
-  struct solo_list_mgmt *slm;
+void piraq_dump_this_ray(struct solo_list_mgmt *slm)
 {
     int gg, ii, nf, nn, fw=10;
     char *aa, *bb, *cc, str[128], *str_terminate(), tmp_str[16];
@@ -3419,9 +3389,7 @@ piraq_dump_this_ray(slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-piraq_print_headers(slm)
-  struct solo_list_mgmt *slm;
+void piraq_print_headers(struct solo_list_mgmt *slm)
 {
     solo_reset_list_entries(slm);
     piraq_print_rhdr(rhdr, slm);
@@ -3431,11 +3399,7 @@ piraq_print_headers(slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-piraq_print_hdr(hdr, slm, rhdr)
-  HEADERV *hdr;
-  RADARV *rhdr;
-  struct solo_list_mgmt *slm;
+void piraq_print_hdr(HEADERV *hdr, struct solo_list_mgmt *slm, RADARV *rhdr)
 {
     int ii;
     char *aa, str[128], *str_terminate(), tmp[32];
@@ -3532,10 +3496,7 @@ piraq_print_hdr(hdr, slm, rhdr)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-piraq_print_rhdr(rhdr, slm)
-  RADARV *rhdr;
-  struct solo_list_mgmt *slm;
+void piraq_print_rhdr(RADARV *rhdr, struct solo_list_mgmt *slm)
 {
     int ii, jj, nc, nn;
     char *aa, *bb, *cc, *zz, str[128], *str_terminate(), tmp[32];
@@ -5887,7 +5848,7 @@ void dualpolplusGf(DWELL *dwellness, RADARV *radar, float *prods) {
 }
 /* c------------------------------------------------------------------------ */
 
-piraq_ts_stats()
+int piraq_ts_stats(void)
 {
     /* for a given prt accumulate statistics and print out periodically */
 

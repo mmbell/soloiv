@@ -71,7 +71,7 @@ int wsrqc_power_cor();
 # ifdef obsolete
 /* c------------------------------------------------------------------------ */
 
-main()
+int main(void)
 {
     struct generic_radar_info *gri, *return_gri_ptr();
 
@@ -110,9 +110,7 @@ main()
 
 /* c------------------------------------------------------------------------ */
 
-int wsrqc_correct(gri, name)
-  struct generic_radar_info *gri;
-  char *name;
+int wsrqc_correct(struct generic_radar_info *gri, char *name)
 {
     static count=0;
     int ii, mm, mark;
@@ -185,8 +183,7 @@ int wsrqc_correct(gri, name)
 }
 /* c------------------------------------------------------------------------ */
 
-int wsrqc_init(gri)
-  struct generic_radar_info *gri;
+int wsrqc_init(struct generic_radar_info *gri)
 {
     /* routine to
      * read in scope1 stuff then
@@ -342,8 +339,7 @@ int wsrqc_init(gri)
 }
 /* c------------------------------------------------------------------------ */
 
-struct wsrqc_stuff_ptrs *
-wsr_malloc()
+struct wsrqc_stuff_ptrs *wsr_malloc(void)
 {
     struct wsrqc_stuff_ptrs *wsp;
 
@@ -356,11 +352,11 @@ wsr_malloc()
 }
 /* c------------------------------------------------------------------------ */
 
-int nab_wsrqc_stuff(stream, buf, wsp, quit_at, num_occurs)
-  FILE *stream;
-  char *buf, *quit_at;
-  struct wsrqc_stuff_ptrs *wsp;
-  int num_occurs;
+int nab_wsrqc_stuff(FILE *stream,
+                    char *buf,
+                    struct wsrqc_stuff_ptrs *wsp,
+                    char *quit_at,
+                    int num_occurs)
 {
     /* routine to read in the next set of wsrqc stuff and return a pointer
      * to the last line read in
@@ -508,9 +504,7 @@ int nab_wsrqc_stuff(stream, buf, wsp, quit_at, num_occurs)
 }
 /* c------------------------------------------------------------------------ */
 
-int wsrqc_power_cor(gri, name)
-  struct generic_radar_info *gri;
-  char *name;
+int wsrqc_power_cor(struct generic_radar_info *gri, char *name)
 {
     int ii, nn, mark, fn, ibad;
     float *rc=gri->range_correction, scale, bias, f, rcp_scale;

@@ -82,8 +82,7 @@ void dd_print_angle_table(const struct rot_ang_table *rat, FILE *out);
 
 /* c------------------------------------------------------------------------ */
 
-int dd_absorb_header_info(dgi)
-    DGI_PTR dgi;
+int dd_absorb_header_info(DGI_PTR dgi)
 {
     int ii, jj, mm, nn, pn, bc=0, loop_count=0, gottaSwap=NO, broken=NO;
     int iret = 0;
@@ -412,8 +411,7 @@ int dd_absorb_header_info(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_absorb_ray_info(dgi)
-    DGI_PTR dgi;
+int dd_absorb_ray_info(DGI_PTR dgi)
 {
     /*
      * Keep sucking up input until all headers (if applicable )
@@ -749,9 +747,7 @@ int dd_absorb_ray_info(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_absorb_rotang_info(dgi, gottaSwap)
-    DGI_PTR dgi;
-    int gottaSwap;
+int dd_absorb_rotang_info(DGI_PTR dgi, int gottaSwap)
 {
   int i, jj, n, len;
     struct rot_ang_table *rat;
@@ -813,9 +809,7 @@ int dd_absorb_rotang_info(dgi, gottaSwap)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_absorb_seds(dgi, gottaSwap)
-    DGI_PTR dgi;
-    int gottaSwap;
+int dd_absorb_seds(DGI_PTR dgi, int gottaSwap)
 {
     /* absorb the editing summary */
     int ii, nn;
@@ -869,8 +863,7 @@ int dd_absorb_seds(dgi, gottaSwap)
 
 /* c------------------------------------------------------------------------ */
 
-struct dd_input_sweepfiles_v3 *
-dd_return_sweepfile_structs_v3()
+struct dd_input_sweepfiles_v3 *dd_return_sweepfile_structs_v3(void)
 {
     if(!dis_v3) {
 	dis_v3 = (struct dd_input_sweepfiles_v3 *)
@@ -885,9 +878,7 @@ dd_return_sweepfile_structs_v3()
 }
 /* c------------------------------------------------------------------------ */
 
-struct dd_input_sweepfiles_v3 *
-dd_setup_sweepfile_structs_v3(ok)
-  int *ok;
+struct dd_input_sweepfiles_v3 *dd_setup_sweepfile_structs_v3(int *ok)
 {
     int ii, jj, kk, nn, nt, mark, drn, rn;
     int old_num_radars;
@@ -1019,9 +1010,7 @@ dd_setup_sweepfile_structs_v3(ok)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_sweepfile_list_v3(usi, start_time, stop_time)
-  struct unique_sweepfile_info_v3 *usi; 
-  double start_time, stop_time;
+int dd_sweepfile_list_v3(struct unique_sweepfile_info_v3 *usi, double start_time, double stop_time)
 {
     /*
      * create a list of time stamps of sweep files
@@ -1093,11 +1082,7 @@ int dd_sweepfile_list_v3(usi, start_time, stop_time)
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_ts_start(frme, radar_num, start, version, info, name)
-  int frme, radar_num, *version;
-  double start;
-  char *info, *name;
+double dd_ts_start(int frme, int radar_num, double start, int *version, char *info, char *name)
 {
     double d_time, d_mddir_file_info_v3();
 
@@ -1117,8 +1102,7 @@ dd_ts_start(frme, radar_num, start, version, info, name)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_update_ray_info(dgi)
-    DGI_PTR dgi;
+void dd_update_ray_info(DGI_PTR dgi)
 {
     struct prev_rays *prs;
     struct sweepinfo_d *swib=dgi->dds->swib;
@@ -1136,8 +1120,7 @@ void dd_update_ray_info(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_update_sweep_info(dgi)
-    DGI_PTR dgi;
+void dd_update_sweep_info(DGI_PTR dgi)
 {
     struct prev_swps *pss;
     DD_TIME *dts=dgi->dds->dts, *d_unstamp_time();
@@ -1161,15 +1144,13 @@ void dd_update_sweep_info(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int ddswp_last_ray(usi)
-struct unique_sweepfile_info_v3 *usi;
+int ddswp_last_ray(struct unique_sweepfile_info_v3 *usi)
 {
     return(usi->ray_num >= usi->num_rays);
 }
 /* c------------------------------------------------------------------------ */
 
-int ddswp_new_sweep_v3(usi)
-  struct unique_sweepfile_info_v3 *usi;
+int ddswp_new_sweep_v3(struct unique_sweepfile_info_v3 *usi)
 {
     int ii, nn, ierr=0;
     char str[256], *str_terminate();
@@ -1234,8 +1215,7 @@ int ddswp_new_sweep_v3(usi)
 }
 /* c------------------------------------------------------------------------ */
 
-struct cfac_wrap *ddswp_nab_cfacs (radar_name)
-  char *radar_name;
+struct cfac_wrap *ddswp_nab_cfacs(char *radar_name)
 {
    struct correction_d cfacx, *cfac;
    struct cfac_wrap *cfw = 0, *first_cfac = 0, *dd_absorb_cfacs();
@@ -1287,8 +1267,7 @@ struct cfac_wrap *ddswp_nab_cfacs (radar_name)
 
 /* c------------------------------------------------------------------------ */
 
-int ddswp_next_ray_v3(usi)
-struct unique_sweepfile_info_v3 *usi;
+int ddswp_next_ray_v3(struct unique_sweepfile_info_v3 *usi)
 {
     /*
      * Keep sucking up input until all headers (if applicable )
@@ -1334,8 +1313,7 @@ struct unique_sweepfile_info_v3 *usi;
 }
 /* c------------------------------------------------------------------------ */
 
-void ddswp_stuff_ray(dgi)
-  DGI_PTR dgi;
+void ddswp_stuff_ray(DGI_PTR dgi)
 {
     /*
      * this routine assumes that there is a ray of data to be
@@ -1390,8 +1368,7 @@ void ddswp_stuff_ray(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddswp_stuff_sweep(dgi)
-  DGI_PTR dgi;
+void ddswp_stuff_sweep(DGI_PTR dgi)
 {
     DDS_PTR dds=dgi->dds;
     struct sweepinfo_d *swib=dds->swib;

@@ -176,8 +176,7 @@ static void dd_add_bias();
 
 /* c------------------------------------------------------------------------ */
 
-void dd_derived_fields(dgi)
-  DGI_PTR dgi;
+void dd_derived_fields(DGI_PTR dgi)
 {
     DDS_PTR dds=dgi->dds;
     int dn, fns, fnd, ii, n, nt, mark, kill_count;
@@ -668,10 +667,7 @@ void dd_derived_fields(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-static int
-zdr_prime( dgi, fn )
-  DGI_PTR dgi;
-  int fn;
+static int zdr_prime(DGI_PTR dgi, int fn)
 {
     struct dds_structs *dds=dgi->dds;
     char * ldrv = "LVDR";
@@ -701,11 +697,7 @@ zdr_prime( dgi, fn )
 }
 /* c------------------------------------------------------------------------ */
 
-static int
-thr_ldr( dgi, fn, threshold )
-  DGI_PTR dgi;
-  int fn;
-  float threshold;
+static int thr_ldr(DGI_PTR dgi, int fn, double threshold)
 {
     struct dds_structs *dds=dgi->dds;
     char * dx = "DX";
@@ -740,8 +732,7 @@ thr_ldr( dgi, fn, threshold )
 }
 /* c------------------------------------------------------------------------ */
 
-static struct lidar_parameters *
-malloc_lidar_parm()
+static struct lidar_parameters *malloc_lidar_parm(void)
 {
     struct lidar_parameters * this =
 	(struct lidar_parameters *)malloc(sizeof(struct lidar_parameters));
@@ -754,8 +745,7 @@ malloc_lidar_parm()
 }
 /* c------------------------------------------------------------------------ */
 
-static struct der_pair *
-malloc_der_pair()
+static struct der_pair *malloc_der_pair(void)
 {
     /* source name and destination name derived pairs
      */
@@ -766,9 +756,7 @@ malloc_der_pair()
 }
 /* c------------------------------------------------------------------------ */
 
-static int setup_der_pairs( list, der_list )
-    char * list;
-    struct der_pair ** der_list;
+static int setup_der_pairs(char *list, struct der_pair **der_list)
 {
     int ii, nt, nn = 0;
     char *aa, *bb, *cc, *dd;
@@ -802,8 +790,7 @@ static int setup_der_pairs( list, der_list )
 }
 /* c------------------------------------------------------------------------ */
 
-static int setup_der_alts( list )
-    char * list;
+static int setup_der_alts(char *list)
 {
     int ii, nn, total = 0, nt;
     char *aa, *bb, *cc, *dd;
@@ -851,9 +838,7 @@ static int setup_der_alts( list )
 }
 /* c------------------------------------------------------------------------ */
 
-double
-dd_ac_vel(dgi)
-  DGI_PTR dgi;
+double dd_ac_vel(DGI_PTR dgi)
 {
     DDS_PTR dds=dgi->dds;
     struct radar_angles *ra=dds->ra;
@@ -869,11 +854,7 @@ dd_ac_vel(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_BB_unfold(dgi, fn, ac_vel, qsize, f_fold_shear, vqv)
-  DGI_PTR dgi;
-  int fn, qsize;
-  float ac_vel, f_fold_shear;
-  struct ve_que_val *vqv;
+void dd_BB_unfold(DGI_PTR dgi, int fn, double ac_vel, int qsize, double f_fold_shear, struct ve_que_val *vqv)
 {
     DDS_PTR dds=dgi->dds;
     struct radar_angles *ra=dds->ra;
@@ -1002,10 +983,7 @@ void dd_BB_unfold(dgi, fn, ac_vel, qsize, f_fold_shear, vqv)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_denotch(dgi, fn, f_notch_max, f_notch_shear)
-  DGI_PTR dgi;
-  int fn;
-  float f_notch_max, f_notch_shear;
+void dd_denotch(DGI_PTR dgi, int fn, double f_notch_max, double f_notch_shear)
 {
     DDS_PTR dds=dgi->dds;
     int bad=dds->parm[fn]->bad_data;
@@ -1089,9 +1067,7 @@ void dd_denotch(dgi, fn, f_notch_max, f_notch_shear)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_despeckle(dgi, fn, a_speckle)
-  DGI_PTR dgi;
-  int fn, a_speckle;
+int dd_despeckle(DGI_PTR dgi, int fn, int a_speckle)
 {
     /*
      * remove speckles
@@ -1170,9 +1146,7 @@ int dd_despeckle(dgi, fn, a_speckle)
 
 /* c------------------------------------------------------------------------ */
 
-static int get_kdp(dgi, fn)
-  DGI_PTR dgi;
-  int fn;
+static int get_kdp(DGI_PTR dgi, int fn)
 {
    DDS_PTR dds=dgi->dds;
    struct cell_d *celv=dgi->dds->celvc;
@@ -1660,10 +1634,7 @@ L1000: ;
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_single_prf_vortex_vels(dgi, fn, dname)
-  DGI_PTR dgi;
-  int fn;
-  char * dname;
+int dd_single_prf_vortex_vels(DGI_PTR dgi, int fn, char *dname)
 {
     int ii, kk, nc, scaled_av_nyq, vr;
     int fn_vr;
@@ -1719,10 +1690,7 @@ int dd_single_prf_vortex_vels(dgi, fn, dname)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_fix_vortex_vels(dgi, fn, dname)
-  DGI_PTR dgi;
-  int fn;
-  char * dname;
+int dd_fix_vortex_vels(DGI_PTR dgi, int fn, char *dname)
 {
     static struct fix_vortex_vels *fvvs[MAX_SENSORS];
     static int radar_count=0;
@@ -1900,11 +1868,7 @@ int dd_fix_vortex_vels(dgi, fn, dname)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_gp_threshold(dgi, fn, thr_name, thr_val1, thr_val2, thr_type)
-  DGI_PTR dgi;
-  int fn, thr_type;
-  char *thr_name;
-  float thr_val1, thr_val2;
+int dd_gp_threshold(DGI_PTR dgi, int fn, char *thr_name, double thr_val1, double thr_val2, int thr_type)
 {
     /* general purpose thresholding
      */
@@ -2007,8 +1971,7 @@ int dd_gp_threshold(dgi, fn, thr_name, thr_val1, thr_val2, thr_type)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_legal_pname(name)
-  char *name;
+int dd_legal_pname(char *name)
 {
     /* parameter names can only contain upper case, lower case and
      * underscores for now
@@ -2027,10 +1990,7 @@ int dd_legal_pname(name)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_lidar_db( dgi, fnd, lps )
-  DGI_PTR dgi;
-  int fnd;
-  struct lidar_parameters *lps;
+void dd_lidar_db(DGI_PTR dgi, int fnd, struct lidar_parameters *lps)
 {
     /* generate a lidar db field
      */
@@ -2125,10 +2085,7 @@ void dd_lidar_db( dgi, fnd, lps )
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_new_param(dgi, srs_name, dst_name)
-  DGI_PTR dgi;
-  char *srs_name, *dst_name;
+int dd_new_param(DGI_PTR dgi, char *srs_name, char *dst_name)
 {
     DDS_PTR dds=dgi->dds;
     int ii, fn, fns, fnd, size=0, mark;
@@ -2207,10 +2164,7 @@ dd_new_param(dgi, srs_name, dst_name)
 }  
 /* c------------------------------------------------------------------------ */
 
-void dd_add_bias(dgi, fn, add_bias)
-  DGI_PTR dgi;
-  int fn;
-  float add_bias;
+static void dd_add_bias(DGI_PTR dgi, int fn, double add_bias)
 {
     DDS_PTR dds=dgi->dds;
     int nc=dgi->clip_gate+1;
@@ -2236,10 +2190,7 @@ void dd_add_bias(dgi, fn, add_bias)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_nix_air_motion(dgi, fn, ac_vel, center_on_zero)
-  DGI_PTR dgi;
-  int fn, center_on_zero;
-  float ac_vel;
+void dd_nix_air_motion(DGI_PTR dgi, int fn, double ac_vel, int center_on_zero)
 {
     DDS_PTR dds=dgi->dds;
     int nc=dgi->clip_gate+1;
@@ -2291,9 +2242,7 @@ void dd_nix_air_motion(dgi, fn, ac_vel, center_on_zero)
 }
 /* c------------------------------------------------------------------------ */
 
-void
-dd_pct_stats(dgi)
-  DGI_PTR dgi;
+void dd_pct_stats(DGI_PTR dgi)
 {
     /* routine to do some simple statics on a particular field
      * for printout with the catalog information
@@ -2415,10 +2364,7 @@ dd_pct_stats(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_thr_parms(a, name, val)
-  char *a, *name;
-  float *val;
+int dd_thr_parms(char *a, char *name, float *val)
 {
     /* routine to extract the name and value from the string
      * this routines assumes it's ok to put nulls in the source string
@@ -2450,10 +2396,7 @@ dd_thr_parms(a, name, val)
 }
 /* c------------------------------------------------------------------------ */
 
-int dder_lidar_opts(derfs, opts, dst_flds, num_dst)
-  struct derived_fields *derfs;
-  char *opts;
-  char *dst_flds[];
+int dder_lidar_opts(struct derived_fields *derfs, char *opts, char *dst_flds[], int num_dst)
 {
     int ii, jj, nt, ndx;
     char *aa=opts, *bb=opts, *cc, *pp;

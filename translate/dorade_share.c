@@ -197,9 +197,7 @@ int dd_absorb_strings (char *path_name, struct solo_list_mgmt *slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_sort_strings(sptr, ns)
-  char **sptr;
-  int ns;
+void solo_sort_strings(char **sptr, int ns)
 {
     int ii, jj;
     char *keep;
@@ -216,10 +214,7 @@ void solo_sort_strings(sptr, ns)
 }
 /* c------------------------------------------------------------------------ */
 
-int generic_sweepfiles( dir, lm, prefix, suffix, not_this_suffix )
-  char *dir, *prefix, *suffix;
-  struct solo_list_mgmt *lm;
-  int not_this_suffix;
+int generic_sweepfiles(char *dir, struct solo_list_mgmt *lm, char *prefix, char *suffix, int not_this_suffix)
 {
     /* tries to create a list of files in a directory
      */
@@ -274,10 +269,7 @@ int generic_sweepfiles( dir, lm, prefix, suffix, not_this_suffix )
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_return_interpulse_periods( dgi, field_num, ipps )
-struct dd_general_info *dgi;
-int field_num;
-double * ipps;
+int dd_return_interpulse_periods(struct dd_general_info *dgi, int field_num, double *ipps)
 {
   int ii, nn = 0, mask = dgi->dds->parm[field_num]->interpulse_time;
   int probe = 1;
@@ -309,10 +301,7 @@ double * ipps;
 
 /* c------------------------------------------------------------------------ */
 
-int dd_return_frequencies( dgi, field_num, freqs )
-struct dd_general_info *dgi;
-int field_num;
-double * freqs;
+int dd_return_frequencies(struct dd_general_info *dgi, int field_num, double *freqs)
 {
   int ii, nn = 0, mask = dgi->dds->parm[field_num]->xmitted_freq;
   int probe = 1;
@@ -332,9 +321,7 @@ double * freqs;
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_alias_index_num( dgi, name ) 
-struct dd_general_info *dgi;
-char * name;
+int dd_alias_index_num(struct dd_general_info *dgi, char *name)
 {
   static char * known_aliases [] =
   {
@@ -382,8 +369,7 @@ char * name;
 }
 /* c------------------------------------------------------------------------ */
 
-double angdiff( a1, a2 )
-  float a1, a2;
+double angdiff(double a1, double a2)
 {
     double d=a2-a1;
 
@@ -395,8 +381,7 @@ double angdiff( a1, a2 )
 }
 /* c------------------------------------------------------------------------ */
 
-double d_angdiff( a1, a2 )
-  double a1, a2;
+double d_angdiff(double a1, double a2)
 {
     double d=a2-a1;
 
@@ -408,9 +393,12 @@ double d_angdiff( a1, a2 )
 }
 /*c----------------------------------------------------------------------*/
 
-void cascdmp( b, m, n )		/* ascii dump of n bytes */
-  char *b;
-  int m, n;
+void 
+cascdmp (		/* ascii dump of n bytes */
+    char *b,
+    int m,
+    int n
+)
 {
     int s=0;
     char *c=b+m;
@@ -436,9 +424,12 @@ void cascdmp( b, m, n )		/* ascii dump of n bytes */
 }
 /*c----------------------------------------------------------------------*/
 
-void chexdmp( b, m, n )		/* hexdump of n bytes */
-  char *b;
-  int m, n;
+void 
+chexdmp (		/* hexdump of n bytes */
+    char *b,
+    int m,
+    int n
+)
 {
     int c, i, s;
     char h[20];
@@ -469,9 +460,7 @@ void chexdmp( b, m, n )		/* hexdump of n bytes */
 }
 /* c------------------------------------------------------------------------ */
 
-char *cpy_bfill_str(dst, srs, n)
-  CHAR_PTR srs, dst;
-  int n;
+char *cpy_bfill_str(CHAR_PTR dst, CHAR_PTR srs, int n)
 {
     int i, j;
 
@@ -488,10 +477,7 @@ char *cpy_bfill_str(dst, srs, n)
 }
 /*c----------------------------------------------------------------------*/
 
-int dcdatime( str, n, yy, mon, dd, hh, mm, ss, ms )
-  char *str;
-  int n;
-  short *yy, *mon, *dd, *hh, *mm, *ss, *ms;
+int dcdatime(char *str, int n, short *yy, short *mon, short *dd, short *hh, short *mm, short *ss, short *ms)
 {
     /*
      * this routine decodes a time string hh:mm:ss.ms
@@ -565,9 +551,7 @@ int dcdatime( str, n, yy, mon, dd, hh, mm, ss, ms )
 }
 /* c------------------------------------------------------------------------ */
 
-char *dd_blank_fill(srs,n,dst)
-  CHAR_PTR srs, dst;
-  int n;
+char *dd_blank_fill(CHAR_PTR srs, int n, CHAR_PTR dst)
 {
     int i;
 
@@ -581,9 +565,7 @@ char *dd_blank_fill(srs,n,dst)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-dd_chop(aa)
-  char *aa;
+char *dd_chop(char *aa)
 {
     /* remove the line feed from the end of the string
      * if there is one
@@ -600,10 +582,7 @@ dd_chop(aa)
 # ifdef obsolete
 /* c------------------------------------------------------------------------ */
 
-int dd_crack_file_name( type, time_stamp, radar, version, fn )
-  char *type, *radar, *fn;
-  long *time_stamp;
-  int *version;
+int dd_crack_file_name(char *type, long *time_stamp, char *radar, int *version, char *fn)
 {
     char *delim=DD_NAME_DELIMITER;
     int i, t[6];
@@ -662,10 +641,7 @@ int dd_crack_file_name( type, time_stamp, radar, version, fn )
 # else
 /* c------------------------------------------------------------------------ */
 
-int dd_crack_file_name( type, time_stamp, radar, version, fn )
-  char *type, *radar, *fn;
-  long *time_stamp;
-  int *version;
+int dd_crack_file_name(char *type, long *time_stamp, char *radar, int *version, char *fn)
 {
     char *delim=DD_NAME_DELIMITER;
     double d, d_time_stamp();
@@ -708,10 +684,7 @@ int dd_crack_file_name( type, time_stamp, radar, version, fn )
 # ifdef obsolete
 /* c------------------------------------------------------------------------ */
 
-int dd_crack_file_name_ms( type, time_stamp, radar, version, fn, ms )
-  char *type, *radar, *fn;
-  double *time_stamp;
-  int *version, *ms;
+int dd_crack_file_name_ms(char *type, double *time_stamp, char *radar, int *version, char *fn, int *ms)
 {
     char *delim=DD_NAME_DELIMITER;
     int i, t[8];
@@ -771,10 +744,7 @@ int dd_crack_file_name_ms( type, time_stamp, radar, version, fn, ms )
 # else
 /* c------------------------------------------------------------------------ */
 
-int dd_crack_file_name_ms( type, time_stamp, radar, version, fn, ms )
-  char *type, *radar, *fn;
-  double *time_stamp;
-  int *version, *ms;
+int dd_crack_file_name_ms(char *type, double *time_stamp, char *radar, int *version, char *fn, int *ms)
 {
     char *delim=DD_NAME_DELIMITER;
     double d, d_time_stamp();
@@ -820,10 +790,7 @@ int dd_crack_file_name_ms( type, time_stamp, radar, version, fn, ms )
 # endif
 /* c------------------------------------------------------------------------ */
 
-void dd_file_name( type, time_stamp, radar, version, fn )
-  char *type, *radar, *fn;
-  long time_stamp;
-  int version;
+void dd_file_name(char *type, long time_stamp, char *radar, int version, char *fn)
 {
     DD_TIME dts, *d_unstamp_time();
 
@@ -845,10 +812,7 @@ void dd_file_name( type, time_stamp, radar, version, fn )
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_file_name_ms( type, time_stamp, radar, version, fn, ms )
-  char *type, *radar, *fn;
-  long time_stamp;
-  int version, ms;
+void dd_file_name_ms(char *type, long time_stamp, char *radar, int version, char *fn, int ms)
 {
     int vzn=ms+version*1000;
     DD_TIME dts, *d_unstamp_time();
@@ -872,10 +836,7 @@ void dd_file_name_ms( type, time_stamp, radar, version, fn, ms )
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_hrd16( buf, dd, flag, empty_run )
-  char *buf;
-  short *dd;
-  int flag, *empty_run;
+int dd_hrd16(char *buf, short *dd, int flag, int *empty_run)
 {
     /*
      * routine to unpacks actual data assuming MIT/HRD compression
@@ -905,9 +866,7 @@ int dd_hrd16( buf, dd, flag, empty_run )
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_hrd16_uncompressx( ss, dd, flag, empty_run, wmax )
-  short *ss, *dd;
-  int flag, *empty_run, wmax;
+int dd_hrd16_uncompressx(short *ss, short *dd, int flag, int *empty_run, int wmax)
 {
     /*
      * routine to unpacks actual data assuming MIT/HRD compression where:
@@ -952,9 +911,7 @@ int dd_hrd16_uncompressx( ss, dd, flag, empty_run, wmax )
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_hrd16LE_uncompressx( ss, dd, flag, empty_run, wmax )
-  unsigned short *ss, *dd;
-  int flag, *empty_run, wmax;
+int dd_hrd16LE_uncompressx(unsigned short *ss, unsigned short *dd, int flag, int *empty_run, int wmax)
 {
     /*
      * routine to unpacks actual data assuming MIT/HRD compression where:
@@ -1009,9 +966,7 @@ int dd_hrd16LE_uncompressx( ss, dd, flag, empty_run, wmax )
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_nab_floats(str, vals)
-  char *str;
-  float *vals;
+int dd_nab_floats(char *str, float *vals)
 {
     int ii, jj, nt, dd_tokens();
     char string_space[256], *str_ptrs[32];
@@ -1026,9 +981,7 @@ int dd_nab_floats(str, vals)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_nab_ints(str, vals)
-  char *str;
-  int *vals;
+int dd_nab_ints(char *str, int *vals)
 {
     int ii, jj, nt;
     char string_space[256], *str_ptrs[32];
@@ -1043,8 +996,7 @@ int dd_nab_ints(str, vals)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_rdp_uncompress8( buf, dd, bad_val)
-  unsigned char *buf, *dd, bad_val;
+int dd_rdp_uncompress8(unsigned char *buf, unsigned char *dd, int bad_val)
 {
     /*
      * routine to unpacks actual data assuming MIT/HRD compression
@@ -1072,9 +1024,7 @@ int dd_rdp_uncompress8( buf, dd, bad_val)
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_scan_mode(str)
-  char *str;
+int dd_scan_mode(char *str)
 {
     char uc_scan_mode[16];
     int max_scan_mode = 10, ii, nn;
@@ -1099,10 +1049,7 @@ dd_scan_mode(str)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-dd_scan_mode_mne(scan_mode, str)
-  int scan_mode;
-  char *str;
+char *dd_scan_mode_mne(int scan_mode, char *str)
 {
     int max_scan_mode = 10;
 
@@ -1114,10 +1061,7 @@ dd_scan_mode_mne(scan_mode, str)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-dd_radar_type_ascii(radar_type, str)
-  int radar_type;
-  char *str;
+char *dd_radar_type_ascii(int radar_type, char *str)
 {
     int max_radar_types = 10;
     static char *Rtypes[] = { "GROUND", "AIR_FORE", "AIR_AFT", "AIR_TAIL"
@@ -1133,9 +1077,7 @@ dd_radar_type_ascii(radar_type, str)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-dd_unquote_string(uqs, qs)
-char *qs, *uqs;
+char *dd_unquote_string(char *uqs, char *qs)
 {
     char *a=uqs;
     /*
@@ -1148,10 +1090,7 @@ char *qs, *uqs;
 }
 /* c------------------------------------------------------------------------ */
 
-double dorade_time_stamp( vold, ryib, dts )
-  struct volume_d *vold;
-  struct ray_i *ryib;
-  DD_TIME *dts;
+double dorade_time_stamp(struct volume_d *vold, struct ray_i *ryib, DD_TIME *dts)
 {
 
     double d, d_time_stamp();
@@ -1167,8 +1106,7 @@ double dorade_time_stamp( vold, ryib, dts )
  }
 /* c----------------------------------------------------------------------- */
 
-char *dts_print(dts)
-  DD_TIME *dts;
+char *dts_print(DD_TIME *dts)
 {
     static char str[32];
 
@@ -1185,9 +1123,7 @@ char *dts_print(dts)
 }
 /* c------------------------------------------------------------------------ */
 
-double eldora_time_stamp( vold, ryib )
-  struct volume_d *vold;
-  struct ray_i *ryib;
+double eldora_time_stamp(struct volume_d *vold, struct ray_i *ryib)
 {
     double d, d_time_stamp(), dorade_time_stamp();
     DD_TIME dts;
@@ -1198,9 +1134,7 @@ double eldora_time_stamp( vold, ryib )
 }
 /* c------------------------------------------------------------------------ */
 
-int fb_read( fin, buf, count )
-  int fin, count;
-  char *buf;
+int fb_read(int fin, char *buf, int count)
 {
     /* fortran-binary read routine
      */
@@ -1242,9 +1176,7 @@ int fb_read( fin, buf, count )
 }
 /* c------------------------------------------------------------------------ */
 
-int fb_write( fout, buf, count )
-  int fout, count;
-  char *buf;
+int fb_write(int fout, char *buf, int count)
 {
     /* fortran-binary write routine
      */
@@ -1280,10 +1212,7 @@ int fb_write( fout, buf, count )
 /* c------------------------------------------------------------------------ */
 
 char *
-fgetsx(aa, nn, stream)
-  unsigned char *aa;
-  int nn;
-  FILE *stream;
+fgetsx(unsigned char *aa, int nn, FILE *stream)
 {
     /* similar to fgets()
      */
@@ -1309,9 +1238,7 @@ fgetsx(aa, nn, stream)
 }
 /* c------------------------------------------------------------------------ */
 
-long
-file_time_stamp(fn)
-  char *fn;
+long file_time_stamp(char *fn)
 {
     long time_stamp;
     int version;
@@ -1324,10 +1251,7 @@ file_time_stamp(fn)
 /* c------------------------------------------------------------------------ */
 
 char *
-fstring(line, nn, stream)
-  char *line;
-  int nn;
-  FILE *stream;
+fstring(char *line, int nn, FILE *stream)
 {
     /* read in lines from a file and remove leading blanks
      * trailing blanks and line feeds
@@ -1357,8 +1281,7 @@ fstring(line, nn, stream)
 }
 /* c------------------------------------------------------------------------ */
 
-char *get_tagged_string( tag )
-  char *tag;
+char *get_tagged_string(char *tag)
 {
     int i;
 
@@ -1371,9 +1294,7 @@ char *get_tagged_string( tag )
 }
 /* c------------------------------------------------------------------------ */
 
-int gp_read(fid, buf, size, io_type)
-  int fid, size, io_type;
-  char *buf;
+int gp_read(int fid, char *buf, int size, int io_type)
 {
     /* general purpose write
      */
@@ -1389,9 +1310,7 @@ int gp_read(fid, buf, size, io_type)
 }
 /* c------------------------------------------------------------------------ */
 
-int gp_write(fid, buf, size, io_type)
-  int fid, size, io_type;
-  char *buf;
+int gp_write(int fid, char *buf, int size, int io_type)
 {
     /* general purpose write
      */
@@ -1427,8 +1346,7 @@ int gp_write(fid, buf, size, io_type)
 }
 /* c------------------------------------------------------------------------ */
 
-int in_sector(ang, ang1, ang2)
-  float ang, ang1, ang2;
+int in_sector(double ang, double ang1, double ang2)
 {
     if(ang1 > ang2) return(ang >= ang1 || ang < ang2);
 
@@ -1436,8 +1354,7 @@ int in_sector(ang, ang1, ang2)
 }
 /* c------------------------------------------------------------------------ */
 
-char *put_tagged_string( tag, string )
-  char *tag, *string;
+char *put_tagged_string(char *tag, char *string)
 {
     int i, j, m=strlen(tag), n=strlen(string);
 
@@ -1462,7 +1379,7 @@ char *put_tagged_string( tag, string )
 }
 /* c------------------------------------------------------------------------ */
 
-int se_free_raqs()
+int se_free_raqs(void)
 {
     int ii;
     struct running_avg_que *raq=top_raq;
@@ -1474,9 +1391,7 @@ int se_free_raqs()
 }
 /* c------------------------------------------------------------------------ */
 
-struct running_avg_que *
-se_return_ravgs(nvals)
-  int nvals;
+struct running_avg_que *se_return_ravgs(int nvals)
 {
     /* routine to return a pointer to the next free
      * running average struct/queue set up to average "nvals"
@@ -1545,8 +1460,7 @@ se_return_ravgs(nvals)
 }
 /* c------------------------------------------------------------------------ */
 
-char *slash_path( dst, srs )
-  char *dst, *srs;
+char *slash_path(char *dst, char *srs)
 {
     int n;
 
@@ -1563,8 +1477,7 @@ char *slash_path( dst, srs )
 }
 /* c------------------------------------------------------------------------ */
 
-void slm_dump_list(slm)
-  struct solo_list_mgmt *slm;
+void slm_dump_list(struct solo_list_mgmt *slm)
 {
     char **ptr;
     int nl;
@@ -1584,8 +1497,7 @@ void slm_dump_list(slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void slm_print_list(slm)
-  struct solo_list_mgmt *slm;
+void slm_print_list(struct solo_list_mgmt *slm)
 {
     char **pt, **ptrs=slm->list;
     int ii, jj, kk, ll=0, mm, nl, max=gri_max_lines(), last_mm;
@@ -1634,10 +1546,7 @@ void slm_print_list(slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_add_list_entry(which, entry, len)
-  struct solo_list_mgmt *which;
-  char *entry;
-  int len;
+void solo_add_list_entry(struct solo_list_mgmt *which, char *entry, int len)
 {
     int ii;
     char *a, *c, *str_terminate();
@@ -1671,10 +1580,7 @@ void solo_add_list_entry(which, entry, len)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-solo_list_entry(which, entry_num)
-  struct solo_list_mgmt *which;
-  int entry_num;
+char *solo_list_entry(struct solo_list_mgmt *which, int entry_num)
 {
     char *c;
 
@@ -1686,8 +1592,7 @@ solo_list_entry(which, entry_num)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_list_remove_dups(slm)
-  struct solo_list_mgmt *slm;
+void solo_list_remove_dups(struct solo_list_mgmt *slm)
 {
     /* remove duplicate strings from the list
      */
@@ -1709,9 +1614,7 @@ void solo_list_remove_dups(slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_list_remove_entry(slm, ii, jj)
-  struct solo_list_mgmt *slm;
-  int ii, jj;
+void solo_list_remove_entry(struct solo_list_mgmt *slm, int ii, int jj)
 {
     /* remove a span of entries where ii and jj are entry numbers
      */
@@ -1743,8 +1646,7 @@ void solo_list_remove_entry(slm, ii, jj)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_list_sort_file_names(slm)
-  struct solo_list_mgmt *slm;
+void solo_list_sort_file_names(struct solo_list_mgmt *slm)
 {
     int ii, jj;
     char *keep;
@@ -1767,9 +1669,7 @@ void solo_list_sort_file_names(slm)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_list_mgmt *
-solo_malloc_list_mgmt(sizeof_entries)
-  int sizeof_entries;
+struct solo_list_mgmt *solo_malloc_list_mgmt(int sizeof_entries)
 {
     struct solo_list_mgmt *slm;
 
@@ -1780,8 +1680,7 @@ solo_malloc_list_mgmt(sizeof_entries)
 }
 /* c------------------------------------------------------------------------ */
 
-struct point_in_space *
-solo_malloc_pisp()
+struct point_in_space *solo_malloc_pisp(void)
 {
     struct point_in_space *next;
 
@@ -1795,10 +1694,7 @@ solo_malloc_pisp()
 }
 /* c------------------------------------------------------------------------ */
 
-char *solo_modify_list_entry(which, entry, len, entry_num)
-  struct solo_list_mgmt *which;
-  char *entry;
-  int len;
+char *solo_modify_list_entry(struct solo_list_mgmt *which, char *entry, int len, int entry_num)
 {
     int ii;
     char *a, *c, *str_terminate();
@@ -1823,8 +1719,7 @@ char *solo_modify_list_entry(which, entry, len, entry_num)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_reset_list_entries(which)
-  struct solo_list_mgmt *which;
+void solo_reset_list_entries(struct solo_list_mgmt *which)
 {
     int ii;
 
@@ -1838,8 +1733,7 @@ void solo_reset_list_entries(which)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_unmalloc_list_mgmt(slm)
-  struct solo_list_mgmt *slm;
+void solo_unmalloc_list_mgmt(struct solo_list_mgmt *slm)
 {
     int ii;
 
@@ -1853,8 +1747,7 @@ void solo_unmalloc_list_mgmt(slm)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_sort_slm_entries (slm)
-  struct solo_list_mgmt *slm;
+void solo_sort_slm_entries(struct solo_list_mgmt *slm)
 {
    char *aa, *bb;
    int ii, jj, nn = slm->num_entries;
@@ -1876,9 +1769,7 @@ void solo_sort_slm_entries (slm)
   
 /* c------------------------------------------------------------------------ */
 
-char *str_terminate(dst, srs, n)
-  CHAR_PTR srs, dst;
-  int n;
+char *str_terminate(CHAR_PTR dst, CHAR_PTR srs, int n)
 {
     int m=n;
     char *a=srs, *c=dst;
@@ -1904,8 +1795,7 @@ char *str_terminate(dst, srs, n)
 }
 /* c------------------------------------------------------------------------ */
 
-long
-time_now()
+long time_now(void)
 {
     int i;
     struct timeval tp;
@@ -1916,9 +1806,7 @@ time_now()
 }
 /* c------------------------------------------------------------------------ */
 
-time_t
-todays_date(date_time)
-  short date_time[];
+time_t todays_date(short date_time[])
 {
     struct tm *tm, *localtime();
     int i;
@@ -1938,8 +1826,7 @@ todays_date(date_time)
 }
 /* c------------------------------------------------------------------------ */
 
-struct run_sum *init_run_sum( length, short_len )
-    int length;
+struct run_sum *init_run_sum(int length, int short_len)
 {
     struct run_sum * rs;
     rs = (struct run_sum *)malloc( sizeof( struct run_sum ));
@@ -1955,8 +1842,7 @@ struct run_sum *init_run_sum( length, short_len )
 }
 /* c------------------------------------------------------------------------ */
 
-void reset_running_sum( rs )
-    struct run_sum *rs;
+void reset_running_sum(struct run_sum *rs)
 {
     rs->count = 0;
     memset( rs->vals, 0, rs->run_size * sizeof(double));
@@ -1965,16 +1851,13 @@ void reset_running_sum( rs )
 }
 /* c------------------------------------------------------------------------ */
 
-double short_running_sum( rs )
-    struct run_sum *rs;
+double short_running_sum(struct run_sum *rs)
 {
     return( rs->short_sum );
 }
 /* c------------------------------------------------------------------------ */
 
-double running_sum( rs, val )
-    struct run_sum *rs;
-    double val;
+double running_sum(struct run_sum *rs, double val)
 {
     int ii, nn = ++rs->count, length = rs->run_size;
     int ndx = rs->index_next;
@@ -1995,8 +1878,7 @@ double running_sum( rs, val )
 
 /* c------------------------------------------------------------------------ */
 
-double avg_running_sum( rs )
-    struct run_sum *rs;
+double avg_running_sum(struct run_sum *rs)
 {
     double d;
 
@@ -2011,8 +1893,7 @@ double avg_running_sum( rs )
 
 /* c------------------------------------------------------------------------ */
 
-double short_avg_running_sum( rs )
-    struct run_sum *rs;
+double short_avg_running_sum(struct run_sum *rs)
 {
     double d;
     int nn = rs->count;

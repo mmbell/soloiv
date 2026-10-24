@@ -40,8 +40,7 @@ void dd_stuff_ray();
 
 /* c------------------------------------------------------------------------ */
 
-void dd_celv_update(dds)
-  struct dds_structs *dds;
+void dd_celv_update(struct dds_structs *dds)
 {
     int ii, nn;
     struct cell_d *celv=dds->celv;
@@ -64,9 +63,7 @@ void dd_celv_update(dds)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_init_sweep(dgi,new_vol)
-  struct dd_general_info *dgi;
-  int new_vol;
+void dd_init_sweep(struct dd_general_info *dgi, int new_vol)
 {
     CHAR_PTR dd_radar_name(), dd_blank_fill();
     short date[6];
@@ -136,8 +133,7 @@ void dd_init_sweep(dgi,new_vol)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_parms_update(dgi)
-  struct dd_general_info *dgi;
+void dd_parms_update(struct dd_general_info *dgi)
 {
     int ii, jj, ncopy;
     char *str_terminate();
@@ -203,8 +199,7 @@ void dd_parms_update(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_radd_update(dds)
-  struct dds_structs *dds;
+void dd_radd_update(struct dds_structs *dds)
 {
     int i;
     struct radar_d *radd=dds->radd;
@@ -260,7 +255,7 @@ void dd_radd_update(dds)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_stuff_ray()
+void dd_stuff_ray(void)
 {
     /*
      * this routine assumes that there is a ray of data to be
@@ -479,8 +474,7 @@ void dd_stuff_ray()
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_vold_update(dgi)
-  struct dd_general_info *dgi;
+void dd_vold_update(struct dd_general_info *dgi)
 {
     struct dds_structs *dds=dgi->dds;
     char *dd_radar_name();
@@ -510,8 +504,7 @@ void dd_vold_update(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-struct generic_radar_info *
-return_gri_ptr()
+struct generic_radar_info *return_gri_ptr(void)
 {
     int j;
     char *c;

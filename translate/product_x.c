@@ -33,8 +33,7 @@ static double trip_time=0;
 
 void dd_px();
 
-void dd_product_x(dgi)
-  DGI_PTR dgi;
+void dd_product_x(DGI_PTR dgi)
 {
     DDS_PTR dds=dgi->dds;
     int i, mark, rn=dgi->radar_num;
@@ -104,9 +103,7 @@ void dd_product_x(dgi)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_px( dgi, fid, rn)
-  DGI_PTR dgi;
-  int fid, rn;
+void dd_px(DGI_PTR dgi, int fid, int rn)
 {
     /* 
      * routine to generate a px file

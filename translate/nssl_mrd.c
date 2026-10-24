@@ -37,7 +37,7 @@ int mrd_find_param();
 
 /* c------------------------------------------------------------------------ */
 
-void dd_mrd_conv()
+void dd_mrd_conv(void)
 {
     static int count=0;
     int ii, rn, flush=NO;
@@ -85,7 +85,7 @@ void dd_mrd_conv()
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_mrd_init()
+int dd_mrd_init(void)
 {
     int ii, ok;
     struct dd_input_filters *dd_return_difs_ptr();
@@ -117,9 +117,7 @@ int dd_mrd_init()
 }
 /* c------------------------------------------------------------------------ */
 
-void produce_nssl_mrd( dgi, flush )
-  struct dd_general_info *dgi;
-  int flush;
+void produce_nssl_mrd(struct dd_general_info *dgi, int flush)
 {
     short *ss, *tt, *dd;
 
@@ -444,9 +442,7 @@ void produce_nssl_mrd( dgi, flush )
 }
 /* c------------------------------------------------------------------------ */
 
-void mrdp_write(mrdp, header_only)
-  struct mrd_production *mrdp;
-  int header_only;
+void mrdp_write(struct mrd_production *mrdp, int header_only)
 {
     struct mrd_record *this=mrdp->rec_que;
     int i, n;
@@ -507,9 +503,7 @@ void mrdp_write(mrdp, header_only)
 }
 /* c------------------------------------------------------------------------ */
 
-int mrd_find_param(dgi, find)
-  struct dd_general_info *dgi;
-  int find;
+int mrd_find_param(struct dd_general_info *dgi, int find)
 {
     struct dds_structs *dds=dgi->dds;
     char pname[12], *str_terminate(), string_space[256], *str_ptrs[32];

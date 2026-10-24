@@ -87,8 +87,7 @@ static char * default_help_file = "hlp.";
 
 /* c------------------------------------------------------------------------ */
 
-void se_process_click(sci)
-  struct solo_click_info *sci;
+void se_process_click(struct solo_click_info *sci)
 {
     static int hclicks = 0;
     int arg=0;
@@ -519,8 +518,7 @@ void se_process_click(sci)
 /* c------------------------------------------------------------------------ */
 
 struct solo_list_mgmt *
-se_update_list(list_id)
-  int list_id;
+se_update_list(int list_id)
 {
     /* update various lists so they can be refreshed on the screen
      * solo_refresh_list(list_id)
@@ -780,10 +778,7 @@ se_update_list(list_id)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_nab_files(dir, slm, type, nt)
-  char *dir, *type;
-  struct solo_list_mgmt *slm;
-  int nt;
+int se_nab_files(char *dir, struct solo_list_mgmt *slm, char *type, int nt)
 {
     int ii, jj, nn, mark;
     DIR *dir_ptr;
@@ -819,9 +814,7 @@ int se_nab_files(dir, slm, type, nt)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_nab_all_files(dir, slm)
-  char *dir;
-  struct solo_list_mgmt *slm;
+int se_nab_all_files(char *dir, struct solo_list_mgmt *slm)
 {
     int ii, jj, nn, mark;
     DIR *dir_ptr;

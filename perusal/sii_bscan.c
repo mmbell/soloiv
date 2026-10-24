@@ -116,9 +116,7 @@ void sp_ts_column();
 
 /* c------------------------------------------------------------------------ */
 
-int sp_ts_data_loop(tsLink0, usi)
-  struct ts_linked_frames *tsLink0;
-  struct unique_sweepfile_info_v3 *usi;
+int sp_ts_data_loop(struct ts_linked_frames *tsLink0, struct unique_sweepfile_info_v3 *usi)
 {
    static int dia_count=0, dia_trip=54;
    static int count=0, trip=0;
@@ -415,9 +413,7 @@ int sp_ts_data_loop(tsLink0, usi)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_ts_line(tsl, top_down)
-  struct ts_linked_frames *tsl;
-  int top_down;
+void sp_ts_line(struct ts_linked_frames *tsl, int top_down)
 {
     /* color in the line
      * remember y is really upside down
@@ -441,9 +437,7 @@ void sp_ts_line(tsl, top_down)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_ts_column(frme, image, x_pxl, top_down)
-  int frme, x_pxl, top_down;
-  unsigned char *image;
+void sp_ts_column(int frme, unsigned char *image, int x_pxl, int top_down)
 {
     /* paint one time-series column of frame "frme" into "image" with
      * the frame's current cell colors, as sp_ts_data_loop does for each
@@ -467,8 +461,7 @@ void sp_ts_column(frme, image, x_pxl, top_down)
 }
 /* c------------------------------------------------------------------------ */
 
-int tsDisplay(click_frme, command)
-  int click_frme, command;
+int tsDisplay(int click_frme, int command)
 {
     static int plot_count=0;
     int ii, jj, nn, ok, vv, ww, frme, mark, broke=NO, lead_frame, one_pass;
@@ -777,9 +770,7 @@ int tsDisplay(click_frme, command)
 }
 /* c------------------------------------------------------------------------ */
 
-void ts_ray_clone(aa, cc, y_count, frame_width, nlines, top_down, right_left)
-  char *aa, *cc;
-  int y_count, frame_width, nlines, top_down, right_left;
+void ts_ray_clone(char *aa, char *cc, int y_count, int frame_width, int nlines, int top_down, int right_left)
 {
     /* copies a vertical line of data from left to right and bottom up
      * "aa" points to the bottom pixel of the vertical line to be cloned
@@ -802,9 +793,7 @@ void ts_ray_clone(aa, cc, y_count, frame_width, nlines, top_down, right_left)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_tsYpixel_info(tsLink, top_down)
-  struct ts_linked_frames *tsLink;
-  int top_down;
+void sp_tsYpixel_info(struct ts_linked_frames *tsLink, int top_down)
 {
     int ymax, ncells;
     struct ts_linked_frames *tsl=tsLink;

@@ -45,9 +45,7 @@ int solo_pixelate_color();
 
 /* c------------------------------------------------------------------------ */
 
-int solo_absorb_color_table(frme, dir, file)
-  int frme;
-  char *dir, *file;
+int solo_absorb_color_table(int frme, char *dir, char *file)
 {
     /* the purpose of this routine is to read in a color either of
      * rgb values normalized to one or xcolor names
@@ -129,9 +127,7 @@ int solo_absorb_color_table(frme, dir, file)
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_color_bar_pixels(frme, xlen, ylen, buf)
-  int frme, xlen, ylen;
-  char *buf;
+void solo_color_bar_pixels(int frme, int xlen, int ylen, char *buf)
 {
     /* generate pixel values in the color bar image
      */
@@ -197,9 +193,7 @@ void xsolo_color_bar_pixels(XImage *cb_image, int height, int frme)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_color_check(theColorName, theHardwareColor)
-  char *theColorName;
-  XColor *theHardwareColor;
+int solo_color_check(char *theColorName, XColor *theHardwareColor)
 {
     char mess[256];
     XColor theRGBColor;
@@ -225,9 +219,7 @@ int solo_color_check(theColorName, theHardwareColor)
 }
 /* c------------------------------------------------------------------------ */
 
-int xsolo_hardware_color_table(frme, directory, filename)
-  int frme;
-  char *directory, *filename;
+int xsolo_hardware_color_table(int frme, char *directory, char *filename)
 {
     char mess[256];
     int ii, jj, nc, ok=YES;
@@ -306,9 +298,7 @@ int xsolo_hardware_color_table(frme, directory, filename)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_pixelate_color(theHardwareColor, theColorName)
-  XColor *theHardwareColor;
-  char *theColorName;
+int solo_pixelate_color(XColor *theHardwareColor, char *theColorName)
 {
     char mess[256];
     int theStatus, mark;

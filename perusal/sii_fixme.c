@@ -11,7 +11,7 @@ void se_refresh_bnd_files_widget (struct boundary_stuff *sebs) {}
 /* c------------------------------------------------------------------------ */
 void se_dump_state_widget (struct solo_frame_state_files *sfsf) {}
 /* c------------------------------------------------------------------------ */
-void sp_refresh_delete_sweeps() {}
+void sp_refresh_delete_sweeps(void) {}
 /* c------------------------------------------------------------------------ */
 void se_dump_sed_files_widget(struct sed_command_files *scf) {}
 /* c------------------------------------------------------------------------ */
@@ -27,7 +27,7 @@ void solo_refresh_command_buffer(struct solo_click_info *sci) {}
 /* c------------------------------------------------------------------------ */
 void solo_changed_parameter_info(int frame_num) {}
 /* c------------------------------------------------------------------------ */
-void config_from_frame_states_file() {}
+void config_from_frame_states_file(void) {}
 /* c------------------------------------------------------------------------ */
 void se_refresh_state_widget(struct solo_frame_state_files *sfsf) {}
 /* c------------------------------------------------------------------------ */

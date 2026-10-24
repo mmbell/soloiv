@@ -98,22 +98,21 @@ int sii_cmd_tmplt_tokens (struct ui_cmd_mgmt *the_ucm);
 
 /* c------------------------------------------------------------------------ */
 
-int se_ucm_errlen()
+int se_ucm_errlen(void)
 {
    return 512;
 }
 
 /* c------------------------------------------------------------------------ */
 
-int se_ucm_cmdlen()
+int se_ucm_cmdlen(void)
 {
    return 128;
 }
 
 /* c------------------------------------------------------------------------ */
 
-void se_cull_setup_input(top_ssm)
-  struct solo_str_mgmt **top_ssm;
+void se_cull_setup_input(struct solo_str_mgmt **top_ssm)
 {  
     /* routine to cull setup-input commands from a list of commands
      */
@@ -151,9 +150,7 @@ void se_cull_setup_input(top_ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_edd(time_series, automatic, down, d_ctr)
-  int time_series, automatic, down;
-  double d_ctr;
+void dd_edd(int time_series, int automatic, int down, double d_ctr)
 {
    /* c...mark */
    int ii, jj, mm, nn, nc,  mark, nx, g1, g2, num_segments=0, bflag;
@@ -509,7 +506,7 @@ void dd_edd(time_series, automatic, down, d_ctr)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_edit_summary()
+void se_edit_summary(void)
 {
     /* saves the all the current editor commands 
      */
@@ -564,7 +561,7 @@ void se_edit_summary()
 }
 /* c------------------------------------------------------------------------ */
 
-int se_gen_sweep_list()
+int se_gen_sweep_list(void)
 {
     int ii,jj, nn, mark, rn;
     char str[64], *a, *mddir_radar_name_v3();
@@ -631,7 +628,7 @@ int se_gen_sweep_list()
 }
 /* c------------------------------------------------------------------------ */
 
-struct ui_cmd_mgmt *se_malloc_ucm()
+struct ui_cmd_mgmt *se_malloc_ucm(void)
 {
   struct ui_cmd_mgmt *ucm;
   struct ui_command *cmds;
@@ -921,11 +918,7 @@ int se_perform_cmds (struct ui_cmd_mgmt *the_ucm, int num_cmds)
 
 /* c------------------------------------------------------------------------ */
 
-int se_process_data(arg, cmds, time_series, automatic, down, d_ctr, frame_num)
-  int arg, frame_num;
-  struct ui_command *cmds;
-  int time_series, automatic, down;
-  double d_ctr;
+int se_process_data(int arg, struct ui_command *cmds, int time_series, int automatic, int down, double d_ctr, int frame_num)
 {
     int ii, jj, nn, mark, ncmds, item_num, nc;
     int oto_count, fer_count;
@@ -1028,7 +1021,7 @@ int se_process_data(arg, cmds, time_series, automatic, down, d_ctr, frame_num)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_really_readin_cmds()
+int se_really_readin_cmds(void)
 {
     int ii, nn, mark, ncmds, item_num;
     short yy, mon, dd, hh, mm, ss, ms;
@@ -1068,7 +1061,7 @@ int se_really_readin_cmds()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_setup_input_cmds()
+void se_setup_input_cmds(void)
 {
     /* this routine takes the contents of the sfic widget and constructs
      * input control commands from it
@@ -1195,8 +1188,7 @@ void se_setup_input_cmds()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_shift_setup_inputs(ssm)
-  struct solo_str_mgmt *ssm;
+void se_shift_setup_inputs(struct solo_str_mgmt *ssm)
 {
     /* routine to pop the current set of setup-input cmds on top
      * of the stack of previous inputs
@@ -1219,9 +1211,7 @@ void se_shift_setup_inputs(ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_tack_on_cmds(where, how_much)
-  char **where;
-  int *how_much;
+void se_tack_on_cmds(char **where, int *how_much)
 {
     int ii, mm, nn, mark, size;
     char *a, *b, *c;
@@ -1272,9 +1262,7 @@ void se_tack_on_cmds(where, how_much)
 }
 /* c------------------------------------------------------------------------ */
 
-double ts_pointing_angle(dgi, wn)
-  struct dd_general_info *dgi;
-  int wn;
+double ts_pointing_angle(struct dd_general_info *dgi, int wn)
 {
     double d_rot;
 
@@ -1298,7 +1286,7 @@ double ts_pointing_angle(dgi, wn)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_write_sed_cmds()
+void se_write_sed_cmds(void)
 {
     /* saves the editor commands before beginning a pass through
      * the data

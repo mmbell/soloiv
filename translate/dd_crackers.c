@@ -47,9 +47,7 @@ void swack_double();
 
 /* c------------------------------------------------------------------------ */
 
-void nssl_crack_head (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void nssl_crack_head(char *srs, char *dst, int limit)
 {
    int sizeof_struct=250;
    int item_count=38;
@@ -100,9 +98,7 @@ void nssl_crack_head (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void nssl_crack_head2 (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void nssl_crack_head2(char *srs, char *dst, int limit)
 {
    int sizeof_struct=160;
    int item_count=40;
@@ -155,9 +151,7 @@ void nssl_crack_head2 (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_crack_bdhd (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void se_crack_bdhd(char *srs, char *dst, int limit)
 {
    int sizeof_struct=76;
    int item_count=14;
@@ -184,9 +178,7 @@ void se_crack_bdhd (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_crack_pisp (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void se_crack_pisp(char *srs, char *dst, int limit)
 {
    int sizeof_struct=128;
    int item_count=24;
@@ -223,9 +215,7 @@ void se_crack_pisp (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sxmn (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_sxmn(char *srs, char *dst, int limit)
 {
    int sizeof_struct=220;
    int item_count=21;
@@ -259,9 +249,7 @@ void sp_crack_sxmn (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_slmk0 (srs, dst, limit, swap_em)
-  char *srs, *dst;
-  int limit, swap_em;
+void sp_crack_slmk0(char *srs, char *dst, int limit, int swap_em)
 {
    int sizeof_struct=56;
    int item_count=9;
@@ -283,9 +271,7 @@ void sp_crack_slmk0 (srs, dst, limit, swap_em)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_slmk (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_slmk(char *srs, char *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=9;
@@ -307,9 +293,7 @@ void sp_crack_slmk (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sctr0 (srs, dst, limit, swap_em)
-  char *srs, *dst;
-  int limit, swap_em;
+void sp_crack_sctr0(char *srs, char *dst, int limit, int swap_em)
 {
    int sizeof_struct=56;
    int item_count=9;
@@ -331,9 +315,7 @@ void sp_crack_sctr0 (srs, dst, limit, swap_em)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sctr (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_sctr(char *srs, char *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=9;
@@ -355,9 +337,7 @@ void sp_crack_sctr (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sptl0 (srs, dst, limit, swap_em)
-  char *srs, *dst;
-  int limit, swap_em;
+void sp_crack_sptl0(char *srs, char *dst, int limit, int swap_em)
 {
    int sizeof_struct=48;
    int item_count=7;
@@ -377,9 +357,7 @@ void sp_crack_sptl0 (srs, dst, limit, swap_em)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sptl (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_sptl(char *srs, char *dst, int limit)
 {
    int sizeof_struct=72;
    int item_count=7;
@@ -399,9 +377,7 @@ void sp_crack_sptl (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfi0 (srs, dst, limit, swap_em)
-  char *srs, *dst;
-  int limit, swap_em;
+void sp_crack_ssfi0(char *srs, char *dst, int limit, int swap_em)
 {
    int sizeof_struct=400;
    int item_count=25;
@@ -439,9 +415,7 @@ void sp_crack_ssfi0 (srs, dst, limit, swap_em)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfi (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_ssfi(char *srs, char *dst, int limit)
 {
    int sizeof_struct=424;
    int item_count=25;
@@ -479,9 +453,7 @@ void sp_crack_ssfi (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfiLE (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_ssfiLE(char *srs, char *dst, int limit)
 {
    int sizeof_struct=400;
    int item_count=25;
@@ -519,9 +491,7 @@ void sp_crack_ssfiLE (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfiLE0 (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_ssfiLE0(char *srs, char *dst, int limit)
 {
    int sizeof_struct=400;
    int item_count=25;
@@ -559,9 +529,7 @@ void sp_crack_ssfiLE0 (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_spmi0 (srs, dst, limit, swap_em)
-  char *srs, *dst;
-  int limit, swap_em;
+void sp_crack_spmi0(char *srs, char *dst, int limit, int swap_em)
 {
    int sizeof_struct=80;
    int item_count=9;
@@ -583,9 +551,7 @@ void sp_crack_spmi0 (srs, dst, limit, swap_em)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_spmi (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_spmi(char *srs, char *dst, int limit)
 {
   int sizeof_struct=104;
   int item_count=9;
@@ -607,9 +573,7 @@ void sp_crack_spmi (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_spal (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_spal(char *srs, char *dst, int limit)
 {
    int sizeof_struct=796;
    int item_count=26;
@@ -648,9 +612,7 @@ void sp_crack_spal (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_swvi0 (srs, dst, limit, swap_em)
-  char *srs, *dst;
-  int limit, swap_em;
+void sp_crack_swvi0(char *srs, char *dst, int limit, int swap_em)
 {
    int sizeof_struct=220;
    int item_count=39;
@@ -702,9 +664,7 @@ void sp_crack_swvi0 (srs, dst, limit, swap_em)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_swvi (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void sp_crack_swvi(char *srs, char *dst, int limit)
 {
    int sizeof_struct=244;
    int item_count=39;
@@ -756,9 +716,7 @@ void sp_crack_swvi (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_rktb (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_rktb(char *srs, char *dst, int limit)
 {
    int sizeof_struct=28;
    int item_count=7;
@@ -780,9 +738,7 @@ void ddin_crack_rktb (srs, dst, limit)
 
 /* LE swap for super swib aligned on 8-byte boundaries - as for SPARC */
 
-void ddin_crack_sswbLE_aligned8 (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_sswbLE_aligned8(char *srs, char *dst, int limit)
 {
    int sizeof_struct=196;
    int item_count=17;
@@ -814,9 +770,7 @@ void ddin_crack_sswbLE_aligned8 (srs, dst, limit)
 
 /* swap for super swib aligned on 8-byte boundaries - as for SPARC */
 
-void ddin_crack_sswb_aligned8 (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_sswb_aligned8(char *srs, char *dst, int limit)
 {
    int sizeof_struct=196;
    int item_count=17;
@@ -847,9 +801,7 @@ void ddin_crack_sswb_aligned8 (srs, dst, limit)
 
 /* LE swap for super swib not aligned on 8-byte boundaries - as for INTEL */
 
-void ddin_crack_sswbLE (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_sswbLE(char *srs, char *dst, int limit)
 {
    int sizeof_struct=196;
    int item_count=17;
@@ -880,9 +832,7 @@ void ddin_crack_sswbLE (srs, dst, limit)
 
 /* swap for super swib not aligned on 8-byte boundaries - as for INTEL */
 
-void ddin_crack_sswb (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_sswb(char *srs, char *dst, int limit)
 {
    int sizeof_struct=196;
    int item_count=17;
@@ -913,9 +863,7 @@ void ddin_crack_sswb (srs, dst, limit)
 
 /* c------------------------------------------------------------------------ */
 
-void eld_crack_cspd (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void eld_crack_cspd(char *srs, char *dst, int limit)
 {
    int sizeof_struct=36;
    int item_count=6;
@@ -934,9 +882,7 @@ void eld_crack_cspd (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void eld_crack_lidr (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void eld_crack_lidr(char *srs, char *dst, int limit)
 {
 
    int sizeof_struct=148;
@@ -979,9 +925,7 @@ void eld_crack_lidr (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void eld_crack_frad (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void eld_crack_frad(char *srs, char *dst, int limit)
 {
    int sizeof_struct=52;
    int item_count=14;
@@ -1008,9 +952,7 @@ void eld_crack_frad (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void eld_crack_ldat (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void eld_crack_ldat(char *srs, char *dst, int limit)
 {
    int sizeof_struct=164;
    int item_count=14;
@@ -1037,9 +979,7 @@ void eld_crack_ldat (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void fof_crack_hsk (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void fof_crack_hsk(char *srs, char *dst, int limit)
 {
    int sizeof_struct=512;
    int item_count=116;
@@ -1168,9 +1108,7 @@ void fof_crack_hsk (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_vold (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_vold(char *srs, char *dst, int limit)
 {
    int sizeof_struct=72;
    int item_count=18;
@@ -1201,9 +1139,7 @@ void ddin_crack_vold (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_cfac (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_cfac(char *srs, char *dst, int limit)
 {
    int sizeof_struct=72;
    int item_count=18;
@@ -1234,9 +1170,7 @@ void ddin_crack_cfac (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_celv (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_celv(char *srs, char *dst, int limit)
 {
    int sizeof_struct=16;
    int item_count=4;
@@ -1253,9 +1187,7 @@ void ddin_crack_celv (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_radd (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_radd(char *srs, char *dst, int limit)
 {
    int sizeof_struct=300;
    int item_count=53;
@@ -1321,9 +1253,7 @@ void ddin_crack_radd (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_frib (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_frib(char *srs, char *dst, int limit)
 {
 
    int sizeof_struct=264;
@@ -1370,9 +1300,7 @@ void ddin_crack_frib (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_parm (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_parm(char *srs, char *dst, int limit)
 {
    int sizeof_struct=216;
    int item_count=30;
@@ -1415,9 +1343,7 @@ void ddin_crack_parm (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_swib (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_swib(char *srs, char *dst, int limit)
 {
    int sizeof_struct=40;
    int item_count=9;
@@ -1439,9 +1365,7 @@ void ddin_crack_swib (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_asib (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_asib(char *srs, char *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=20;
@@ -1474,9 +1398,7 @@ void ddin_crack_asib (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_ryib (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_ryib(char *srs, char *dst, int limit)
 {
    int sizeof_struct=44;
    int item_count=13;
@@ -1502,9 +1424,7 @@ void ddin_crack_ryib (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_qdat (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void ddin_crack_qdat(char *srs, char *dst, int limit)
 {
    int sizeof_struct=56;
    int item_count=8;
@@ -1525,9 +1445,7 @@ void ddin_crack_qdat (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void tdwr_crack_cbdh (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void tdwr_crack_cbdh(char *srs, char *dst, int limit)
 {
    int sizeof_struct=52;
    int item_count=20;
@@ -1560,9 +1478,7 @@ void tdwr_crack_cbdh (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_crack_hrh (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void hrd_crack_hrh(char *srs, char *dst, int limit)
 {
    int sizeof_struct=44;
    int item_count=25;
@@ -1600,9 +1516,7 @@ void hrd_crack_hrh (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_crack_hdrh (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void hrd_crack_hdrh(char *srs, char *dst, int limit)
 {
    int sizeof_struct=10;
    int item_count=6;
@@ -1621,9 +1535,7 @@ void hrd_crack_hdrh (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_crack_radar (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void hrd_crack_radar(char *srs, char *dst, int limit)
 {
    int sizeof_struct=600;
    int item_count=300;
@@ -1936,9 +1848,7 @@ void hrd_crack_radar (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_crack_header (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void hrd_crack_header(char *srs, char *dst, int limit)
 {
    int sizeof_struct=200;
    int item_count=73;
@@ -2024,9 +1934,7 @@ void hrd_crack_header (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_loc_use_ncar (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void uf_crack_loc_use_ncar(char *srs, char *dst, int limit)
 {
    int sizeof_struct=40;
    int item_count=19;
@@ -2058,9 +1966,7 @@ void uf_crack_loc_use_ncar (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_loc_use_ucla (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void uf_crack_loc_use_ucla(char *srs, char *dst, int limit)
 {
    int sizeof_struct=50;
    int item_count=18;
@@ -2091,9 +1997,7 @@ void uf_crack_loc_use_ucla (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_fhed (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void uf_crack_fhed(char *srs, char *dst, int limit)
 {
    int sizeof_struct=64;
    int item_count=32;
@@ -2138,9 +2042,7 @@ void uf_crack_fhed (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_opt (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void uf_crack_opt(char *srs, char *dst, int limit)
 {
    int sizeof_struct=32;
    int item_count=10;
@@ -2163,9 +2065,7 @@ void uf_crack_opt (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_man (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void uf_crack_man(char *srs, char *dst, int limit)
 {
    int sizeof_struct=92;
    int item_count=37;
@@ -2214,9 +2114,7 @@ void uf_crack_man (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void nex_crack_drdh (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void nex_crack_drdh(char *srs, char *dst, int limit)
 {
    int dst_ndx = sparc_ndx;
    int sizeof_struct=100;
@@ -2277,9 +2175,7 @@ void nex_crack_drdh (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void nex_crack_nmh (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void nex_crack_nmh(char *srs, char *dst, int limit)
 {
    int sizeof_struct=16;
    int item_count=8;
@@ -2300,9 +2196,7 @@ void nex_crack_nmh (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void nex_crack_rda (srs, dst, limit)
-  char *srs, *dst;
-  int limit;
+void nex_crack_rda(char *srs, char *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=27;
@@ -2342,10 +2236,7 @@ void nex_crack_rda (srs, dst, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void piraq_crack_header (srs, dst, limit, sparc_alignment)
-  char *srs, *dst;
-  int limit;
-  int sparc_alignment;
+void piraq_crack_header(char *srs, char *dst, int limit, int sparc_alignment)
 {
    int mark=0;
    int srs_ndx = sparc_alignment ? sparc_ndx : offs_ndx;
@@ -2442,10 +2333,7 @@ void piraq_crack_header (srs, dst, limit, sparc_alignment)
 # endif
 /* c------------------------------------------------------------------------ */
 
-void piraq_crack_radar (srs, dst, limit, sparc_alignment)
-  char *srs, *dst;
-  int limit;
-  int sparc_alignment;
+void piraq_crack_radar(char *srs, char *dst, int limit, int sparc_alignment)
 {
    /*
    int srs_ndx = sparc_alignment ? sparc_ndx : offs_ndx;
@@ -2583,11 +2471,7 @@ void piraq_crack_radar (srs, dst, limit, sparc_alignment)
 # endif
 /* c------------------------------------------------------------------------ */
 
-void crackers(srs, dst, item_count, ndx_cnt, tbl, srs_ndx, dst_ndx, limit)
-  char *srs, *dst;
-  const int item_count, ndx_cnt;
-  int *tbl;
-  int srs_ndx, dst_ndx, limit;
+void crackers(char *srs, char *dst, const int item_count, const int ndx_cnt, int *tbl, int srs_ndx, int dst_ndx, int limit)
 {
    int ii, jj, itm, nn, *row = tbl;
    char *ss=srs, *tt=dst;
@@ -2652,11 +2536,7 @@ void crackers(srs, dst, item_count, ndx_cnt, tbl, srs_ndx, dst_ndx, limit)
 }
 /* c------------------------------------------------------------------------ */
 
-void piraq_crackers
-(srs, dst, item_count, ndx_cnt, tbl, srs_ndx, dst_ndx, limit)
-  char *srs, *dst;
-  int item_count, ndx_cnt, *tbl;
-  int srs_ndx, dst_ndx, limit;
+void piraq_crackers(char *srs, char *dst, int item_count, int ndx_cnt, int *tbl, int srs_ndx, int dst_ndx, int limit)
 {
    int ii, jj, itm, nn, *row = tbl;
    char *ss=srs, *tt=dst;
@@ -2695,9 +2575,7 @@ void piraq_crackers
 }
 /* c------------------------------------------------------------------------ */
 
-void swack_short(ss, tt, nn)
-  char *ss, *tt;
-  int nn;
+void swack_short(char *ss, char *tt, int nn)
 {
    for(; nn--;) {
       *tt++ = *(ss+1);
@@ -2707,17 +2585,14 @@ void swack_short(ss, tt, nn)
 }
 /* c------------------------------------------------------------------------ */
 
-void swack2(ss, tt)
-  char *ss, *tt;
+void swack2(char *ss, char *tt)
 {
    *tt++ = *(ss+1);
    *tt = *ss;
 }
 /* c------------------------------------------------------------------------ */
 
-void swack_long(ss, tt, nn)
-  char *ss, *tt;
-  int nn;
+void swack_long(char *ss, char *tt, int nn)
 {
    for(; nn--;) {
       *tt++ = *(ss+3);
@@ -2729,8 +2604,7 @@ void swack_long(ss, tt, nn)
 }
 /* c------------------------------------------------------------------------ */
 
-void swack4(ss, tt)
-  char *ss, *tt;
+void swack4(char *ss, char *tt)
 {
    *tt++ = *(ss+3);
    *tt++ = *(ss+2);
@@ -2739,9 +2613,7 @@ void swack4(ss, tt)
 }
 /* c------------------------------------------------------------------------ */
 
-void swack_double(ss, tt, nn)
-  char *ss, *tt;
-  int nn;
+void swack_double(char *ss, char *tt, int nn)
 {
    for(; nn--;) {
       *tt++ = *(ss+7);

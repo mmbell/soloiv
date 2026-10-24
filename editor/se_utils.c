@@ -237,9 +237,7 @@ struct ui_cmd_mgmt *ok_cmd( char * line, struct ui_cmd_mgmt *the_ucm )
 }
 /* c------------------------------------------------------------------------ */
 
-int se_absorb_strings(path_name, top_ssm)
-  char *path_name;
-  struct solo_str_mgmt **top_ssm;
+int se_absorb_strings(char *path_name, struct solo_str_mgmt **top_ssm)
 {
     int ii, nn, mark;
     char *a, str[256], *fgetz();
@@ -268,15 +266,14 @@ int se_absorb_strings(path_name, top_ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_util_dummy()
+void se_util_dummy(void)
 {
     int ii, mark;
     mark = 0;
 }
 /* c------------------------------------------------------------------------ */
 
-void se_fix_comment(comment)
-  char *comment;
+void se_fix_comment(char *comment)
 {				/* remove blanks and slashed from comment */
     char *a=comment;
     for(; *a; a++)
@@ -285,8 +282,7 @@ void se_fix_comment(comment)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_crack_ed_file_name(name, file, comment)
-  char *name, *file, *comment;
+int se_crack_ed_file_name(char *name, char *file, char *comment)
 {
     int ii, jj=0, kk=0, nn, mark, nt, dd_tokenz();
     struct boundary_stuff *sebs, *return_se_bnd_struct();
@@ -328,8 +324,7 @@ int se_crack_ed_file_name(name, file, comment)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_crack_ed_path_name(name, dir, file, comment)
-  char *name, *dir, *file, *comment;
+void se_crack_ed_path_name(char *name, char *dir, char *file, char *comment)
 {
     int ii, nn, mark;
     char *a=name, *b, *c, *e, *strrchr();
@@ -353,8 +348,7 @@ void se_crack_ed_path_name(name, dir, file, comment)
 }
 /* c------------------------------------------------------------------------ */
 
-struct sed_command_files *
-se_return_cmd_files_struct()
+struct sed_command_files *se_return_cmd_files_struct(void)
 {
     int nt, dd_tokens();
     char *aa, string_space[88], *strptrs[16];
@@ -375,8 +369,7 @@ se_return_cmd_files_struct()
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_frame_state_files *
-se_return_state_files_struct()
+struct solo_frame_state_files *se_return_state_files_struct(void)
 {
     if(!sfsf) {
 	sfsf = (struct solo_frame_state_files *)
@@ -388,10 +381,7 @@ se_return_state_files_struct()
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-se_string_time(t, str)
-  double t;
-  char *str;
+char *se_string_time(double t, char *str)
 {
     double d, d_time_stamp();
     DD_TIME dts, *d_unstamp_time();
@@ -415,8 +405,7 @@ se_string_time(t, str)
 /* c...mark */
 /* c------------------------------------------------------------------------ */
 
-struct solo_click_info *
-clear_click_info()
+struct solo_click_info *clear_click_info(void)
 {
     struct solo_click_info *sci, *return_solo_click_ptr();
 
@@ -427,10 +416,7 @@ clear_click_info()
 /* c------------------------------------------------------------------------ */
 
 char *
-fgetz(aa, nn, stream)
-  char *aa;
-  int nn;
-  FILE *stream;
+fgetz(char *aa, int nn, FILE *stream)
 {
     int ii, jj=0;
     char *c=aa;
@@ -450,8 +436,7 @@ fgetz(aa, nn, stream)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_click_info *
-return_solo_click_ptr()
+struct solo_click_info *return_solo_click_ptr(void)
 {
     struct solo_edit_stuff *seds, *return_sed_stuff();
 
@@ -465,10 +450,7 @@ return_solo_click_ptr()
 }
 /* c------------------------------------------------------------------------ */
 
-int
-se_malloc_flagged_arrays(seds, max_gates)
-  struct solo_edit_stuff *seds;
-  int max_gates;
+int se_malloc_flagged_arrays(struct solo_edit_stuff *seds, int max_gates)
 {
     int ii, nn=max_gates;
     unsigned short *us;
@@ -525,7 +507,7 @@ se_malloc_flagged_arrays(seds, max_gates)
 }
 /* c------------------------------------------------------------------------ */
 
-struct ui_cmd_mgmt *malloc_cmd_mgmt()
+struct ui_cmd_mgmt *malloc_cmd_mgmt(void)
 {
   int llen = 128;
   struct ui_cmd_mgmt *ucm;
@@ -536,8 +518,7 @@ struct ui_cmd_mgmt *malloc_cmd_mgmt()
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_edit_stuff *
-return_sed_stuff()
+struct solo_edit_stuff *return_sed_stuff(void)
 {
     int ii, jj, mm, nn, llen;
     struct solo_list_mgmt *slm, *solo_malloc_list_mgmt();
@@ -1812,8 +1793,7 @@ return_sed_stuff()
 }
 /* c------------------------------------------------------------------------ */
 
-struct swp_file_input_control *
-return_swp_fi_in_cntrl()
+struct swp_file_input_control *return_swp_fi_in_cntrl(void)
 {
     struct solo_edit_stuff *seds, *return_sed_stuff();
 
@@ -1822,8 +1802,7 @@ return_swp_fi_in_cntrl()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_all_fer_cmds(which)
-  struct solo_list_mgmt *which;
+void se_all_fer_cmds(struct solo_list_mgmt *which)
 {
     char *a, str[SE_MAX_STRING];
 
@@ -1995,8 +1974,7 @@ void se_all_fer_cmds(which)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_all_input_commands(which)
-  struct solo_list_mgmt *which;
+void se_all_input_commands(struct solo_list_mgmt *which)
 {
    char *a, str[SE_MAX_STRING];
    
@@ -2023,8 +2001,7 @@ void se_all_input_commands(which)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_all_other_commands(which)
-  struct solo_list_mgmt *which;
+void se_all_other_commands(struct solo_list_mgmt *which)
 {
     char *a, str[SE_MAX_STRING];
 
@@ -2181,8 +2158,7 @@ void se_all_other_commands(which)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_append_string(top_ssm, ssm)
-  struct solo_str_mgmt **top_ssm, *ssm;
+void se_append_string(struct solo_str_mgmt **top_ssm, struct solo_str_mgmt *ssm)
 {
     /*
      * this routine appends a ssm to a list of ssms
@@ -2204,11 +2180,7 @@ void se_append_string(top_ssm, ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_str_mgmt *
-se_bracket_procedure(top_ssm, name, ncmds, item_num)
-  struct solo_str_mgmt **top_ssm;
-  char *name;
-  int *ncmds, *item_num;
+struct solo_str_mgmt *se_bracket_procedure(struct solo_str_mgmt **top_ssm, char *name, int *ncmds, int *item_num)
 {
     int ii, nn=0;
     struct solo_str_mgmt *ssmx=*top_ssm, *ssm=NULL, *se_pop_spair_string();
@@ -2251,9 +2223,7 @@ se_bracket_procedure(top_ssm, name, ncmds, item_num)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_str_mgmt *
-se_clone_ssm(ssm)
-  struct solo_str_mgmt *ssm;
+struct solo_str_mgmt *se_clone_ssm(struct solo_str_mgmt *ssm)
 {
     struct solo_str_mgmt *ssmx, *se_pop_spair_string();
 
@@ -2263,9 +2233,7 @@ se_clone_ssm(ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_insert_ssm_string(top_ssm, item, ssm)
-  struct solo_str_mgmt **top_ssm, *ssm;
-  int item;
+void se_insert_ssm_string(struct solo_str_mgmt **top_ssm, int item, struct solo_str_mgmt *ssm)
 {
     /* this routine inserts a ssm before ssm indicated
      * item 0 is the first string
@@ -2303,8 +2271,7 @@ void se_insert_ssm_string(top_ssm, item, ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_str_mgmt *
-se_pop_spair_string()
+struct solo_str_mgmt *se_pop_spair_string(void)
 {
     struct solo_str_mgmt *ssm = se_spair_strings;
 
@@ -2322,8 +2289,7 @@ se_pop_spair_string()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_print_ssm_strings(top_ssm)
-  struct solo_str_mgmt *top_ssm;
+void se_print_ssm_strings(struct solo_str_mgmt *top_ssm)
 {
     int nn;
     char *a, str[256];
@@ -2339,9 +2305,7 @@ void se_print_ssm_strings(top_ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_str_mgmt *
-se_pull_ssm_string(top_ssm, ssmx)
-  struct solo_str_mgmt **top_ssm, *ssmx;
+struct solo_str_mgmt *se_pull_ssm_string(struct solo_str_mgmt **top_ssm, struct solo_str_mgmt *ssmx)
 {
     int ii;
 
@@ -2366,8 +2330,7 @@ se_pull_ssm_string(top_ssm, ssmx)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_push_all_ssms(ssmptr)
-  struct solo_str_mgmt **ssmptr;
+void se_push_all_ssms(struct solo_str_mgmt **ssmptr)
 {
     struct solo_str_mgmt *ssm=(*ssmptr);
 
@@ -2382,8 +2345,7 @@ void se_push_all_ssms(ssmptr)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_push_spair_string(ssm)
-  struct solo_str_mgmt *ssm;
+void se_push_spair_string(struct solo_str_mgmt *ssm)
 {
     ssm->next = se_spair_strings;
     se_spair_strings = ssm;
@@ -2391,10 +2353,7 @@ void se_push_spair_string(ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-struct solo_str_mgmt *
-se_remove_ssm_string(top_ssm, item)
-  struct solo_str_mgmt **top_ssm;
-  int item;
+struct solo_str_mgmt *se_remove_ssm_string(struct solo_str_mgmt **top_ssm, int item)
 {
     int ii;
     struct solo_str_mgmt *next, *ssmx=(*top_ssm);
@@ -2425,8 +2384,7 @@ se_remove_ssm_string(top_ssm, item)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_replace_prcdr_items(ssma,ssmb)
-  struct solo_str_mgmt **ssma, **ssmb;
+void se_replace_prcdr_items(struct solo_str_mgmt **ssma, struct solo_str_mgmt **ssmb)
 {
     /* for each command in "b", find its counterpart in "a"
      * and replace it
@@ -2458,9 +2416,7 @@ void se_replace_prcdr_items(ssma,ssmb)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_replace_ssm_string(top_ssm, item, ssm)
-  struct solo_str_mgmt **top_ssm, *ssm;
-  int item;
+int se_replace_ssm_string(struct solo_str_mgmt **top_ssm, int item, struct solo_str_mgmt *ssm)
 {
     int ii;
     se_remove_ssm_string(top_ssm, item);
@@ -2469,9 +2425,7 @@ int se_replace_ssm_string(top_ssm, item, ssm)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-se_unquote_string(uqs, qs)
-char *qs, *uqs;
+char *se_unquote_string(char *uqs, char *qs)
 {
 # ifdef obsolete
     char *a=uqs;
@@ -2490,8 +2444,7 @@ char *qs, *uqs;
 }
 /* c------------------------------------------------------------------------ */
 
-void solo_print_list(slm)
-  struct solo_list_mgmt *slm;
+void solo_print_list(struct solo_list_mgmt *slm)
 {
     /* print the entries in the list
      */

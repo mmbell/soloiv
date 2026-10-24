@@ -200,10 +200,7 @@ int ffb_skip_one_bkw (FILE *strm)
 
 /* c------------------------------------------------------------------------ */
 
-int ffb_read( fin, buf, count )
-    FILE * fin;
-  int count;
-  char *buf;
+int ffb_read(FILE *fin, char *buf, int count)
 {
     /* fortran-binary read routine
      */
@@ -247,10 +244,13 @@ int ffb_read( fin, buf, count )
 }
 /*c----------------------------------------------------------------------*/
 
-int cdcode( s, n, ival, rval ) /* try to decode the string */
-  char *s;
-  int n, *ival;
-  float *rval;
+int 
+cdcode ( /* try to decode the string */
+    char *s,
+    int n,
+    int *ival,
+    float *rval
+)
 {
     int okint(), okreal(), oketype();
 
@@ -271,9 +271,12 @@ int cdcode( s, n, ival, rval ) /* try to decode the string */
 }
 /* c-------------------------------------------------------------------------*/
 
-void ctype16( a, m, n )	/* type as 16 bit integers */
-  short *a;
-  int m, n;
+void 
+ctype16 (	/* type as 16 bit integers */
+    short *a,
+    int m,
+    int n
+)
 {
     int ii=m/2, s=0, nn=(n+1)/2;
     short *us=a+m;
@@ -297,9 +300,12 @@ void ctype16( a, m, n )	/* type as 16 bit integers */
 }
 /* c-------------------------------------------------------------------------*/
 
-void xctypeu16( a, m, n )	/* type as 16 bit integers */
-  unsigned short *a;
-  int m, n;
+void 
+xctypeu16 (	/* type as 16 bit integers */
+    unsigned short *a,
+    int m,
+    int n
+)
 {
     int ii=m/2, s=0, nn=(n+1)/2;
     unsigned short *us=a+ii;
@@ -323,9 +329,12 @@ void xctypeu16( a, m, n )	/* type as 16 bit integers */
 }
 /* c-------------------------------------------------------------------------*/
 
-void ctypeu16( a, m, n )	/* type as 16 bit integers */
-  unsigned char *a;
-  int m, n;
+void 
+ctypeu16 (	/* type as 16 bit integers */
+    unsigned char *a,
+    int m,
+    int n
+)
 {
     int ii=m/2, s=0, nn=(n+1)/2;
     int jj = m;
@@ -352,10 +361,13 @@ void ctypeu16( a, m, n )	/* type as 16 bit integers */
 }
 /* c-------------------------------------------------------------------------*/
 
-void slm_ctypeu16( slm, a, m, n )	/* type as 16 bit integers */
-  struct solo_list_mgmt *slm;
-  unsigned char *a;
-  int m, n;
+void 
+slm_ctypeu16 (	/* type as 16 bit integers */
+    struct solo_list_mgmt *slm,
+    unsigned char *a,
+    int m,
+    int n
+)
 {
     int ii=m/2, s=0, nn=(n+1)/2;
     int jj = m;
@@ -392,10 +404,13 @@ void slm_ctypeu16( slm, a, m, n )	/* type as 16 bit integers */
 }
 /* c-------------------------------------------------------------------------*/
 
-void slm_xctypeu16( slm, a, m, n )	/* type as 16 bit integers */
-  struct solo_list_mgmt *slm;
-  unsigned char *a;
-  int m, n;
+void 
+slm_xctypeu16 (	/* type as 16 bit integers */
+    struct solo_list_mgmt *slm,
+    unsigned char *a,
+    int m,
+    int n
+)
 {
     int ii=m/2, s=0, nn=(n+1)/2;
     int jj = m;
@@ -432,9 +447,12 @@ void slm_xctypeu16( slm, a, m, n )	/* type as 16 bit integers */
 }
 /* c-------------------------------------------------------------------------*/
 
-void Xctypeu16( a, m, n )	/* type as 16 bit integers */
-  unsigned char *a;
-  int m, n;
+void 
+Xctypeu16 (	/* type as 16 bit integers */
+    unsigned char *a,
+    int m,
+    int n
+)
 {
     int ii=m/2, s=0, nn=(n+1)/2;
     int jj = m;
@@ -461,11 +479,7 @@ void Xctypeu16( a, m, n )	/* type as 16 bit integers */
 }
 /* c------------------------------------------------------------------------ */
 
-int
-dd_crack_datime(datime, nc, dts)
-  char *datime;
-  int nc;
-  DD_TIME *dts;
+int dd_crack_datime(char *datime, int nc, DD_TIME *dts)
 {
     int yy, mon, dd, hh=0, mm=0, ss=0, ms=0;
     int ii, nn;
@@ -565,10 +579,7 @@ dd_crack_datime(datime, nc, dts)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-dd_est_src_dev_names_list(id, slm, src_dir)
-  char *id, *src_dir;
-  struct solo_list_mgmt *slm;
+char *dd_est_src_dev_names_list(char *id, struct solo_list_mgmt *slm, char *src_dir)
 {
     /* this routine sets up a list of dev names or most likely
      * file names associated with this "id" so we can cycle through
@@ -609,9 +620,7 @@ dd_est_src_dev_names_list(id, slm, src_dir)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-dd_establish_source_dev_names(id, names)
-  char *id, *names;
+char *dd_establish_source_dev_names(char *id, char *names)
 {
     /* this routine sets up a list of dev names or most likely
      * file names associated with this "id" so we can cycle through
@@ -650,9 +659,7 @@ dd_establish_source_dev_names(id, names)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_gen_packet_info(iri, dp)
-  struct input_read_info *iri;
-  struct io_packet *dp;
+void dd_gen_packet_info(struct input_read_info *iri, struct io_packet *dp)
 {
     dp->ib = iri->top;
     dp->seq_num = iri->top->seq_num;
@@ -663,9 +670,7 @@ void dd_gen_packet_info(iri, dp)
 }
 /* c------------------------------------------------------------------------ */
 
-struct input_read_info *
-dd_init_io_structs(index, fmt)
-  int index, fmt;
+struct input_read_info *dd_init_io_structs(int index, int fmt)
 {
     int ii, jj;
     struct input_read_info *iri;
@@ -744,8 +749,7 @@ dd_init_io_structs(index, fmt)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_input_read_close(iri)
-  struct input_read_info *iri;
+void dd_input_read_close(struct input_read_info *iri)
 {
    if (iri->io_type == PHYSICAL_TAPE)
      { close(iri->fid); }
@@ -754,9 +758,7 @@ void dd_input_read_close(iri)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_input_read_open(iri, dev_name)
-  struct input_read_info *iri;
-  char *dev_name;
+int dd_input_read_open(struct input_read_info *iri, char *dev_name)
 {
     int ii;
     long *lp, keep, keep2;
@@ -843,9 +845,7 @@ int dd_input_read_open(iri, dev_name)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_io_reset_offset(iri, offset)
-  struct input_read_info *iri;
-  long offset;
+void dd_io_reset_offset(struct input_read_info *iri, long offset)
 {
     long nn;
     /* reset the current offset
@@ -857,9 +857,7 @@ void dd_io_reset_offset(iri, offset)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_logical_read(iri, direction)
-  struct input_read_info *iri;
-  int direction;
+int dd_logical_read(struct input_read_info *iri, int direction)
 {
     int ii;
 
@@ -893,9 +891,7 @@ int dd_logical_read(iri, direction)
 }
 /* c------------------------------------------------------------------------ */
 
-char *
-dd_next_source_dev_name(id)
-  char *id;
+char *dd_next_source_dev_name(char *id)
 {
     struct source_devs_mgmt *sdm=devs_top;
 
@@ -913,8 +909,7 @@ dd_next_source_dev_name(id)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_phys_read(iri)
-  struct input_read_info *iri;
+int dd_phys_read(struct input_read_info *iri)
 {
     int ii, mark;
 
@@ -977,9 +972,7 @@ int dd_phys_read(iri)
 }
 /* c------------------------------------------------------------------------ */
 
-int dd_really_skip_recs(iri, direction, skip_count)
-  struct input_read_info *iri;
-  int direction, skip_count;
+int dd_really_skip_recs(struct input_read_info *iri, int direction, int skip_count)
 {
     int ii, nn, mark;
     long ll, rlen;
@@ -1155,9 +1148,7 @@ dd_relative_time(const char *rtm)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_reset_ios(iri, level)
-  struct input_read_info *iri;
-  int level;
+void dd_reset_ios(struct input_read_info *iri, int level)
 {
     int ii;
     struct input_buf *ib;
@@ -1178,17 +1169,13 @@ void dd_reset_ios(iri, level)
 }
 /* c------------------------------------------------------------------------ */
 
-struct io_packet*
-dd_return_current_packet(iri)
-  struct input_read_info *iri;
+struct io_packet *dd_return_current_packet(struct input_read_info *iri)
 {
     return(iri->packet_que);
 }
 /* c------------------------------------------------------------------------ */
 
-struct input_read_info *
-dd_return_ios(index, fmt)
-  int index, fmt;
+struct input_read_info *dd_return_ios(int index, int fmt)
 {
     int ii;
     struct input_read_info *dd_init_io_structs();
@@ -1209,9 +1196,7 @@ dd_return_ios(index, fmt)
 }
 /* c------------------------------------------------------------------------ */
 
-struct io_packet*
-dd_return_next_packet(iri)
-  struct input_read_info *iri;
+struct io_packet *dd_return_next_packet(struct input_read_info *iri)
 {
     struct io_packet *dp;
 
@@ -1221,8 +1206,7 @@ dd_return_next_packet(iri)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_rewind_dev(iri)
-  struct input_read_info *iri;
+void dd_rewind_dev(struct input_read_info *iri)
 {
 #ifdef HAVE_SYS_MTIO_H
     struct mtop op;
@@ -1251,9 +1235,7 @@ void dd_rewind_dev(iri)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_skip_files(iri, direction, skip_count)
-  struct input_read_info *iri;
-  int direction, skip_count;
+void dd_skip_files(struct input_read_info *iri, int direction, int skip_count)
 {
     int ii, jj, mark, ok=YES;
     long ll, rlen;
@@ -1308,9 +1290,7 @@ void dd_skip_files(iri, direction, skip_count)
  }
 /* c------------------------------------------------------------------------ */
 
-int dd_skip_recs(iri, direction, skip_count)
-  struct input_read_info *iri;
-  int direction, skip_count;
+int dd_skip_recs(struct input_read_info *iri, int direction, int skip_count)
 {
     /* move in the direction indicated and read the next record
      */
@@ -1376,8 +1356,7 @@ int dd_skip_recs(iri, direction, skip_count)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_unwind_dev(iri)
-  struct input_read_info *iri;
+void dd_unwind_dev(struct input_read_info *iri)
 {
     char mess[256];
     int ii;
@@ -1395,9 +1374,12 @@ void dd_unwind_dev(iri)
 }
 /*c----------------------------------------------------------------------*/
 
-void ezascdmp( b, m, n )		/* ascii dump of n bytes */
-  char *b;
-  int m, n;
+void 
+ezascdmp (		/* ascii dump of n bytes */
+    char *b,
+    int m,
+    int n
+)
 {
     int s=0;
     char *c=b+m;
@@ -1422,10 +1404,13 @@ void ezascdmp( b, m, n )		/* ascii dump of n bytes */
 }
 /*c----------------------------------------------------------------------*/
 
-void slm_ezascdmp( slm, b, m, n )		/* ascii dump of n bytes */
-  struct solo_list_mgmt *slm;
-  char *b;
-  int m, n;
+void 
+slm_ezascdmp (		/* ascii dump of n bytes */
+    struct solo_list_mgmt *slm,
+    char *b,
+    int m,
+    int n
+)
 {
     int s=0;
     char *c=b+m;
@@ -1462,9 +1447,12 @@ void slm_ezascdmp( slm, b, m, n )		/* ascii dump of n bytes */
 }
 /*c----------------------------------------------------------------------*/
 
-void ezhxdmp( b, m, n )		/* hexdump of n bytes */
-  char *b;
-  int m, n;
+void 
+ezhxdmp (		/* hexdump of n bytes */
+    char *b,
+    int m,
+    int n
+)
 {
     int c, i, s;
     char h[20];
@@ -1493,10 +1481,13 @@ void ezhxdmp( b, m, n )		/* hexdump of n bytes */
 }
 /*c----------------------------------------------------------------------*/
 
-void slm_ezhxdmp( slm, b, m, n )		/* hexdump of n bytes */
-  struct solo_list_mgmt *slm;
-  char *b;
-  int m, n;
+void 
+slm_ezhxdmp (		/* hexdump of n bytes */
+    struct solo_list_mgmt *slm,
+    char *b,
+    int m,
+    int n
+)
 {
     int c, s;
     char ascii[16], *as;
@@ -1550,9 +1541,7 @@ void slm_ezhxdmp( slm, b, m, n )		/* hexdump of n bytes */
 }
 /* c---------------------------------------------------------------------- */
 
-int getreply( s, lim )
-  char *s;
-  int lim;
+int getreply(char *s, int lim)
 {
     int c, ii=0, nn, mark=EOF;
     char *a=s;
@@ -1580,10 +1569,12 @@ int getreply( s, lim )
 }
  /* c---------------------------------------------------------------------- */
 
-int oketype( s, n, val ) /* determine if string is real number */
-  char s[];
-  int n;
-  float *val;
+int 
+oketype ( /* determine if string is real number */
+    char s[],
+    int n,
+    float *val
+)
 {
     int d, i, ival;
     int okint();
@@ -1621,9 +1612,12 @@ int oketype( s, n, val ) /* determine if string is real number */
 }
 /* c---------------------------------------------------------------------- */
 
-int okint( s, n, ival ) /* see if string is an integer */
-  char s[];
-  int n, *ival;
+int 
+okint ( /* see if string is an integer */
+    char s[],
+    int n,
+    int *ival
+)
 {
     int sign, i;
     
@@ -1656,10 +1650,12 @@ int okint( s, n, ival ) /* see if string is an integer */
 }
  /* c---------------------------------------------------------------------- */
 
-int okreal( s, n, val ) /* determine if string is real number */
-  char s[];
-  int n;
-  float *val;
+int 
+okreal ( /* determine if string is real number */
+    char s[],
+    int n,
+    float *val
+)
 {
     int d, i, ival;
     float frak=1.0;
@@ -1695,9 +1691,7 @@ int okreal( s, n, val ) /* determine if string is real number */
 # ifdef obsolete
 /* c------------------------------------------------------------------------ */
 
-int strnlen(str,n)
-  char *str;
-  int n;
+int strnlen(char *str, int n)
 {
     /* routine to return the length of string "s" but
      * don't look past the "n" th character for a null
@@ -1712,10 +1706,7 @@ int strnlen(str,n)
 # endif
 /* c------------------------------------------------------------------------ */
 
-void gri_interest(gri, verbose, preamble, postamble)
-  struct generic_radar_info *gri;
-  int verbose;
-  char *preamble, *postamble;
+void gri_interest(struct generic_radar_info *gri, int verbose, char *preamble, char *postamble)
 {
     /* print interesting info from the gri struct such as:
      * time
@@ -1794,7 +1785,7 @@ void gri_interest(gri, verbose, preamble, postamble)
 }
 /* c------------------------------------------------------------------------ */
 
-int gri_max_lines()
+int gri_max_lines(void)
 {
     static int count=0;
     char *a, *get_tagged_string();
@@ -1811,10 +1802,7 @@ int gri_max_lines()
 }
 /* c------------------------------------------------------------------------ */
 
-int gri_nab_input_filters(current_time, difs, less)
-  double current_time;
-  struct dd_input_filters *difs;
-  int less;
+int gri_nab_input_filters(double current_time, struct dd_input_filters *difs, int less)
 {
     int ii, kk, mark, longer_menu = !less;
     int nn, ival;
@@ -2012,8 +2000,7 @@ int gri_nab_input_filters(current_time, difs, less)
 }
 /* c------------------------------------------------------------------------ */
 
-void gri_print_list(ptrs)
-  char **ptrs;
+void gri_print_list(char **ptrs)
 {
     char **pt=ptrs;
     int ii, jj, kk, ll=0, mm, nl, max=gri_max_lines(), last_mm;
@@ -2060,16 +2047,14 @@ void gri_print_list(ptrs)
 }
 /* c------------------------------------------------------------------------ */
 
-void gri_set_max_lines(nlines)
-  int nlines;
+void gri_set_max_lines(int nlines)
 {
     if(nlines > 0)
 	  lines_in_display = nlines;
 }
 /* c------------------------------------------------------------------------ */
 
-int gri_start_stop_chars(view_char, view_char_count)
-  int *view_char, *view_char_count;
+int gri_start_stop_chars(int *view_char, int *view_char_count)
 {
     int nn, ival;
     float val;

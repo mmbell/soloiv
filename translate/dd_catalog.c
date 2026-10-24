@@ -141,9 +141,7 @@ void ddcat_write();
 
 /* c------------------------------------------------------------------------ */
 
-void
-dd_append_cat_comment(comm_str)
-  char *comm_str;
+void dd_append_cat_comment(char *comm_str)
 {
     /* it is assumed each call represents a line of text in the catalog
      */
@@ -165,7 +163,7 @@ dd_append_cat_comment(comm_str)
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_enable_cat_comments()
+void dd_enable_cat_comments(void)
 {
     if(cmt)
 	  return;
@@ -179,10 +177,7 @@ void dd_enable_cat_comments()
 }
 /* c------------------------------------------------------------------------ */
 
-void dd_catalog(dgi, ignored_time, flush)
-  struct dd_general_info *dgi;
-  time_t ignored_time;
-  int flush;
+void dd_catalog(struct dd_general_info *dgi, time_t ignored_time, int flush)
 {
     int rn=dgi->radar_num;
     static int count=0;
@@ -377,11 +372,7 @@ void dd_catalog(dgi, ignored_time, flush)
 }
 /* c------------------------------------------------------------------------ */
 
-void cat_volume( dgi, cii, current_time, finish )
-  struct dd_general_info *dgi;
-  struct catalog_info *cii;
-  time_t current_time;
-  int finish;
+void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t current_time, int finish)
 {
     int i, n;
     double d, fabs();
@@ -790,11 +781,7 @@ void cat_volume( dgi, cii, current_time, finish )
 }
 /* c------------------------------------------------------------------------ */
 
-void cat_sweep( dgi, cii, current_time, finish )
-  struct dd_general_info *dgi;
-  struct catalog_info *cii;
-  time_t current_time;
-  int finish;
+void cat_sweep(struct dd_general_info *dgi, struct catalog_info *cii, time_t current_time, int finish)
 {
     int i, n, nc, llen, max_llen=77;
     float e, f;
@@ -975,9 +962,7 @@ void cat_sweep( dgi, cii, current_time, finish )
 }
 /* c------------------------------------------------------------------------ */
 
-char *cat_time( time, dst )
-  time_t time;
-  char *dst;
+char *cat_time(time_t time, char *dst)
 {
     DD_TIME dts;
 
@@ -989,9 +974,7 @@ char *cat_time( time, dst )
 }
 /* c------------------------------------------------------------------------ */
 
-char *cat_date( time, dst )
-  time_t time;
-  char *dst;
+char *cat_date(time_t time, char *dst)
 {
     DD_TIME dts;
 
@@ -1007,9 +990,7 @@ char *cat_date( time, dst )
 }
 /* c------------------------------------------------------------------------ */
 
-void cat_cat_att( name, num_args, arg, cat )
-  char *name, *arg, *cat;
-  int num_args;
+void cat_cat_att(char *name, int num_args, char *arg, char *cat)
 {
     strcat(cat,name );
     if( num_args == 1 ) {
@@ -1020,9 +1001,7 @@ void cat_cat_att( name, num_args, arg, cat )
 }
 /* c------------------------------------------------------------------------ */
 
-void cat_cat_att_args( name, num_args, arglist, cat )
-  char *name, *arglist[], *cat;
-  int num_args;
+void cat_cat_att_args(char *name, int num_args, char *arglist[], char *cat)
 {
     int i;
 
@@ -1038,8 +1017,7 @@ void cat_cat_att_args( name, num_args, arglist, cat )
 }
 /* c------------------------------------------------------------------------ */
 
-char *reverse_string( str, rev )
-  char *str, *rev;
+char *reverse_string(char *str, char *rev)
 {
     int n=strlen(str);
     char *a=str+n, *b=rev;
@@ -1051,9 +1029,7 @@ char *reverse_string( str, rev )
 }
 /* c------------------------------------------------------------------------ */
 
-char *c_deblank( a, n, clean )
-  char *a, *clean;
-  int n;
+char *c_deblank(char *a, int n, char *clean)
 {
     /* remove leading and trailing blanks from the
      * n character string
@@ -1071,8 +1047,7 @@ char *c_deblank( a, n, clean )
 }
 /* c------------------------------------------------------------------------ */
 
-void ddcat_close( fid )
-  int fid;
+void ddcat_close(int fid)
 {
     if( !Catalog_flag  )
 	  return;
@@ -1082,8 +1057,7 @@ void ddcat_close( fid )
 /* c------------------------------------------------------------------------ */
 # define PMODE 0666
 
-int ddcat_open(file_name )
-  char *file_name;
+int ddcat_open(char *file_name)
 {
     int i = -99;
 
@@ -1094,10 +1068,7 @@ int ddcat_open(file_name )
 }
 /* c------------------------------------------------------------------------ */
 
-void ddcat_write( cii, buf, size, func )
-  struct catalog_info *cii;
-  int size, func;
-  char *buf;
+void ddcat_write(struct catalog_info *cii, char *buf, int size, int func)
 {
     int i, j, *blowit=0, mark, save_place, fid=cii->volumes_fid;
 

@@ -110,8 +110,7 @@ guint sii_config_sync_num (guint frame_num);
 
 /* c------------------------------------------------------------------------ */
 
-int displayq(click_frme, command)
-  int click_frme, command;
+int displayq(int click_frme, int command)
 {
     static int plot_count=0;
     static int no_access_count = 0;
@@ -642,9 +641,7 @@ int displayq(click_frme, command)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_nex_sweep_set(ns, sweep_list)
-  int ns;
-  struct linked_frames *sweep_list[];
+void sp_nex_sweep_set(int ns, struct linked_frames *sweep_list[])
 {
     int ii, jj, kk;
     struct linked_frames *flink, *flinkx, *last_flink;
@@ -672,8 +669,7 @@ void sp_nex_sweep_set(ns, sweep_list)
 }
 /* c------------------------------------------------------------------------ */
 
-int sp_data_loop(flink0)
-  struct linked_frames *flink0;
+int sp_data_loop(struct linked_frames *flink0)
 {
     struct linked_frames *flink=flink0;
     int lead_frame=flink0->lead_sweep->window_num;
@@ -811,20 +807,19 @@ int sp_data_loop(flink0)
 }
 /* c------------------------------------------------------------------------ */
 
-int sp_diag_flag()
+int sp_diag_flag(void)
 {
     return(diag_flag);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_set_diag_flag(flag)
-  int flag;
+void sp_set_diag_flag(int flag)
 {
     diag_flag = flag;
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_replot_all()
+void sp_replot_all(void)
 {
     int ii, jj, nn, ww;
     struct solo_perusal_info *spi, *solo_return_winfo_ptr();
@@ -840,7 +835,7 @@ void sp_replot_all()
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_worksheet()
+int solo_worksheet(void)
 {
 
   void sp_do_lock_color(int frame);
@@ -998,8 +993,7 @@ int solo_worksheet()
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
-  int frme, file_action, version, sweep_skip, replot;
+int solo_nab_next_file(int frme, int file_action, int version, int sweep_skip, int replot)
 {
     WW_PTR wwptr, solo_return_wwptr(), wwptrx;
     long mddir_file_info_v3(), time_now();
@@ -1218,9 +1212,7 @@ int solo_nab_next_file(frme, file_action, version, sweep_skip, replot)
 }
 /* c------------------------------------------------------------------------ */
 
-int sp_nab_fixed_angle_from_fn(fn, fxd)
-  char *fn;
-  double *fxd;
+int sp_nab_fixed_angle_from_fn(char *fn, double *fxd)
 {
     float f;
     char *a=fn, *b, *c, *delim=".";
@@ -1249,8 +1241,7 @@ int sp_nab_fixed_angle_from_fn(fn, fxd)
 }
 /* c------------------------------------------------------------------------ */
 
-int solo_parameter_setup(frme)
-  int frme;
+int solo_parameter_setup(int frme)
 {
     int ii, ww, pnum, ok=YES, np, nf;
     char *a, *solo_gen_file_info(), *str_terminate(), pname[12], mess[256];
@@ -1330,8 +1321,7 @@ int solo_parameter_setup(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_landmark_offsets(frme)
-  int frme;
+void sp_landmark_offsets(int frme)
 {
     int ii, nn, ww;
     struct point_in_space pisp, radar, *landmark;
@@ -1372,8 +1362,7 @@ void sp_landmark_offsets(frme)
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_align_center(frme)
-  int frme;
+void sp_align_center(int frme)
 {
     struct frame_ctr_info *fci;
     struct point_in_space pisp, *radar, *center;

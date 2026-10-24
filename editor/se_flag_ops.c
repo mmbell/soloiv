@@ -29,9 +29,11 @@ void se_do_clear_bad_flags_array();
 
 /* c------------------------------------------------------------------------ */
 
-int se_assert_bad_flags(arg, cmds)	/* #assert-bad-flags# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_assert_bad_flags (	/* #assert-bad-flags# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
@@ -89,9 +91,11 @@ int se_assert_bad_flags(arg, cmds)	/* #assert-bad-flags# */
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_flagged_add(arg, cmds)	/* #flagged-add# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_flagged_add (	/* #flagged-add# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* #flagged-add#
      * #flagged-multiply#
@@ -164,9 +168,7 @@ int se_flagged_add(arg, cmds)	/* #flagged-add# */
 }
 /* c------------------------------------------------------------------------ */
 
-int se_bad_flags_logic(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_bad_flags_logic(int arg, struct ui_command *cmds)	
 {
     /*
      * #and-bad-flags#
@@ -326,9 +328,7 @@ int se_bad_flags_logic(arg, cmds)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_clear_bad_flags(arg, cmds)
-  int arg;
-  struct ui_command *cmds;	
+int se_clear_bad_flags(int arg, struct ui_command *cmds)	
 {
   /* #clear-bad-flags#
    * #complement-bad-flags#
@@ -356,9 +356,11 @@ int se_clear_bad_flags(arg, cmds)
 }  
 /* c------------------------------------------------------------------------ */
 
-int se_copy_bad_flags(arg, cmds)	/* #copy-bad-flags# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_copy_bad_flags (	/* #copy-bad-flags# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     /* creates a bad flag mask corresponding to the bad flagged
      * gates in the test field
@@ -422,8 +424,7 @@ int se_copy_bad_flags(arg, cmds)	/* #copy-bad-flags# */
 }  
 /* c------------------------------------------------------------------------ */
 
-void se_do_clear_bad_flags_array(nn)
-  int nn;
+void se_do_clear_bad_flags_array(int nn)
 {
     struct solo_edit_stuff *seds, *return_sed_stuff();
 
@@ -433,9 +434,11 @@ void se_do_clear_bad_flags_array(nn)
 }
 /* c------------------------------------------------------------------------ */
 
-int se_set_bad_flags(arg, cmds)	/* #set-bad-flags# */
-  int arg;
-  struct ui_command *cmds;	
+int 
+se_set_bad_flags (	/* #set-bad-flags# */
+    int arg,
+    struct ui_command *cmds
+)	
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */

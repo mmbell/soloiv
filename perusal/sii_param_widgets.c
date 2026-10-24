@@ -1266,7 +1266,7 @@ void sii_ctr_inc_from_min_max (guint ncolors, gfloat *ctr, gfloat *inc,
 
 /* c---------------------------------------------------------------------- */
 
-gchar *sii_default_palettes_list()
+gchar *sii_default_palettes_list(void)
 {
    guint size=0, jj, nn;
    gchar *aa, *bb, *name;
@@ -1841,7 +1841,7 @@ void sii_initialize_parameter (guint frame_num, gchar *name)
 }
 /* c---------------------------------------------------------------------- */
 
-SiiPalette *sii_malloc_palette()
+SiiPalette *sii_malloc_palette(void)
 {
    SiiPalette * pal;
 
@@ -1909,7 +1909,7 @@ SiiLinkedList *sii_new_palette_for_param (const gchar *p_name, const gchar *name
 
 /* c---------------------------------------------------------------------- */
 
-gchar *sii_new_color_tables_list ()
+gchar *sii_new_color_tables_list(void)
 { 
    SiiPalette * pal;
    GSList *list;
@@ -1930,7 +1930,7 @@ gchar *sii_new_color_tables_list ()
 
 /* c---------------------------------------------------------------------- */
 
-gchar *sii_new_colors_list ()
+gchar *sii_new_colors_list(void)
 { 
    SiiPalette * pal;
    GSList *list;
@@ -1951,7 +1951,7 @@ gchar *sii_new_colors_list ()
 
 /* c---------------------------------------------------------------------- */
 
-gchar *sii_new_palettes_list ()
+gchar *sii_new_palettes_list(void)
 { 
    static GString *gs_list = NULL;
    SiiPalette * pal;
@@ -4087,7 +4087,7 @@ int solo_palette_color_numbers(int frame_num)
 
 /* c---------------------------------------------------------------------- */
 
-SiiLinkedList *sii_solo_palette_stack ()
+SiiLinkedList *sii_solo_palette_stack(void)
 {
     struct solo_palette s_pal, *solo_malloc_old_palette();
     SiiPalette *pal;

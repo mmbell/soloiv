@@ -29,15 +29,13 @@ static void init_d_time();
 
 /* c------------------------------------------------------------------------ */
 
-void dd_clear_dts(dts)
-  struct d_time_struct *dts;
+void dd_clear_dts(struct d_time_struct *dts)
 {
     memset(dts, 0, sizeof(struct d_time_struct));
 }
 /* c----------------------------------------------------------------------- */
 
-double d_time_stamp(dts)
-  DD_TIME *dts;
+double d_time_stamp(DD_TIME *dts)
 {
     int i, mm, dd;
     /*
@@ -70,8 +68,7 @@ double d_time_stamp(dts)
 }
 /* c----------------------------------------------------------------------- */
 
-DD_TIME *d_unstamp_time(dts)
-  DD_TIME *dts;
+DD_TIME *d_unstamp_time(DD_TIME *dts)
 {
     int i=iguess;
     long j=dts->time_stamp;
@@ -134,7 +131,7 @@ DD_TIME *d_unstamp_time(dts)
 }
 /* c----------------------------------------------------------------------- */
 
-static void init_d_time()
+static void init_d_time(void)
 {
     int i, yy, mark;
     int t28=2419200, t29=2505600, t30=2592000, t31=2678400;
