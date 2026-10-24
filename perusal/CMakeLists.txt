@@ -65,6 +65,15 @@ if(MATH_LIBRARY)
   target_link_libraries(soloiv_core PUBLIC ${MATH_LIBRARY})
 endif()
 
+# translate/ calls back into this library (solo_message, LittleEndian, ...),
+# so the two static libraries form a cycle. Apple's linker rescans archives
+# until nothing is left undefined, but GNU ld reads each one once, in order;
+# declaring the cycle makes CMake repeat the libraries on the link line.
+# (Apple's linker warns about the repeats, and does not need them.)
+if(NOT APPLE)
+  target_link_libraries(s2 PUBLIC soloiv_core)
+endif()
+
 # Executable: just main() + the core library.
 add_executable(soloiv soloii_main.c)
 target_link_libraries(soloiv PRIVATE soloiv_core)
