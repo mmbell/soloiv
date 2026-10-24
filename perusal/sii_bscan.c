@@ -477,7 +477,7 @@ int tsDisplay(click_frme, command)
     struct solo_perusal_info *spi, *solo_return_winfo_ptr();
     struct dd_general_info *dgi, *dd_window_dgi();
     char *aa, *bb, *solo_gen_file_info(), *getenv();
-    char mess[256], *get_tagged_string();
+    char mess[512], *get_tagged_string();
     int original_sweep_count, original_sweep_set_count, sset;
     int frame_list[SOLO_MAX_WINDOWS], frame_count=0;
     int checked_off[SOLO_MAX_WINDOWS];

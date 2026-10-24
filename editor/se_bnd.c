@@ -167,7 +167,7 @@ int xse_absorb_bnd()
     FILE *stream;
     WW_PTR wwptr, solo_return_wwptr();
     struct boundary_stuff *sebs, *return_se_bnd_struct();
-    char *a, *b, *c, *e, str[256], mess[256], *buf;
+    char *a, *b, *c, *e, str[256], mess[512], *buf;
     double d;
 
 
@@ -1503,7 +1503,7 @@ void xse_save_bnd ()
     WW_PTR wwptr, solo_return_wwptr();
     struct one_boundary *ob;
     struct boundary_stuff *sebs, *return_se_bnd_struct();
-    char *a, *bb, str[256], mess[256], **buf, *bbuf;
+    char *a, *bb, str[256], mess[512], **buf, *bbuf;
 
     sebs = return_se_bnd_struct();
 
@@ -2132,7 +2132,7 @@ char * absorb_zmap_bnd( ifile, skip, nbytes )
     /* routine to read in a zmap file and convert it to a boundary
      */
     FILE *fs;
-    char str[256], *aa, *cc, *ee, line[256], *str_ptrs[32], mess[256], *bbuf;
+    char str[256], *aa, *cc, *ee, line[256], *str_ptrs[32], mess[512], *bbuf;
     int ii, jj, len, lenx, mark, nt, trip=0;
     int max_pts = 0;
     int point_count = 1;
@@ -2230,7 +2230,7 @@ int absorb_zmap_pts( top, ifile )
   /* This routine is called in se_histog_setup() in se_histog.c */
 
     FILE *fs;
-    char str[256], *aa, *bb, line[256], mess[256];
+    char str[256], *aa, *bb, line[256], mess[512];
     char *sptrs[32];
     int mark, nt, nn, point_count = 0;
     double d;

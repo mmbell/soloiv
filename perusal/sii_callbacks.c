@@ -67,7 +67,7 @@ void sii_blow_up_draw_func (GtkDrawingArea *area, cairo_t *cr,
    gboolean reconfigured, uncovered, totally_exposed;
    static gboolean new_frames = FALSE;
    GdkRectangle area_rect;
-   gchar *aa, str[256], mess[256];
+   gchar *aa, str[256], mess[512];
 
   frame_num = GPOINTER_TO_UINT
     (g_object_get_data (G_OBJECT(frame), "frame_num" ));

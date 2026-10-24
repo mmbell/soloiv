@@ -552,7 +552,7 @@ int solo_read_open(wwptr)
   struct solo_window_ptrs *wwptr;
 {
     char str[256];
-    char mess[256];
+    char mess[512];
 
     slash_path(str, wwptr->sweep->directory_name);
     strcat(str, wwptr->sweep->file_name);

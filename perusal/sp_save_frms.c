@@ -60,7 +60,7 @@ int solo_absorb_window_info (char *dir, char *fname, int ignore_swpfi_info)
     unsigned long gdsos, ppsos, gww;
     size_t len, lenx;
     FILE *stream;
-    char *a, *b, *c, *buf, *e, str[256], mess[256], atts[256], *sptrs[32];
+    char *a, *b, *c, *buf, *e, str[256], mess[512], atts[256], *sptrs[32];
     char *cbuf, *aa, *bb, *cc;
     struct solo_generic_window_struct *gws, gwx;
     struct point_in_space pisp;
@@ -601,7 +601,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
     struct solo_palette_ptr *pal, *solo_topof_palettes();
     
     struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    char mess[256];
+    char mess[512];
     SiiFrameConfig *sfc;
     SiiLinkedList *sps, *top;
 

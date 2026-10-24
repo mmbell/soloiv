@@ -1315,7 +1315,7 @@ int dd_skip_recs(iri, direction, skip_count)
     /* move in the direction indicated and read the next record
      */
     int ii, mark;
-    char mess[256];
+    char mess[512];
 
     if(skip_count <= 0)
 	  return(iri->top->read_state);

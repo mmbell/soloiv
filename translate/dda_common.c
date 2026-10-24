@@ -87,7 +87,7 @@ static int Max_sweeps_per_volume=0;
 static int Min_sweeps_per_volume=0;
 static int Output_flag=NO;
 static int Catalog_only_flag=NO, print_dd_open_info=YES;
-static char dd_open_info[128];
+static char dd_open_info[384];
 static int Control_C=NO;
 static int solo_flag=0;
 void dd_unlink();

@@ -278,7 +278,7 @@ void sp_ts_seek_field_vals(frme)
     double angdiff(), fabs();
     int indices[3], solo_busy(), in_sector();
     float angles[3], angle_k, range, theta=0;
-    char str[256], *aa, mess[256];
+    char str[256], *aa, mess[512];
 
 
     wwptrx = solo_return_wwptr(frme);

@@ -63,7 +63,7 @@ int se_histo_output()
 {
    struct solo_str_mgmt *ssm;
    struct solo_edit_stuff *seds, *return_sed_stuff();
-   char str[256], mess[256];
+   char str[256], mess[512];
 
    seds = return_sed_stuff();	/* solo editing struct */
    se_print_ssm_strings(seds->h_output);

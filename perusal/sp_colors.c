@@ -58,7 +58,7 @@ int solo_absorb_color_table(frme, dir, file)
     struct solo_list_mgmt *lm;
     float red, green, blue, rnum, rden, gnum, gden, bnum, bden;
     char *aa, *a, *b, *c, str[256], *dd_whiteout();
-    char mess[256];
+    char mess[512];
     struct solo_perusal_info *spi, *solo_return_winfo_ptr();
     struct solo_list_mgmt *slm;
 
