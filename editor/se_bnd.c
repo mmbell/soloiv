@@ -1429,7 +1429,7 @@ void xse_save_bnd (void)
 	se_prev_bnd_set();
     }
     if(!nn) {
-	sprintf(mess,
+	snprintf(mess, sizeof(mess),
 		"There are not enough points in the current boundary!\n");
 	sii_message(mess);
 	return;
@@ -1493,7 +1493,7 @@ void xse_save_bnd (void)
     /* write out bbuf
      */
     if((nn = fwrite(bbuf, sizeof(char), (size_t)size, stream)) < size) {
-	sprintf(mess, "Problem writing boundary info: %d\n", nn);
+	snprintf(mess, sizeof(mess), "Problem writing boundary info: %d\n", nn);
 	solo_message(mess);
     }
     if(bnd_loop > 0) {		/* nabbed and saved the prev bnd set
@@ -2091,7 +2091,7 @@ char * absorb_zmap_bnd(char *ifile, int skip, int *nbytes)
 	    max_pts += 100;
 	    size += ( max_pts +1 ) * spisp;
 	    if( !( bbuf = (char *)realloc( bbuf, size ) )) {
-		sprintf(mess, "Unable to malloc space for zmap boundary: %d\n"
+		snprintf(mess, sizeof(mess), "Unable to malloc space for zmap boundary: %d\n"
 		    , point_count );
 		solo_message(mess);
 		return(NULL);
@@ -2238,7 +2238,7 @@ int se_rain_gauge_info(double dlat, double dlon)
     }
   }
   if( !num_hits ) {
-    sprintf( mess, "No gauges within %.3f of lat: %.4f lon: %.4f\n"
+    snprintf(mess, sizeof(mess), "No gauges within %.3f of lat: %.4f lon: %.4f\n"
 	     , min_radius, dlat, dlon );
     solo_message(mess);
     return( 0 );
@@ -2258,7 +2258,7 @@ int se_rain_gauge_info(double dlat, double dlon)
 
   for(ii = 0; ii < num_hits; ii++ ) {
     zmpc = zzmpc[ii];
-    sprintf( mess, "%10s rng:%7.2f x:%7.2f y:%7.2f\n"
+    snprintf(mess, sizeof(mess), "%10s rng:%7.2f x:%7.2f y:%7.2f\n"
 	     , zmpc->list_id, zmpc->rng, zmpc->x, zmpc->y );
     solo_message(mess);
   }
@@ -2292,7 +2292,7 @@ int xabsorb_zmap_pts( top, ifile )
     lname[0] = '\0';
 
     if(!(fs = fopen(str, "r"))) {
-	sprintf(mess, "Unable to open zmap points file %s\n", str);
+	snprintf(mess, sizeof(mess), "Unable to open zmap points file %s\n", str);
 	solo_message(mess);
 	return(-1);
     }
@@ -2451,7 +2451,7 @@ int list_zmap_values(char *fname, int frame)
 	dd_absorb_ray_info(dgi);
 	pn = dd_find_field( dgi, fname );
 	if( pn < 0 ) {
-	    sprintf( mess, "Field: %s cannot be accesses for %s\n"
+	    snprintf(mess, sizeof(mess), "Field: %s cannot be accesses for %s\n"
 		     , fname, zmpc->id );
 	    uii_printf( mess );
 	    continue;
@@ -2477,11 +2477,11 @@ int list_zmap_values(char *fname, int frame)
 	   dts.time_stamp = dgi->time;
 	   dd_file_name("rgc", (long)dgi->time
 		     , dgi->radar_name, 0, seds->histo_filename);
-	   sprintf( ssm->at, "\nSite values for %s for %s for"
+	   snprintf( ssm->at, SE_MAX_STRING, "\nSite values for %s for %s for"
 		   , dts_print(d_unstamp_time(&dts))
 		   , str_terminate( mess, dgi->dds->radd->radar_name, 8 )
 		   );
-	   sprintf( ssm->at + strlen(ssm->at), " %s in frame %d\n"
+	   snprintf( ssm->at + strlen(ssm->at), SE_MAX_STRING - strlen(ssm->at), " %s in frame %d\n"
 		   , str_terminate( mess, dgi->dds->parm[pn]->parameter_name, 8 )
 		   , frame+1 );
 
@@ -2490,7 +2490,7 @@ int list_zmap_values(char *fname, int frame)
 
 	ssm = se_pop_spair_string();
 
-	sprintf( ssm->at
+	snprintf( ssm->at, SE_MAX_STRING
  , "%5s %7.3f %8.3f   rg:%5.1f rd:%5.1f d:%5.1f   da:%5.1f dr:%6.3f\n"
 		 , zmpc->id, zmpc->lat, zmpc->lon, zmpc->src_val
 		 , zmpc->curr_val, zmpc->src_val - zmpc->curr_val
@@ -2507,7 +2507,7 @@ int list_zmap_values(char *fname, int frame)
     ratio = sumy ? sumx/sumy : 0;
     ratio2 = numRatios ? sumRatios/(float)numRatios : 0;
     ssm = se_pop_spair_string();
-    sprintf( ssm->at
+    snprintf( ssm->at, SE_MAX_STRING
 	     , "\nCorrelation:%6.3f g/r:%6.3f %6.3f for %s\n"
 	     , correlation
 	     , ratio

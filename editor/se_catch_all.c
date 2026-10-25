@@ -366,7 +366,7 @@ int se_dir(int arg, struct ui_command *cmds)
 		 "\nCould not interpret version number: %s  Using: %d\n"
 		 , cmdq->uc_text, seds->sfic->version);
 	    }
-	    sprintf(sfic->version_text, "%d", seds->sfic->version);
+	    snprintf(sfic->version_text, sizeof(sfic->version_text), "%d", seds->sfic->version);
 	    mark = 0;
 	}
     }

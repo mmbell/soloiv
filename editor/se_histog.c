@@ -131,7 +131,7 @@ void se_histo_fin_irreg_areas(void)
     for(; pair; pair=pair->next) {
 	if(pair->f_sum >= f_max) {
 	    f_max = pair->f_sum;
-	    sprintf(ssm->at,
+	    snprintf(ssm->at, SE_MAX_STRING,
  " From %7.1f to %7.1f contains the largest area: %8.1f sq.km.\n"
 		    , pair->f_low, pair->f_high, f_max);
 	}
@@ -141,27 +141,27 @@ void se_histo_fin_irreg_areas(void)
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "      Low area: %8.1f sq.km.\n", seds->low_area * SQM2KM);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "     High area: %8.1f sq.km.\n", seds->high_area * SQM2KM);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "Histogram area: %8.1f sq.km.\n", f_sum);
     se_append_string(&seds->h_output, ssm);
     
     f_inc = (f_max -f_min)/50.;
     rcp_inc = 1./f_inc;;
-    sprintf(str, "%7.1f to %7.1f ", f_min, f_max); e = str +strlen(str);
+    snprintf(str, sizeof(str), "%7.1f to %7.1f ", f_min, f_max); e = str +strlen(str);
 
     memset(str, ' ', sizeof(str));
     for(f_val=f_min,c=e-8; f_val <= f_max; f_val += 10*f_inc, c+=10) {
-	sprintf(number, "%9.1f", f_val);
+	snprintf(number, sizeof(number), "%9.1f", f_val);
 	strncpy(c, number, strlen(number));
     }
     *c++ = '\n'; *c++ = '\0';
@@ -184,7 +184,7 @@ void se_histo_fin_irreg_areas(void)
 	ssm = se_pop_spair_string();
 	c = ssm->at;
 	nn = (pair->f_sum -f_min)/f_inc;
-	sprintf(c, "%7.1f to %7.1f ", pair->f_low, pair->f_high); 
+	snprintf(c, SE_MAX_STRING, "%7.1f to %7.1f ", pair->f_low, pair->f_high); 
 	c += strlen(c);
 
 	if( nn <= 0  && f_sum )
@@ -240,7 +240,7 @@ void se_histo_fin_irreg_counts(void)
 	      min = pair->sum;
     }
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	"  Mode: %8.2f\n", f_mode);
     se_append_string(&seds->h_output, ssm);
 
@@ -249,11 +249,11 @@ void se_histo_fin_irreg_counts(void)
 	f_inc = 1./50.;
     }
     rcp_inc = 1./f_inc;
-    sprintf(str, "%8.2f to %8.2f", f_inc, f_inc); e = str +strlen(str);
+    snprintf(str, sizeof(str), "%8.2f to %8.2f", f_inc, f_inc); e = str +strlen(str);
 
     memset(str, ' ', sizeof(str));
     for(ii=min,c=e-6; ii <= max; ii += 10*f_inc+.5, c+=10) {
-	sprintf(number, "%7d", ii);
+	snprintf(number, sizeof(number), "%7d", ii);
 	strncpy(c, number, strlen(number));
     }
     *c++ = '\n'; *c++ = '\0';
@@ -275,7 +275,7 @@ void se_histo_fin_irreg_counts(void)
 	ssm = se_pop_spair_string();
 	c = ssm->at;
 	nn = (pair->sum -min)/f_inc;
-	sprintf(c, "%8.2f to %8.2f ", pair->f_low, pair->f_high); 
+	snprintf(c, SE_MAX_STRING, "%8.2f to %8.2f ", pair->f_low, pair->f_high); 
 	c += strlen(c);
 	if( nn <= 0 && pair->sum > 0 ) 
 	    { nn = 1; }
@@ -306,38 +306,38 @@ void se_histo_fin_areas(char *name)
     ssm = se_pop_spair_string();
     b = (H_IRREG SET_IN seds->histo_key) ? "irregular intervals of " :
 	  "regular intervals of ";
-    sprintf(ssm->at, "Areas Histogram in %s%s\n"
+    snprintf(ssm->at, SE_MAX_STRING, "Areas Histogram in %s%s\n"
 	    , b, seds->histogram_field);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string(); a = ssm->at;
     dts.time_stamp = seds->histo_start_time;
-    sprintf(a, "From %s to ",  dts_print(d_unstamp_time(&dts)));
+    snprintf(a, SE_MAX_STRING, "From %s to ",  dts_print(d_unstamp_time(&dts)));
     a += strlen(a);
     dts.time_stamp = seds->histo_stop_time;
-    sprintf(a, "%s for %s at %.1f deg.\n"
+    snprintf(a, SE_MAX_STRING - (a - ssm->at), "%s for %s at %.1f deg.\n"
 	    , dts_print(d_unstamp_time(&dts)), seds->histo_radar_name
 	    , seds->histo_fixed_angle);
 
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "       Missing: %8d gates\n", seds->histo_missing_count);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "   Points below:%8d gates\n", seds->low_count);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "   Points above:%8d gates\n", seds->high_count);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "Points between: %8d gates\n", seds->medium_count);
     se_append_string(&seds->h_output, ssm);
 
@@ -353,12 +353,12 @@ void se_histo_fin_areas(char *name)
 			   /((double)(nn-1))));
 # endif
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "  Mean: %7.1f\n", f_mean);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "  Sdev: %7.1f\n", f_sdev);
     se_append_string(&seds->h_output, ssm);
 
@@ -395,7 +395,7 @@ void se_histo_fin_areas(char *name)
 	}
     }
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "Median: %7.1f\n", f_median);
     se_append_string(&seds->h_output, ssm);
 
@@ -404,33 +404,33 @@ void se_histo_fin_areas(char *name)
 	return;
     }
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	"  Mode: %7.1f\n", f_mode);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "      Low area: %8.1f sq.km.\n", seds->low_area * SQM2KM);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "     High area: %8.1f sq.km.\n", seds->high_area * SQM2KM);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "Histogram area: %8.1f sq.km.      Volume: %.6f\n"
 	    , f_sum * SQM2KM, areaXval * .001 * 1.e-6 );
     se_append_string(&seds->h_output, ssm);
     
     f_inc = (f_max -f_min)/50.;
     rcp_inc = 1./f_inc;;
-    sprintf(str, "%7.1f ", f_val); e = str +strlen(str);
+    snprintf(str, sizeof(str), "%7.1f ", f_val); e = str +strlen(str);
 
     memset(str, ' ', sizeof(str));
     for(f_val=f_min,c=e-8; f_val <= f_max; f_val += 10*f_inc, c+=10) {
-	sprintf(number, "%9.1f", f_val*SQM2KM);
+	snprintf(number, sizeof(number), "%9.1f", f_val*SQM2KM);
 	strncpy(c, number, strlen(number));
     }
     *c++ = '\n'; *c++ = '\0';
@@ -451,7 +451,7 @@ void se_histo_fin_areas(char *name)
 
     for(ii=0; ii < seds->histo_num_bins; ii++, f_val+=seds->histo_increment) {
 	nn = (*(seds->areas_array+ii) -f_min)/f_inc;
-	sprintf(str, "%7.1f ", f_val); c = str +strlen(str);
+	snprintf(str, sizeof(str), "%7.1f ", f_val); c = str +strlen(str);
 	if( nn <= 0 && *(seds->areas_array+ii) > 0 )
 	    { nn = 1; }
 	for(; nn--; *c++ = H);
@@ -490,38 +490,38 @@ void se_histo_fin_counts(void)
     ssm = se_pop_spair_string();
     b = (H_IRREG SET_IN seds->histo_key) ? "irregular intervals of " :
 	  "regular intervals of ";
-    sprintf(ssm->at, "Counts Histogram in %s%s\n"
+    snprintf(ssm->at, SE_MAX_STRING, "Counts Histogram in %s%s\n"
 	    , b, seds->histogram_field);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string(); a = ssm->at;
     dts.time_stamp = seds->histo_start_time;
-    sprintf(a, "From %s to ",  dts_print(d_unstamp_time(&dts)));
+    snprintf(a, SE_MAX_STRING, "From %s to ",  dts_print(d_unstamp_time(&dts)));
     a += strlen(a);
     dts.time_stamp = seds->histo_stop_time;
-    sprintf(a, "%s for %s at %.1f deg.\n"
+    snprintf(a, SE_MAX_STRING - (a - ssm->at), "%s for %s at %.1f deg.\n"
 	    , dts_print(d_unstamp_time(&dts)), seds->histo_radar_name
 	    , seds->histo_fixed_angle);
 
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "       Missing: %8d gates\n", seds->histo_missing_count);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "   Points below:%8d gates\n", seds->low_count);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "   Points above:%8d gates\n", seds->high_count);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "Points between: %8d gates\n", seds->medium_count);
     se_append_string(&seds->h_output, ssm);
 
@@ -537,12 +537,12 @@ void se_histo_fin_counts(void)
 			   /((double)(nn-1))));
 # endif
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "  Mean: %8.2f\n", f_mean);
     se_append_string(&seds->h_output, ssm);
 
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "  Sdev: %8.2f\n", f_sdev);
     se_append_string(&seds->h_output, ssm);
 
@@ -574,7 +574,7 @@ void se_histo_fin_counts(void)
 	}
     }
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	    "Median: %8.2f\n", f_median);
     se_append_string(&seds->h_output, ssm);
 
@@ -583,18 +583,18 @@ void se_histo_fin_counts(void)
 	return;
     }
     ssm = se_pop_spair_string();
-    sprintf(ssm->at,
+    snprintf(ssm->at, SE_MAX_STRING,
 	"  Mode: %8.2f\n", f_mode);
     se_append_string(&seds->h_output, ssm);
 
     f_val = seds->histo_low + 0.5 * seds->histo_increment;
     f_inc = (max -min)/50.;
     rcp_inc = 1./f_inc;;
-    sprintf(str, "%8.2f ", f_val); e = str +strlen(str);
+    snprintf(str, sizeof(str), "%8.2f ", f_val); e = str +strlen(str);
 
     memset(str, ' ', sizeof(str));
     for(ii=min,c=e-5; ii <= max; ii += 10*f_inc+.5, c+=10) {
-	sprintf(number, "%7d", ii);
+	snprintf(number, sizeof(number), "%7d", ii);
 	strncpy(c, number, strlen(number));
     }
     *c++ = '\n'; *c++ = '\0';
@@ -613,7 +613,7 @@ void se_histo_fin_counts(void)
 
     for(ii=0; ii < seds->histo_num_bins; ii++, f_val+=seds->histo_increment) {
 	nn = (*(seds->counts_array+ii) -min)/f_inc;
-	sprintf(str, "%8.2f ", f_val); c = str +strlen(str);
+	snprintf(str, sizeof(str), "%8.2f ", f_val); c = str +strlen(str);
 	if( nn <= 0 && *(seds->counts_array+ii) > 0 )
 	    { nn = 1; }
 	for(; nn--; *c++ = H);
@@ -1116,7 +1116,7 @@ int se_xy_stuff(int arg, struct ui_command *cmds)
 	  }
 	  /* tack on the variable names
 	   */
-	  sprintf(str+strlen(str), ",%s,%s", src_name, dst_name);
+	  snprintf(str+strlen(str), sizeof(str) - strlen(str), ",%s,%s", src_name, dst_name);
 
 	  if(!(x_y_stream = fopen(str, "w"))) {
 	     uii_printf("Could not open xy-listing file : %s\n"

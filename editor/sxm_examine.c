@@ -44,6 +44,8 @@ static char *preservation_file_name=PRESERVATION_FILE_NAME;
 # define     LOG_CLOSED 0
 # define     LOG_ACTIVE 1
 # define  LOG_SUSPENDED 2
+/* capacity of the buffer every caller hands to sxm_stat_line() */
+# define SXM_STAT_LINE_LEN 2048
 
 static FILE *log_stream=NULL;
 static int log_state=LOG_CLOSED;
@@ -322,7 +324,7 @@ int sxm_append_to_log_stream(char *stuff, int nchar)
     }
     
     char line[4096];
-    sprintf(line,"%s\n",stuff);
+    snprintf(line, sizeof(line), "%s\n", stuff);
 
     return(nn = fwrite(line, sizeof(char), strlen(line), log_stream));
 }
@@ -335,7 +337,7 @@ void sxm_change_cell_in_list(struct se_changez *chz, int data_row_num, double va
     struct examine_control *ecs;
     WW_PTR wwptr;
     struct solo_list_mgmt *slm;
-    char *aa, *bb, *line, tmp_val[16];
+    char *aa, *bb, *line, tmp_val[64];
 
 
     wwptr = solo_return_wwptr(chz->window_num);
@@ -352,7 +354,7 @@ void sxm_change_cell_in_list(struct se_changez *chz, int data_row_num, double va
     }
     else {
 	bb = tmp_val;
-	sprintf(tmp_val, ecs->actual_data_format, val);
+	snprintf(tmp_val, sizeof(tmp_val), ecs->actual_data_format, val);
 	if((int)strlen(tmp_val) > ecs->num_chars_per_cell) {
 	    tmp_val[ecs->num_chars_per_cell-1] = '|';
 	    tmp_val[ecs->num_chars_per_cell] = '\0';
@@ -631,7 +633,7 @@ void sxm_flush_log_stream(void)
 void sxm_set_log_dir(const char *dir)
 {
   char str[2048];
-  sprintf (str, "Setting log directory to: %s\n", dir);
+  snprintf (str, sizeof(str), "Setting log directory to: %s\n", dir);
   sii_message (str);
   sxm_close_log_stream();
   slash_path(log_directory, dir);
@@ -656,7 +658,7 @@ void sxm_toggle_log_dir(int active)
   char str[2048];
   log_state = (active) ? LOG_ACTIVE : LOG_SUSPENDED;
 
-  sprintf (str, "Toggled log state to: %s!\n"
+  snprintf (str, sizeof(str), "Toggled log state to: %s!\n"
 	   , (active) ? "log active" : "log suspended");
   sii_message (str);
 }
@@ -823,7 +825,7 @@ void sxm_list_beams(int frme)
     struct dd_general_info *dgi;
     int file_action=TIME_NEAREST, version=LATEST_VERSION;
     int sweep_skip=1, replot=YES, nr;
-    char *aa, str[2048];
+    char *aa, str[SXM_STAT_LINE_LEN];
 
     wwptr = solo_return_wwptr(frme);
     dgi = dd_window_dgi(wwptr->lead_sweep->window_num);
@@ -952,7 +954,7 @@ void sxm_list_to_log(struct solo_list_mgmt *slm, int entry, int num)
 
 void sxm_log_stat_line(struct dd_general_info *dgi)
 {
-    char str[2048];
+    char str[SXM_STAT_LINE_LEN];
 
     if(log_state != LOG_ACTIVE)
 	  return;
@@ -1491,7 +1493,7 @@ void sxm_set_click_frame(int frme, double theta, double range)
 	seds->focus_frame = 
 	      focus_frame = click_frame = frme;
 	wwptr = solo_return_wwptr(frme);
-	sprintf(aa,
+	snprintf(aa, sizeof(str),
 		"Click at angle, range, and frame | %7.2f | %8.3f | %d |\n"
 		, theta, range, frme);
 	sxm_append_to_log_stream(aa, strlen(aa));
@@ -1531,10 +1533,10 @@ void sxm_stat_line(struct dd_general_info *dgi, int verbosity, char *preamble, c
 
     *aa = '\0';
 
-    sprintf(aa+strlen(aa), "%s ", preamble);
-    sprintf(aa+strlen(aa), "%s ", dts_print(d_unstamp_time(dds->dts)));
+    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "%s ", preamble);
+    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "%s ", dts_print(d_unstamp_time(dds->dts)));
     strcpy(radar_name, str_terminate(str, dds->radd->radar_name, 8));
-    sprintf(aa+strlen(aa), "%s ", radar_name);
+    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "%s ", radar_name);
     aa += strlen(aa);
 
 
@@ -1542,65 +1544,65 @@ void sxm_stat_line(struct dd_general_info *dgi, int verbosity, char *preamble, c
     if(dds->radd->scan_mode == AIR || dds->radd->radar_type == AIR_LF ||
        dds->radd->radar_type == AIR_NOSE
 	) {
-	sprintf(aa+strlen(aa), "az:%6.1f ", dd_azimuth_angle(dgi));
-	sprintf(aa+strlen(aa), "el:%6.2f ", dd_elevation_angle(dgi));
-	sprintf(aa+strlen(aa), "h:%6.1f ", dd_heading(dgi));
-	sprintf(aa+strlen(aa), "rl:%5.1f ", dd_roll(dgi));
-	sprintf(aa+strlen(aa), "al:%6.3f ", dd_altitude(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "az:%6.1f ", dd_azimuth_angle(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "el:%6.2f ", dd_elevation_angle(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "h:%6.1f ", dd_heading(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "rl:%5.1f ", dd_roll(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "al:%6.3f ", dd_altitude(dgi));
     }    
 # endif
     if(dds->radd->scan_mode == AIR) {
-	sprintf(aa+strlen(aa), "rt:%6.1f "
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "rt:%6.1f "
 		, FMOD360(dd_rotation_angle(dgi)));
-	sprintf(aa+strlen(aa), "t:%5.1f ", dd_tilt_angle (dgi));
-	sprintf(aa+strlen(aa), "rl:%5.1f ", asib->roll);
-	sprintf(aa+strlen(aa), "h:%6.1f ", asib->heading);
-	sprintf(aa+strlen(aa), "al:%6.3f ", asib->altitude_msl);
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "t:%5.1f ", dd_tilt_angle (dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "rl:%5.1f ", asib->roll);
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "h:%6.1f ", asib->heading);
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "al:%6.3f ", asib->altitude_msl);
     }
     else if(dds->radd->radar_type == AIR_LF) {
-	sprintf(aa+strlen(aa), "az:%6.1f ", dd_azimuth_angle(dgi));
-	sprintf(aa+strlen(aa), "el:%6.2f ", dd_elevation_angle(dgi));
-	sprintf(aa+strlen(aa), "h:%6.1f ", dd_heading(dgi));
-	sprintf(aa+strlen(aa), "rl:%5.1f ", dd_roll(dgi));
-	sprintf(aa+strlen(aa), "p:%5.1f ", dd_pitch(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "az:%6.1f ", dd_azimuth_angle(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "el:%6.2f ", dd_elevation_angle(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "h:%6.1f ", dd_heading(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "rl:%5.1f ", dd_roll(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "p:%5.1f ", dd_pitch(dgi));
     }
     else {
-	sprintf(aa+strlen(aa), "fx:%6.1f ", swib->fixed_angle);
-	sprintf(aa+strlen(aa), "az:%6.1f ", dd_azimuth_angle(dgi));
-	sprintf(aa+strlen(aa), "el:%6.2f ", dd_elevation_angle(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "fx:%6.1f ", swib->fixed_angle);
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "az:%6.1f ", dd_azimuth_angle(dgi));
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "el:%6.2f ", dd_elevation_angle(dgi));
     }
     aa += strlen(aa);
-    sprintf(aa+strlen(aa), "swp: %2d ", ryib->sweep_num);
-    sprintf(aa+strlen(aa), "%s ", postamble);
+    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "swp: %2d ", ryib->sweep_num);
+    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "%s ", postamble);
     if(verbosity) {
-	sprintf(aa+strlen(aa), "\n");
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "\n");
     }   
 
     if(verbosity) {
-	sprintf(aa+strlen(aa), "la:%9.4f ", asib->latitude);
-	sprintf(aa+strlen(aa), "lo:%9.4f ", asib->longitude);
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "la:%9.4f ", asib->latitude);
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "lo:%9.4f ", asib->longitude);
 	if(dds->radd->scan_mode == AIR) {
-	    sprintf(aa+strlen(aa), "p:%5.1f ", asib->pitch);
-	    sprintf(aa+strlen(aa), "d:%5.1f ", asib->drift_angle);
-	    sprintf(aa+strlen(aa), "ag:%6.3f ", asib->altitude_agl);
-	    sprintf(aa+strlen(aa), "\n");
-	    sprintf(aa+strlen(aa), "ve:%6.1f ", asib->ew_velocity);
-	    sprintf(aa+strlen(aa), "vn:%6.1f ", asib->ns_velocity);
-	    sprintf(aa+strlen(aa), "vv:%6.1f ", asib->vert_velocity);
-	    sprintf(aa+strlen(aa), "we:%6.1f ", asib->ew_horiz_wind);
-	    sprintf(aa+strlen(aa), "wn:%6.1f ", asib->ns_horiz_wind);
-	    sprintf(aa+strlen(aa), "wv:%6.1f ", asib->vert_wind);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "p:%5.1f ", asib->pitch);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "d:%5.1f ", asib->drift_angle);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "ag:%6.3f ", asib->altitude_agl);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "\n");
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "ve:%6.1f ", asib->ew_velocity);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "vn:%6.1f ", asib->ns_velocity);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "vv:%6.1f ", asib->vert_velocity);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "we:%6.1f ", asib->ew_horiz_wind);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "wn:%6.1f ", asib->ns_horiz_wind);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "wv:%6.1f ", asib->vert_wind);
 	}
 	else {
-	    sprintf(aa+strlen(aa), "al:%6.3f ", asib->altitude_msl);
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "al:%6.3f ", asib->altitude_msl);
 	}
-	sprintf(aa+strlen(aa), "\n");
-	sprintf(aa+strlen(aa), "Num parameters: %d  ", dgi->source_num_parms);
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "\n");
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "Num parameters: %d  ", dgi->source_num_parms);
 	for(ii=0; ii < dgi->source_num_parms; ii++) {
-	    sprintf(aa+strlen(aa), "%s ", str_terminate
+	    snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "%s ", str_terminate
 		   (str, dds->parm[ii]->parameter_name, 8));
 	}
-	sprintf(aa+strlen(aa), "\n");
+	snprintf(aa+strlen(aa), SXM_STAT_LINE_LEN - strlen(line), "\n");
     }
 }
 /* c------------------------------------------------------------------------ */
@@ -2304,7 +2306,7 @@ void sxm_update_examine_data(int frme, int wgt_btn)
     struct ts_ray_info *tsri;
     int file_action=TIME_NEAREST, version=LATEST_VERSION;
     int sweep_skip=1, replot=YES;
-    char *aa, *bb, *cc, *ee, *line, tmp_val[32];
+    char *aa, *bb, *cc, *ee, *line, tmp_val[64];
     char tmp_flds[32], str[2048];
     double d, d_start, et;
     float bad_val, val, *fptr;
@@ -2332,7 +2334,7 @@ void sxm_update_examine_data(int frme, int wgt_btn)
 	slm = spi->list_a_message;
 	solo_reset_list_entries(slm);
 	aa = str;
-	sprintf(aa, "You have %ld changes outstanding!"
+	snprintf(aa, sizeof(str), "You have %ld changes outstanding!"
 		  , wwptr->examine_info->change_count);
 	solo_add_list_entry(slm, aa, strlen(aa));
 	aa = "You cannot change the display";
@@ -2362,7 +2364,7 @@ void sxm_update_examine_data(int frme, int wgt_btn)
      */
     strcpy(ecs->rng_fmt, "%7.2f_|");
     line = ecs->data_line;
-    sprintf(line, ecs->rng_fmt, 1.0);
+    snprintf(line, sizeof(ecs->data_line), ecs->rng_fmt, 1.0);
     ecs->num_chars_rng_label = strlen(line);
     ecs->col_lims[0] = strlen(line);
     /*
@@ -2372,7 +2374,7 @@ void sxm_update_examine_data(int frme, int wgt_btn)
     strcpy(aa, "%");
     strcat(aa, wwptr->examine_info->display_format);
     strcat(aa, "|");
-    sprintf(line, ecs->actual_data_format, 1.0);
+    snprintf(line, sizeof(ecs->data_line), ecs->actual_data_format, 1.0);
     ecs->num_chars_per_cell = strlen(line);
     /*
      * next get the number of fields per ray
@@ -2608,12 +2610,12 @@ void sxm_update_examine_data(int frme, int wgt_btn)
 	*aa++ = '|'; *aa++ = '\0';
 
 	if(sei->col_annotation) {
-	    sprintf(tmp_val, "%d"
+	    snprintf(tmp_val, sizeof(tmp_val), "%d"
 		    , rc + ecs->actual_ray_num +1);
 	}
 	else if(time_series) {
 	    et = fmod(dgi->time -d_start, (double)1000.);
-	    sprintf(tmp_val, "%.2f", et);
+	    snprintf(tmp_val, sizeof(tmp_val), "%.2f", et);
 	    if((mm = strlen(tmp_val)) > nn) {
 		jj = mm -nn;
 		ee = tmp_val;
@@ -2625,7 +2627,7 @@ void sxm_update_examine_data(int frme, int wgt_btn)
 	else {
 	    d = dgi->dds->radd->scan_mode == RHI
 		  ? dd_elevation_angle(dgi) : dd_rotation_angle(dgi);
-	    sprintf(tmp_val, "%.2f", d);
+	    snprintf(tmp_val, sizeof(tmp_val), "%.2f", d);
 	}
 	if((mm = strlen(tmp_val)) > nn) mm = nn;
 	nb = nn - mm;
@@ -2717,11 +2719,11 @@ void sxm_update_examine_data(int frme, int wgt_btn)
 		*cc++ = ' ')
 	    ;
 	*cc++ = '_'; *cc++ = '|'; *cc++ = '\0';
-	    sprintf(tmp_val, "%4d", cell_num + ecs->actual_at_cell +1);
+	    snprintf(tmp_val, sizeof(tmp_val), "%4d", cell_num + ecs->actual_at_cell +1);
 	    strncpy(line+1, tmp_val, strlen(tmp_val));
 	}
 	else {
-	    sprintf(tmp_val, ecs->rng_fmt, *(ecs->ranges + cell_num));
+	    snprintf(tmp_val, sizeof(tmp_val), ecs->rng_fmt, *(ecs->ranges + cell_num));
 	    if((int)strlen(tmp_val) > ecs->num_chars_rng_label) {
 		strcpy(tmp_val + ecs->num_chars_rng_label -1, "|");
 	    }
@@ -2732,7 +2734,7 @@ void sxm_update_examine_data(int frme, int wgt_btn)
 	for(col=0; col < ecs->num_data_cols; col++) {
 	    val = *(ecs->data_ptrs[col] + cell_num);
 	    if(val != ecs->bad_data[col]) {
-		sprintf(tmp_val, ecs->actual_data_format, val);
+		snprintf(tmp_val, sizeof(tmp_val), ecs->actual_data_format, val);
 		if((int)strlen(tmp_val) > ecs->num_chars_per_cell) {
 		    tmp_val[ecs->num_chars_per_cell-1] = '|';
 		    tmp_val[ecs->num_chars_per_cell] = '\0';
