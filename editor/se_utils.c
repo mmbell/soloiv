@@ -330,10 +330,13 @@ char *se_string_time(double t, char *str)
 {
     double d;
     DD_TIME dts;
+    /* room for any int in every field, so the formatting can't truncate;
+     * a real time is 22 characters and fits the caller's buffer */
+    char tmp[96];
 
     dts.time_stamp = t;
     d_unstamp_time(&dts);
-    snprintf(str, SE_TIME_STR_LEN, "%02d/%02d/%02d:%02d:%02d:%02d.%03d"
+    snprintf(tmp, sizeof(tmp), "%02d/%02d/%02d:%02d:%02d:%02d.%03d"
 	   , dts.month
 	   , dts.day
 	   , dts.year-1900
@@ -342,6 +345,7 @@ char *se_string_time(double t, char *str)
 	   , dts.second
 	   , dts.millisecond
 	   );
+    g_strlcpy(str, tmp, SE_TIME_STR_LEN);
     return(str);
 }
 /* c------------------------------------------------------------------------ */
