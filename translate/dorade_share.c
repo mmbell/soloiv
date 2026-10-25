@@ -123,7 +123,7 @@ int dd_text_to_slm (const char *txt, struct solo_list_mgmt *slm)
   nn = dd_tokenz (buf, lines, "\n");
   
   for (ii=0; ii < nn; ii++) {
-    if (aa = strchr (lines[ii], '#')) /* comment */
+    if ((aa = strchr (lines[ii], '#'))) /* comment */
       { *aa = '\0'; }
     
     strcpy (str, lines[ii]);
@@ -149,7 +149,7 @@ int dd_strings_to_slm (const char **lines, struct solo_list_mgmt *slm, int nn)
  
   for (ii=0; ii < nn; ii++) {
     strcpy (str, lines[ii]);
-    if (aa = strchr (str, '#')) /* comment */
+    if ((aa = strchr (str, '#'))) /* comment */
       { *aa = '\0'; }
     strcpy (str2, str);
     nt = dd_tokens (str2, sptrs);
@@ -183,7 +183,7 @@ int dd_absorb_strings (char *path_name, struct solo_list_mgmt *slm)
 	if(!(aa = fgets(str, (int)128, stream))) {
 	    break;
 	}
-	if (bb = strchr (str, '#')) /* comment */
+	if ((bb = strchr (str, '#'))) /* comment */
 	  { *bb = '\0'; }
 
 	strcpy (str2, str);
@@ -231,7 +231,7 @@ int generic_sweepfiles(char *dir, struct solo_list_mgmt *lm, char *prefix, char 
     lm->num_entries = 0;
 
     if(!(dir_ptr = opendir(dir))) {
-	sprintf(mess, "Cannot open directory %s\n", dir);
+	snprintf(mess, sizeof(mess), "Cannot open directory %s\n", dir);
 	printf( "%s", mess );
 	return(-1);
     }
@@ -432,7 +432,7 @@ chexdmp (		/* hexdump of n bytes */
 {
     int c, i, s;
     char h[20];
-    sprintf( h, "0123456789abcdef" );   /* adds a '\0'to the string */
+    snprintf(h, sizeof(h), "0123456789abcdef" );   /* adds a '\0'to the string */
     
     for(i=1,s=0; 0 < n--; i++,m++) {
 	if( s == 0 ) {
@@ -488,7 +488,7 @@ int dcdatime(char *str, int n, short *yy, short *mon, short *dd, short *hh, shor
     ls[n] = '\0';
     s = ls;
     
-    if( t = strchr( s, '/' )) {
+    if( (t = strchr( s, '/' ))) {
 	/*
 	 * assume this string contains date and time
 	 * of the form mm/dd/yy:hh:mm:ss.ms
@@ -787,6 +787,13 @@ int dd_crack_file_name_ms(char *type, double *time_stamp, char *radar, int *vers
     return(YES);
 }
 # endif
+/* Capacity assumed for the caller-supplied buffer in dd_file_name() and
+ * dd_file_name_ms().  The callers (translate, perusal and editor) pass
+ * buffers of at least this size (the smallest is a 64 byte filename field);
+ * the longest name produced is about 40 characters.
+ */
+# define DD_FILE_NAME_SIZE 64
+
 /* c------------------------------------------------------------------------ */
 
 void dd_file_name(char *type, long time_stamp, char *radar, int version, char *fn)
@@ -796,7 +803,7 @@ void dd_file_name(char *type, long time_stamp, char *radar, int version, char *f
     dts.time_stamp = time_stamp;
     d_unstamp_time(&dts);
 
-    sprintf( fn
+    snprintf( fn, DD_FILE_NAME_SIZE
 	    , "%s%s%02d%02d%02d%02d%02d%02d%s%s%s%d"
 	    , type
 	    , DD_NAME_DELIMITER
@@ -819,7 +826,7 @@ void dd_file_name_ms(char *type, long time_stamp, char *radar, int version, char
     dts.time_stamp = time_stamp;
     d_unstamp_time(&dts);
 
-    sprintf( fn
+    snprintf( fn, DD_FILE_NAME_SIZE
 	    , "%s%s%02d%02d%02d%02d%02d%02d%s%s%s%d"
 	    , type
 	    , DD_NAME_DELIMITER
@@ -1109,7 +1116,7 @@ char *dts_print(DD_TIME *dts)
 {
     static char str[32];
 
-    sprintf(str, "%02d/%02d/%02d %02d:%02d:%02d.%03d"
+    snprintf(str, sizeof(str), "%02d/%02d/%02d %02d:%02d:%02d.%03d"
 	   , dts->month
 	   , dts->day
 	   , dts->year
@@ -1574,7 +1581,7 @@ void solo_add_list_entry(struct solo_list_mgmt *which, char *entry, int len)
     len = len < which->sizeof_entries ? len : which->sizeof_entries;
     c = *(which->list+which->num_entries++);
 
-    if(a=entry) {
+    if((a=entry)) {
 	for(; *a && len--; *c++ = *a++);
     }
     *c = '\0';

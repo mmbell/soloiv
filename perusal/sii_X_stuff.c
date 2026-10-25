@@ -88,7 +88,7 @@ int sii_png_image (char *fname)
   cairo_status_t status;
   int rendered = 0;
 
-  sprintf (png_fname, "%s.png", fname);
+  snprintf (png_fname, sizeof(png_fname), "%s.png", fname);
 
   /* Try to compose all visible frames into a single PNG */
   fc = sii_frame_count;

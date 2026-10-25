@@ -151,7 +151,7 @@ void produce_nssl_mrd(struct dd_general_info *dgi, int flush)
 	 */
 	mrd_output = NO;
 
-	if(a=get_tagged_string("OUTPUT_FLAGS")) {
+	if((a=get_tagged_string("OUTPUT_FLAGS"))) {
 	    if(strstr(a,"NSSL_MRD")) {
 		mrd_output = YES;
 	    }
@@ -159,18 +159,18 @@ void produce_nssl_mrd(struct dd_general_info *dgi, int flush)
 	if(!mrd_output)
 	      return;
 
-	if(a=get_tagged_string("OPTIONS")) {
+	if((a=get_tagged_string("OPTIONS"))) {
 	    if( strstr( a, "USE_PALT" )) {
 		options |= USE_PALT;
 	    }
 	}
-	if(a=get_tagged_string("MRD_DZ_FIELD")) {
+	if((a=get_tagged_string("MRD_DZ_FIELD"))) {
 	    mrd_dz_field = a;
 	}
-	if(a=get_tagged_string("MRD_VE_FIELD")) {
+	if((a=get_tagged_string("MRD_VE_FIELD"))) {
 	    mrd_ve_field = a;
 	}
-	if(a=get_tagged_string("MRD_MAX_RANGE")) {
+	if((a=get_tagged_string("MRD_MAX_RANGE"))) {
 	    d = atof(a);
 	    if(d > 0)
 		  mrd_max_range = d*1000.; /* meters! */
@@ -297,7 +297,7 @@ void produce_nssl_mrd(struct dd_general_info *dgi, int flush)
 	else {
 	    id = "UK"; sfx = "U";
 	}
-	sprintf(str, "%02d%02d%02d%s ", dts->year % 100
+	snprintf(str, sizeof(str), "%02d%02d%02d%s ", dts->year % 100
 		, dts->month, dts->day, sfx);
 	for(that=this,i=0; i < 3; i++,that=that->next) {
 	    strncpy(that->mrdh->aircraft_id, id, 2);

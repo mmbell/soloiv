@@ -941,7 +941,7 @@ int se_edit_start_stop (int frame_num, struct swp_file_input_control *sfic)
   else {
     dtime = sii_dtime_from_string (str);
     if (dtime == 0) {
-      sprintf (mess, "%s is an unusable start time string\n", aa);
+      snprintf (mess, sizeof(mess), "%s is an unusable start time string\n", aa);
       ok = FALSE;
     }
   }
@@ -958,7 +958,7 @@ int se_edit_start_stop (int frame_num, struct swp_file_input_control *sfic)
   else {
     dtime = sii_dtime_from_string (str);
     if (dtime == 0) {
-      sprintf (mess, "%s is an unusable stop time string\n", bb);
+      snprintf (mess, sizeof(mess), "%s is an unusable stop time string\n", bb);
       ok = FALSE;
     }
   }

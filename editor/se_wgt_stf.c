@@ -556,7 +556,7 @@ se_update_list(int list_id)
 	    }
 	    if(!ii) {
 # ifdef obsolete
-		sprintf(mess, "! Sorry, there is no help file for \'%s\'"
+		snprintf(mess, sizeof(mess), "! Sorry, there is no help file for \'%s\'"
 			, e);
 		solo_add_list_entry(slm, mess, strlen(mess));
 # endif
@@ -714,7 +714,7 @@ se_update_list(int list_id)
 	if(ob && ob->num_points) {
 	    bpm = ob->top_bpm;
 	    for(; bpm; bpm = bpm->next) {
-		sprintf(str, "x:%8.3fkm y:%8.3fkm"
+		snprintf(str, sizeof(str), "x:%8.3fkm y:%8.3fkm"
 			, M_TO_KM((float)bpm->x)
 			, M_TO_KM((float)bpm->y));
 		solo_add_list_entry(slm, str, strlen(str));
@@ -734,7 +734,7 @@ int se_nab_files(const char *dir, struct solo_list_mgmt *slm, char *type, int nt
     char *fn, *keep, str[256], mess[256];
 
     if(!(dir_ptr = opendir(dir))) {
-	sprintf(mess, "Cannot open directory %s\n", dir);
+	snprintf(mess, sizeof(mess), "Cannot open directory %s\n", dir);
 	solo_message(mess);
 	return(0);
     }
@@ -770,7 +770,7 @@ int se_nab_all_files(char *dir, struct solo_list_mgmt *slm)
     char *a, *b, *fn, *keep, mess[256];
 
     if(!(dir_ptr = opendir(dir))) {
-	sprintf(mess, "Cannot open directory %s\n", dir);
+	snprintf(mess, sizeof(mess), "Cannot open directory %s\n", dir);
 	solo_message(mess);
 	return(0);
     }

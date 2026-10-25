@@ -91,6 +91,12 @@ soloiv_add_test(test_font_cache)
 soloiv_add_test(test_xfer_area_clip)
 set_tests_properties(test_xfer_area_clip PROPERTIES WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 
+# The histogram text output builds its scale and bar lines in fixed char[88]
+# buffers; a zero/tiny range used to loop forever past the end, and huge
+# values overran it. Pure editor-code test (no GUI): a hang is a failure.
+soloiv_add_test(test_histogram_output)
+set_tests_properties(test_histogram_output PROPERTIES TIMEOUT 30)
+
 # These GUI tests open data-dependent widgets, so they need a loaded sweep:
 # run them with cwd = a committed fixture sweep dir. (Previously they relied
 # on sweeps sitting at test_data/ root, which no longer holds any after the

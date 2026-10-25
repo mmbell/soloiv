@@ -74,9 +74,9 @@ void solo_new_list_field_vals(int frme)
     if (!ts) {
 	dts.time_stamp = sfv->next->time;
 	aa = dts_print(d_unstamp_time(&dts));
-        sprintf(str, "%s:  %s\n", wwptr->parameter->parameter_name, aa);
+        snprintf(str, sizeof(str), "%s:  %s\n", wwptr->parameter->parameter_name, aa);
     } else {
-        sprintf(str, "   %s\n", wwptr->parameter->parameter_name);
+        snprintf(str, sizeof(str), "   %s\n", wwptr->parameter->parameter_name);
     }
         
     
@@ -85,32 +85,32 @@ void solo_new_list_field_vals(int frme)
     d = ts ? sfv->next->alt :
 	  sfv->next->agl + (clicked.altitude - radar.altitude);
 
-    sprintf(str, " Hdg. %9.1f   Agl: %7.3f\n"
+    snprintf(str, sizeof(str), " Hdg. %9.1f   Agl: %7.3f\n"
 	    , sfv->next->heading, d);
     solo_add_list_entry(slm, str, strlen(str));
 
     d = ts ? sfv->next->lon : clicked.longitude;
-    sprintf(str, " Lon. %9.4f     x: %7.3f\n"
+    snprintf(str, sizeof(str), " Lon. %9.4f     x: %7.3f\n"
 	    , d, radar.x); 
     solo_add_list_entry(slm, str, strlen(str));
 
     d = ts ? sfv->next->lat : clicked.latitude;
-    sprintf(str, " Lat. %9.4f     y: %7.3f\n"
+    snprintf(str, sizeof(str), " Lat. %9.4f     y: %7.3f\n"
 	    , d, radar.y);
     solo_add_list_entry(slm, str, strlen(str));
 
-    sprintf(str, " Alt. %9.4f     z: %7.3f\n"
+    snprintf(str, sizeof(str), " Alt. %9.4f     z: %7.3f\n"
 	    , clicked.altitude, radar.z); 
     solo_add_list_entry(slm, str, strlen(str));
 
-    sprintf(str, " Angle    %7.2f %7.2f %7.2f\n", sfv->rot_ang
+    snprintf(str, sizeof(str), " Angle    %7.2f %7.2f %7.2f\n", sfv->rot_ang
 	    , sfv->next->rot_ang, sfv->next->next->rot_ang); 
 
     if(ts) {
 	dts.time_stamp = sfv->next->time;
 	aa = dts_print(d_unstamp_time(&dts));
 	aa = strchr(aa, ' ') +1;
-	sprintf(str, "Time          %s", aa);
+	snprintf(str, sizeof(str), "Time          %s", aa);
     }
     solo_add_list_entry(slm, str, strlen(str));
 
@@ -121,7 +121,7 @@ void solo_new_list_field_vals(int frme)
 	 * ranges disagreed with both. */
 	d = M_TO_KM(sfv->ranges[ii]);
 
-	sprintf(str, "%7.2fkm.%7.2f %7.2f %7.2f\n"
+	snprintf(str, sizeof(str), "%7.2fkm.%7.2f %7.2f %7.2f\n"
 		, d
 		, sfv->field_vals[ii]
 		, sfv->next->field_vals[ii]
@@ -240,7 +240,7 @@ void sp_ts_seek_field_vals(int frme)
     wwptr = wwptrx->lead_sweep;
     tsrt = wwptr->tsrt;
     if(!tsrt || !tsrt->tsri_top) {
-	sprintf (mess, "NULL tsrt in sp_ts_seek_field_vals() for frame %d\n"
+	snprintf (mess, sizeof(mess), "NULL tsrt in sp_ts_seek_field_vals() for frame %d\n"
 		 , frme);
 	g_message ("%s", mess);
 	return;
@@ -463,7 +463,7 @@ void sp_ts_data_click(int frme, int xpos, int ypos)
     wwptrx = solo_return_wwptr(frme)->lead_sweep;
     tsrt = wwptrx->tsrt;
     if(!tsrt || !tsrt->tsri_top) {
-	sprintf (mess, "NULL tsri in sp_ts_ray_list() for frame: %d\n"
+	snprintf (mess, sizeof(mess), "NULL tsri in sp_ts_ray_list() for frame: %d\n"
 		 , frme);
 	g_message ("%s", mess);
 	return;

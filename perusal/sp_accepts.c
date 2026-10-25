@@ -187,7 +187,7 @@ int solo_set_lock_info(struct sweep_widget_info *swi)
     char mess[256];
 
     if(frme < 0 || frme >= SOLO_MAX_WINDOWS) {
-	sprintf(mess, "Bad frame number: %d\n", frme);
+	snprintf(mess, sizeof(mess), "Bad frame number: %d\n", frme);
 	solo_message(mess);
 	return(SOLO_BAD_DIR_NAME);
     }
@@ -268,7 +268,7 @@ int solo_set_parameter_info(struct parameter_widget_info *pwi)
 
 
     if(frme < 0 || frme >= SOLO_MAX_WINDOWS) {
-	sprintf(mess, "Bad frame number: %d\n", frme);
+	snprintf(mess, sizeof(mess), "Bad frame number: %d\n", frme);
 	solo_message(mess);
 	return(SOLO_BAD_DIR_NAME);
     }
@@ -344,7 +344,7 @@ int solo_set_parameter_info(struct parameter_widget_info *pwi)
 	    strcpy(pal->at->palette_name, pwi->palette_name);
 	    pal = solo_push_palette(pal);
 	    *pal->at->usual_parms = '\0';
-	    sprintf(mess, "Generated new palette %s\n", pwi->palette_name);
+	    snprintf(mess, sizeof(mess), "Generated new palette %s\n", pwi->palette_name);
 	    solo_message(mess);
 	}
 	solo_check_zap_parms(pwi->parameter_name, pal);
@@ -415,7 +415,7 @@ int solo_set_parameter_info(struct parameter_widget_info *pwi)
     if(directory_changed) {
 	nn = solo_get_files(directory, spi->list_color_tables);
 	if(nn < 1) {
-	    sprintf(mess, "No files in dir: %s\n", directory);
+	    snprintf(mess, sizeof(mess), "No files in dir: %s\n", directory);
 	    solo_message(mess);
 	    ok = NO;
 	}
@@ -530,7 +530,7 @@ int solo_set_sweep_info(struct sweep_widget_info *swi)
 
 
     if(frme < 0 || frme >= SOLO_MAX_WINDOWS) {
-	sprintf(mess, "Bad frame number: %d\n", frme);
+	snprintf(mess, sizeof(mess), "Bad frame number: %d\n", frme);
 	solo_message(mess);
 	return(SOLO_BAD_DIR_NAME);
     }
@@ -574,7 +574,7 @@ int solo_set_sweep_info(struct sweep_widget_info *swi)
 	solo_trigger_dir_rescans(wwptr->sweep->directory_name);
 
 	if((n = mddir_file_list_v3(frme, str)) < 1) {
-	   sprintf(mess, "No sweep files in dir: %s\n", str);
+	   snprintf(mess, sizeof(mess), "No sweep files in dir: %s\n", str);
 	   sii_message (mess);
 	   return(SOLO_BAD_DIR_NAME);
 	}
@@ -584,9 +584,9 @@ int solo_set_sweep_info(struct sweep_widget_info *swi)
 	 */
 	if((rn = mddir_radar_num_v3(frme, swi->radar_name)) < 0) {
 	   rn = 0;
-	   sprintf(mess, "No data exists for radar %s in %s\n"
+	   snprintf(mess, sizeof(mess), "No data exists for radar %s in %s\n"
 		   , radar_name, str);
-	   sprintf(mess+strlen(mess), "switching to radar %s\n"
+	   snprintf(mess+strlen(mess), sizeof(mess)-strlen(mess), "switching to radar %s\n"
 		   , mddir_radar_name_v3(frme, rn));
 	   g_message ("%s", mess);
 	}
@@ -812,7 +812,7 @@ void sp_set_center_of_view_info(struct view_widget_info *pvi, struct centering_w
 
     if(ref_frme < 1 || ref_frme > SOLO_MAX_WINDOWS ||
        !spi->active_windows[ref_frme-1]) {
-	sprintf(mess, "Illegal reference frame number: %d\n", ref_frme);
+	snprintf(mess, sizeof(mess), "Illegal reference frame number: %d\n", ref_frme);
 	sii_message (mess);
 	return;
     }
@@ -962,7 +962,7 @@ int solo_set_view_info(struct view_widget_info *pvi, struct landmark_widget_info
     char mess[256];
 
     if(frme < 0 || frme >= SOLO_MAX_WINDOWS) {
-	sprintf(mess, "Bad frame number: %d\n", frme);
+	snprintf(mess, sizeof(mess), "Bad frame number: %d\n", frme);
 	solo_message(mess);
 	return(SOLO_BAD_DIR_NAME);
     }

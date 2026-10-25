@@ -477,7 +477,7 @@ void se_edit_summary(void)
     /*
      * time stamp this set of cmds
      */
-    sprintf(ssm->at, "!   time-now %s GMT\n", dts_print(d_unstamp_time(&dts)));
+    snprintf(ssm->at, SE_MAX_STRING, "!   time-now %s GMT\n", dts_print(d_unstamp_time(&dts)));
     se_append_string(&seds->edit_summary, ssm);
     /*
      * dump out the setup-input cmds
@@ -742,14 +742,14 @@ int sii_cmd_tmplt_tokens (struct ui_cmd_mgmt *the_ucm)
 
    if (nx < nt) {
       ok = NO;
-      sprintf (ee, "\nmissing at least %d argument(s)"
+      snprintf (ee, sizeof(mess) - (ee - mess), "\nmissing at least %d argument(s)"
 	       , nt -nx);
       ee += strlen(ee);
       noks++;
    }
    else if (!the_ucm->xtra_tokens && nx > nt) {
       ok = NO;
-      sprintf (ee, "\n%d extra tokens not expected"
+      snprintf (ee, sizeof(mess) - (ee - mess), "\n%d extra tokens not expected"
 	       , nx -nt);
       ee += strlen(ee);
       noks++;
@@ -765,7 +765,7 @@ int sii_cmd_tmplt_tokens (struct ui_cmd_mgmt *the_ucm)
 	{
 	   ok = NO;
 	   noks++;
-	   sprintf (ee, "/n%s should not be a <where> ", cmds->uc_text);
+	   snprintf (ee, sizeof(mess) - (ee - mess), "/n%s should not be a <where> ", cmds->uc_text);
 	   ee += strlen(ee);
 	}
       else if ((kk >= nt && prev_uc_ctype == UTT_FIELD) ||
@@ -788,7 +788,7 @@ int sii_cmd_tmplt_tokens (struct ui_cmd_mgmt *the_ucm)
 	   else {
 	      ok = NO;
 	      noks++;
-	      sprintf (ee, "\n%s is not an <integer> ", cmds->uc_text);
+	      snprintf (ee, sizeof(mess) - (ee - mess), "\n%s is not an <integer> ", cmds->uc_text);
 	      ee += strlen(ee);
 	   }
 	}
@@ -805,7 +805,7 @@ int sii_cmd_tmplt_tokens (struct ui_cmd_mgmt *the_ucm)
 	   else {
 	      ok = NO;
 	      noks++;
-	      sprintf (ee, "\n%s is not a <real> ", cmds->uc_text);
+	      snprintf (ee, sizeof(mess) - (ee - mess), "\n%s is not a <real> ", cmds->uc_text);
 	      ee += strlen(ee);
 	   }
 	}
@@ -819,7 +819,7 @@ int sii_cmd_tmplt_tokens (struct ui_cmd_mgmt *the_ucm)
 	      if (strncmp (cmds->uc_text, "between", 3) == 0 && kk >= nx -2) {
 		 ok = NO;
 		 noks++;
-		 sprintf (ee, "\nthere needs to be 2 arguments following %s"
+		 snprintf (ee, sizeof(mess) - (ee - mess), "\nthere needs to be 2 arguments following %s"
 			  , cmds->uc_text);
 		 ee += strlen(ee);
 	      }
@@ -827,7 +827,7 @@ int sii_cmd_tmplt_tokens (struct ui_cmd_mgmt *the_ucm)
 	 else {
 	    ok = NO;
 	    noks++;
-	    sprintf (ee, "\n%s is not a <where> (above,below,between)"
+	    snprintf (ee, sizeof(mess) - (ee - mess), "\n%s is not a <where> (above,below,between)"
 		     , cmds->uc_text);
 	    ee += strlen(ee);
 	 }
@@ -1067,7 +1067,7 @@ void se_setup_input_cmds(void)
     else {
 	dts.time_stamp = sfic->start_time;
 	d_unstamp_time(&dts);
-	sprintf(c+strlen(c), "%02d/%02d/%02d:%02d:%02d:%02d.%03d"
+	snprintf(c+strlen(c), SE_MAX_STRING - strlen(c), "%02d/%02d/%02d:%02d:%02d:%02d.%03d"
 		, dts.month
 		, dts.day
 		, dts.year-1900
@@ -1090,7 +1090,7 @@ void se_setup_input_cmds(void)
     else {
 	dts.time_stamp = sfic->stop_time;
 	d_unstamp_time(&dts);
-	sprintf(c+strlen(c), "%02d/%02d/%02d:%02d:%02d:%02d.%03d"
+	snprintf(c+strlen(c), SE_MAX_STRING - strlen(c), "%02d/%02d/%02d:%02d:%02d:%02d.%03d"
 		, dts.month
 		, dts.day
 		, dts.year-1900
@@ -1111,7 +1111,7 @@ void se_setup_input_cmds(void)
 	strcat(c, "last");
     }
     else {
-	sprintf(c+strlen(c), "%d", sfic->version);
+	snprintf(c+strlen(c), SE_MAX_STRING - strlen(c), "%d", sfic->version);
     }
     se_append_string(&seds->scratch1, ssm);
 

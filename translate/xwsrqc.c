@@ -191,7 +191,7 @@ int wsrqc_init(struct generic_radar_info *gri)
     long fpos, flen, finc;
 
 
-    if(a=get_tagged_string("WSR_QC_FILE")) {
+    if((a=get_tagged_string("WSR_QC_FILE"))) {
 	if(!(stream = fopen(a, "r"))) {
 	    printf("Unable to open wsr qc file: %s\n", a);
 	    wsr_correct = NO;
@@ -407,7 +407,7 @@ int nab_wsrqc_stuff(FILE *stream,
     for(a=buf; a < last_line; a=nl+1) {
 	/* find the next new line and put a null there
 	 */
-	if(nl = strchr(a, '\n')) *nl = '\0'; else nl = c;
+	if((nl = strchr(a, '\n'))) *nl = '\0'; else nl = c;
 	if(strlen(a) < 5)
 	      continue;
 
@@ -440,53 +440,53 @@ int nab_wsrqc_stuff(FILE *stream,
 		ws->stop_time = d_time_stamp(&dts);
 	    }
 	}
-	else if(b = strstr(a, "lat")) {
+	else if((b = strstr(a, "lat"))) {
 	    sscanf(a, "%*s %f", &ws->lat);
 	    /* "%*s" ignores the string in that position */
 	}
-	else if(b = strstr(a, "lon")) {
+	else if((b = strstr(a, "lon"))) {
 	    sscanf(a, "%*s %f", &ws->lon);
 	}
-	else if(b = strstr(a, "horz_beam_w")) {
+	else if((b = strstr(a, "horz_beam_w"))) {
 	    sscanf(a, "%*s %f", &ws->h_beamwidth);
 	}
-	else if(b = strstr(a, "vert_beam_w")) {
+	else if((b = strstr(a, "vert_beam_w"))) {
 	    sscanf(a, "%*s %f", &ws->v_beamwidth);
 	}
-	else if(b = strstr(a, "site")) {
+	else if((b = strstr(a, "site"))) {
 	    sscanf(a, "%*s %s", ws->site);
 	}
-	else if(b = strstr(a, "name")) {
+	else if((b = strstr(a, "name"))) {
 	    sscanf(a, "%*s %s", ws->radar_name);
 	}
-	else if(b = strstr(a, "f_048")) {
+	else if((b = strstr(a, "f_048"))) {
 	    sscanf(a, "%*s %f", &ws->dbzoff_048);
 	}
-	else if(b = strstr(a, "f_182")) {
+	else if((b = strstr(a, "f_182"))) {
 	    sscanf(a, "%*s %f", &ws->dbzoff_182);
 	}
-	else if(b = strstr(a, "f_080")) {
+	else if((b = strstr(a, "f_080"))) {
 	    sscanf(a, "%*s %f", &ws->dbzoff_080);
 	}
-	else if(b = strstr(a, "dboff")) {
+	else if((b = strstr(a, "dboff"))) {
 	    sscanf(a, "%*s %f", &ws->dboff);
 	}
-	else if(b = strstr(a, "st_048")) {
+	else if((b = strstr(a, "st_048"))) {
 	    sscanf(a, "%*s %f", &ws->radconst_048);
 	}
-	else if(b = strstr(a, "st_182")) {
+	else if((b = strstr(a, "st_182"))) {
 	    sscanf(a, "%*s %f", &ws->radconst_182);
 	}
-	else if(b = strstr(a, "st_080")) {
+	else if((b = strstr(a, "st_080"))) {
 	    sscanf(a, "%*s %f", &ws->radconst_080);
 	}
-	else if(b = strstr(a, "atten")) {
+	else if((b = strstr(a, "atten"))) {
 	    sscanf(a, "%*s %f", &ws->attenuation);
 	}
-	else if(b = strstr(a, "g_slope")) {
+	else if((b = strstr(a, "g_slope"))) {
 	    sscanf(a, "%*s %f", &ws->log_slope);
 	}
-	else if(b = strstr(a, "g_inter")) {
+	else if((b = strstr(a, "g_inter"))) {
 	    sscanf(a, "%*s %f", &ws->log_intercept);
 	}
 	else {

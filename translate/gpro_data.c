@@ -206,18 +206,18 @@ char *eld_nimbus_fix_asib(DD_TIME *dts, struct platform_i *asib, int options, in
 		if(++unSync == 1) {
 		    aa = mess;
 		    dtx.time_stamp = nai->next_time;
-		    sprintf(aa, "Lost sync with AC data at %s "
+		    snprintf(aa, sizeof(mess), "Lost sync with AC data at %s "
 			    , dts_print(d_unstamp_time(&dtx)));
-		    sprintf(aa+strlen(aa), " radar time: %s  rn: %d"
+		    snprintf(aa+strlen(aa), sizeof(mess) - strlen(aa), " radar time: %s  rn: %d"
 			    , dts_print(d_unstamp_time(dts)), radar_num);
 		    dd_append_cat_comment(mess);
 		    printf("%s\n", mess);
 		    
 		    dtx.time_stamp = nai->reference_time;
-		    sprintf(aa, "Previous AC time: %s  "
+		    snprintf(aa, sizeof(mess), "Previous AC time: %s  "
 			    , dts_print(d_unstamp_time(&dtx)));
 		    dtx.time_stamp = nai->last_radar_time;
-		    sprintf(aa+strlen(aa), "previous radar time: %s  rn: %d"
+		    snprintf(aa+strlen(aa), sizeof(mess) - strlen(aa), "previous radar time: %s  rn: %d"
 			    , dts_print(d_unstamp_time(&dtx))
 			    , nai->last_radar_num);
 		    dd_append_cat_comment(mess);
@@ -488,10 +488,10 @@ int ac_nc_init(void)
 	/*
 	 * see if we have any name changes
 	 */
-	if(aa=get_tagged_string("AC_NETCDF_ALIASES")) {
+	if((aa=get_tagged_string("AC_NETCDF_ALIASES"))) {
 	    strcpy(string_space, aa);
 	    ii = 0;
-	    if(nt = dd_tokens(string_space, str_ptrs)) {
+	    if((nt = dd_tokens(string_space, str_ptrs))) {
 		if(strstr(str_ptrs[0], "ONLY")) {
 		    for(jj=0; jj < MAX_NC_NDX; jj++) {
 			if(jj != ndx_time_offset)
@@ -556,14 +556,14 @@ int ac_nc_init(void)
 	}
 	/* set up the file names list
 	 */
-	if(aa=get_tagged_string("AC_NETCDF_FILES")) {
+	if((aa=get_tagged_string("AC_NETCDF_FILES"))) {
 	    strcpy(nai->file_names, aa);
 	    nai->file_count = dd_tokens(nai->file_names, nai->file_names_ptrs);
 	    if(!nai->file_count) {
 		return(NO);
 	    }
 	}
-	if(aa=get_tagged_string("AC_TIME_CORRECTION")) {
+	if((aa=get_tagged_string("AC_TIME_CORRECTION"))) {
 	    if((ii = sscanf(aa, "%f", &f)) == 1) {
 		nai->time_correction = f;
 		printf("ac_netCDF time correction: %.3f seconds!\n"
@@ -582,7 +582,7 @@ int ac_nc_init(void)
 	exit(1); /* return(NO); */
     }
     aa = nai->file_names_ptrs[nai->file_ndx++];
-    if(bb = strrchr(aa, '/')) {
+    if((bb = strrchr(aa, '/'))) {
 	/* save the directory name
 	 */
 	cc = nai->file_directory;
@@ -1305,7 +1305,7 @@ void gp_header(char *buf)
      * set up pointers to and count the variable names and descriptions
      */
     for(In_count=0,a=Titles +LINE_LEN; a < Units; a+=LINE_LEN ) {
-	if( hd_vbls[In_count] = gp_arg_ptr( a, TNAME ) ) {
+	if( (hd_vbls[In_count] = gp_arg_ptr( a, TNAME )) ) {
 	    In_count++;
 	}
     }

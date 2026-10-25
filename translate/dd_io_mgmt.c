@@ -379,12 +379,12 @@ slm_ctypeu16 (	/* type as 16 bit integers */
 
     for(; nn-- > 0; ii++, bb += 2, jj += 2) {
 	if( s == 0 ) {
-	    sprintf( aa, "%5d)", jj);	/* new line label */
+	    snprintf(aa, sizeof(str) - (aa - str), "%5d)", jj);	/* new line label */
 	    aa += strlen(aa);
 	    s = 6;
 	}
 	memcpy(&ival, bb, 2);
-	sprintf( aa, "%6d", ival);
+	snprintf(aa, sizeof(str) - (aa - str), "%6d", ival);
 	aa += strlen(aa);
 	*aa = naught;
 	s += 6;
@@ -422,12 +422,12 @@ slm_xctypeu16 (	/* type as 16 bit integers */
 
     for(; nn-- > 0; ii++, bb += 2, jj += 2) {
 	if( s == 0 ) {
-	    sprintf( aa, "%5d)", jj);	/* new line label */
+	    snprintf(aa, sizeof(str) - (aa - str), "%5d)", jj);	/* new line label */
 	    aa += strlen(aa);
 	    s = 6;
 	}
 	swack2(bb, &ival);
-	sprintf( aa, "%6d", ival);
+	snprintf(aa, sizeof(str) - (aa - str), "%6d", ival);
 	aa += strlen(aa);
 	*aa = naught;
 	s += 6;
@@ -497,7 +497,7 @@ int dd_crack_datime(char *datime, int nc, DD_TIME *dts)
 
     /* this string can be of the form mon/dd/yy:hh:mm:ss.ms */
 
-    if (bb = strrchr (aa, '.')) { /* contains milliseconds */
+    if ((bb = strrchr (aa, '.'))) { /* contains milliseconds */
 	d = atof(strrchr(aa, '.')); /* capture leading zeroes */
 	ms = d * 1000.;
     }
@@ -769,7 +769,7 @@ int dd_input_read_open(struct input_read_info *iri, char *dev_name)
     dd_reset_ios(iri, 1);
     iri->sizeof_file = 0;
 
-    if(bb = strrchr(aa, '/')) {	/* nab the directory name */
+    if((bb = strrchr(aa, '/'))) {	/* nab the directory name */
 	cc = iri->directory_name;
 	for(; aa <= bb; *cc++ = *aa++)
 	    {}
@@ -811,7 +811,7 @@ int dd_input_read_open(struct input_read_info *iri, char *dev_name)
        ii = fseek(iri->strm, 0L, SEEK_SET); /* postion back to beginning */
        iri->current_offset = ftell(iri->strm);
 
-	if(cc = get_tagged_string("IO_TYPE")) {
+	if((cc = get_tagged_string("IO_TYPE"))) {
 	    if(strstr(cc, "FB_IO"))
 		  iri->io_type = FB_IO;
 	    else if(strstr(cc, "PHYSICAL_TAPE"))
@@ -990,7 +990,7 @@ int dd_really_skip_recs(struct input_read_info *iri, int direction, int skip_cou
 	op.mt_count = skip_count;
 	op.mt_op = direction == FORWARD ? MTFSR : MTBSR;
 	if((ii = ioctl(iri->fid, MTIOCTOP, &op)) < 0 ) {
-	    sprintf(mess,
+	    snprintf(mess, sizeof(mess),
 "Skip records error on %s\n count: %d dir: %d fid: %d state: %d\n"
 		    , iri->dev_name, skip_count, direction
 		    , iri->fid, iri->top->skip_state);
@@ -1221,7 +1221,7 @@ void dd_rewind_dev(struct input_read_info *iri)
 	op.mt_op = MTREW;
 	op.mt_count = 1;	/* Only rewind once */
 	if((iri->top->skip_state = ioctl(iri->fid, MTIOCTOP, &op)) < 0 ) {
-	    sprintf(mess, "Rewind error on %s fid: %d state: %d\n"
+	    snprintf(mess, sizeof(mess), "Rewind error on %s fid: %d state: %d\n"
 		    , iri->dev_name, iri->fid, iri->top->skip_state);
 	    perror(mess);
 	}
@@ -1252,7 +1252,7 @@ void dd_skip_files(struct input_read_info *iri, int direction, int skip_count)
 	op.mt_count = skip_count;
 	op.mt_op = direction == FORWARD ? MTFSF : MTBSF;
 	if((iri->top->skip_state = ioctl(iri->fid, MTIOCTOP, &op)) < 0 ) {
-	    sprintf(mess,
+	    snprintf(mess, sizeof(mess),
 "Skip files error on %s\n count: %d dir: %d fid: %d state: %d\n"
 		    , iri->dev_name, skip_count, direction
 		    , iri->fid, iri->top->skip_state);
@@ -1284,7 +1284,7 @@ void dd_skip_files(struct input_read_info *iri, int direction, int skip_count)
      }
     else {
 	/* assume binary io */
-	sprintf(mess, "NO file skipping capability in binary io\n");
+	snprintf(mess, sizeof(mess), "NO file skipping capability in binary io\n");
 	perror(mess);
      }
  }
@@ -1364,7 +1364,7 @@ void dd_unwind_dev(struct input_read_info *iri)
     dd_reset_ios(iri, 0);
 
     if(iri->io_type == PHYSICAL_TAPE) {
-	    sprintf(mess, "Unwind undefined for PHYSICAL TAPE\n");
+	    snprintf(mess, sizeof(mess), "Unwind undefined for PHYSICAL TAPE\n");
 	    perror(mess);
     }
     else {
@@ -1421,7 +1421,7 @@ slm_ezascdmp (		/* ascii dump of n bytes */
     
     for(; 0 < n--; c++,m++) {
 	if( s == 0 ) {
-	    sprintf( aa, "%5d) ", m );	/* new line label */
+	    snprintf(aa, sizeof(str) - (aa - str), "%5d) ", m );	/* new line label */
 	    aa += strlen(aa);
 	}
 	if( *c > 31 && *c < 127 ) {
@@ -1456,7 +1456,7 @@ ezhxdmp (		/* hexdump of n bytes */
 {
     int c, i, s;
     char h[20];
-    sprintf( h, "0123456789abcdef" );   /* adds a '\0'to the string */
+    snprintf(h, sizeof(h), "0123456789abcdef" );   /* adds a '\0'to the string */
     
     for(i=1,s=0; 0 < n--; i++,m++) {
 	if( s == 0 ) {
@@ -1497,11 +1497,11 @@ slm_ezhxdmp (		/* hexdump of n bytes */
     strcpy (ascii, " ");
 
     solo_reset_list_entries(slm);
-    sprintf( h, "0123456789abcdef" );   /* adds a '\0'to the string */
+    snprintf(h, sizeof(h), "0123456789abcdef" );   /* adds a '\0'to the string */
     
     for(s=0; 0 < n--; bb++,m++) {
 	if( s == 0 ) {
-	    sprintf( aa, "%5d) ", m); /* new line label */
+	    snprintf( aa, sizeof(str) - (aa - str), "%5d) ", m); /* new line label */
 	    aa += strlen(aa);
 	    as = ascii+1;
 	}
@@ -1788,7 +1788,7 @@ int gri_max_lines(void)
     int ii=0;
 
     if(!count++) {
-	if(a=get_tagged_string("LINES_IN_WINDOW")) {
+	if((a=get_tagged_string("LINES_IN_WINDOW"))) {
 	    if((ii = atoi(a)) > 0)
 		  lines_in_display = ii;
 	}
@@ -1857,7 +1857,7 @@ int gri_nab_input_filters(double current_time, struct dd_input_filters *difs, in
 	    printf("\nIllegal time spec: %s\n", str);
 	    goto menu2;
 	}
-	else if(d = dd_relative_time(str)) {
+	else if((d = dd_relative_time(str))) {
 	    t1 = current_time +d;
 	}
 	else if(!(kk = dd_crack_datime(str, nn, &dtx))) {
@@ -1875,7 +1875,7 @@ int gri_nab_input_filters(double current_time, struct dd_input_filters *difs, in
 	nn = getreply(str, sizeof(str));
 	if(nn < 2)
 	      goto menu2;
-	if(d = dd_relative_time(str)) {
+	if((d = dd_relative_time(str))) {
 	    t2 = t1 +d;
 	}
 	else if(!(kk = dd_crack_datime(str, nn, &dtx))) {

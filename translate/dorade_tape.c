@@ -202,12 +202,12 @@ void dd_tape(DGI_PTR dgi, int flush)
 	   if((i = atoi(a)) >= 0 )
 		 time_span = i;
 	}
-	if(a=get_tagged_string("MAX_DORADE_TAPE_SIZE")) {
+	if((a=get_tagged_string("MAX_DORADE_TAPE_SIZE"))) {
 	   if((d = atof(a)) > 0) {
 	      max_dorade_tape_size = d * 1.e9; 
 	   }
 	}
-	if( a=get_tagged_string("MAX_MEDIA_SIZE")) {
+	if( (a=get_tagged_string("MAX_MEDIA_SIZE"))) {
 	   if((d = atof(a)) > 0) {
 	      max_dorade_tape_size = d * 1.e6;
 	   }
@@ -239,7 +239,7 @@ void dd_tape(DGI_PTR dgi, int flush)
 	    /* FB_IO is the default */
 	}
 
-	if( dfn=get_tagged_string("DORADE_DEV") ) {
+	if( (dfn=get_tagged_string("DORADE_DEV")) ) {
 	    /* see if the string contains a physical device name */
 
 	    if(dd_itsa_physical_dev(dfn)) {
@@ -918,7 +918,7 @@ static void dd_tape_dump(struct dd_sweep_list_entries *top, int sweep_count, int
 
 	if(stacker_flag) {
 	    close(out_fid);
-	    sprintf( str, "mt -f %s offline"
+	    snprintf(str, sizeof(str), "mt -f %s offline"
 		     , dev_name_ptrs[stacker_num+1] );
 	    kk = system( str );
 

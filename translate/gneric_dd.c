@@ -509,8 +509,8 @@ struct generic_radar_info *return_gri_ptr(void)
 	    strncpy(c, "RDAT", 4);
 	    gri->scaled_data[j] = (short *)(c +sizeof(struct paramdata_d));
 # else
-	    if(gri->scaled_data[j] = (short *)
-	       malloc(SRS_MAX_GATES*sizeof(short)))
+	    if((gri->scaled_data[j] = (short *)
+	       malloc(SRS_MAX_GATES*sizeof(short))))
 		  memset(gri->scaled_data[j], 0, SRS_MAX_GATES*sizeof(short));
 	    else {
 		printf("Unable to allocate gri\n");

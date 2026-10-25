@@ -48,8 +48,6 @@ endif()
 # way by making a missing prototype or an implicit declaration an error.
 # C only: radx_shim.cc is C++.
 target_compile_options(s2 PRIVATE
-    -Wno-return-mismatch
-    -Wno-error=parentheses -Wno-parentheses
     $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Clang,AppleClang>>:-Werror=deprecated-non-prototype -Werror=implicit-function-declaration -Werror=implicit-int -Werror=strict-prototypes>
     $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:-Werror=implicit-function-declaration -Werror=implicit-int -Werror=old-style-definition -Werror=strict-prototypes>
 )

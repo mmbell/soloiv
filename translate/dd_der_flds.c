@@ -218,7 +218,7 @@ void dd_derived_fields(DGI_PTR dgi)
 	
 
 
-	if(a = get_tagged_string("DERIVED_FIELDS")) {
+	if((a = get_tagged_string("DERIVED_FIELDS"))) {
 	    if( setup_der_alts( a ) < 1 )
 		{ return; }
 
@@ -264,7 +264,7 @@ void dd_derived_fields(DGI_PTR dgi)
 	strcpy(pwr_name, "DZ");
 	strcpy(snr_name, "SNR");
 
-	if(tdf = dd_time_dependent_fixes(&fx_count)) {
+	if((tdf = dd_time_dependent_fixes(&fx_count))) {
 	    for(fx = tdf; fx ; fx = fx->next) {
 		/*
 		 * remove non-applicable fixes
@@ -313,7 +313,7 @@ void dd_derived_fields(DGI_PTR dgi)
 	    Include_dH_dP = YES;
 	    printf("Include dH/dt and dP/dt\n");
 	}
-	if(a=get_tagged_string("NCP_THRESHOLD_VAL")) {
+	if((a=get_tagged_string("NCP_THRESHOLD_VAL"))) {
 	    f_vals[0] = ncp_threshold;
 	    f_vals[1] = ncp_hi_threshold;
 	    nt = dd_thr_parms(a, ncp_name, f_vals);
@@ -323,7 +323,7 @@ void dd_derived_fields(DGI_PTR dgi)
 	printf( "NCP threshold field: %s  vals: %f <-> %f\n"
 	       , ncp_name, ncp_threshold, ncp_hi_threshold);
 
-	if(a=get_tagged_string("BIAS")) {
+	if((a=get_tagged_string("BIAS"))) {
 	    d = atof( a );
 	    if( d )
 	      param_bias = d;
@@ -331,19 +331,19 @@ void dd_derived_fields(DGI_PTR dgi)
 	printf( "SW threshold field: %s  val: %f\n"
 	       , sw_name, sw_threshold);
 
-	if(a=get_tagged_string("SW_THRESHOLD_VAL")) {
+	if((a=get_tagged_string("SW_THRESHOLD_VAL"))) {
 	    dd_thr_parms(a, sw_name, &sw_threshold);
 	}
 	printf( "SW threshold field: %s  val: %f\n"
 	       , sw_name, sw_threshold);
 
-	if(a=get_tagged_string("PWR_THRESHOLD_VAL")) {
+	if((a=get_tagged_string("PWR_THRESHOLD_VAL"))) {
 	    dd_thr_parms(a, pwr_name, &pwr_threshold);
 	}
 	printf( "Power threshold field: %s  val: %f\n"
 	       , pwr_name, pwr_threshold);
 
-	if(a=get_tagged_string("SNR_THRESHOLD_VAL")) {
+	if((a=get_tagged_string("SNR_THRESHOLD_VAL"))) {
 	    dd_thr_parms(a, snr_name, &snr_threshold);
 	}
 	printf( "SNR threshold field: %s  val: %f\n"
@@ -1394,11 +1394,12 @@ L100:	    z[i+OFSZ] = avrg2 ;
 			    flip = 0 ;
 			    if ( avrg1 < init0 )
 				avrg1 = init0 ;
-			    if ( ( avrg2 > avrg1 ) || ( avrg2 < init0 ) )
+			    if ( ( avrg2 > avrg1 ) || ( avrg2 < init0 ) ) {
 				if ( avrg2 > avrg1 )
 				    avrg2 = avrg1 ;
 				else
 				    avrg2 = init0 ;
+			    }
 			}
 
 /* Link the bad gap by a slope line instead of a flat line. Li Liu, 9/29/95 */
@@ -1568,14 +1569,14 @@ L1000: ;
 	    
 	    for(kk = length; kk--; *to++ = *from++);
 
-	    sprintf(str, "/scr/hotlips/oye/spol/Ray%dxlt.txt", ray_count);
+	    snprintf(str, sizeof(str), "/scr/hotlips/oye/spol/Ray%dxlt.txt", ray_count);
 	    ffid = fopen(str, "w");
 	    phiz = phiz0;
 	    phid = phid0;
 	    phif = phif0;
 
 	    for(kk = 0; kk < length; kk++, phiz++, phid++, phif++) {
-		sprintf(str, "%10.2f %10.2f %10.2f %10.2f \n"
+		snprintf(str, sizeof(str), "%10.2f %10.2f %10.2f %10.2f \n"
 			, M_TO_KM(celv->dist_cells[kk])
 			, *phiz, *phid, *phif
 			);
@@ -2249,7 +2250,7 @@ void dd_pct_stats(DGI_PTR dgi)
 
     if(!count++) {
 	pct_stats_flag = NO;
-	if(a=get_tagged_string("PCT_STATS")) {
+	if((a=get_tagged_string("PCT_STATS"))) {
 	    strcpy(string_space, a);
 	    nt = dd_tokens(string_space, str_ptrs);
 	    if(nt < 3) {

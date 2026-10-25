@@ -53,6 +53,12 @@ static char vcid[] = "$Id$";
 # include "radar_io.h"
 # include <dorade_share.h>
 # include "solo_utils.h"
+
+/* Capacity assumed for the caller-supplied buffers filled by
+ * ddfn_file_name() and ddfn_file_info_line().  The callers (perusal, editor
+ * and translate) pass buffers of 88 bytes or more.
+ */
+# define DDFN_BUF_SIZE 88
 # include <s2_protos.h>
 
 # include <errno.h>
@@ -238,11 +244,11 @@ char *ddfn_file_info_line(struct dd_file_name_v3 *ddfn, char *str)
 
     dts.time_stamp = ddfn_time(ddfn);
 
-    sprintf(str, " %s %s"
+    snprintf(str, DDFN_BUF_SIZE, " %s %s"
 	    , dts_print(d_unstamp_time(&dts))
 	    , ddfn->radar_name
 	    );
-    if(nn=strlen(ddfn->comment)) {
+    if((nn=strlen(ddfn->comment))) {
 	b = ddfn->comment;
 	if(nn > 24) nn = 24;
 	strcat(str, " ");

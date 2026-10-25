@@ -305,7 +305,7 @@ void sii_blow_up_resize_cb(GtkDrawingArea *frame, int width, int height,
   frame_configs[0]->big_colorize_count = 0;
 
 # ifdef config_debug
-  sprintf (mess,"bup configure frm %d %dx%d"
+  snprintf (mess, sizeof(mess),"bup configure frm %d %dx%d"
 	     , frame_num
 	     , width
 	     , height
@@ -346,7 +346,7 @@ void sii_frame_resize_cb(GtkDrawingArea *frame, int width, int height,
   }
 
 # ifdef config_debug
-  sprintf (mess, "CFG frm:%d %dx%d gtk:%dx%d  ec:%d cc:%d nf:%d"
+  snprintf (mess, sizeof(mess), "CFG frm:%d %dx%d gtk:%dx%d  ec:%d cc:%d nf:%d"
 	     , frame_num
 	     , sfc->width
 	     , sfc->height
@@ -421,7 +421,7 @@ void sii_blow_up_mouse_click_cb (GtkGestureClick *gesture, int n_press,
   button = gtk_gesture_single_get_current_button (GTK_GESTURE_SINGLE(gesture));
 
 # ifdef config_debug
-  sprintf (mess, "xx:%d yy:%d button:%d", xx, yy, button);
+  snprintf (mess, sizeof(mess), "xx:%d yy:%d button:%d", xx, yy, button);
   sii_append_debug_stuff (mess);
 # endif
 
@@ -861,7 +861,7 @@ gboolean sii_frame_key_pressed_cb(GtkEventControllerKey *controller,
     { aa = "unk"; }
 
 # ifdef config_debug
-  sprintf (mess,"data %d frame: %d keyed k:%d s:%d aa:%s mod:%s"
+  snprintf (mess, sizeof(mess),"data %d frame: %d keyed k:%d s:%d aa:%s mod:%s"
 	   , frame_num, cursor_frame
 	   , keyval, state, aa, mod);
   sii_append_debug_stuff (mess);
@@ -1197,7 +1197,7 @@ void test_widget( GtkWidget *w, gpointer   data )
   bb = " HHH V0000";
 
   for (mm=0; mm < nn; mm++ ) {
-     sprintf (str, "%s%6.1f%s               ", aa, (gfloat)mm, bb );
+     snprintf (str, sizeof(str), "%s%6.1f%s               ", aa, (gfloat)mm, bb );
      button = gtk_button_new_with_label (str);
      gtk_box_append (GTK_BOX (list_box), button);
 

@@ -385,7 +385,7 @@ void dd_insert_headers(struct dd_general_info *dgi)
     dgi->sizeof_dd_buf = 0;
 
     if(!dgi->dd_buf) {
-	if(dgi->dd_buf = (char *)malloc(MAX_READ))
+	if((dgi->dd_buf = (char *)malloc(MAX_READ)))
 	      memset(dgi->dd_buf, 0, MAX_READ);
 	else {
 	    printf("Unable to allocate dgi->dd_buf\n");
@@ -492,9 +492,9 @@ void dd_insert_headers(struct dd_general_info *dgi)
     c += sizeof(struct sweepinfo_d);
     bsize += sizeof(struct sweepinfo_d);
 
-    if(ncomm = dd_return_num_comments()) {
+    if((ncomm = dd_return_num_comments())) {
 	for(ii=0; ii < ncomm; ii++) {
-	    if(comm = dd_return_comment(ii)) {
+	    if((comm = dd_return_comment(ii))) {
 		memcpy(c, (char *)comm, comm->comment_des_length);
 		c += comm->comment_des_length;
 		bsize += comm->comment_des_length;

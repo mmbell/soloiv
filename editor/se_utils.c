@@ -43,6 +43,8 @@ static char vcid[] = "$Id$";
 
 extern GString *gs_complaints;
 
+# define SE_TIME_STR_LEN 24	/* callers pass a char[24] */
+
 static struct solo_str_mgmt *se_spair_strings=NULL;
 static struct solo_edit_stuff *seds=NULL;
 static struct sed_command_files *scf=NULL;
@@ -151,7 +153,7 @@ struct ui_cmd_mgmt *ok_cmd( char * line, struct ui_cmd_mgmt *the_ucm )
 	memset (the_ucm->error, 0, se_ucm_errlen());
      }
      ee = the_ucm->error;
-     sprintf (ee, "%s\n %s %s", the_ucm->cmd_line, the_ucm->keyword
+     snprintf (ee, se_ucm_errlen(), "%s\n %s %s", the_ucm->cmd_line, the_ucm->keyword
 	      , (hits < 1) ? "not supported" : "ambiguous");
   }
   else {
@@ -328,10 +330,13 @@ char *se_string_time(double t, char *str)
 {
     double d;
     DD_TIME dts;
+    /* room for any int in every field, so the formatting can't truncate;
+     * a real time is 22 characters and fits the caller's buffer */
+    char tmp[96];
 
     dts.time_stamp = t;
     d_unstamp_time(&dts);
-    sprintf(str, "%02d/%02d/%02d:%02d:%02d:%02d.%03d"
+    snprintf(tmp, sizeof(tmp), "%02d/%02d/%02d:%02d:%02d:%02d.%03d"
 	   , dts.month
 	   , dts.day
 	   , dts.year-1900
@@ -340,6 +345,7 @@ char *se_string_time(double t, char *str)
 	   , dts.second
 	   , dts.millisecond
 	   );
+    g_strlcpy(str, tmp, SE_TIME_STR_LEN);
     return(str);
 }
 /* c------------------------------------------------------------------------ */

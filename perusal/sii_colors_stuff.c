@@ -35,7 +35,7 @@ GdkRGBA *tone_down_gdk_color( gchar * name, gfloat atten )
   gfloat r, g, b;
 
   old = (GdkRGBA *)g_hash_table_lookup( colors_hash, (gpointer)name );
-  sprintf( new_name, "%s%02d", name, (gint)( atten * 100 +.5 ));
+  snprintf(new_name, sizeof(new_name), "%s%02d", name, (gint)( atten * 100 +.5 ));
 
   r = old->red * value;
   g = old->green * value;

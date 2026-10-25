@@ -218,7 +218,7 @@ void sii_png_image_prep (char *dir)
   dd_file_name("png", (long)wwptr->sweep->start_time
 	       , wwptr->sweep->radar_name, 0, bb);
   bb += strlen (bb);
-  sprintf (bb, "_%.1f_%s_%s", dgi->dds->swib->fixed_angle
+  snprintf (bb, sizeof(fname)-(bb-fname), "_%.1f_%s_%s", dgi->dds->swib->fixed_angle
 	   , dd_scan_mode_mne(dgi->dds->radd->scan_mode, mne)
 	   , wwptr->parameter->parameter_name
 	   );
@@ -1411,7 +1411,7 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
   magic_angle = FMOD360 (CART_ANGLE (DEGREES (theta)));
 
   if (max > 500) {
-    sprintf (str, "sii_xfer_images: Max: %.3f > 500", max);
+    snprintf (str, sizeof(str), "sii_xfer_images: Max: %.3f > 500", max);
     g_message ("%s", str);
     max = 500;
   }
@@ -1520,7 +1520,7 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
     x = (gint)((xx > 0) ? xx +.5 : xx -.5) * bup_factor;
     y = (gint)((yy > 0) ? yy +.5 : yy -.5) * bup_factor;
     fmt = (wwptr->view->rng_ring_int_km < 3) ? "%.1f" : "%.0f";
-    sprintf (aa, fmt, rng);
+    snprintf (aa, sizeof(annot), fmt, rng);
     text_width = sii_font_string_width (font, aa);
     x = (angle > 180) ? x : x - text_width;
     y = (angle > 90 && angle < 270) ? y
@@ -1560,7 +1560,7 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
     x = (gint)((xx > 0) ? xx +.5 : xx -.5) * bup_factor;
     y = (gint)((yy > 0) ? yy +.5 : yy -.5) * bup_factor;
 
-    sprintf (aa, "%.0f", angle);
+    snprintf (aa, sizeof(annot), "%.0f", angle);
     text_width = sii_font_string_width (font, aa);
     x = (angle > 180) ? x : x - text_width;
 
@@ -1662,7 +1662,7 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
 	  { tval = xtic; }
 
 	fmt =  (xtici < 2.) ? "%.1f" : "%.0f";
-	sprintf (aa, fmt, tval);
+	snprintf (aa, sizeof(annot), fmt, tval);
 	text_width = sii_font_string_width (font, aa);
 	x -= text_width/2;
 	y += ticlen/2 + font->ascent + font->descent;
@@ -1674,7 +1674,7 @@ void sii_really_xfer_images_cairo (cairo_t *cr, int frame_num,
 	x *= bup_factor;
 	y *= bup_factor;
 	fmt =  (ytici < 2.) ? "%.1f" : "%.0f";
-	sprintf (aa, fmt, ytic);
+	snprintf (aa, sizeof(annot), fmt, ytic);
 	text_width = sii_font_string_width (font, aa);
 	x += ticlen/2 +1;
 	y += (font->ascent + font->descent)/2;
@@ -2136,7 +2136,7 @@ void sii_check_image_size (guint frame_num)
 
   if (size > sfc->max_image_size) {
 # ifdef config_debug
-     sprintf (str, "Enlarge Image %d %d %d -> %d"
+     snprintf (str, sizeof(str), "Enlarge Image %d %d %d -> %d"
 	      , frame_num, sii_frame_count, sfc->max_image_size, size);
 # endif
      if (sfc->image) {
@@ -2148,7 +2148,7 @@ void sii_check_image_size (guint frame_num)
      }
      sfc->image->data = g_malloc0 (size * 4);
 # ifdef config_debug
-     sprintf (str+strlen(str), " data:%p", (void *)sfc->image->data);
+     snprintf (str+strlen(str), sizeof(str)-strlen(str), " data:%p", (void *)sfc->image->data);
      /*
      g_message (str);
       */

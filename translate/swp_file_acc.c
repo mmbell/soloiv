@@ -291,7 +291,7 @@ int dd_absorb_header_info(DGI_PTR dgi)
 	     dd_absorb_cfac( aa, radar_name, dgi->dds->cfac);
 	     dgi->ignore_cfacs = YES;
 	   }
-	   else if (cfw = ddswp_nab_cfacs (radar_name)) {
+	   else if ((cfw = ddswp_nab_cfacs (radar_name))) {
 	     /* external cfac files */
 	     cfac_id = "default";
 	     if (cfw->ok_frib && frib)
@@ -1233,7 +1233,7 @@ struct cfac_wrap *ddswp_nab_cfacs(char *radar_name)
    bb = getenv ("CFAC_FILE");
 
    if (!(aa || bb)) {
-     if (aa=getenv("ELD_CFAC_FILES")) {
+     if ((aa=getenv("ELD_CFAC_FILES"))) {
        first_cfac = dd_absorb_cfacs (aa, radar_name);
        dis->cfac_wrap[dis->num_cfac_sets++] = first_cfac;
        return (first_cfac);

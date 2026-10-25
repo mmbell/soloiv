@@ -244,7 +244,7 @@ void frame_click_data_widget ( guint frame_num )
 		      GINT_TO_POINTER(frame_num * TASK_MODULO + FRAME_MENU));
 
   /* --- Title and border --- */
-  sprintf (str, "Frame %d  Data", frame_num+1 );
+  snprintf (str, sizeof(str), "Frame %d  Data", frame_num+1 );
   gtk_window_set_title (GTK_WINDOW (window), str);
   /* GTK4: gtk_container_border_width removed; use margins on child */
 

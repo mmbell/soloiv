@@ -277,7 +277,7 @@ void dd_alloc_data_field(DGI_PTR dgi, int pn)
 	if(dds->qdat_ptrs[pn]) {
 	    free(dds->qdat_ptrs[pn]);
 	}
-	if(dds->qdat_ptrs[pn] = (char *)malloc(mm))
+	if((dds->qdat_ptrs[pn] = (char *)malloc(mm)))
 	      memset(dds->qdat_ptrs[pn], 0, mm);
 	else {
 	    printf("Unable to allocate qdat num: %d\n", pn);
@@ -674,7 +674,7 @@ void dd_get_cfac(FILE *stream, struct correction_d *cfac)
     double d;
     float f;
 
-    for(d = 0; aa = fgets(string_space, 256, stream); d = 0) { /* next line */
+    for(d = 0; (aa = fgets(string_space, 256, stream)); d = 0) { /* next line */
 	if(*aa == '#' || *aa == '!') /* comment */
 	      continue;
 	strcpy(string_space, aa);
@@ -757,7 +757,7 @@ void dd_get_difs(struct dd_input_filters *difs)
     env_ptrs = (char **)malloc(num_ptrs * sizeof(char *));
     memset(env_ptrs, 0, num_ptrs * sizeof(char *));
 
-    if(a=get_tagged_string("TIME_LIMITS")) {
+    if((a=get_tagged_string("TIME_LIMITS"))) {
 	strcpy(env, a);
 	nt = dd_tokens(env, env_ptrs);
 	for(ii=0; ii < nt; ii += 3, t1=t2=0) {
@@ -796,7 +796,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 	}
     }
 
-    if(a=get_tagged_string("SWEEP_MODES")) {
+    if((a=get_tagged_string("SWEEP_MODES"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	for(ii=0; ii < nt; ii++) {
@@ -810,7 +810,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 	    }
 	}
     }
-    if(a=get_tagged_string("ALTITUDE_LIMITS")) {
+    if((a=get_tagged_string("ALTITUDE_LIMITS"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	str_ptrs[nt] = NULL;
@@ -826,7 +826,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 	       , difs->altitude_limits->lower
 	       , difs->altitude_limits->upper);
     }
-    if(a=get_tagged_string("FIXED_ANGLES")) {
+    if((a=get_tagged_string("FIXED_ANGLES"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	for(ii=0; ii < nt; ii += 3) {
@@ -837,7 +837,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 		   , difs->fxd_angs[jj]->upper);
 	}
     }
-    if(a=get_tagged_string("PRF_LIMITS")) {
+    if((a=get_tagged_string("PRF_LIMITS"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	for(ii=0; ii < nt; ii += 3) {
@@ -848,7 +848,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 		   , difs->prfs[jj]->upper);
 	}
     }
-    if(a=get_tagged_string("RANGE_LIMITS")) {
+    if((a=get_tagged_string("RANGE_LIMITS"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	for(ii=0; ii < nt; ii += 3) {
@@ -859,7 +859,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 		   , difs->ranges[jj]->upper);
 	}
     }
-    if(a=get_tagged_string("XOUT_AZIMUTHS")) {
+    if((a=get_tagged_string("XOUT_AZIMUTHS"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	for(ii=0; ii < nt; ii += 3) {
@@ -870,7 +870,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 		   , difs->xout_azs[jj]->upper);
 	}
     }
-    if(a=get_tagged_string("XOUT_ELEVATIONS")) {
+    if((a=get_tagged_string("XOUT_ELEVATIONS"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	for(ii=0; ii < nt; ii += 3) {
@@ -881,7 +881,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 		   , difs->xout_els[jj]->upper);
 	}
     }
-    if(a=get_tagged_string("AZ_SECTORS")) {
+    if((a=get_tagged_string("AZ_SECTORS"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	for(ii=0; ii < nt; ii += 3) {
@@ -892,7 +892,7 @@ void dd_get_difs(struct dd_input_filters *difs)
 		   , difs->azs[jj]->upper);
 	}
     }
-    if(a=get_tagged_string("EL_SECTORS")) {
+    if((a=get_tagged_string("EL_SECTORS"))) {
 	strcpy(str, a);
 	nt = dd_tokens(str, str_ptrs);
 	for(ii=0; ii < nt; ii += 3) {
@@ -909,42 +909,42 @@ void dd_get_difs(struct dd_input_filters *difs)
 	      difs->min_free_MB = d;
     }
 # endif
-    if(a=get_tagged_string("SWEEP_SKIP")) {
+    if((a=get_tagged_string("SWEEP_SKIP"))) {
 	if((ii = atoi(a)) > 0) 
 	      difs->sweep_skip = ii+1;
     }
-    if(a=get_tagged_string("BEAM_SKIP")) {
+    if((a=get_tagged_string("BEAM_SKIP"))) {
 	if((ii = atoi(a)) > 0) 
 	      difs->beam_skip = ii+1;
     }
-    if(a=get_tagged_string("VOLUME_COUNT")) {
+    if((a=get_tagged_string("VOLUME_COUNT"))) {
 	if((ii = atoi(a)) > 0) 
 	      difs->max_vols = ii;
     }
-    if(a=get_tagged_string("SWEEP_COUNT")) {
+    if((a=get_tagged_string("SWEEP_COUNT"))) {
 	if((ii = atoi(a)) > 0) 
 	      difs->max_sweeps = ii;
     }
-    if(a=get_tagged_string("BEAM_COUNT")) {
+    if((a=get_tagged_string("BEAM_COUNT"))) {
 	if((ii = atoi(a)) > 0) 
 	      difs->max_beams = ii;
     }
-    if(a=get_tagged_string("RUN_TIME")) {
+    if((a=get_tagged_string("RUN_TIME"))) {
 	if((ii = atoi(a)) > 0) 
 	      difs->run_time = ii;
     }
-    if(a=get_tagged_string("COMPRESSION_SCHEME")) {
+    if((a=get_tagged_string("COMPRESSION_SCHEME"))) {
 	if(strstr(a, "HRD") || strstr(a, "RLE")) 
 	      difs->compression_scheme = HRD_COMPRESSION;
 	if(strstr(a, "RDP_8")) 
 	      difs->compression_scheme = RDP_8_BIT_COMPRESSION;
     }
-    if(a=get_tagged_string("OPTIONS")) {
+    if((a=get_tagged_string("OPTIONS"))) {
 	if(strstr(a,"ABSOLUTE_TIME")) {
 	    difs->abrupt_start_stop = YES;
 	}
     }
-    if(a=get_tagged_string("OUTPUT_FLAGS")) {
+    if((a=get_tagged_string("OUTPUT_FLAGS"))) {
 	if(strstr(a,"CATALOG_ONLY")) {
 	    difs->catalog_only = YES;
 	    dd_output_flag(NO);
@@ -1128,7 +1128,7 @@ struct dd_general_info *dd_ini(int rn, char *radar_name)
 # endif
 
 # ifdef NEW_ALLOC_SCHEME
-    if(dgi = MALLOC_S(struct dd_general_info))
+    if((dgi = MALLOC_S(struct dd_general_info)))
 	  memset(dgi, 0, sizeof(struct dd_general_info));
     else {
 	printf("Unable to malloc dgi struct for: %s %d\n"
@@ -1151,7 +1151,7 @@ struct dd_general_info *dd_ini(int rn, char *radar_name)
     dgi->sizeof_dgi = sizeof_dgi;
     dgi->radar_num = rn;
     str_terminate(dgi->radar_name, radar_name, 8 );
-    if(a=get_tagged_string("DORADE_DIR"))
+    if((a=get_tagged_string("DORADE_DIR")))
 	  slash_path(dgi->directory_name, a);
     difs = dd_return_difs_ptr();
     dgi->compression_scheme = difs->compression_scheme;
@@ -1242,7 +1242,7 @@ struct dd_general_info *dd_ini(int rn, char *radar_name)
     vold->format_version = 1;
     vold->maximum_bytes = MAX_REC_SIZE;
 
-    if(a=get_tagged_string("GEN_FACILITY")) {
+    if((a=get_tagged_string("GEN_FACILITY"))) {
 	  strncpy(vold->gen_facility, "         ", 8 );
 	  jj = strlen(a) > 8 ? 8 : strlen(a);
 	  strncpy(vold->gen_facility, a, jj);
@@ -1499,101 +1499,101 @@ void dd_input_strings(void)
     }
 # endif
 
-    if(a=getenv("A_SPECKLE")) {
+    if((a=getenv("A_SPECKLE"))) {
 	/* if a run of cells less than or equal to this
 	 * number is surrounded by bad flagged data,
 	 * the run is also bad flagged
 	 */
 	put_tagged_string("A_SPECKLE", a);
     }
-    if(a=getenv("AC_NETCDF_ALIASES")) {
+    if((a=getenv("AC_NETCDF_ALIASES"))) {
 	put_tagged_string("AC_NETCDF_ALIASES", a);
     }
-    if(a=getenv("AC_NETCDF_FILES")) {
+    if((a=getenv("AC_NETCDF_FILES"))) {
 	put_tagged_string("AC_NETCDF_FILES", a);
     }
-    if(a=getenv("AC_TIME_CORRECTION")) {
+    if((a=getenv("AC_TIME_CORRECTION"))) {
 	put_tagged_string("AC_TIME_CORRECTION", a);
     }
-    if(a=getenv("ADS_START_DATE")) {
+    if((a=getenv("ADS_START_DATE"))) {
 	put_tagged_string("ADS_START_DATE", a);
     }
-    if(a=getenv("ADS_IO_TYPE")) {
+    if((a=getenv("ADS_IO_TYPE"))) {
 	put_tagged_string("ADS_IO_TYPE", a);
     }
-    if(a=getenv("ADS_TAPES")) {
+    if((a=getenv("ADS_TAPES"))) {
 	/* Electra raw data tapes */
 	put_tagged_string("ADS_TAPES", a);
     }
-    if(a=getenv("AFT_ANGLE_LIMITS")) {
+    if((a=getenv("AFT_ANGLE_LIMITS"))) {
 	put_tagged_string("AFT_ANGLE_LIMITS", a);
     }
-    if(a=getenv("AFT_REFL_CORR")) {
+    if((a=getenv("AFT_REFL_CORR"))) {
 	put_tagged_string("AFT_REFL_CORR", a);
     }
-    if(a=getenv("ALTITUDE_LIMITS")) {
+    if((a=getenv("ALTITUDE_LIMITS"))) {
 	/* upper and lower limits for altitude clipping */
 	put_tagged_string("ALTITUDE_LIMITS", a);
     }
-    if(a=getenv("ASCENDING_ONLY")) {
+    if((a=getenv("ASCENDING_ONLY"))) {
 	/* rejects non-ascending fixed angles */
 	put_tagged_string("ASCENDING_ONLY", a);
     }
-    if(a=getenv("AZ_SECTORS")) {
+    if((a=getenv("AZ_SECTORS"))) {
 	put_tagged_string("AZ_SECTORS", a);
     }
-    if(a=getenv("BATCH_MODE")) {
+    if((a=getenv("BATCH_MODE"))) {
 	put_tagged_string("BATCH_MODE", a);
     }
-    if(a=getenv("BEAM_COUNT")) {
+    if((a=getenv("BEAM_COUNT"))) {
 	/* stop after reading this number of beams */
 	put_tagged_string("BEAM_COUNT", a);
     }
-    if(a=getenv("BEAM_SKIP")) {
+    if((a=getenv("BEAM_SKIP"))) {
 	/* only for ELDORA */
 	put_tagged_string("BEAM_SKIP", a);
     }
-    if(a=getenv("BIAS")) {
+    if((a=getenv("BIAS"))) {
 	put_tagged_string("BIAS", a);
     }
-    if(a=getenv("CAPPI_HEIGHT")) {
+    if((a=getenv("CAPPI_HEIGHT"))) {
 	/* altitude msl in meters of the cappi plane */
 	put_tagged_string("CAPPI_HEIGHT",a);
     }
-    if(a=getenv("CAPPI_LATITUDES")) {
+    if((a=getenv("CAPPI_LATITUDES"))) {
 	put_tagged_string("CAPPI_LATITUDES", a);
     }
-    if(a=getenv("CAPPI_LEVELS")) {
+    if((a=getenv("CAPPI_LEVELS"))) {
 	put_tagged_string("CAPPI_LEVELS", a);
     }
-    if(a=getenv("CAPPI_LONGITUDES")) {
+    if((a=getenv("CAPPI_LONGITUDES"))) {
 	put_tagged_string("CAPPI_LONGITUDES", a);
     }
-    if(a=getenv("CAPPI_RADAR")) {
+    if((a=getenv("CAPPI_RADAR"))) {
 	put_tagged_string("CAPPI_RADAR", a);
     }
-    if(a=getenv("CAPPI_TIMES")) {
+    if((a=getenv("CAPPI_TIMES"))) {
 	put_tagged_string("CAPPI_TIMES", a);
     }
-    if(a=getenv("CAPPI_RANGE_RES")) { /* resolution in meters */
+    if((a=getenv("CAPPI_RANGE_RES"))) { /* resolution in meters */
 	put_tagged_string("CAPPI_RANGE_RES",a);
     }
-    if(a=getenv("CAPPI_REFL")) { /* source field name */
+    if((a=getenv("CAPPI_REFL"))) { /* source field name */
 	put_tagged_string("CAPPI_REFL",a);
     }
-    if(a=getenv("CAPPI_RESOLUTION")) {
+    if((a=getenv("CAPPI_RESOLUTION"))) {
 	put_tagged_string("CAPPI_RESOLUTION", a);
     }
-    if(a=getenv("CAPPI_VEL")) {
+    if((a=getenv("CAPPI_VEL"))) {
 	put_tagged_string("CAPPI_VEL",a);
     }
-    if(a=getenv("CAPPI_X_AXIS")) {
+    if((a=getenv("CAPPI_X_AXIS"))) {
 	put_tagged_string("CAPPI_X_AXIS", a);
     }
-    if(a=getenv("CAPPI_Y_AXIS")) {
+    if((a=getenv("CAPPI_Y_AXIS"))) {
 	put_tagged_string("CAPPI_Y_AXIS", a);
     }
-    if(a=getenv("CATALOG_FLUSH_COUNT")) {
+    if((a=getenv("CATALOG_FLUSH_COUNT"))) {
 	/* the catalog routine writes the info for a volume when
 	 * it is complete but Unix may not actually write to the disk
 	 * this option forces a disk write if the number of scans
@@ -1601,38 +1601,38 @@ void dd_input_strings(void)
 	 */
 	put_tagged_string("CATALOG_FLUSH_COUNT",a);
     }
-    if(a=getenv("CATALOG_SWEEP_SUMMARY")) {
+    if((a=getenv("CATALOG_SWEEP_SUMMARY"))) {
 	/* causes catalog scan info to cover at least the time span
 	 * in seconds if it's aircraft data
 	 * otherwise there is one catalog entry per scan
 	 */
 	put_tagged_string("CATALOG_SWEEP_SUMMARY",a);
     }
-    if(a=getenv("CELL_VECTOR_BIAS")) {
+    if((a=getenv("CELL_VECTOR_BIAS"))) {
 	/* the value in meters that will be subtracted from
 	 * each of the dist_cells
 	 */
 	put_tagged_string("CELL_VECTOR_BIAS",a);
     }
-    if(a=getenv("CFAC_FILES")) {
+    if((a=getenv("CFAC_FILES"))) {
 	put_tagged_string("CFAC_FILES", a);
     }
-    if( a=getenv("CFAC_FILE")) {
+    if( (a=getenv("CFAC_FILE"))) {
 	put_tagged_string("CFAC_FILES", a);
     }
-    if(a=getenv("ELD_CFAC_FILES")) {
+    if((a=getenv("ELD_CFAC_FILES"))) {
       put_tagged_string("ELD_CFAC_FILES", a);
     }
-    if(a=getenv("ELD_CFAC_FILE")) {
+    if((a=getenv("ELD_CFAC_FILE"))) {
 	put_tagged_string("ELD_CFAC_FILES", a);
     }
-    if(a=getenv("COMPRESSION_SCHEME")) {
+    if((a=getenv("COMPRESSION_SCHEME"))) {
 	put_tagged_string("COMPRESSION_SCHEME",a);
     }
-    if(a=getenv("DAP_HEADER_FILE")) {
+    if((a=getenv("DAP_HEADER_FILE"))) {
 	put_tagged_string("DAP_HEADER_FILE", a);
     }
-    if(a=getenv("DAP_DATA_FILE")) {
+    if((a=getenv("DAP_DATA_FILE"))) {
 	put_tagged_string("DAP_DATA_FILE", a);
     }
     if((a=getenv("DD_DIR")) || (a=getenv("DORADE_DIR"))) {
@@ -1642,16 +1642,16 @@ void dd_input_strings(void)
 	put_tagged_string("DORADE_DIR", a);
 	put_tagged_string("DD_DIR", a);
     }
-    if(a=getenv("DERIVED_FIELDS")) {
+    if((a=getenv("DERIVED_FIELDS"))) {
 	put_tagged_string("DERIVED_FIELDS", a);
     }
-    if(a=getenv("DORADE_DEV")) {
+    if((a=getenv("DORADE_DEV"))) {
 	/* the device name if not a standard named file
 	 * to which DORADE tape format data is written
 	 */
 	put_tagged_string("DORADE_DEV",a);
     }
-    if(a=getenv("DORADE_IO_TYPE")) {
+    if((a=getenv("DORADE_IO_TYPE"))) {
 	/* io types include PHYSICAL_TAPE, BINARY_IO, and
 	 * FB_IO which stands for fortran-binary io
 	 * which are the kind files understood by todisk
@@ -1659,284 +1659,284 @@ void dd_input_strings(void)
 	 */
 	put_tagged_string("DORADE_IO_TYPE",a);
     }
-    if(a=getenv("DORADE_VOLUME_INTERVAL")) {
+    if((a=getenv("DORADE_VOLUME_INTERVAL"))) {
 	/* specifies the maximum time in seconds that
 	 * a DORADE volume can span
 	 */
 	put_tagged_string("DORADE_VOLUME_INTERVAL", a);
     }
-    if(a=getenv("DRIFT_REFERENCE_TIME")) {
+    if((a=getenv("DRIFT_REFERENCE_TIME"))) {
 	put_tagged_string("DRIFT_REFERENCE_TIME", a);
     }
-    if(a=getenv("EL_SECTORS")) {
+    if((a=getenv("EL_SECTORS"))) {
 	put_tagged_string("EL_SECTORS", a);
     }
-    if(a=getenv("ELDORA_VOLUME_HEADER")) {
+    if((a=getenv("ELDORA_VOLUME_HEADER"))) {
 	/* specifies the complete file name of a surrogate
 	 * volume header record
 	 */
 	put_tagged_string("ELDORA_VOLUME_HEADER",a);
     }
-    if(a=getenv("FIRST_GOOD_GATE")) {
+    if((a=getenv("FIRST_GOOD_GATE"))) {
 	/* causes bad flags to be inserted in the first n gates
 	 * during the thresholding process
 	 */
 	put_tagged_string("FIRST_GOOD_GATE", a);
     }
-    if(a=getenv("FIXED_ANGLES")) {
+    if((a=getenv("FIXED_ANGLES"))) {
 	/* specified as "lower < upper"
 	 * if only one number is present it is considered as lower
 	 * and upper becomes a very large number
 	 */
 	put_tagged_string("FIXED_ANGLES", a);
     }
-    if(a=getenv("FLIGHT_ID")) {
+    if((a=getenv("FLIGHT_ID"))) {
 	put_tagged_string("FLIGHT_ID", a);
     }
-    if(a=getenv("FOF_OUTPUT_FIELDS")) {
+    if((a=getenv("FOF_OUTPUT_FIELDS"))) {
 	put_tagged_string("FOF_OUTPUT_FIELDS", a);
     }
-    if(a=getenv("FOF_OMIT_TRANSITIONS")) {
+    if((a=getenv("FOF_OMIT_TRANSITIONS"))) {
 	put_tagged_string("FOF_OMIT_TRANSITIONS", a);
     }
-    if(a=getenv("FOLD_SHEAR")) {
+    if((a=getenv("FOLD_SHEAR"))) {
 	/* triggers an unfold if the shear is greater
 	 * than this number
 	 */
 	put_tagged_string("FOLD_SHEAR", a);
     }
-    if(a=getenv("FORE_ANGLE_LIMITS")) {
+    if((a=getenv("FORE_ANGLE_LIMITS"))) {
 	put_tagged_string("FORE_ANGLE_LIMITS", a);
     }
-    if(a=getenv("FORE_REFL_CORR")) {
+    if((a=getenv("FORE_REFL_CORR"))) {
 	put_tagged_string("FORE_REFL_CORR", a);
     }
-    if(a=getenv("GECHO_MAX_ROT_ANGLE")) { /* in degrees */
+    if((a=getenv("GECHO_MAX_ROT_ANGLE"))) { /* in degrees */
 	put_tagged_string("GECHO_MAX_ROT_ANGLE", a);
     }
-    if(a=getenv("GECHO_MIN_GATES")) {
+    if((a=getenv("GECHO_MIN_GATES"))) {
 	/* the ground echo program should always produce
 	 * at least this number of gates per beam
 	 */
 	put_tagged_string("GECHO_MIN_GATES", a);
     }
-    if(a=getenv("GECHO_MIN_ROT_ANGLE")) {
+    if((a=getenv("GECHO_MIN_ROT_ANGLE"))) {
 	put_tagged_string("GECHO_MIN_ROT_ANGLE", a);
     }
-    if(a=getenv("GECHO_MSL")) {
+    if((a=getenv("GECHO_MSL"))) {
 	put_tagged_string("GECHO_MSL", a);
     }
-    if(a=getenv("GECHO_REFL")) {
+    if((a=getenv("GECHO_REFL"))) {
 	put_tagged_string("GECHO_REFL",a);
     }
-    if(a=getenv("GECHO_VEL")) {
+    if((a=getenv("GECHO_VEL"))) {
 	put_tagged_string("GECHO_VEL",a);
     }
-    if(a=getenv("GENERATE_SUBSECOND_TIMES")) {
+    if((a=getenv("GENERATE_SUBSECOND_TIMES"))) {
 	put_tagged_string("GENERATE_SUBSECOND_TIMES", a);
     }
-    if(a=getenv("GENERATE_THRESHOLDED_FIELDS")) {
+    if((a=getenv("GENERATE_THRESHOLDED_FIELDS"))) {
 	put_tagged_string("GENERATE_THRESHOLDED_FIELDS",a);
     }
-    if(a=getenv("GPRO_TAPES")) {
+    if((a=getenv("GPRO_TAPES"))) {
 	put_tagged_string("GPRO_TAPES", a);
     }
-    if(a=getenv("HRD_ASCII_TAPE")) {
+    if((a=getenv("HRD_ASCII_TAPE"))) {
 	put_tagged_string("HRD_ASCII_TAPE", a);
     }
-    if(a=getenv("HRD_IO_TYPE")) {
+    if((a=getenv("HRD_IO_TYPE"))) {
 	put_tagged_string("HRD_IO_TYPE", a);
     }
-    if(a=getenv("HRD_RANGE_DELAY")) {
+    if((a=getenv("HRD_RANGE_DELAY"))) {
 	/* the number of gates to throw away
 	 * at the beginning of the beam
 	 */
 	put_tagged_string("HRD_RANGE_DELAY",a);
     }
-    if(a=getenv("HRD_STD_TAPE")) {
+    if((a=getenv("HRD_STD_TAPE"))) {
 	put_tagged_string("HRD_STD_TAPE", a);
     }
-    if(a=getenv("HRD_VOLUME_HEADER")) {
+    if((a=getenv("HRD_VOLUME_HEADER"))) {
 	/* specifies the complete file name of a surrogate
 	 * volume header record
 	 */
 	put_tagged_string("HRD_VOLUME_HEADER",a);
     }
-    if(a=getenv("IMPROVE_HZO_RCONST_CORR")) {
+    if((a=getenv("IMPROVE_HZO_RCONST_CORR"))) {
 	put_tagged_string("IMPROVE_HZO_RCONST_CORR", a);
     }
-    if(a=getenv("INCLUDE_DH_DP")) {
+    if((a=getenv("INCLUDE_DH_DP"))) {
 	put_tagged_string("INCLUDE_DH_DP", a);
     }
-    if(a=getenv("INPUT_FORMAT")) {
+    if((a=getenv("INPUT_FORMAT"))) {
 	put_tagged_string("INPUT_FORMAT", a);
     }
-    if(a=getenv("INPUT_FILES_LIST")) {
+    if((a=getenv("INPUT_FILES_LIST"))) {
 	put_tagged_string("INPUT_FILES_LIST", a);
     }
-    if(a=getenv("INTERLEAVE")) {
+    if((a=getenv("INTERLEAVE"))) {
 	put_tagged_string("INTERLEAVE", a);
     }
-    if(a=getenv("IO_TYPE")) {	/* see DORADE_IO_TYPE */
+    if((a=getenv("IO_TYPE"))) {	/* see DORADE_IO_TYPE */
 	put_tagged_string("IO_TYPE", a);
     }
-    if(a=getenv("JULIAN_DAY_BIAS")) {
+    if((a=getenv("JULIAN_DAY_BIAS"))) {
 	/* the number of days that will be subtracted from the
 	 * julian day in the ray info descriptor
 	 */
 	put_tagged_string("JULIAN_DAY_BIAS", a);
     }
-    if(a=getenv("KEEP_ORTHOG0NAL_DATA")) {
+    if((a=getenv("KEEP_ORTHOG0NAL_DATA"))) {
 	put_tagged_string("KEEP_ORTHOG0NAL_DATA", a);
     }
-    if(a=getenv("LIDAR_AVERAGING")) {
+    if((a=getenv("LIDAR_AVERAGING"))) {
 	put_tagged_string("LIDAR_AVERAGING", a);
     }
-    if(a=getenv("LIDAR_CELL_SPACING")) {
+    if((a=getenv("LIDAR_CELL_SPACING"))) {
 	put_tagged_string("LIDAR_CELL_SPACING", a);
     }
-    if(a=getenv("LIDAR_OPTIONS")) {
+    if((a=getenv("LIDAR_OPTIONS"))) {
 	put_tagged_string("LIDAR_OPTIONS", a);
     }
-    if(a=getenv("LIDAR_SWEEP_TIME_LIMIT")) {
+    if((a=getenv("LIDAR_SWEEP_TIME_LIMIT"))) {
 	put_tagged_string("LIDAR_SWEEP_TIME_LIMIT", a);
     }
-    if(a=getenv("LINES_IN_WINDOW")) {
+    if((a=getenv("LINES_IN_WINDOW"))) {
 	put_tagged_string("LINES_IN_WINDOW", a);
     }
-    if(a=getenv("MAX_DORADE_TAPE_SIZE")) {
+    if((a=getenv("MAX_DORADE_TAPE_SIZE"))) {
 	put_tagged_string("MAX_DORADE_TAPE_SIZE", a); /* in GB */
     }
     if((a=getenv("MAX_MEDIA_SIZE"))) {
 	/* in MB */
 	put_tagged_string("MAX_MEDIA_SIZE", a);
     }
-    if(a=getenv("MAX_NOTCH_VELOCITY")) {
+    if((a=getenv("MAX_NOTCH_VELOCITY"))) {
 	/* The maximum (in m/s) that a notch velocity
 	 * can attain
 	 */
 	put_tagged_string("MAX_NOTCH_VELOCITY", a);
     }
-    if(a=getenv("MAX_RAYS_PER_SWEEP")) {
+    if((a=getenv("MAX_RAYS_PER_SWEEP"))) {
 	put_tagged_string("MAX_RAYS_PER_SWEEP", a);
     }
-    if(a=getenv("MAX_RHI_DIFF")) {
+    if((a=getenv("MAX_RHI_DIFF"))) {
 	put_tagged_string("MAX_RHI_DIFF", a);
     }
-    if(a=getenv("MAX_SWEEPS_PER_VOLUME")) {
+    if((a=getenv("MAX_SWEEPS_PER_VOLUME"))) {
 	put_tagged_string("MAX_SWEEPS_PER_VOLUME", a);
     }
-    if(a=getenv("MAX_UF_CELLS")) {
+    if((a=getenv("MAX_UF_CELLS"))) {
 	/* fixes the number of uf range bins at some max value */
 	put_tagged_string("MAX_UF_CELLS", a);
     }
-    if(a=getenv("MAX_VOLUME_SIZE")) {
+    if((a=getenv("MAX_VOLUME_SIZE"))) {
 	/* in MagaBytes
 	 * DORADE volume must only slightly exceed this size
 	 */
 	put_tagged_string("MAX_VOLUME_SIZE", a);
     }
-    if(a=getenv("MAX_WIND")) {
+    if((a=getenv("MAX_WIND"))) {
 	put_tagged_string("MAX_WIND", a);
     }
-    if(a=getenv("MAX_AZ_DIFF")) {
+    if((a=getenv("MAX_AZ_DIFF"))) {
 	put_tagged_string("MAX_AZ_DIFF", a);
     }
-    if(a=getenv("MC_DATA")) {
+    if((a=getenv("MC_DATA"))) {
 	put_tagged_string("MC_DATA", a);
     }
-    if(a=getenv("MIN_AZ_DIFF")) {
+    if((a=getenv("MIN_AZ_DIFF"))) {
 	put_tagged_string("MIN_AZ_DIFF", a);
     }
-    if(a=getenv("MIN_BAD_COUNT")) {
+    if((a=getenv("MIN_BAD_COUNT"))) {
 	/* In some cases is used to stop an algorithm
 	 * after more than n consecutive bad cells
 	 */
 	put_tagged_string("MIN_BAD_COUNT", a);
     }
-    if(a=getenv("MIN_EL_DIFF")) {
+    if((a=getenv("MIN_EL_DIFF"))) {
 	put_tagged_string("MIN_EL_DIFF", a);
     }
-    if(a=getenv("MIN_FXD_DIFF")) {
+    if((a=getenv("MIN_FXD_DIFF"))) {
 	put_tagged_string("MIN_FXD_DIFF", a);
     }
-    if(a=getenv("MIN_FREE_MB")) {
+    if((a=getenv("MIN_FREE_MB"))) {
 	/* stops creating new sweep files when free space on disk
 	 * drops below this value
 	 */
 	put_tagged_string("MIN_FREE_MB", a);
     }
-    if(a=getenv("MIN_RAYS_PER_SWEEP")) {
+    if((a=getenv("MIN_RAYS_PER_SWEEP"))) {
 	put_tagged_string("MIN_RAYS_PER_SWEEP", a);
     }
-    if(a=getenv("MIN_SWEEPS_PER_VOLUME")) {
+    if((a=getenv("MIN_SWEEPS_PER_VOLUME"))) {
 	put_tagged_string("MIN_SWEEPS_PER_VOLUME", a);
     }
-    if(a=getenv("MIN_TIME_GAP")) {
+    if((a=getenv("MIN_TIME_GAP"))) {
 	/* In some cases is used to start a new volume
 	 * after more than n seconds of missing data
 	 */
 	put_tagged_string("MIN_TIME_GAP", a);
     }
-    if(a=getenv("MIN_VOLUME_TIME_SPAN")) {
+    if((a=getenv("MIN_VOLUME_TIME_SPAN"))) {
 	/* in seconds
 	 * DORADE volume must be a least this long
 	 */
 	put_tagged_string("MIN_VOLUME_TIME_SPAN", a);
     }
-    if(a=getenv("MRD_DZ_FIELD")) {
+    if((a=getenv("MRD_DZ_FIELD"))) {
 	put_tagged_string("MRD_DZ_FIELD", a);
     }
-    if(a=getenv("MRD_MAX_RANGE")) {
+    if((a=getenv("MRD_MAX_RANGE"))) {
 	put_tagged_string("MRD_MAX_RANGE", a);
     }
-    if(a=getenv("MRD_VE_FIELD")) {
+    if((a=getenv("MRD_VE_FIELD"))) {
 	put_tagged_string("MRD_VE_FIELD", a);
     }
     if((a=getenv("NETCDF_DIRECTORY")) || (a=getenv("NC_DIR"))) {
 	put_tagged_string("NC_DIR", a);
     }
-    if(a=getenv("NETCDF_FIELDS")) {
+    if((a=getenv("NETCDF_FIELDS"))) {
 	put_tagged_string("NETCDF_FIELDS", a);
     }
-    if(a=getenv("NEW_SWEEP_FLAGS")) {
+    if((a=getenv("NEW_SWEEP_FLAGS"))) {
 	put_tagged_string("NEW_SWEEP_FLAGS", a);
     }
-    if(a=getenv("NOTCH_SHEAR")) {
+    if((a=getenv("NOTCH_SHEAR"))) {
 	/* triggers denotching if the shear is greater
 	 * than this number
 	 */
 	put_tagged_string("NOTCH_SHEAR", a);
     }
-    if(a=getenv("NCP_THRESHOLD_VAL")) {
+    if((a=getenv("NCP_THRESHOLD_VAL"))) {
 	put_tagged_string("NCP_THRESHOLD_VAL", a);
     }
-    if(a=getenv("NEW_SWEEP_HESITATION")) {
+    if((a=getenv("NEW_SWEEP_HESITATION"))) {
 	put_tagged_string("NEW_SWEEP_HESITATION", a);
     }
-    if(a=getenv("NO_WIND_INFO")) {
+    if((a=getenv("NO_WIND_INFO"))) {
 	/* do not use wind info in unfolding */
 	put_tagged_string("NO_WIND_INFO", a);
     }
-    if(a=getenv("NUM_AZ_DIFFS_AVGD")) {
+    if((a=getenv("NUM_AZ_DIFFS_AVGD"))) {
 	put_tagged_string("NUM_AZ_DIFFS_AVGD", a);
     }
-    if(a=getenv("NUM_EL_DIFFS_AVGD")) {
+    if((a=getenv("NUM_EL_DIFFS_AVGD"))) {
 	put_tagged_string("NUM_EL_DIFFS_AVGD", a);
     }
-    if(a=getenv("NUM_SHORT_AVG")) {
+    if((a=getenv("NUM_SHORT_AVG"))) {
 	put_tagged_string("NUM_SHORT_AVG", a);
     }
-    if(a=getenv("NYQUIST_VELOCITY")) {
+    if((a=getenv("NYQUIST_VELOCITY"))) {
 	put_tagged_string("NYQUIST_VELOCITY", a);
     }
-    if(a=getenv("OPTIONS")) {
+    if((a=getenv("OPTIONS"))) {
 	put_tagged_string("OPTIONS", a);
     }
-    if(a=getenv("OUTPUT_FIELDS")) {
+    if((a=getenv("OUTPUT_FIELDS"))) {
 	put_tagged_string("OUTPUT_FIELDS", a);
     }
-    if(a=getenv("OUTPUT_FLAGS")) {
+    if((a=getenv("OUTPUT_FLAGS"))) {
 	/* recognized strings/flags are:
 	 * "NO_CATALOG" default is to produce a catalot
 	 * "NO_SWEEP_FILES" default is to produce sweep files
@@ -1948,122 +1948,122 @@ void dd_input_strings(void)
 	 */
 	put_tagged_string("OUTPUT_FLAGS", a);
     }
-    if(a=getenv("PCT_STATS")) {
+    if((a=getenv("PCT_STATS"))) {
 	put_tagged_string("PCT_STATS", a);
     }
-    if(a=getenv("PHASE_OFFSET")) {
+    if((a=getenv("PHASE_OFFSET"))) {
 	put_tagged_string("PHASE_OFFSET", a);
     }
-    if(a=getenv("PPI_EL_TOL")) {
+    if((a=getenv("PPI_EL_TOL"))) {
 	put_tagged_string("PPI_EL_TOL", a);
     }
-    if(a=getenv("RHI_AZ_TOL")) {
+    if((a=getenv("RHI_AZ_TOL"))) {
 	put_tagged_string("RHI_AZ_TOL", a);
     }
-    if(a=getenv("ZDR_OFFSET")) {
+    if((a=getenv("ZDR_OFFSET"))) {
 	put_tagged_string("ZDR_OFFSET", a);
     }
-    if(a=getenv("PIRAQ_FORCE_POLYPP")) {
+    if((a=getenv("PIRAQ_FORCE_POLYPP"))) {
 	put_tagged_string("PIRAQ_FORCE_POLYPP", a);
     }
-    if(a=getenv("PRESERVE_SWEEP_FILES")) {
+    if((a=getenv("PRESERVE_SWEEP_FILES"))) {
 	/* prevents DORADE tape output routine from
 	 * deleting used up sweep files
 	 */
 	put_tagged_string("PRESERVE_SWEEP_FILES", a);
     }
-    if(a=getenv("PRF_LIMITS")) { /* see fixed angle */
+    if((a=getenv("PRF_LIMITS"))) { /* see fixed angle */
 	put_tagged_string("PRF_LIMITS", a);
     }
-    if(a=getenv("PROJECT_NAME")) {
+    if((a=getenv("PROJECT_NAME"))) {
 	put_tagged_string("PROJECT_NAME", a);
     }
-    if(a=getenv("PWR_THRESHOLD_VAL")) {
+    if((a=getenv("PWR_THRESHOLD_VAL"))) {
 	put_tagged_string("PWR_THRESHOLD_VAL", a);
     }
-    if(a=getenv("RADAR_ALTITUDE")) {
+    if((a=getenv("RADAR_ALTITUDE"))) {
 	put_tagged_string("RADAR_ALTITUDE", a);
     }
-    if(a=getenv("RCONST_CORRECTION")) {
+    if((a=getenv("RCONST_CORRECTION"))) {
 	put_tagged_string("RCONST_CORRECTION", a);
     }
-    if(a=getenv("RADAR_LATITUDE")) {
+    if((a=getenv("RADAR_LATITUDE"))) {
 	put_tagged_string("RADAR_LATITUDE", a);
     }
-    if(a=getenv("RADAR_LONGITUDE")) {
+    if((a=getenv("RADAR_LONGITUDE"))) {
 	put_tagged_string("RADAR_LONGITUDE", a);
     }
-    if(a=getenv("RADAR_WAVELENGTH")) {
+    if((a=getenv("RADAR_WAVELENGTH"))) {
 	put_tagged_string("RADAR_WAVELENGTH", a);
     }
-    if(a=getenv("RANGE_CORRECTION")) {
+    if((a=getenv("RANGE_CORRECTION"))) {
 	put_tagged_string("RANGE_CORRECTION", a);
     }
-    if(a=getenv("RANGE_DELAY")) {
+    if((a=getenv("RANGE_DELAY"))) {
 	/* the number of gates to throw away
 	 * at the beginning of the beam
 	 */
 	put_tagged_string("RANGE_DELAY",a);
     }
-    if(a=getenv("RADAR_NAME")) {
+    if((a=getenv("RADAR_NAME"))) {
 	put_tagged_string("RADAR_NAME", a);
     }
-    if(a=getenv("RANGE_LIMITS")) {
+    if((a=getenv("RANGE_LIMITS"))) {
 	put_tagged_string("RANGE_LIMITS", a);
     }
-    if(a=getenv("RENAME")) {
+    if((a=getenv("RENAME"))) {
 	put_tagged_string("RENAME", a);
     }
-    if(a=getenv("ROTATION_ANGLE_TOLERANCE")) {
+    if((a=getenv("ROTATION_ANGLE_TOLERANCE"))) {
 	put_tagged_string("ROTATION_ANGLE_TOLERANCE", a);
     }
-    if(a=getenv("SCAN_LIST")) {
+    if((a=getenv("SCAN_LIST"))) {
 	put_tagged_string("SCAN_LIST", a);
     }
     if((a=getenv("SELECT_RADAR")) || (a=getenv("SELECT_RADARS"))) {
 	put_tagged_string("SELECT_RADARS", a);
     }
-    if(a=getenv("SHANES_DATA_FIELDS")) {
+    if((a=getenv("SHANES_DATA_FIELDS"))) {
 	put_tagged_string("SHANES_DATA_FIELDS", a);
     }
-    if(a=getenv("SHANES_DIRECTORY")) {
+    if((a=getenv("SHANES_DIRECTORY"))) {
 	put_tagged_string("SHANES_DIRECTORY", a);
     }
-    if(a=getenv("SITE_NAME")) {
+    if((a=getenv("SITE_NAME"))) {
 	put_tagged_string("SITE_NAME", a);
     }
-    if(a=getenv("SIDELOBE_RING")) {
+    if((a=getenv("SIDELOBE_RING"))) {
 	put_tagged_string("SIDELOBE_RING", a);
     }
-    if(a=getenv("SNR_THRESHOLD_VAL")) {
+    if((a=getenv("SNR_THRESHOLD_VAL"))) {
 	put_tagged_string("SNR_THRESHOLD_VAL", a);
     }
-    if(a=getenv("SOURCE_DEV")) {
+    if((a=getenv("SOURCE_DEV"))) {
 	/* the device or file name
 	 */
 	put_tagged_string("SOURCE_DEV",a);
     }
-    if(a=getenv("SOURCE_FILE")) {
+    if((a=getenv("SOURCE_FILE"))) {
 	/* names the input file/device */
 	put_tagged_string("SOURCE_FILE", a);
     }
-    if(a=getenv("SOURCE_TAPE_ID")) {
+    if((a=getenv("SOURCE_TAPE_ID"))) {
 	/* goes into the catalog as the source tape id */
 	put_tagged_string("SOURCE_TAPE_ID", a);
     }
-    if(a=getenv("START_RANGE")) {
+    if((a=getenv("START_RANGE"))) {
 	put_tagged_string("START_RANGE", a);
     }
-    if(a=getenv("STOP_RANGE")) {
+    if((a=getenv("STOP_RANGE"))) {
 	put_tagged_string("STOP_RANGE", a);
     }
-    if(a=getenv("STORM_NAME")) {
+    if((a=getenv("STORM_NAME"))) {
 	put_tagged_string("STORM_NAME", a);
     }
-    if(a=getenv("SW_THRESHOLD_VAL")) {
+    if((a=getenv("SW_THRESHOLD_VAL"))) {
 	put_tagged_string("SW_THRESHOLD_VAL", a);
     }
-    if(a=getenv("SWEEP_COUNT")) {
+    if((a=getenv("SWEEP_COUNT"))) {
 	/* stops input after reading n sweeps */
 	put_tagged_string("SWEEP_COUNT", a);
     }
@@ -2071,50 +2071,50 @@ void dd_input_strings(void)
 	/* filters on sweep modes such as "PPI", "AIR", etc. */
 	put_tagged_string("SWEEP_MODES", a);
     }
-    if(a=getenv("SWEEP_SKIP")) {
+    if((a=getenv("SWEEP_SKIP"))) {
 	/* uses every nth sweep of a particular radar */
 	put_tagged_string("SWEEP_SKIP", a);
     }
-    if(a=getenv("SWEEP_TIME_TOLERANCE")) {
+    if((a=getenv("SWEEP_TIME_TOLERANCE"))) {
 	put_tagged_string("SWEEP_TIME_TOLERANCE", a);
     }
-    if(a=getenv("SWEEP_TRIP_ANGLE")) {
+    if((a=getenv("SWEEP_TRIP_ANGLE"))) {
 	put_tagged_string("SWEEP_TRIP_ANGLE", a);
     }
-    if(a=getenv("SWEEP_TRIP_DELTA")) {
+    if((a=getenv("SWEEP_TRIP_DELTA"))) {
 	put_tagged_string("SWEEP_TRIP_DELTA", a);
     }
-    if(a=getenv("TAPE_DIR")) {
+    if((a=getenv("TAPE_DIR"))) {
 	put_tagged_string("TAPE_DIR", a);
     }
-    if(a=getenv("TEST_PULSE_RANGES")) {
+    if((a=getenv("TEST_PULSE_RANGES"))) {
 	put_tagged_string("TEST_PULSE_RANGES", a);
     }
-    if(a=getenv("TIME_CORRECTION")) {
+    if((a=getenv("TIME_CORRECTION"))) {
 	put_tagged_string("TIME_CORRECTION", a);
     }
-    if(a=getenv("TIME_DEFINED_VOLUMES")) {
+    if((a=getenv("TIME_DEFINED_VOLUMES"))) {
 	put_tagged_string("TIME_DEFINED_VOLUMES", a);
     }
-    if(a=getenv("TIME_DEPENDENT_FIXES")) {
+    if((a=getenv("TIME_DEPENDENT_FIXES"))) {
 	put_tagged_string("TIME_DEPENDENT_FIXES", a);
     }
-    if(a=getenv("TIME_LIMITS")) {
+    if((a=getenv("TIME_LIMITS"))) {
 	/* one or more sets of limits of the form
 	 * "02/04/93:22:14:13 < 02/04/93:22:21:18"
 	 */
 	put_tagged_string("TIME_LIMITS", a);
     }
-    if(a=getenv("TIME_DRIFT")) {
+    if((a=getenv("TIME_DRIFT"))) {
 	put_tagged_string("TIME_DRIFT", a);
     }
-    if(a=getenv("TOLERANCE_LEVEL_1")) {
+    if((a=getenv("TOLERANCE_LEVEL_1"))) {
 	put_tagged_string("TOLERANCE_LEVEL_1", a);
     }
-    if(a=getenv("TOLERANCE_LEVEL_2")) {
+    if((a=getenv("TOLERANCE_LEVEL_2"))) {
 	put_tagged_string("TOLERANCE_LEVEL_2", a);
     }
-    if(a=getenv("UF_ALIASES")) {
+    if((a=getenv("UF_ALIASES"))) {
 	put_tagged_string("UF_ALIASES", a);
     }
     if((a=getenv("UF_DEV")) || (a=getenv("UF_DEVS"))) {
@@ -2123,52 +2123,52 @@ void dd_input_strings(void)
 	 */
 	put_tagged_string("UF_DEV",a);
     }
-    if(a=getenv("UF_DIRECTORY")) {
+    if((a=getenv("UF_DIRECTORY"))) {
 	/* destination of uf files */
 	put_tagged_string("UF_DIRECTORY", a);
     }
-    if(a=getenv("UF_IO_TYPE")) { /* see dorade io type */
+    if((a=getenv("UF_IO_TYPE"))) { /* see dorade io type */
 	put_tagged_string("UF_IO_TYPE",a);
     }
-    if(a=getenv("UF_OUTPUT_FIELDS")) {
+    if((a=getenv("UF_OUTPUT_FIELDS"))) {
 	put_tagged_string("UF_OUTPUT_FIELDS", a);
     }
-    if(a=getenv("UNFOLD_QUE_SIZE")) {
+    if((a=getenv("UNFOLD_QUE_SIZE"))) {
 	/* defines the number of cells that determine
 	 * a non-shear run and the number of cells
 	 * averaged for unfolding
 	 */
 	put_tagged_string("UNFOLD_QUE_SIZE", a);
     }
-    if(a=getenv("UNIFORM_CELL_SPACING")) {
+    if((a=getenv("UNIFORM_CELL_SPACING"))) {
 	put_tagged_string("UNIFORM_CELL_SPACING", a);
     }
-    if(a=getenv("VOLUME_COUNT")) {
+    if((a=getenv("VOLUME_COUNT"))) {
 	/* stops input after reading n volumes */
 	put_tagged_string("VOLUME_COUNT", a);
     }
-    if(a=getenv("VOLUME_HEADER")) {
+    if((a=getenv("VOLUME_HEADER"))) {
 	/* specifies the complete file name of a surrogate
 	 * volume header record
 	 */
 	put_tagged_string("VOLUME_HEADER",a);
     }
-    if(a=getenv("XOUT_AZIMUTHS")) {
+    if((a=getenv("XOUT_AZIMUTHS"))) {
 	put_tagged_string("XOUT_AZIMUTHS", a);
     }
-    if(a=getenv("XOUT_ELEVATIONS")) {
+    if((a=getenv("XOUT_ELEVATIONS"))) {
 	put_tagged_string("XOUT_ELEVATIONS", a);
     }
-    if(a=getenv("WSR_QC_FILE")) {
+    if((a=getenv("WSR_QC_FILE"))) {
 	put_tagged_string("WSR_QC_FILE", a);
     }
-    if(a=getenv("WATCH_FIXED_ANGLE")) {
+    if((a=getenv("WATCH_FIXED_ANGLE"))) {
 	put_tagged_string("WATCH_FIXED_ANGLE", a);
     }
-    if(a=getenv("YEAR_OF_DATA")) {
+    if((a=getenv("YEAR_OF_DATA"))) {
 	put_tagged_string("YEAR_OF_DATA", a);
     }
-    if(a=getenv("ZDR_BIAS")) {
+    if((a=getenv("ZDR_BIAS"))) {
 	put_tagged_string("ZDR_BIAS", a);
     }
 
@@ -2492,7 +2492,7 @@ struct radar_d *dd_malloc_radd(DGI_PTR dgi, char *config_name)
 		       sizeof(struct radar_d *));
 	    }
 	}
-	if(radd = (struct radar_d *)malloc(sizeof(struct radar_d)))
+	if((radd = (struct radar_d *)malloc(sizeof(struct radar_d))))
 	      memset(radd, 0, sizeof(struct radar_d));
 	else {
 	    printf("Unable to allocate the next radar descriptor\n");
@@ -2599,51 +2599,51 @@ void dor_print_asib(struct platform_i *asib, struct solo_list_mgmt *slm)
 
     solo_add_list_entry(slm, " ", 1);
 
-    sprintf(aa, "Contents of the platform descriptor  len: %zu"
+    snprintf(aa, sizeof(bstr), "Contents of the platform descriptor  len: %zu"
 	    , sizeof(struct platform_i));
 
     /* c...mark */
 
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " platform_info[4]       %.4s", asib->platform_info);
+    snprintf(aa, sizeof(bstr), " platform_info[4]       %.4s", asib->platform_info);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " platform_info_lengtth  %d", asib->platform_info_length);
+    snprintf(aa, sizeof(bstr), " platform_info_lengtth  %d", asib->platform_info_length);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " longitude              %f", asib->longitude);
+    snprintf(aa, sizeof(bstr), " longitude              %f", asib->longitude);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " latitude               %f", asib->latitude);
+    snprintf(aa, sizeof(bstr), " latitude               %f", asib->latitude);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " altitude_msl           %f", asib->altitude_msl);
+    snprintf(aa, sizeof(bstr), " altitude_msl           %f", asib->altitude_msl);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " altitude_agl           %f", asib->altitude_agl);
+    snprintf(aa, sizeof(bstr), " altitude_agl           %f", asib->altitude_agl);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " ew_velocity            %f", asib->ew_velocity);
+    snprintf(aa, sizeof(bstr), " ew_velocity            %f", asib->ew_velocity);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " ns_velocity            %f", asib->ns_velocity);
+    snprintf(aa, sizeof(bstr), " ns_velocity            %f", asib->ns_velocity);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " vert_velocity          %f", asib->vert_velocity);
+    snprintf(aa, sizeof(bstr), " vert_velocity          %f", asib->vert_velocity);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " heading                %f", asib->heading);
+    snprintf(aa, sizeof(bstr), " heading                %f", asib->heading);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " roll                   %f", asib->roll);
+    snprintf(aa, sizeof(bstr), " roll                   %f", asib->roll);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " pitch                  %f", asib->pitch);
+    snprintf(aa, sizeof(bstr), " pitch                  %f", asib->pitch);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " drift_angle            %f", asib->drift_angle);
+    snprintf(aa, sizeof(bstr), " drift_angle            %f", asib->drift_angle);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " rotation_angle         %f", asib->rotation_angle);
+    snprintf(aa, sizeof(bstr), " rotation_angle         %f", asib->rotation_angle);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " tilt                   %f", asib->tilt);
+    snprintf(aa, sizeof(bstr), " tilt                   %f", asib->tilt);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " ew_horiz_wind          %f", asib->ew_horiz_wind);
+    snprintf(aa, sizeof(bstr), " ew_horiz_wind          %f", asib->ew_horiz_wind);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " ns_horiz_wind          %f", asib->ns_horiz_wind);
+    snprintf(aa, sizeof(bstr), " ns_horiz_wind          %f", asib->ns_horiz_wind);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " vert_wind              %f", asib->vert_wind);
+    snprintf(aa, sizeof(bstr), " vert_wind              %f", asib->vert_wind);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " heading_change         %f", asib->heading_change);
+    snprintf(aa, sizeof(bstr), " heading_change         %f", asib->heading_change);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " pitch_change           %f", asib->pitch_change);
+    snprintf(aa, sizeof(bstr), " pitch_change           %f", asib->pitch_change);
     solo_add_list_entry(slm, aa, strlen(aa));
 
     return;
@@ -2660,19 +2660,19 @@ void dor_print_celv(struct cell_d *celv, struct solo_list_mgmt *slm)
 
     solo_add_list_entry(slm, " ", 1);
 
-    sprintf(aa, "Contents of the cell vector descriptor  len: %zu"
+    snprintf(aa, sizeof(bstr), "Contents of the cell vector descriptor  len: %zu"
 	    , sizeof(struct cell_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, "cell_spacing_des	%.4s", celv->cell_spacing_des);
+    snprintf(aa, sizeof(bstr), "cell_spacing_des	%.4s", celv->cell_spacing_des);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "cell_des_len	%d", celv->cell_des_len);
+    snprintf(aa, sizeof(bstr), "cell_des_len	%d", celv->cell_des_len);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "number_cells	%d", celv->number_cells);   
+    snprintf(aa, sizeof(bstr), "number_cells	%d", celv->number_cells);   
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "dist_cells[  0]     %f", celv->dist_cells[0]);
+    snprintf(aa, sizeof(bstr), "dist_cells[  0]     %f", celv->dist_cells[0]);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "dist_cells[  1]     %f", celv->dist_cells[1]);
+    snprintf(aa, sizeof(bstr), "dist_cells[  1]     %f", celv->dist_cells[1]);
     solo_add_list_entry(slm, aa, strlen(aa));
     
     delta1 = fabs(celv->dist_cells[  1] -celv->dist_cells[0]);
@@ -2680,16 +2680,16 @@ void dor_print_celv(struct cell_d *celv, struct solo_list_mgmt *slm)
     for(ii=1; ii < celv->number_cells-1; ii++) {
 	delta2 = fabs(celv->dist_cells[ii+1] -celv->dist_cells[ii]);
 	if(fabs(delta2 -delta1) > 10) {
-	    sprintf(aa, "dist_cells[%3d]     %f"
+	    snprintf(aa, sizeof(bstr), "dist_cells[%3d]     %f"
 		    , ii, celv->dist_cells[ii]);
 	    solo_add_list_entry(slm, aa, strlen(aa));
-	    sprintf(aa, "dist_cells[%3d]     %f"
+	    snprintf(aa, sizeof(bstr), "dist_cells[%3d]     %f"
 		    , ii+1, celv->dist_cells[ii+1]);
 	    solo_add_list_entry(slm, aa, strlen(aa));
 	}
 	delta1 = delta2;
     }
-    sprintf(aa, "dist_cells[%3d]     %f", ii, celv->dist_cells[ii]);
+    snprintf(aa, sizeof(bstr), "dist_cells[%3d]     %f", ii, celv->dist_cells[ii]);
     solo_add_list_entry(slm, aa, strlen(aa));
     return;
 }
@@ -2704,45 +2704,45 @@ void dor_print_cfac(struct correction_d *cfac, struct solo_list_mgmt *slm)
     aa = bstr;
     solo_add_list_entry(slm, " ", 1);
 
-    sprintf(aa, "Contents of the correction descriptor  len: %zu\n"
+    snprintf(aa, sizeof(bstr), "Contents of the correction descriptor  len: %zu\n"
 	    , sizeof(struct correction_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, "correction_des %.4s       ", cfac->correction_des       );
+    snprintf(aa, sizeof(bstr), "correction_des %.4s       ", cfac->correction_des       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "correction_des_length %d", cfac->correction_des_length);
+    snprintf(aa, sizeof(bstr), "correction_des_length %d", cfac->correction_des_length);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "azimuth_corr %f         ", cfac->azimuth_corr         );
+    snprintf(aa, sizeof(bstr), "azimuth_corr %f         ", cfac->azimuth_corr         );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "elevation_corr %f       ", cfac->elevation_corr       );
+    snprintf(aa, sizeof(bstr), "elevation_corr %f       ", cfac->elevation_corr       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "range_delay_corr %f     ", cfac->range_delay_corr     );
+    snprintf(aa, sizeof(bstr), "range_delay_corr %f     ", cfac->range_delay_corr     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "longitude_corr %f       ", cfac->longitude_corr       );
+    snprintf(aa, sizeof(bstr), "longitude_corr %f       ", cfac->longitude_corr       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "latitude_corr %f        ", cfac->latitude_corr        );
+    snprintf(aa, sizeof(bstr), "latitude_corr %f        ", cfac->latitude_corr        );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "pressure_alt_corr %f    ", cfac->pressure_alt_corr    );
+    snprintf(aa, sizeof(bstr), "pressure_alt_corr %f    ", cfac->pressure_alt_corr    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "radar_alt_corr %f       ", cfac->radar_alt_corr       );
+    snprintf(aa, sizeof(bstr), "radar_alt_corr %f       ", cfac->radar_alt_corr       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "ew_gndspd_corr %f       ", cfac->ew_gndspd_corr       );
+    snprintf(aa, sizeof(bstr), "ew_gndspd_corr %f       ", cfac->ew_gndspd_corr       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "ns_gndspd_corr %f       ", cfac->ns_gndspd_corr       );
+    snprintf(aa, sizeof(bstr), "ns_gndspd_corr %f       ", cfac->ns_gndspd_corr       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "vert_vel_corr %f        ", cfac->vert_vel_corr        );
+    snprintf(aa, sizeof(bstr), "vert_vel_corr %f        ", cfac->vert_vel_corr        );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "heading_corr %f         ", cfac->heading_corr         );
+    snprintf(aa, sizeof(bstr), "heading_corr %f         ", cfac->heading_corr         );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "roll_corr %f            ", cfac->roll_corr            );
+    snprintf(aa, sizeof(bstr), "roll_corr %f            ", cfac->roll_corr            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "pitch_corr %f           ", cfac->pitch_corr           );
+    snprintf(aa, sizeof(bstr), "pitch_corr %f           ", cfac->pitch_corr           );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "drift_corr %f           ", cfac->drift_corr           );
+    snprintf(aa, sizeof(bstr), "drift_corr %f           ", cfac->drift_corr           );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "rot_angle_corr %f       ", cfac->rot_angle_corr       );
+    snprintf(aa, sizeof(bstr), "rot_angle_corr %f       ", cfac->rot_angle_corr       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "tilt_corr %f            ", cfac->tilt_corr            );
+    snprintf(aa, sizeof(bstr), "tilt_corr %f            ", cfac->tilt_corr            );
     solo_add_list_entry(slm, aa, strlen(aa));
 
     return;
@@ -2760,51 +2760,51 @@ void dor_print_parm(struct parameter_d *parm, struct solo_list_mgmt *slm)
     /* routine to print the contents of the parameter descriptor */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the parameter descriptor  len: %zu"
+    snprintf(aa, sizeof(bstr), "Contents of the parameter descriptor  len: %zu"
 	    , sizeof(struct parameter_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, "parameter_des[4]        %.4s", parm->parameter_des       );
+    snprintf(aa, sizeof(bstr), "parameter_des[4]        %.4s", parm->parameter_des       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "parameter_des_length    %d", parm->parameter_des_length);
+    snprintf(aa, sizeof(bstr), "parameter_des_length    %d", parm->parameter_des_length);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "parameter_name[8]       %.8s"			     
+    snprintf(aa, sizeof(bstr), "parameter_name[8]       %.8s"			     
 	    , str_terminate(str, parm->parameter_name			     
 			    , sizeof(parm->parameter_name))                  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "param_description[40]   %.40s"			     
+    snprintf(aa, sizeof(bstr), "param_description[40]   %.40s"			     
 	    , str_terminate(str, parm->param_description		     
 			    , sizeof(parm->param_description))      	     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "param_units[8]          %.8s"			     
+    snprintf(aa, sizeof(bstr), "param_units[8]          %.8s"			     
 	    , str_terminate(str, parm->param_units			     
 			    , sizeof(parm->param_units))                     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "interpulse_time         %d", parm->interpulse_time     );
+    snprintf(aa, sizeof(bstr), "interpulse_time         %d", parm->interpulse_time     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "xmitted_freq            %d", parm->xmitted_freq        );
+    snprintf(aa, sizeof(bstr), "xmitted_freq            %d", parm->xmitted_freq        );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "recvr_bandwidth         %f", parm->recvr_bandwidth     );
+    snprintf(aa, sizeof(bstr), "recvr_bandwidth         %f", parm->recvr_bandwidth     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "pulse_width             %d", parm->pulse_width         );
+    snprintf(aa, sizeof(bstr), "pulse_width             %d", parm->pulse_width         );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "polarization            %d", parm->polarization        );
+    snprintf(aa, sizeof(bstr), "polarization            %d", parm->polarization        );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "num_samples             %d", parm->num_samples         );
+    snprintf(aa, sizeof(bstr), "num_samples             %d", parm->num_samples         );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "binary_format           %d", parm->binary_format       );
+    snprintf(aa, sizeof(bstr), "binary_format           %d", parm->binary_format       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "threshold_field         %s"			     
+    snprintf(aa, sizeof(bstr), "threshold_field         %s"			     
 	    , str_terminate(str, parm->threshold_field			     
 			    , sizeof(parm->threshold_field))         	     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "threshold_value         %f", parm->threshold_value     );
+    snprintf(aa, sizeof(bstr), "threshold_value         %f", parm->threshold_value     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "parameter_scale         %f", parm->parameter_scale     );
+    snprintf(aa, sizeof(bstr), "parameter_scale         %f", parm->parameter_scale     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "parameter_bias          %f", parm->parameter_bias      );
+    snprintf(aa, sizeof(bstr), "parameter_bias          %f", parm->parameter_bias      );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "bad_data                %d", parm->bad_data            );
+    snprintf(aa, sizeof(bstr), "bad_data                %d", parm->bad_data            );
     solo_add_list_entry(slm, aa, strlen(aa));
 
     return;
@@ -2819,115 +2819,115 @@ void dor_print_frib(struct field_radar_i *frib, struct solo_list_mgmt *slm)
   
   solo_add_list_entry(slm, " ", 1);
   solo_add_list_entry(slm, " ", 1);
-  sprintf(aa, "Contents of the field radar descriptor  len: %zu\n"
+  snprintf(aa, sizeof(mess), "Contents of the field radar descriptor  len: %zu\n"
 	  , sizeof(struct field_radar_i));
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "field_radar_info[4] %.4s"
+  snprintf(aa, sizeof(mess), "field_radar_info[4] %.4s"
 	  , frib->field_radar_info);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "field_radar_info_len %d"
+  snprintf(aa, sizeof(mess), "field_radar_info_len %d"
 	  , frib->field_radar_info_len);
   solo_add_list_entry(slm, aa, strlen(aa));
 
-  sprintf(aa, "data_sys_id %d"
+  snprintf(aa, sizeof(mess), "data_sys_id %d"
 	  , frib->data_sys_id);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "loss_out %f		"
+  snprintf(aa, sizeof(mess), "loss_out %f		"
 	  , frib->loss_out		);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "loss_in %f		"
+  snprintf(aa, sizeof(mess), "loss_in %f		"
 	  , frib->loss_in		);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "loss_rjoint %f		"
+  snprintf(aa, sizeof(mess), "loss_rjoint %f		"
 	  , frib->loss_rjoint		);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "ant_v_dim %f		"
+  snprintf(aa, sizeof(mess), "ant_v_dim %f		"
 	  , frib->ant_v_dim		);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "ant_h_dim %f		"
+  snprintf(aa, sizeof(mess), "ant_h_dim %f		"
 	  , frib->ant_h_dim		);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "ant_noise_temp %f	"
+  snprintf(aa, sizeof(mess), "ant_noise_temp %f	"
 	  , frib->ant_noise_temp	);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "r_noise_figure %f	"
+  snprintf(aa, sizeof(mess), "r_noise_figure %f	"
 	  , frib->r_noise_figure	);
   solo_add_list_entry(slm, aa, strlen(aa));
 
-  sprintf(aa, "xmit_power[5]");
+  snprintf(aa, sizeof(mess), "xmit_power[5]");
   for(i=0; i < 5; i++) {
-    sprintf(aa+strlen(aa), " %f", frib->xmit_power[i]);
+    snprintf(aa+strlen(aa), sizeof(mess) - strlen(aa), " %f", frib->xmit_power[i]);
   }
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "x_band_gain %f", frib->x_band_gain);
+  snprintf(aa, sizeof(mess), "x_band_gain %f", frib->x_band_gain);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "receiver_gain[5]");
+  snprintf(aa, sizeof(mess), "receiver_gain[5]");
   for(i=0; i < 5; i++) {
-    sprintf(aa+strlen(aa), " %f", frib->receiver_gain[i]);
+    snprintf(aa+strlen(aa), sizeof(mess) - strlen(aa), " %f", frib->receiver_gain[i]);
   }
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "if_gain[5]");
+  snprintf(aa, sizeof(mess), "if_gain[5]");
   for(i=0; i < 5; i++) {
-    sprintf(aa+strlen(aa), " %f", frib->if_gain[i]);
+    snprintf(aa+strlen(aa), sizeof(mess) - strlen(aa), " %f", frib->if_gain[i]);
   }
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "conversion_gain %f", frib->conversion_gain);
+  snprintf(aa, sizeof(mess), "conversion_gain %f", frib->conversion_gain);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "scale_factor[5]");
+  snprintf(aa, sizeof(mess), "scale_factor[5]");
   for(i=0; i < 5; i++) {
-    sprintf(aa+strlen(aa), " %f", frib->scale_factor[i]);
+    snprintf(aa+strlen(aa), sizeof(mess) - strlen(aa), " %f", frib->scale_factor[i]);
   }
   solo_add_list_entry(slm, aa, strlen(aa));
 
-  sprintf(aa, "processor_const %f      "
+  snprintf(aa, sizeof(mess), "processor_const %f      "
 	  , frib->processor_const      );
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "dly_tube_antenna %d	"
+  snprintf(aa, sizeof(mess), "dly_tube_antenna %d	"
 	  , frib->dly_tube_antenna	);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "dly_rndtrip_chip_atod %d"
+  snprintf(aa, sizeof(mess), "dly_rndtrip_chip_atod %d"
 	  , frib->dly_rndtrip_chip_atod);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "dly_timmod_testpulse %d"
+  snprintf(aa, sizeof(mess), "dly_timmod_testpulse %d"
 	  , frib->dly_timmod_testpulse);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "dly_modulator_on %d	"
+  snprintf(aa, sizeof(mess), "dly_modulator_on %d	"
 	  , frib->dly_modulator_on	);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "dly_modulator_off %d	"
+  snprintf(aa, sizeof(mess), "dly_modulator_off %d	"
 	  , frib->dly_modulator_off	);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "peak_power_offset %f    "
+  snprintf(aa, sizeof(mess), "peak_power_offset %f    "
 	  , frib->peak_power_offset    );
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "test_pulse_offset %f    "
+  snprintf(aa, sizeof(mess), "test_pulse_offset %f    "
 	  , frib->test_pulse_offset    );
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "E_plane_angle %f        "
+  snprintf(aa, sizeof(mess), "E_plane_angle %f        "
 	  , frib->E_plane_angle        );
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "H_plane_angle %f        "
+  snprintf(aa, sizeof(mess), "H_plane_angle %f        "
 	  , frib->H_plane_angle        );
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "encoder_antenna_up %f   "
+  snprintf(aa, sizeof(mess), "encoder_antenna_up %f   "
 	  , frib->encoder_antenna_up   );
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "pitch_antenna_up %f     "
+  snprintf(aa, sizeof(mess), "pitch_antenna_up %f     "
 	  , frib->pitch_antenna_up     );
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "indepf_times_flg %d	"
+  snprintf(aa, sizeof(mess), "indepf_times_flg %d	"
 	  , frib->indepf_times_flg	);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "indep_freq_gate %d	"
+  snprintf(aa, sizeof(mess), "indep_freq_gate %d	"
 	  , frib->indep_freq_gate	);
   solo_add_list_entry(slm, aa, strlen(aa));
-  sprintf(aa, "time_series_gate %d	"
+  snprintf(aa, sizeof(mess), "time_series_gate %d	"
 	  , frib->time_series_gate	);
   solo_add_list_entry(slm, aa, strlen(aa));
 
 
   str_terminate (c, frib->file_name, sizeof (frib->file_name));
-  sprintf(aa, "file_name %s", c);
+  snprintf(aa, sizeof(mess), "file_name %s", c);
   solo_add_list_entry(slm, aa, strlen(aa));
   solo_add_list_entry(slm, " ", 1);
   return;
@@ -2944,88 +2944,88 @@ void dor_print_radd(struct radar_d *radd, struct solo_list_mgmt *slm)
     /* routine to print the contents of the descriptor */
     
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the radar descriptor  len: %zu"
+    snprintf(aa, sizeof(bstr), "Contents of the radar descriptor  len: %zu"
 	    , sizeof(struct radar_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, " radar_des[4]       %.4s", radd->radar_des        );
+    snprintf(aa, sizeof(bstr), " radar_des[4]       %.4s", radd->radar_des        );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " radar_des_length   %d", radd->radar_des_length );
+    snprintf(aa, sizeof(bstr), " radar_des_length   %d", radd->radar_des_length );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " radar_name[8]      %.8s"
+    snprintf(aa, sizeof(bstr), " radar_name[8]      %.8s"
 	    , str_terminate(str, radd->radar_name, sizeof(radd->radar_name)));
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " radar_const        %f", radd->radar_const      );
+    snprintf(aa, sizeof(bstr), " radar_const        %f", radd->radar_const      );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " peak_power         %f", radd->peak_power       );
+    snprintf(aa, sizeof(bstr), " peak_power         %f", radd->peak_power       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " noise_power        %f", radd->noise_power      );
+    snprintf(aa, sizeof(bstr), " noise_power        %f", radd->noise_power      );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " receiver_gain      %f", radd->receiver_gain    );
+    snprintf(aa, sizeof(bstr), " receiver_gain      %f", radd->receiver_gain    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " antenna_gain       %f", radd->antenna_gain     );
+    snprintf(aa, sizeof(bstr), " antenna_gain       %f", radd->antenna_gain     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " system_gain        %f", radd->system_gain      );
+    snprintf(aa, sizeof(bstr), " system_gain        %f", radd->system_gain      );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " horz_beam_width    %f", radd->horz_beam_width  );
+    snprintf(aa, sizeof(bstr), " horz_beam_width    %f", radd->horz_beam_width  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " vert_beam_width    %f", radd->vert_beam_width  );
+    snprintf(aa, sizeof(bstr), " vert_beam_width    %f", radd->vert_beam_width  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " radar_type         %d", radd->radar_type       );
+    snprintf(aa, sizeof(bstr), " radar_type         %d", radd->radar_type       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " scan_mode          %d", radd->scan_mode        );
+    snprintf(aa, sizeof(bstr), " scan_mode          %d", radd->scan_mode        );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " req_rotat_vel      %f", radd->req_rotat_vel    );
+    snprintf(aa, sizeof(bstr), " req_rotat_vel      %f", radd->req_rotat_vel    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " scan_mode_pram0    %f", radd->scan_mode_pram0  );
+    snprintf(aa, sizeof(bstr), " scan_mode_pram0    %f", radd->scan_mode_pram0  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " scan_mode_pram1    %f", radd->scan_mode_pram1  );
+    snprintf(aa, sizeof(bstr), " scan_mode_pram1    %f", radd->scan_mode_pram1  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " num_parameter_des  %d", radd->num_parameter_des);
+    snprintf(aa, sizeof(bstr), " num_parameter_des  %d", radd->num_parameter_des);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " total_num_des      %d", radd->total_num_des    );
+    snprintf(aa, sizeof(bstr), " total_num_des      %d", radd->total_num_des    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " data_compress      %d", radd->data_compress    );
+    snprintf(aa, sizeof(bstr), " data_compress      %d", radd->data_compress    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " data_reduction     %d", radd->data_reduction   );
+    snprintf(aa, sizeof(bstr), " data_reduction     %d", radd->data_reduction   );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " data_red_parm0     %f", radd->data_red_parm0   );
+    snprintf(aa, sizeof(bstr), " data_red_parm0     %f", radd->data_red_parm0   );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " data_red_parm1     %f", radd->data_red_parm1   );
+    snprintf(aa, sizeof(bstr), " data_red_parm1     %f", radd->data_red_parm1   );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " radar_longitude    %f", radd->radar_longitude  );
+    snprintf(aa, sizeof(bstr), " radar_longitude    %f", radd->radar_longitude  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " radar_latitude     %f", radd->radar_latitude   );
+    snprintf(aa, sizeof(bstr), " radar_latitude     %f", radd->radar_latitude   );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " radar_altitude     %f", radd->radar_altitude   );
+    snprintf(aa, sizeof(bstr), " radar_altitude     %f", radd->radar_altitude   );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " eff_unamb_vel      %f", radd->eff_unamb_vel    );
+    snprintf(aa, sizeof(bstr), " eff_unamb_vel      %f", radd->eff_unamb_vel    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " eff_unamb_range    %f", radd->eff_unamb_range  );
+    snprintf(aa, sizeof(bstr), " eff_unamb_range    %f", radd->eff_unamb_range  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " num_freq_trans     %d", radd->num_freq_trans   );
+    snprintf(aa, sizeof(bstr), " num_freq_trans     %d", radd->num_freq_trans   );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " num_ipps_trans     %d", radd->num_ipps_trans   );
+    snprintf(aa, sizeof(bstr), " num_ipps_trans     %d", radd->num_ipps_trans   );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " freq1              %f", radd->freq1            );
+    snprintf(aa, sizeof(bstr), " freq1              %f", radd->freq1            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " freq2              %f", radd->freq2            );
+    snprintf(aa, sizeof(bstr), " freq2              %f", radd->freq2            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " freq3              %f", radd->freq3            );
+    snprintf(aa, sizeof(bstr), " freq3              %f", radd->freq3            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " freq4              %f", radd->freq4            );
+    snprintf(aa, sizeof(bstr), " freq4              %f", radd->freq4            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " freq5              %f", radd->freq5            );
+    snprintf(aa, sizeof(bstr), " freq5              %f", radd->freq5            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " interpulse_per1    %f", radd->interpulse_per1  );
+    snprintf(aa, sizeof(bstr), " interpulse_per1    %f", radd->interpulse_per1  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " interpulse_per2    %f", radd->interpulse_per2  );
+    snprintf(aa, sizeof(bstr), " interpulse_per2    %f", radd->interpulse_per2  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " interpulse_per3    %f", radd->interpulse_per3  );
+    snprintf(aa, sizeof(bstr), " interpulse_per3    %f", radd->interpulse_per3  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " interpulse_per4    %f", radd->interpulse_per4  );
+    snprintf(aa, sizeof(bstr), " interpulse_per4    %f", radd->interpulse_per4  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " interpulse_per5    %f", radd->interpulse_per5  );
+    snprintf(aa, sizeof(bstr), " interpulse_per5    %f", radd->interpulse_per5  );
     solo_add_list_entry(slm, aa, strlen(aa));
 
     return;
@@ -3043,23 +3043,23 @@ void dor_print_rktb(struct rot_ang_table *rktb, struct solo_list_mgmt *slm)
     /* routine to print the contents of the rotation angle table */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the rotation angle table  len: %zu"
+    snprintf(aa, sizeof(bstr), "Contents of the rotation angle table  len: %zu"
 	    , sizeof(struct rot_ang_table));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, " name_struct[4]     %.4s", rktb->name_struct );
+    snprintf(aa, sizeof(bstr), " name_struct[4]     %.4s", rktb->name_struct );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " sizeof_struct      %d", rktb->sizeof_struct );
+    snprintf(aa, sizeof(bstr), " sizeof_struct      %d", rktb->sizeof_struct );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " angle2ndx          %.3f", rktb->angle2ndx );
+    snprintf(aa, sizeof(bstr), " angle2ndx          %.3f", rktb->angle2ndx );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " ndx_que_size       %d", rktb->ndx_que_size );
+    snprintf(aa, sizeof(bstr), " ndx_que_size       %d", rktb->ndx_que_size );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " first_key_offset   %d", rktb->first_key_offset );
+    snprintf(aa, sizeof(bstr), " first_key_offset   %d", rktb->first_key_offset );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " angle_table_offset %d", rktb->angle_table_offset );
+    snprintf(aa, sizeof(bstr), " angle_table_offset %d", rktb->angle_table_offset );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " num_rays           %d", rktb->num_rays );
+    snprintf(aa, sizeof(bstr), " num_rays           %d", rktb->num_rays );
     solo_add_list_entry(slm, aa, strlen(aa));
 
     bb = (char *)rktb + rktb->first_key_offset;
@@ -3067,7 +3067,7 @@ void dor_print_rktb(struct rot_ang_table *rktb, struct solo_list_mgmt *slm)
 
     for(ii=0; ii < rktb->num_rays; ii++) {
 	rte = (struct rot_table_entry *)bb;
-	sprintf(aa, "%4d %7.2f %8d %7d\n"
+	snprintf(aa, sizeof(bstr), "%4d %7.2f %8d %7d\n"
 		, ii
 		, rte->rotation_angle
 		, rte->offset
@@ -3090,35 +3090,35 @@ void dor_print_ryib(struct ray_i *ryib, struct solo_list_mgmt *slm)
     /* routine to print the contents of the descriptor */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the ray descriptor  len: %zu"
+    snprintf(aa, sizeof(bstr), "Contents of the ray descriptor  len: %zu"
 	    , sizeof(struct ray_i));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, " ray_info[4]      %.4s", ryib->ray_info        );
+    snprintf(aa, sizeof(bstr), " ray_info[4]      %.4s", ryib->ray_info        );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " ray_info_length  %d", ryib->ray_info_length );
+    snprintf(aa, sizeof(bstr), " ray_info_length  %d", ryib->ray_info_length );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " sweep_num        %d", ryib->sweep_num       );
+    snprintf(aa, sizeof(bstr), " sweep_num        %d", ryib->sweep_num       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " julian_day       %d", ryib->julian_day      );
+    snprintf(aa, sizeof(bstr), " julian_day       %d", ryib->julian_day      );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " hour             %d", ryib->hour            );
+    snprintf(aa, sizeof(bstr), " hour             %d", ryib->hour            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " minute           %d", ryib->minute          );
+    snprintf(aa, sizeof(bstr), " minute           %d", ryib->minute          );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " second           %d", ryib->second          );
+    snprintf(aa, sizeof(bstr), " second           %d", ryib->second          );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " millisecond      %d", ryib->millisecond     );
+    snprintf(aa, sizeof(bstr), " millisecond      %d", ryib->millisecond     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " azimuth          %f", ryib->azimuth         );
+    snprintf(aa, sizeof(bstr), " azimuth          %f", ryib->azimuth         );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " elevation        %f", ryib->elevation       );
+    snprintf(aa, sizeof(bstr), " elevation        %f", ryib->elevation       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " peak_power       %f", ryib->peak_power      );
+    snprintf(aa, sizeof(bstr), " peak_power       %f", ryib->peak_power      );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " true_scan_rate   %f", ryib->true_scan_rate  );
+    snprintf(aa, sizeof(bstr), " true_scan_rate   %f", ryib->true_scan_rate  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " ray_status       %d", ryib->ray_status      );
+    snprintf(aa, sizeof(bstr), " ray_status       %d", ryib->ray_status      );
     solo_add_list_entry(slm, aa, strlen(aa));
 
     return;
@@ -3132,27 +3132,27 @@ void dor_print_swib(struct sweepinfo_d *swib, struct solo_list_mgmt *slm)
     aa = bstr;
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the sweep descriptor  len: %zu"
+    snprintf(aa, sizeof(bstr), "Contents of the sweep descriptor  len: %zu"
 	    , sizeof(struct sweepinfo_d));
 
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "sweep_des[4]     %.4s", swib->sweep_des);       
+    snprintf(aa, sizeof(bstr), "sweep_des[4]     %.4s", swib->sweep_des);       
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "sweep_des_length %d", swib->sweep_des_length);
+    snprintf(aa, sizeof(bstr), "sweep_des_length %d", swib->sweep_des_length);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "radar_name[8]    %.8s", swib->radar_name);      
+    snprintf(aa, sizeof(bstr), "radar_name[8]    %.8s", swib->radar_name);      
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "sweep_num        %d", swib->sweep_num);       
+    snprintf(aa, sizeof(bstr), "sweep_num        %d", swib->sweep_num);       
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "num_rays         %d", swib->num_rays);        
+    snprintf(aa, sizeof(bstr), "num_rays         %d", swib->num_rays);        
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "start_angle      %f", swib->start_angle);     
+    snprintf(aa, sizeof(bstr), "start_angle      %f", swib->start_angle);     
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "stop_angle       %f", swib->stop_angle);      
+    snprintf(aa, sizeof(bstr), "stop_angle       %f", swib->stop_angle);      
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "fixed_angle      %f", swib->fixed_angle);     
+    snprintf(aa, sizeof(bstr), "fixed_angle      %f", swib->fixed_angle);     
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "filter_flag      %d", swib->filter_flag);     
+    snprintf(aa, sizeof(bstr), "filter_flag      %d", swib->filter_flag);     
     solo_add_list_entry(slm, aa, strlen(aa));
 
     return;
@@ -3173,66 +3173,66 @@ void dor_print_sswb(struct super_SWIB *sswb, struct solo_list_mgmt *slm)
     /* routine to print the contents of the volume descriptor */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the super sweepinfo descriptor  len: %zu\n"
+    snprintf(aa, sizeof(bstr), "Contents of the super sweepinfo descriptor  len: %zu\n"
 	    , sizeof(struct super_SWIB));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, " name_struct        %.4s   ", sswb->name_struct       );
+    snprintf(aa, sizeof(bstr), " name_struct        %.4s   ", sswb->name_struct       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " sizeof_struct      %d   ", sswb->sizeof_struct     );
+    snprintf(aa, sizeof(bstr), " sizeof_struct      %d   ", sswb->sizeof_struct     );
     solo_add_list_entry(slm, aa, strlen(aa));
 
     dts.time_stamp = sswb->last_used;
-    sprintf(aa, " last_used          %d  %s ", sswb->last_used
+    snprintf(aa, sizeof(bstr), " last_used          %d  %s ", sswb->last_used
 	, dts_print( d_unstamp_time( &dts )));
     solo_add_list_entry(slm, aa, strlen(aa));
 
     dts.time_stamp = sswb->start_time;
-    sprintf(aa, " start_time         %d  %s ", sswb->start_time
+    snprintf(aa, sizeof(bstr), " start_time         %d  %s ", sswb->start_time
         , dts_print( d_unstamp_time( &dts )));
     solo_add_list_entry(slm, aa, strlen(aa));
 
     dts.time_stamp = sswb->stop_time;
-    sprintf(aa, " stop_time          %d  %s ", sswb->stop_time
+    snprintf(aa, sizeof(bstr), " stop_time          %d  %s ", sswb->stop_time
         , dts_print( d_unstamp_time( &dts )));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, " sizeof_file        %d   ", sswb->sizeof_file       );
+    snprintf(aa, sizeof(bstr), " sizeof_file        %d   ", sswb->sizeof_file       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " compression_flag   %d   ", sswb->compression_flag  );
+    snprintf(aa, sizeof(bstr), " compression_flag   %d   ", sswb->compression_flag  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " volume_time_stamp  %d   ", sswb->volume_time_stamp );
+    snprintf(aa, sizeof(bstr), " volume_time_stamp  %d   ", sswb->volume_time_stamp );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " num_params         %d   ", sswb->num_params        );
+    snprintf(aa, sizeof(bstr), " num_params         %d   ", sswb->num_params        );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " radar_name         %s   "					   
+    snprintf(aa, sizeof(bstr), " radar_name         %s   "					   
 	    , str_terminate(str, sswb->radar_name, sizeof(sswb->radar_name)));
     solo_add_list_entry(slm, aa, strlen(aa));
 
     dts.time_stamp = sswb->d_start_time;
-    sprintf(aa, " d_start_time       %.3f  %s ", sswb->d_start_time
+    snprintf(aa, sizeof(bstr), " d_start_time       %.3f  %s ", sswb->d_start_time
         , dts_print( d_unstamp_time( &dts )));
     solo_add_list_entry(slm, aa, strlen(aa));
 
     dts.time_stamp = sswb->d_stop_time;
-    sprintf(aa, " d_stop_time        %.3f  %s ", sswb->d_stop_time
+    snprintf(aa, sizeof(bstr), " d_stop_time        %.3f  %s ", sswb->d_stop_time
         , dts_print( d_unstamp_time( &dts )));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, " version_num        %d   ", sswb->version_num       );
+    snprintf(aa, sizeof(bstr), " version_num        %d   ", sswb->version_num       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " num_key_tables     %d   ", sswb->num_key_tables    );
+    snprintf(aa, sizeof(bstr), " num_key_tables     %d   ", sswb->num_key_tables    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " status             %d   ", sswb->status            );
+    snprintf(aa, sizeof(bstr), " status             %d   ", sswb->status            );
     solo_add_list_entry(slm, aa, strlen(aa));
 
     for(ii=0; ii < 7; ii++) {
-	sprintf(aa, "place_holder[%d] %d\n", ii, sswb->place_holder[ii]);
+	snprintf(aa, sizeof(bstr), "place_holder[%d] %d\n", ii, sswb->place_holder[ii]);
 	solo_add_list_entry(slm, aa, strlen(aa));
     }
 
     for(ii=0; ii < sswb->num_key_tables; ii++) {
-	sprintf(aa, "key_table[%d]->  offset: %d  size: %d  type: %d\n"
+	snprintf(aa, sizeof(bstr), "key_table[%d]->  offset: %d  size: %d  type: %d\n"
 		, ii
 		, sswb->key_table[ii].offset
 		, sswb->key_table[ii].size
@@ -3255,48 +3255,48 @@ void dor_print_vold(struct volume_d *vold, struct solo_list_mgmt *slm)
     /* routine to print the contents of the volume descriptor */
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of the volume descriptor  len: %zu"
+    snprintf(aa, sizeof(bstr), "Contents of the volume descriptor  len: %zu"
 	    , sizeof(struct volume_d));
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, " volume_des[4]      %.4s", vold->volume_des);                                                     
+    snprintf(aa, sizeof(bstr), " volume_des[4]      %.4s", vold->volume_des);                                                     
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " volume_des_length  %d", vold->volume_des_length);                                              
+    snprintf(aa, sizeof(bstr), " volume_des_length  %d", vold->volume_des_length);                                              
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " format_version     %d", vold->format_version     );                                            
+    snprintf(aa, sizeof(bstr), " format_version     %d", vold->format_version     );                                            
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " volume_num         %d", vold->volume_num           );                                          
+    snprintf(aa, sizeof(bstr), " volume_num         %d", vold->volume_num           );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " maximum_bytes      %d", vold->maximum_bytes        );                                          
+    snprintf(aa, sizeof(bstr), " maximum_bytes      %d", vold->maximum_bytes        );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " proj_name[20]      %.20s"
+    snprintf(aa, sizeof(bstr), " proj_name[20]      %.20s"
 	    , str_terminate(str, vold->proj_name, sizeof(vold->proj_name)));         
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " year               %d", vold->year                 );                                          
+    snprintf(aa, sizeof(bstr), " year               %d", vold->year                 );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " month              %d", vold->month                );                                          
+    snprintf(aa, sizeof(bstr), " month              %d", vold->month                );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " day                %d", vold->day                  );                                          
+    snprintf(aa, sizeof(bstr), " day                %d", vold->day                  );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " data_set_hour      %d", vold->data_set_hour        );                                          
+    snprintf(aa, sizeof(bstr), " data_set_hour      %d", vold->data_set_hour        );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " data_set_minute    %d", vold->data_set_minute      );                                          
+    snprintf(aa, sizeof(bstr), " data_set_minute    %d", vold->data_set_minute      );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " data_set_second    %d", vold->data_set_second      );                                          
+    snprintf(aa, sizeof(bstr), " data_set_second    %d", vold->data_set_second      );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " flight_num[8]      %.8s"
+    snprintf(aa, sizeof(bstr), " flight_num[8]      %.8s"
 	    , str_terminate(str, vold->flight_num, sizeof(vold->flight_num)));       
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " gen_facility[8]    %.8s",
+    snprintf(aa, sizeof(bstr), " gen_facility[8]    %.8s",
 	    str_terminate(str, vold->gen_facility, sizeof(vold->gen_facility)));   
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " gen_year           %d", vold->gen_year             );                                          
+    snprintf(aa, sizeof(bstr), " gen_year           %d", vold->gen_year             );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " gen_month          %d", vold->gen_month            );                                          
+    snprintf(aa, sizeof(bstr), " gen_month          %d", vold->gen_month            );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " gen_day            %d", vold->gen_day              );                                          
+    snprintf(aa, sizeof(bstr), " gen_day            %d", vold->gen_day              );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, " number_sensor_des  %d", vold->number_sensor_des    );                                          
+    snprintf(aa, sizeof(bstr), " number_sensor_des  %d", vold->number_sensor_des    );                                          
     solo_add_list_entry(slm, aa, strlen(aa));
 
     return;
@@ -4237,7 +4237,7 @@ int dgi_buf_rewind(DGI_PTR dgi)
     memset(dgi->in_buf, 0, 8);
     dgi->in_next_block = dgi->in_buf;
 
-    if(mark = lseek(dgi->in_swp_fid, 0L, 0L)) {
+    if((mark = lseek(dgi->in_swp_fid, 0L, 0L))) {
 	mark = 0;
     }
 

@@ -91,7 +91,7 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
     slash_path(str, dir);
     if(strncmp("wds", fname, 3)) {
 	/* trashed file name! */
-	sprintf(mess, "**** Illegal file name: %s ****\n"
+	snprintf(mess, sizeof(mess), "**** Illegal file name: %s ****\n"
 		, fname);
 	sii_message(mess);
 	return(-1);
@@ -648,7 +648,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
       if((nn = fwrite(spal, sizeof(char), (size_t)spal->sizeof_struct, stream))
 	 < spal->sizeof_struct)
 	{
-	  sprintf(mess, "Problem writing palette %s\n"
+	  snprintf(mess, sizeof(mess), "Problem writing palette %s\n"
 		  , spal->palette_name);
 	  sii_message(mess);
 	  return;
@@ -670,7 +670,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , (size_t)wwptr->sweep->sizeof_struct, stream))
 	   < wwptr->sweep->sizeof_struct)
 	      {
-		  sprintf(mess, "Problem writing sweep info %d\n", ww);
+		  snprintf(mess, sizeof(mess), "Problem writing sweep info %d\n", ww);
 		  solo_message(mess);
 		  return;
 	      }
@@ -679,7 +679,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , (size_t)wwptr->lock->sizeof_struct, stream))
 	   < wwptr->lock->sizeof_struct)
 	      {
-		  sprintf(mess, "Problem writing lock info %d\n", ww);
+		  snprintf(mess, sizeof(mess), "Problem writing lock info %d\n", ww);
 		  solo_message(mess);
 		  return;
 	      }
@@ -688,7 +688,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , (size_t)wwptr->parameter->sizeof_struct, stream))
 	   < wwptr->parameter->sizeof_struct)
 	      {
-		  sprintf(mess, "Problem writing radar parameter %d\n", ww);
+		  snprintf(mess, sizeof(mess), "Problem writing radar parameter %d\n", ww);
 		  solo_message(mess);
 		  return;
 	      }
@@ -697,7 +697,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , (size_t)wwptr->frame_ctr_info->sizeof_struct, stream))
 	   < wwptr->frame_ctr_info->sizeof_struct)
 	      {
-		  sprintf(mess, "Problem writing frame_ctr info %d\n", ww);
+		  snprintf(mess, sizeof(mess), "Problem writing frame_ctr info %d\n", ww);
 		  solo_message(mess);
 		  return;
 	      }
@@ -706,7 +706,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , (size_t)wwptr->landmark_info->sizeof_struct, stream))
 	   < wwptr->landmark_info->sizeof_struct)
 	      {
-		  sprintf(mess, "Problem writing landmark info %d\n", ww);
+		  snprintf(mess, sizeof(mess), "Problem writing landmark info %d\n", ww);
 		  solo_message(mess);
 		  return;
 	      }
@@ -715,7 +715,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , (size_t)wwptr->examine_info->sizeof_struct, stream))
 	   < wwptr->examine_info->sizeof_struct)
 	      {
-		  sprintf(mess, "Problem writing solo_examine_info %d\n", ww);
+		  snprintf(mess, sizeof(mess), "Problem writing solo_examine_info %d\n", ww);
 		  solo_message(mess);
 		  return;
 	      }
@@ -744,7 +744,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , sizeof(struct solo_view_info), stream))
 	   < sizeof(struct solo_view_info))
 	      {
-		  sprintf(mess, "Problem writing view info %d\n", ww);
+		  snprintf(mess, sizeof(mess), "Problem writing view info %d\n", ww);
 		  solo_message(mess);
 		  return;
 	      }
@@ -752,7 +752,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , sizeof(struct point_in_space), stream))
 	   < sizeof(struct point_in_space))
 	      {
-		  sprintf(mess, "Problem writing radar_location info %d\n",
+		  snprintf(mess, sizeof(mess), "Problem writing radar_location info %d\n",
 			  ww);
 		  solo_message(mess);
 		  return;
@@ -761,7 +761,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , sizeof(struct point_in_space), stream))
 	   < sizeof(struct point_in_space))
 	      {
-		  sprintf(mess, "Problem writing center_of_view info %d\n",
+		  snprintf(mess, sizeof(mess), "Problem writing center_of_view info %d\n",
 			  ww);
 		  solo_message(mess);
 		  return;
@@ -770,7 +770,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 		       , sizeof(struct point_in_space), stream))
 	   < sizeof(struct point_in_space))
 	      {
-		  sprintf(mess, "Problem writing landmark info %d\n",
+		  snprintf(mess, sizeof(mess), "Problem writing landmark info %d\n",
 			  ww);
 		  solo_message(mess);
 		  return;
@@ -791,7 +791,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 
 	if (wwptr->swpfi_filter_set) { 
 	   strcat (a, "SWPFLT:");
-	   sprintf (a +strlen (a), "%.2f,%.3f,", wwptr->filter_fxd_ang
+	   snprintf (a +strlen (a), sizeof(sse->attributes)-strlen(a), "%.2f,%.3f,", wwptr->filter_fxd_ang
 		    , wwptr->filter_tolerance);
 	   strcat (a, wwptr->filter_scan_modes);
 	   strcat (a, ";");
@@ -807,7 +807,7 @@ void solo_save_window_info (const char *dir, const char *a_comment)
 	if((nn = fwrite(sse, sizeof(char)
 			, sizeof(*sse), stream)) < sizeof(*sse))
 	  {
-	     sprintf(mess, "Problem writing solo_ssi_extras info %d\n",
+	     snprintf(mess, sizeof(mess), "Problem writing solo_ssi_extras info %d\n",
 		     ww);
 	     solo_message(mess);
 	     return;

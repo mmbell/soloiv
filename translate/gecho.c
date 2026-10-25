@@ -58,7 +58,7 @@ void dd_gecho(DGI_PTR dgi)
 	if(dd_catalog_only_flag()) {
 	    return;
 	}
-	if(a = get_tagged_string("OUTPUT_FLAGS")) {
+	if((a = get_tagged_string("OUTPUT_FLAGS"))) {
 	    if(strstr(a,"NO_GECHO")) {
 		return;
 	    }
@@ -82,22 +82,22 @@ void dd_gecho(DGI_PTR dgi)
 	}
 	ra = (struct radar_angles *)malloc(sizeof(struct radar_angles));
 	
-	if(a = get_tagged_string("GECHO_MSL"))
+	if((a = get_tagged_string("GECHO_MSL")))
 	      gecho_msl = YES;
-	if(a = get_tagged_string("GECHO_REFL"))
+	if((a = get_tagged_string("GECHO_REFL")))
 	      gecho_refl = a;
-	if(a = get_tagged_string("GECHO_VEL"))
+	if((a = get_tagged_string("GECHO_VEL")))
 	      gecho_vel = a;
-	if(a = get_tagged_string("EARTH_RADIUS"))
+	if((a = get_tagged_string("EARTH_RADIUS")))
 	      earth_radius = atof(a);
-	if(a = get_tagged_string("GECHO_MAX_ROT_ANGLE"))
+	if((a = get_tagged_string("GECHO_MAX_ROT_ANGLE")))
 	      max_rot_angle = atof(a);
-	if(a = get_tagged_string("GECHO_MIN_ROT_ANGLE"))
+	if((a = get_tagged_string("GECHO_MIN_ROT_ANGLE")))
 	      min_rot_angle = atof(a);
-	if(a = get_tagged_string("GECHO_MIN_GATES"))
+	if((a = get_tagged_string("GECHO_MIN_GATES")))
 	      min_gates = atoi(a);
 
-	if(a = get_tagged_string("OPTIONS")) {
+	if((a = get_tagged_string("OPTIONS"))) {
 	    if( strstr( a, "GECHO_10" )) {
 		first_10_only = YES;
 	    }
@@ -346,7 +346,7 @@ void dd_gecho_intxn(DGI_PTR dgi, int fid, double min_rot_angle, double max_rot_a
     if((ndx = dd_ndx_name(dgi, gecho_ncp)) >= 0 )
 	  dd_givfld( dgi, &ndx, &g1, &ng, ncp, &bad_val);
 
-    sprintf( a,
+    snprintf(a, sizeof(str),
 "%3d%7.1f%6.1f%6.1f%5.2f%7.2f%8.1f%8.1f%8.1f%7.2f%8.1f%8.1f%8.1f%8.1f%8.1f%8.1f\n"
 	    , ng
 	    , rotation_angle +dds->cfac->rot_angle_corr
@@ -394,7 +394,7 @@ void dd_gecho_intxn(DGI_PTR dgi, int fid, double min_rot_angle, double max_rot_a
 	  cos(ra->elevation) * (u*sin(ra->azimuth) + v*cos(ra->azimuth))
 		+ w*sin(ra->elevation);
 
-    sprintf( a
+    snprintf( a, sizeof(str) - slen
  , "%6d%3d:%3d:%3d%8.4f%8.4f%8.4f%8.4f%8.4f%8.4f%8.4f%8.4f%8.4f%8.4f%8.4f%8.4f\n"
 	    , (int)(celv->dist_cells[0])
 	    , ryib->hour
@@ -419,7 +419,7 @@ void dd_gecho_intxn(DGI_PTR dgi, int fid, double min_rot_angle, double max_rot_a
     a += nc;
 
     for(i=g1,j=0; j < ng; i++, j++ ) {
-	sprintf(a, "%6d%10.1f%10.2f%10.1f%10.3f\n", i, refl[j], vel[j], rng[j]
+	snprintf(a, sizeof(str) - slen, "%6d%10.1f%10.2f%10.1f%10.3f\n", i, refl[j], vel[j], rng[j]
 	    , ncp[j] );
 	nc = strlen(a);
 	slen += nc;

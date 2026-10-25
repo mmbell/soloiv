@@ -86,6 +86,9 @@ int solo_ensure_cell_capacity (WW_PTR wwptr, int ncells)
 /* c------------------------------------------------------------------------ */
 /* c------------------------------------------------------------------------ */
 
+/* "HH:MM:SS" plus NUL; no callers yet, so size the write for the format */
+#define TS_ASCII_TIME_LEN 9
+
 char *sp_ts_ascii_time(int frme, int xpos, char *atime)
 {
     int width;
@@ -104,7 +107,7 @@ char *sp_ts_ascii_time(int frme, int xpos, char *atime)
     dts.time_stamp = wwptr->sweep->start_time +
 	  ((double)xpos/(double)width) * time_span;
     d_unstamp_time(&dts);
-    sprintf(atime, "%02d:%02d:%02d", dts.hour, dts.minute, dts.second);
+    snprintf(atime, TS_ASCII_TIME_LEN, "%02d:%02d:%02d", dts.hour, dts.minute, dts.second);
     return(atime);
 }
 /* c------------------------------------------------------------------------ */
@@ -205,8 +208,7 @@ void sp_ui_plot_cmds(int arg, struct ui_command *cmds)
 # ifdef obsolete
 	if(!strncmp(cmds->uc_text, "gif-file", 5)) {
 	    ftype = "gif";
-	    sprintf(command
-		    , "xwd -id %d -nobdrs | xwdtopnm | ppmtogif > ", windowID);
+	    snprintf(command, sizeof(command), "xwd -id %d -nobdrs | xwdtopnm | ppmtogif > ", windowID);
 	}
 	else if(!strncmp(cmds->uc_text, "jpeg-file", 5) ||
 # else
@@ -227,22 +229,19 @@ void sp_ui_plot_cmds(int arg, struct ui_command *cmds)
 	      ftype = "gif";
 	      suffix = ".gif";
 	    }
-	    sprintf(command
-		    , "xwd -id %d -nobdrs | convert xwd:-  ", windowID);
+	    snprintf(command, sizeof(command), "xwd -id %d -nobdrs | convert xwd:-  ", windowID);
 	}
 	else if(!strncmp(cmds->uc_text, "pnm-file", 5)) {
 	    ftype = "pnm";
-	    sprintf(command
-		    , "xwd -id %d -nobdrs | xwdtopnm > ", windowID);
+	    snprintf(command, sizeof(command), "xwd -id %d -nobdrs | xwdtopnm > ", windowID);
 	}
 	else if(!strncmp(cmds->uc_text, "postscript-file", 5)) {
 	    ftype = "ps";
-	    sprintf(command
-		    , "xwd -id %d -nobdrs | xwd2ps > ", windowID);
+	    snprintf(command, sizeof(command), "xwd -id %d -nobdrs | xwd2ps > ", windowID);
 	}
 	else {
 	    ftype = "xwd";
-	    sprintf(command, "xwd -id %d -out ", windowID);
+	    snprintf(command, sizeof(command), "xwd -id %d -out ", windowID);
 	}
 	bb += strlen(bb);
 	if(!(dir = getenv("WINDOW_DUMP_DIR")))
@@ -259,7 +258,7 @@ void sp_ui_plot_cmds(int arg, struct ui_command *cmds)
 
 	dd_file_name(ftype, ltime, wwptr->sweep->radar_name, 0, bb);
 
-	sprintf( bb+strlen(bb), "_%.1f_%s", dgi->dds->swib->fixed_angle
+	snprintf( bb+strlen(bb), sizeof(command)-(bb-command)-strlen(bb), "_%.1f_%s", dgi->dds->swib->fixed_angle
 		 , dd_scan_mode_mne(dgi->dds->radd->scan_mode, mne));
 
 	if( suffix )
@@ -916,7 +915,7 @@ void se_set_sfic_from_frame(int frme)
 	strcpy(sfic->version_text, "first");
     }
     else {
-	sprintf(sfic->version_text, "%ld", wwptr->sweep->version_num);
+	snprintf(sfic->version_text, sizeof(sfic->version_text), "%ld", wwptr->sweep->version_num);
     }
     sfic->version = wwptr->sweep->version_num;
 }
@@ -995,7 +994,7 @@ void solo_ww_top_line(int frme)
     dts = &dtx;
 # endif
     d_unstamp_time(dts);
-    sprintf(aa, "%d %02d/%02d/%d %02d:%02d:%02d %s %.1f %s %s"
+    snprintf(aa, sizeof(wwptr->top_line), "%d %02d/%02d/%d %02d:%02d:%02d %s %.1f %s %s"
 	    , frme+1
 	    , dts->month
 	    , dts->day

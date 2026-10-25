@@ -264,7 +264,7 @@ void produce_shanes_data(DGI_PTR dgi)
 	spv = (struct shane_info *)malloc(sizeof(struct shane_info));
 	memset(spv, 0, sizeof(struct shane_info));
 	
-	if(aa=get_tagged_string("SHANES_DIRECTORY")) {
+	if((aa=get_tagged_string("SHANES_DIRECTORY"))) {
 	    slash_path(spv->directory, aa);
 	}
 	else {

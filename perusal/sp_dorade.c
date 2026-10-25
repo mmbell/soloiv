@@ -204,7 +204,7 @@ void solo_color_cells(int frme)
      * no indication as to why it happens...
      */
     default:
-        sprintf(msg, 
+        snprintf(msg, sizeof(msg), 
                 "DORADE binary format %d unsupported. %s will display as a constant field!\n",
                 binary_format,
                 dgi->dds->parm[wwptr->parameter_num]->parameter_name);

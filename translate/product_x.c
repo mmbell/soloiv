@@ -46,7 +46,7 @@ void dd_product_x(DGI_PTR dgi)
 	 */
 	local_px_flag = NO;
 	
-	if(a = get_tagged_string("OUTPUT_FLAGS")) {
+	if((a = get_tagged_string("OUTPUT_FLAGS"))) {
 	    if(strstr(a, "SPECIAL_DATA")) {
 		local_px_flag = YES;
 	    }
@@ -65,7 +65,7 @@ void dd_product_x(DGI_PTR dgi)
 	pxpx->pbp = pxpx->pb;
 	pxpx->pb_lim = pxpx->pb +BLOCK_SIZE -1;
 
-	if(a = get_tagged_string("EARTH_RADIUS"))
+	if((a = get_tagged_string("EARTH_RADIUS")))
 	      earth_radius = atof(a);
 	/*
 	 * build a filename and open the file
@@ -125,7 +125,7 @@ void dd_px(DGI_PTR dgi, int fid, int rn)
 
     str[0] = '\0';
     if(pxpx->sweep_num[rn] != dgi->sweep_num) {
-	sprintf(str,"vol:%3d sweep:%3d %s\n"
+	snprintf(str, sizeof(str),"vol:%3d sweep:%3d %s\n"
 		, dgi->vol_num
 		, dgi->sweep_num
 		, dgi->radar_name
@@ -137,7 +137,7 @@ void dd_px(DGI_PTR dgi, int fid, int rn)
     dts->time_stamp = dgi->time;
     d_unstamp_time(dts);
 # ifdef obsolete
-    sprintf(a, "%3d %-9s%s%5.1f%6.1f%4.0f%4.0f%4.0f %8.4f %8.4f"
+    snprintf(a, sizeof(str) - n, "%3d %-9s%s%5.1f%6.1f%4.0f%4.0f%4.0f %8.4f %8.4f"
 	    , ryib->sweep_num
 	    , dgi->radar_name
 	    , dts_print(dts)
@@ -150,7 +150,7 @@ void dd_px(DGI_PTR dgi, int fid, int rn)
 	    , asib->longitude
 	    );
 # else
-    sprintf(a, "%s %3d%6.1f%6.1f%6.1f%6.1f%6.2f %6.1f%6.1f%6.1f%6.1f%6.1f%6.1f"
+    snprintf(a, sizeof(str) - n, "%s %3d%6.1f%6.1f%6.1f%6.1f%6.2f %6.1f%6.1f%6.1f%6.1f%6.1f%6.1f"
 	    , dts_print(dts)
 	    , ryib->sweep_num
 	    , asib->heading
@@ -173,7 +173,7 @@ void dd_px(DGI_PTR dgi, int fid, int rn)
 	dd_givfld( dgi, &ndx, &g1, &ng, refl, &bad_val);
 	strcat(a, "\n");
 	for(i=0; i < ng; i++) {
-	    sprintf(a, " %.1f", refl[i]);
+	    snprintf(a, sizeof(str) - n, " %.1f", refl[i]);
 	    n += strlen(a);
 	    a = str +n;
 	}

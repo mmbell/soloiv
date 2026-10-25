@@ -200,7 +200,7 @@ int solo_color_check(char *theColorName, XColor *theHardwareColor)
 			     , theHardwareColor);
 # endif 
     if(theStatus == 0) {
-	sprintf(mess, "Unable to use color: %s\n"
+	snprintf(mess, sizeof(mess), "Unable to use color: %s\n"
 		, theColorName);
 	solo_add_list_entry(slm, mess, strlen(mess));
     }
@@ -226,7 +226,7 @@ int xsolo_hardware_color_table(int frme, char *directory, char *filename)
     /* try absorbing the color table
      */
     if((nc = solo_absorb_color_table(frme, directory, filename)) < 1) {
-	sprintf(mess, "Not a useful color table: %s %s"
+	snprintf(mess, sizeof(mess), "Not a useful color table: %s %s"
 		, directory, filename);
 	solo_add_list_entry(slm, mess, strlen(mess));
 	slm_list_ui(slm);
@@ -269,7 +269,7 @@ int xsolo_hardware_color_table(int frme, char *directory, char *filename)
 	}
     }
     if(!ok) {
-	sprintf(mess, "Not a useful color table: %s %s"
+	snprintf(mess, sizeof(mess), "Not a useful color table: %s %s"
 		, directory, filename);
 	solo_add_list_entry(slm, mess, strlen(mess));
 	slm_list_ui(slm);
@@ -301,13 +301,13 @@ int solo_pixelate_color(XColor *theHardwareColor, char *theColorName)
 			     , theHardwareColor);
 # endif
     if(theStatus == 0) {
-	sprintf(mess, "Unable to pixelate color: %s %d %d %d"
+	snprintf(mess, sizeof(mess), "Unable to pixelate color: %s %d %d %d"
 		, theColorName, theHardwareColor->red
 		, theHardwareColor->green, theHardwareColor->blue);
 	solo_add_list_entry(slm, mess, strlen(mess));
     }
     if(theHardwareColor->pixel > 255) {
-	sprintf(mess, "Pixel value %lu exceeds 255 for %s %d %d %d"
+	snprintf(mess, sizeof(mess), "Pixel value %lu exceeds 255 for %s %d %d %d"
 		, theHardwareColor->pixel
 		, theColorName, theHardwareColor->red
 		, theHardwareColor->green, theHardwareColor->blue);

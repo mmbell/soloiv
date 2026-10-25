@@ -255,7 +255,7 @@ void sii_links_widget( guint frame_num, guint widget_id, LinksInfo *linkfo )
   for (row=0; row < maxConfigRows-1; row++ ) {
      for (col=0; col < maxConfigCols; col++, button_num++ ) {
 
-	sprintf (str, "F%d", button_num+1 );
+	snprintf (str, sizeof(str), "F%d", button_num+1 );
 	button = gtk_toggle_button_new_with_label (str);
 	gtk_widget_set_size_request (button, 0, 40);
 	gtk_widget_set_hexpand (button, TRUE);
