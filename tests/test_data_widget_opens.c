@@ -9,8 +9,10 @@
 
 #include "sii_log_handler.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-void show_click_data_widget(guint frame_num);
 
 typedef struct { guint baseline; } DataResult;
 

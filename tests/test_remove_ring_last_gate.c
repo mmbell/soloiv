@@ -26,15 +26,13 @@
 #include "solo_editor_structs.h"
 #include "ui.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define CFRAD_FILE "cfrad2.20220907_125318.857_to_20220907_125322.837_N42RF-TM_AIR.nc"
 #define MAXG 8192
 
-struct dd_general_info *dd_window_dgi();
-struct solo_edit_stuff *return_sed_stuff();
-int dd_cell_num();
-int dd_find_field();
-int se_ring_zap();
 
 static void ring_action(GtkWidget *main_window, gpointer user_data)
 {
@@ -52,7 +50,7 @@ static void ring_action(GtkWidget *main_window, gpointer user_data)
     (void)main_window;
     (void)user_data;
 
-    dgi = dd_window_dgi(win, "");
+    dgi = dd_window_dgi(win);
     g_strlcpy(dgi->directory_name, "./", sizeof(dgi->directory_name));
     g_strlcpy(dgi->sweep_file_name, CFRAD_FILE, sizeof(dgi->sweep_file_name));
     dgi->source_fmt = CFRADIAL_FMT;

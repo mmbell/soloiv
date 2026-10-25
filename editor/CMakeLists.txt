@@ -17,11 +17,12 @@ set(EDITOR_SOURCES
 
 add_library(soloedit STATIC ${EDITOR_SOURCES})
 
-# Legacy K&R C code
+# Every C function in soloedit is prototyped (include/soloedit_protos.h);
+# keep it that way by making a missing prototype or an implicit
+# declaration an error.
 target_compile_options(soloedit PRIVATE
-    -Wno-implicit-function-declaration
-    -Wno-implicit-int
-    -Wno-return-mismatch
+    $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:Clang,AppleClang>>:-Werror=deprecated-non-prototype -Werror=implicit-function-declaration -Werror=implicit-int -Werror=strict-prototypes>
+    $<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU>>:-Werror=implicit-function-declaration -Werror=implicit-int -Werror=old-style-definition -Werror=strict-prototypes>
 )
 
 target_include_directories(soloedit PUBLIC

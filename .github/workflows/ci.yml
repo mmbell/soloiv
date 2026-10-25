@@ -67,7 +67,12 @@ jobs:
           sudo ldconfig
 
       - name: Configure
-        run: cmake --preset ${{ matrix.preset }} -DLROSE_PREFIX=/usr/local/lrose
+        # Warnings are errors in the plain build. Not in the sanitizer build:
+        # GCC's ASan instrumentation produces false-positive diagnostics
+        # (e.g. "null destination pointer" on sprintf into a caller's buffer).
+        run: >
+          cmake --preset ${{ matrix.preset }} -DLROSE_PREFIX=/usr/local/lrose
+          -DSOLOIV_WERROR=${{ matrix.preset == 'default' && 'ON' || 'OFF' }}
 
       - name: Build
         run: cmake --build --preset ${{ matrix.preset }} -j "$(nproc)"

@@ -62,7 +62,7 @@ static char vcid[] = "$Id$";
 # endif
 
 # include <dd_math.h>
-# include <function_decl.h>
+# include <s2_protos.h>
 
 # define PMODE 0666
 # define MIN_RAYS_PER_SWEEP 1
@@ -90,7 +90,6 @@ static int Catalog_only_flag=NO, print_dd_open_info=YES;
 static char dd_open_info[384];
 static int Control_C=NO;
 static int solo_flag=0;
-void dd_unlink();
 
 
 
@@ -201,7 +200,6 @@ int dd_set_solo_flag(int val)
 int dd_assign_radar_num(char *radar_name)
 {
     int i, rn;
-    struct dd_general_info *dd_ini();
     /*
      * return the set of structures associated with
      * this radar
@@ -230,7 +228,7 @@ int dd_assign_radar_num(char *radar_name)
 struct time_dependent_fixes *dd_clean_tdfs(int *fx_count)
 {
     int nn=0;
-    struct time_dependent_fixes *fix, *dd_kill_tdf();
+    struct time_dependent_fixes *fix;
 
     *fx_count = 0;
     if(!tdf)
@@ -307,7 +305,7 @@ struct dd_comm_info *dd_last_comment(void)
 
 int dd_min_rays_per_sweep(void)
 {
-    char *aa, *get_tagged_string();
+    char *aa;
     int ii;
 
     if(!Min_rays_per_sweep) {
@@ -331,7 +329,7 @@ int dd_min_rays_per_sweep(void)
 
 int dd_max_rays_per_sweep(void)
 {
-    char *aa, *get_tagged_string();
+    char *aa;
     int ii;
 
     if(!Max_rays_per_sweep) {
@@ -350,7 +348,7 @@ int dd_max_rays_per_sweep(void)
 
 int dd_max_sweeps_per_volume(void)
 {
-    char *aa, *get_tagged_string();
+    char *aa;
     int ii;
 
     if(!Max_sweeps_per_volume) {
@@ -369,7 +367,7 @@ int dd_max_sweeps_per_volume(void)
 
 int dd_min_sweeps_per_volume(void)
 {
-    char *aa, *get_tagged_string();
+    char *aa;
     int ii;
 
     if(!Min_sweeps_per_volume) {
@@ -660,11 +658,11 @@ struct dd_stats *dd_return_stats_ptr(void)
 
 struct time_dependent_fixes *dd_time_dependent_fixes(int *fx_count)
 {
-    int ii, jj, kk, nn, nt, arg_num=0, dd_tokens(), node_num=0;
-    char *aa, *bb, *cc, *dd,  *get_tagged_string(), last_char=' ';
+    int ii, jj, kk, nn, nt, arg_num=0, node_num=0;
+    char *aa, *bb, *cc, *dd, last_char=' ';
     char string_space[2048], *str_ptrs[256];
     DD_TIME dts;
-    struct time_dependent_fixes *fix, *dd_clean_tdfs();
+    struct time_dependent_fixes *fix;
     float f;
 
     *fx_count = 0;
@@ -874,7 +872,6 @@ DGI_PTR dd_window_dgi(int window_num)
 {
     /* returns the dgi struct pointer for the requested window
      */
-    struct dd_general_info *dd_ini();
     int i;
 
     if(Num_windows == 0) {		/* first time! */
@@ -926,7 +923,7 @@ DGI_PTR dgi_last(void)
 void difs_terminators(DGI_PTR dgi, struct dd_input_filters *difs, struct dd_stats *dd_stats)
 {
     int i, mark;
-    double d, ddir_free();
+    double d;
 
     if(difs->min_free_MB &&
        ((d=ddir_free(dgi->directory_name)) <= difs->min_free_MB)) {

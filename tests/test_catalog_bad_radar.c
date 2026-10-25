@@ -34,13 +34,10 @@
 #include "dd_defines.h"
 #include "dd_files.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-struct dd_general_info *dd_window_dgi();
-int mddir_file_list_v3();
-int mddir_num_radars_v3();
-int ddfnp_list();
-double ddfnp_list_entry();
-struct dd_file_name_v3 *ddfn_search();
 
 #define DIR_NUM 5
 
@@ -82,10 +79,10 @@ static void bad_radar_action(GtkWidget *main_window, gpointer user_data)
 
     /* dd_window_dgi must refuse an index past window_dgi[MAX_SENSORS] instead
      * of reading off the end of the array. */
-    g_assert_null(dd_window_dgi(-1, ""));
-    g_assert_null(dd_window_dgi(MAX_SENSORS, ""));
-    g_assert_null(dd_window_dgi(MAX_SENSORS + 2, ""));
-    g_assert_nonnull(dd_window_dgi(MAX_SENSORS - 1, ""));   /* still valid */
+    g_assert_null(dd_window_dgi(-1));
+    g_assert_null(dd_window_dgi(MAX_SENSORS));
+    g_assert_null(dd_window_dgi(MAX_SENSORS + 2));
+    g_assert_nonnull(dd_window_dgi(MAX_SENSORS - 1));   /* still valid */
 
     test_app_runner_pump(10);
 }

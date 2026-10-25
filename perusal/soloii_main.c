@@ -14,8 +14,7 @@
 #include <string.h>
 
 #include "sii_log_handler.h"
-
-void soloiv_activate(GtkApplication *app, gpointer user_data);
+#include "soloiv_core_gtk_protos.h"
 
 static void
 consume_local_flag(int *argc, char **argv, const char *flag, gboolean *out)

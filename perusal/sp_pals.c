@@ -16,8 +16,9 @@ static char vcid[] = "$Id$";
 # include <dd_files.h>
 # include <sed_shared_structs.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 
 /*
  * solo_free_palette
@@ -40,34 +41,6 @@ static char vcid[] = "$Id$";
 
 static struct solo_palette_ptr *top_palette=NULL;
 static char *parm_delim=",";
-
-/* external routines */
-void solo_message();		/* solo.c */
-int solo_color_check();		/* sp_colors.c */
-int solo_pixelate_color();	/* sp_colors.c */
-void yes_exit();		/* solo.c */
-
-
-/* internal routines */
-struct solo_palette_ptr *solo_palette_insert();
-void solo_free_palette();
-void solo_gen_palette_list();
-struct solo_palette_ptr *solo_get_palette();
-void solo_init_palette();
-struct solo_palette_ptr *solo_malloc_palette();
-void solo_merge_usual_parm();
-int solo_palette_color_numbers();
-void solo_palette_message();
-struct solo_palette_ptr *solo_palette_remove();
-struct solo_palette_ptr *solo_push_palette();
-int solo_same_palette();
-void solo_subscribe_palette();
-void solo_check_zap_parms();
-struct solo_palette_ptr *solo_this_palette();
-struct solo_palette_ptr *solo_usual_parms();
-struct solo_palette_ptr *solo_topof_palettes();
-void solo_zap_usual_parm();
-
 
 
 # ifndef obsolete
@@ -128,8 +101,8 @@ void solo_gen_palette_list(void)
     struct solo_list_mgmt *lm;
     int i, j, n;
     char str[256];
-    struct solo_palette_ptr *pal, *solo_topof_palettes();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_palette_ptr *pal;
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
 
@@ -155,18 +128,12 @@ void solo_gen_palette_list(void)
 struct solo_palette_ptr *xsolo_get_palette(char *name, int frme)
 {
     int i, j, n, mark;
-    struct solo_palette_ptr        *pal=NULL, *top
-	  , *solo_topof_palettes()
-		, *solo_this_palette()
-		      , *solo_usual_parms()
-			    , *solo_malloc_palette()
-				  , *solo_push_palette();
+    struct solo_palette_ptr *pal=NULL, *top;
     char mess[256], str[88];
 
 /*
  * forward declarations
  */
-    void solo_merge_usual_parm ();
     
     top = solo_topof_palettes();
 
@@ -194,8 +161,7 @@ struct solo_palette_ptr *xsolo_get_palette(char *name, int frme)
 
 void solo_init_palette(void)
 {
-    struct solo_palette_ptr *next, *last, *solo_malloc_palette();
-    struct solo_palette_ptr *solo_push_palette();
+    struct solo_palette_ptr *next, *last;
 
     if(top_palette)
 	  return;
@@ -389,8 +355,7 @@ struct solo_palette_ptr *solo_malloc_palette(char *name)
      * a generic palette
      */
     struct solo_palette_ptr *next;
-    char *color_dir, *getenv();
-    long time_now();
+    char *color_dir;
 
     next = (struct solo_palette_ptr *)
 	  malloc(sizeof(struct solo_palette_ptr));
@@ -458,7 +423,7 @@ struct solo_palette *solo_malloc_old_palette(void)
 
 void solo_merge_usual_parm(struct solo_palette_ptr *this, char *name)
 {
-    char *a, *aa, *b, *c, *e, *f, str[256], *strstr();
+    char *a, *aa, *b, *c, *e, *f, str[256];
     int i, j, n, nn, mark, prepend=NO;
     /*
      * put "name" at the beginning of the list
@@ -516,7 +481,7 @@ int xsolo_palette_color_numbers(int frme)
      */
     int ii, ok=YES;
     XColor xcolor;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
 
@@ -587,7 +552,7 @@ int xsolo_palette_color_numbers(int frme)
 
 void solo_palette_message(int frme)
 {
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     float half;
 
     wwptr = solo_return_wwptr(frme);
@@ -624,8 +589,7 @@ struct solo_palette_ptr *solo_palette_remove(struct solo_palette_ptr *this)
 
 struct solo_palette_ptr *solo_push_palette(struct solo_palette_ptr *this)
 {
-    struct solo_palette_ptr *solo_palette_insert(), *next, *that;
-    struct solo_palette_ptr *solo_palette_remove();
+    struct solo_palette_ptr *next, *that;
     int before=YES, mark;
 
 
@@ -676,8 +640,7 @@ void solo_subscribe_palette(int frme, struct solo_palette_ptr *this, char *param
 {
     char str[256];
     int i, j, n, mark;
-    struct solo_palette_ptr *top, *pal
-	  , *solo_topof_palettes();
+    struct solo_palette_ptr *top, *pal;
 
     char mess[256];
     
@@ -699,13 +662,11 @@ void solo_subscribe_palette(int frme, struct solo_palette_ptr *this, char *param
 
 void solo_check_zap_parms(char *name, struct solo_palette_ptr *except)
 {
-    struct solo_palette_ptr *top, *pal
-	  , *solo_topof_palettes();
+    struct solo_palette_ptr *top, *pal;
 
 /*
  * forward declarations
  */
-   void solo_zap_usual_parm ();
     
     pal = solo_topof_palettes();
 
@@ -750,7 +711,7 @@ solo_usual_parms(char *name, struct solo_palette_ptr *next)
 /* c------------------------------------------------------------------------ */
 
 struct solo_palette_ptr *
-solo_topof_palettes()
+solo_topof_palettes(void)
 {
     return(top_palette);
 }
@@ -758,9 +719,8 @@ solo_topof_palettes()
 
 void solo_zap_usual_parm(struct solo_palette_ptr *this, char *name)
 {
-    char *a, *b, *c, *e, str[256], *strstr();
+    char *a, *b, *c, *e, str[256];
     int i, j, n, mark;
-    struct solo_palette_ptr *solo_palette_remove();
     /*
      * remove name from list
      */

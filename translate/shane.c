@@ -97,8 +97,7 @@ value without rewriting the whole file.
 # include "input_sweepfiles.h"
 # include "input_limits.h"
 # include "dd_stats.h"
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 
 
 struct shane_header {
@@ -161,21 +160,8 @@ static struct dd_input_sweepfiles_v3 *dis=NULL;
 static struct shane_info *spv=NULL;
 static int shane_output=YES;
 
-double dd_rotation_angle();
-double dd_tilt_angle();
-double dd_latitude();
-double dd_longitude();
-double dd_altitude();
-double dd_earthr();
-double dd_azimuth_angle();
-double dd_elevation_angle();
-double dd_heading();
-double dd_drift();
-double dd_roll();
-double dd_pitch();
 
-static void stuff_shanes_hsk();
-void produce_shanes_data();
+static void stuff_shanes_hsk(DGI_PTR dgi, float *hsk, struct field_mgmt *fm);
 
 
 
@@ -188,11 +174,8 @@ void dd_shane_conv(void)
 {
     static int count=0;
     int ii, rn, flush=NO, ok;
-    struct dd_input_filters *dd_return_difs_ptr();
-    struct dd_stats *dd_return_stats_ptr();
-    struct dd_input_sweepfiles_v3 *dd_setup_sweepfile_structs_v3();
     struct unique_sweepfile_info_v3 *usi;
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct dd_general_info *dgi;
 
     /* do all the necessary initialization including
      * reading in the first ray
@@ -223,7 +206,7 @@ void dd_shane_conv(void)
 	for(;;) {
 	    if(!(count++ % 500))
 		  dgi_interest_really(dgi, NO, "", "", dgi->dds->swib);
-	    produce_shanes_data(dgi, flush);
+	    produce_shanes_data(dgi);
 	    
 	    dgi->new_vol = NO;
 	    dgi->new_sweep = NO;
@@ -254,8 +237,6 @@ void produce_shanes_data(DGI_PTR dgi)
     int ii, mm, nc, nn, nt, pn, mark, bad, shots_per_ray = 1;
     int num_cells, something_changed=NO;
     char *aa, string_space[256], *str_ptrs[32], str[256];
-    char *get_tagged_string();
-    int dd_tokens(), dd_find_field();
     struct field_mgmt *fm, *fm_last;
     float *fp, rcp_scale, bias, bin_spacing;
     short *ss;
@@ -404,7 +385,6 @@ static void stuff_shanes_hsk(DGI_PTR dgi, float *hsk, struct field_mgmt *fm)
 {
     int ii, id, point, field;
     int pn = fm->parm_num;
-    DD_TIME *d_unstamp_time();
     float details;
     double d;
     struct shane_header *shd = (struct shane_header *)hsk;

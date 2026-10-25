@@ -11,7 +11,7 @@ static char vcid[] = "$Id$";
 # include <dd_defines.h>
 # include "generic_radar_info.h"
 # include <dorade_share.h>
-# include <function_decl.h>
+# include <s2_protos.h>
 
 # define HOUR                             0
 # define MINUTE                           1
@@ -264,18 +264,6 @@ static DD_TIME dts;
 static char *deep6=0;
 
 
-int hrd_ascii_read();
-int hrd_merge_std();
-void hrd_std_init();
-int hrd_sync_std();
-int hrd_sync_ascii();
-void hrd_dmp_std();
-void hrd_ac_update_std();
-void type4_new();
-void type5_new();
-double cvt_hp1000fp();
-int hrdstd_read();
-int fb_read();
 
 /* c------------------------------------------------------------------------ */
 
@@ -350,8 +338,7 @@ int hrd_merge_std(struct generic_radar_info *gri)
 {
     static int count=0,  merge_it=YES;
     int ii, mark;
-    char *a, *get_tagged_string(), *dts_print();
-    DD_TIME *d_unstamp_time();
+    char *a;
     /*
      * routine to manage the merging of P3 standard tape data with the
      * airborne radar data
@@ -533,12 +520,12 @@ int hrd_sync_std(struct generic_radar_info *gri)
 {
     /* c...mark */
     int ii, jj, nn, mark, gotta_type4=NO, gotta_type5=NO;
-    static count=0, counta=0, countb=0;
+    static int count=0, counta=0, countb=0;
     static int end_of_tape=YES;
-    char *a, *b, *c, *dd_whiteout(), *dd_delimit(), str[256];
+    char *a, *b, *c, str[256];
     short *ss, *zz;
     struct type1_stuff *t1s;
-    double d, d_time_stamp(), *dptr, cvt_hp1000fp();
+    double d, *dptr;
     float f, *fptr;
 
 
@@ -712,13 +699,13 @@ int hrd_sync_ascii(struct generic_radar_info *gri)
 {
     /* c...mark */
     int ii, jj, nn, mark, gotta_type4=NO, gotta_type5=NO;
-    static count=0, counta=0, countb=0;
+    static int count=0, counta=0, countb=0;
     static int end_of_tape=YES;
-    char *a, *b, *c, *dd_whiteout(), *dd_delimit(), str[256];
+    char *a, *b, *c, str[256];
     char name[16], dummy[16];
     short *ss, *zz;
     struct type1_stuff *t1s;
-    double d, d_time_stamp(), *dptr, cvt_hp1000fp();
+    double d, *dptr;
     float f, *fptr;
 
 
@@ -803,7 +790,6 @@ int hrd_sync_ascii(struct generic_radar_info *gri)
 void hrd_dmp_std(struct type5_stuff *t5s, struct generic_radar_info *gri)
 {
     double d1, d2;
-    DD_TIME *d_unstamp_time();
     char mess[256];
     static int count=0;
 
@@ -846,7 +832,6 @@ void hrd_ac_update_std(struct generic_radar_info *gri)
     double d, d1, d2, frac, movement;
     float lat_err=0, lon_err=0;
     static struct running_avg_que *raq_lat, *raq_lon;
-    struct running_avg_que *se_return_ravgs();
     static struct que_val *qv_lat, *qv_lon;
 				/* c...mark */
 
@@ -1111,7 +1096,7 @@ void type5_new(void)
     struct type4_stuff *t4s=hs->t4s;
     struct type5_stuff *t5s=hs->t5s->next;
     float *fptr, *fus;
-    double d, pow(), exp(), log(), T, Te, Ee, AlogEe, d_time_stamp();
+    double d, T, Te, Ee, AlogEe;
 
 
     for(nn= *(ss+1),ii=0; ii < 10; ii++,t4s=t4s->next,t5s=t5s->next) {
@@ -1223,7 +1208,7 @@ int hrdstd_read(int fid, char *buf, int size, int io_type)
 {
     static int count=0, t_count=0, std_fid=-1;
     int ii, nn, mark;
-    char *a, *get_tagged_string(), *getenv();
+    char *a;
 
     count++;
 
@@ -1298,13 +1283,13 @@ int hrdstd_read(int fid, char *buf, int size, int io_type)
 
 int main(void)
 {
-    struct generic_radar_info *gri, *return_gri_ptr();
+    struct generic_radar_info *gri;
 
     long ival=0x40000004;
-    double d, cvt_hp1000fp(), d_time_stamp();
+    double d;
     int ii, jj, kk, nn;
     int yy=93, mon=2, dd=9, hh=13, mm=15, ss=1;
-    char *a,  *getenv();
+    char *a;
     
 
     if(!(a=getenv("HRD_STD_TAPE"))) {

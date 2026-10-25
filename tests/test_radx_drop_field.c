@@ -34,11 +34,10 @@
 #include "dd_defines.h"
 #include "radar_io.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-struct dd_general_info *dd_window_dgi();
-int dd_givfld();
-int dd_find_field();
-double dd_rotation_angle();
 
 /* Largest angular gap (deg) between consecutive plot angles around the circle.
  * A full sweep has a small gap (~ beam spacing); a missing wedge shows up as a
@@ -116,7 +115,7 @@ static int drop_check(const char *label, int win, const char *file)
     tmpdir = g_dir_make_tmp("soloiv_drop_XXXXXX", NULL);
     g_assert_nonnull(tmpdir);
 
-    dw = dd_window_dgi(win, "");
+    dw = dd_window_dgi(win);
     g_strlcpy(dw->directory_name, "./", sizeof(dw->directory_name));
     g_strlcpy(dw->sweep_file_name, file, sizeof(dw->sweep_file_name));
     dw->source_fmt = CFRADIAL_FMT;          /* force the rio backend */
@@ -173,7 +172,7 @@ static int drop_check(const char *label, int win, const char *file)
      * MAX_SENSORS (16): the old win+10 gave 18 for the AIR-CfRadial case and
      * read past window_dgi[]. win+1 is unused by the other drop_check calls,
      * which use even slots. */
-    dr = dd_window_dgi(win + 1, "");
+    dr = dd_window_dgi(win + 1);
     g_strlcpy(dr->directory_name, tmpdir, sizeof(dr->directory_name));
     if (dr->directory_name[strlen(dr->directory_name) - 1] != '/')
         g_strlcat(dr->directory_name, "/", sizeof(dr->directory_name));

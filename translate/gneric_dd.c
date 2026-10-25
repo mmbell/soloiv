@@ -24,19 +24,12 @@ static char vcid[] = "$Id$";
 # include "input_limits.h"
 # include "dd_stats.h"
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 
 static struct generic_radar_info *gri;
 static struct dd_stats *dd_stats=NULL;
 static struct dd_input_filters *difs=NULL;
 static int ray_num=0;
-
-void dd_celv_update();
-void dd_parms_update();
-void dd_radd_update();
-void dd_vold_update();
-void dd_stuff_ray();
 
 /* c------------------------------------------------------------------------ */
 
@@ -65,15 +58,13 @@ void dd_celv_update(struct dds_structs *dds)
 
 void dd_init_sweep(struct dd_general_info *dgi, int new_vol)
 {
-    CHAR_PTR dd_radar_name(), dd_blank_fill();
     short date[6];
-    time_t todays_date();
     int i;
     struct dds_structs *dds=dgi->dds;
     struct super_SWIB *sswb=dds->sswb;
     struct sweepinfo_d *swib=dds->swib;
     struct prev_swps *pss;
-    DD_TIME *dts=dgi->dds->dts, *d_unstamp_time();
+    DD_TIME *dts=dgi->dds->dts;
     FLOAT_PTR freq, ipps;
     
     dgi->ignore_this_sweep = gri->ignore_this_sweep;
@@ -136,7 +127,6 @@ void dd_init_sweep(struct dd_general_info *dgi, int new_vol)
 void dd_parms_update(struct dd_general_info *dgi)
 {
     int ii, jj, ncopy;
-    char *str_terminate();
 
     /* parameters */
     struct dds_structs *dds=dgi->dds;
@@ -203,7 +193,6 @@ void dd_radd_update(struct dds_structs *dds)
 {
     int i;
     struct radar_d *radd=dds->radd;
-    CHAR_PTR dd_blank_fill();
     FLOAT_PTR freq, ipps;
 
 
@@ -275,19 +264,15 @@ void dd_stuff_ray(void)
     short *ss;
     static int count=0, tripcount=13;
     struct dds_structs *dds;
-    struct dd_general_info *dgi, *dd_get_structs();
+    struct dd_general_info *dgi;
     struct radar_d *radd;
     struct super_SWIB *sswb;
     struct sweepinfo_d *swib;
     struct ray_i *ryib;
     struct platform_i *asib;
     struct prev_rays *prs;
-    struct dd_input_filters *dd_return_difs_ptr();
-    struct dd_stats *dd_return_stats_ptr();
     float elev=0;
-    double eldora_time_stamp(), dorade_time_stamp(), angdiff();
-    double dd_rotation_angle();
-    DD_TIME *dts, *d_unstamp_time();
+    DD_TIME *dts;
 
 
     if(!count++) {		/* first time through */
@@ -296,7 +281,7 @@ void dd_stuff_ray(void)
     }
     ray_num++;
 
-    dgi = dd_get_structs(gri->dd_radar_num, gri->radar_name);
+    dgi = dd_get_structs(gri->dd_radar_num);
 
     dds = dgi->dds;
     radd = dds->radd;
@@ -477,7 +462,6 @@ void dd_stuff_ray(void)
 void dd_vold_update(struct dd_general_info *dgi)
 {
     struct dds_structs *dds=dgi->dds;
-    char *dd_radar_name();
     struct volume_d *vold=dds->vold;
     struct super_SWIB *sswb=dds->sswb;
     struct sweepinfo_d *swib=dds->swib;

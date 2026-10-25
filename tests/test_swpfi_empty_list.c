@@ -32,11 +32,10 @@
 #include "soloii.h"
 #include "sii_log_handler.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-void show_swpfi_widget(GtkWidget *text, gpointer data);
-void sii_swpfi_list_widget(guint frame_num);
-GtkWidget *sii_get_widget_ptr(guint frame_num, guint widget_id);
-WW_PTR solo_return_wwptr();
 
 static void empty_list_action(GtkWidget *main_window, gpointer user_data)
 {

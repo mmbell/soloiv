@@ -10,6 +10,7 @@ static char vcid[] = "$Id$";
 #include <string.h>
 
 # include "dorade_headers.h"
+# include <s2_protos.h>
 
 # define PMODE 0666
 
@@ -31,14 +32,11 @@ static double trip_time=0;
 
 /* c------------------------------------------------------------------------ */
 
-void dd_px();
-
 void dd_product_x(DGI_PTR dgi)
 {
     DDS_PTR dds=dgi->dds;
     int i, mark, rn=dgi->radar_num;
-    char *a, *get_tagged_string(),  str[256];
-    char *dd_radar_name();
+    char *a,  str[256];
 
     if(!local_px_flag)
 	  return;
@@ -113,10 +111,10 @@ void dd_px(DGI_PTR dgi, int fid, int rn)
     DDS_PTR dds=dgi->dds;
     DD_TIME *dts=dgi->dds->dts;
     static int count=0, trip=250;
-    char *a, str[256], date[32], *dts_print();
+    char *a, str[256];
     struct ray_i *ryib=dds->ryib;
     struct platform_i *asib=dds->asib;
-    double d, fmod(), fabs(), dorade_time_stamp();
+    double d;
     int i, n=0, mark;
 
 
@@ -142,7 +140,7 @@ void dd_px(DGI_PTR dgi, int fid, int rn)
     sprintf(a, "%3d %-9s%s%5.1f%6.1f%4.0f%4.0f%4.0f %8.4f %8.4f"
 	    , ryib->sweep_num
 	    , dgi->radar_name
-	    , dts_print(dts, date)
+	    , dts_print(dts)
 	    , asib->pitch
 	    , asib->roll
 	    , asib->heading
@@ -153,7 +151,7 @@ void dd_px(DGI_PTR dgi, int fid, int rn)
 	    );
 # else
     sprintf(a, "%s %3d%6.1f%6.1f%6.1f%6.1f%6.2f %6.1f%6.1f%6.1f%6.1f%6.1f%6.1f"
-	    , dts_print(dts, date)
+	    , dts_print(dts)
 	    , ryib->sweep_num
 	    , asib->heading
 	    , asib->drift_angle

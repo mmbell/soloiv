@@ -12,8 +12,10 @@ static char vcid[] = "$Id$";
 # include <dd_files.h>
 # include <input_sweepfiles.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
+# include "soloiv_core_gtk_protos.h"
 
 
 /*
@@ -64,55 +66,6 @@ static struct ts_linked_frames *original_sweep_set[SOLO_MAX_WINDOWS];
 static struct ts_linked_frames *linked_sweep_set[SOLO_MAX_WINDOWS];
 static struct ts_linked_frames *linked_frames[2*SOLO_MAX_WINDOWS];
 
-void sp_change_cursor();
-void sii_xfer_images ();
-void sii_update_frame_info (guint frame_num);
-guint sii_frame_sync_num (guint frame_num);
-guint sii_config_sync_num (guint frame_num);
-
-
-/* external routines */
-int tsDisplay();		/* color_bscan.c */
-int solo_halt_flag();		/* sp_basics.c */
-void solo_clear_halt_flag();	/* sp_basics.c */
-void solo_set_busy_signal();	/* sp_basics.c */
-void solo_cpy_sweep_info();	/* sp_accepts.c */
-void dd_copy_pisp();		/* ddb_common.c */
-void init_xyraster();		/* sp_xyraster.c */
-void solo_ww_top_line();	/* sp_basics.c */
-void solo_cell_lut();		/* sp_dorade.c */
-void solo_clear_busy_signal();	/* sp_basics.c */
-int ray_raster_setup();		/* sp_xyraster.c */
-void solo_color_cells();	/* sp_dorade.c */
-void xx_inner_loop();		/* sp_xyraster.c */
-void yy_inner_loop();		/* sp_xyraster.c */
-void solo_set_halt_flag();	/* sp_basics.c */
-int solo_read_open();		/* sp_basics.c */
-void solo_def_params();		/* solo_io.c */
-void solo_subscribe_palette();	/* sp_pals.c */
-int solo_hardware_color_table(); /* sp_colors.c */
-int solo_palette_color_numbers(); /* sp_pals.c */
-void solo_data_color_lut();	/* sp_colors.c */
-int solo_color_check();		/* sp_colors.c */
-int solo_pixelate_color();	/* sp_colors.c */
-void solo_message();		/* solo.c */
-void solo_palette_message();	/* sp_pals.c */
-void sp_xyz_to_rtheta_screen (); /* sp_clkd.c */
-void sp_rtheta_screen_to_xyz();	/* sp_clkd.c */
-void yes_exit();		/* solo.c */
-int solo_worksheet();		/* solo_perusal.c */
-int solo_parameter_setup();	/* solo_perusal.c */
-int solo_busy();		/* sp_basics.c */
-
-
-/* internal functions */
-int sp_ts_data_loop();
-void sp_ts_line();
-int tsDisplay();
-void ts_ray_clone();
-void sp_tsYpixel_info();
-void sp_ts_column();
-
 
 /* c------------------------------------------------------------------------ */
 
@@ -130,11 +83,11 @@ int sp_ts_data_loop(struct ts_linked_frames *tsLink0, struct unique_sweepfile_in
    int rc_thr=TS_NUM_DELTAS;
    int top_down=NO, msl_relative=NO, right_left=NO, automatic=NO;
    int x_pxl, width, xinc, xstop, xmax;
-   WW_PTR wwptr, solo_return_wwptr();
-   struct dd_general_info *dgi, *dd_window_dgi();
+   WW_PTR wwptr;
+   struct dd_general_info *dgi;
    double d, d_nn, delta0, delta, delta2, avg_delta=0, sum_deltas=0;
    double rcp_num_deltas=1./(double)TS_NUM_DELTAS;
-   double t_pxl, pxl_span, rcp_pxl_span, dd_rotation_angle();
+   double t_pxl, pxl_span, rcp_pxl_span;
    double sstime;
    float rotang;
    struct times_que *tq;
@@ -147,7 +100,7 @@ int sp_ts_data_loop(struct ts_linked_frames *tsLink0, struct unique_sweepfile_in
 
    wwptr = solo_return_wwptr(lead_frame);
    sii_update_frame_info(lead_frame);
-   dgi = dd_window_dgi(lead_frame, "UNKNOWN");
+   dgi = dd_window_dgi(lead_frame);
    top_down = tsLink0->type_of_plot & TS_PLOT_DOWN;
    right_left = tsLink0->type_of_plot & TS_PLOT_RIGHT_TO_LEFT;
    automatic = tsLink0->type_of_plot & TS_AUTOMATIC;
@@ -445,7 +398,6 @@ void sp_ts_column(int frme, unsigned char *image, int x_pxl, int top_down)
      * a time-series data loop.
      */
     struct ts_linked_frames tsl;
-    WW_PTR solo_return_wwptr();
 
     memset(&tsl, 0, sizeof(tsl));
     tsl.wwptr = solo_return_wwptr(frme);
@@ -466,26 +418,22 @@ int tsDisplay(int click_frme, int command)
     static int plot_count=0;
     int ii, jj, nn, ok, vv, ww, frme, mark, broke=NO, lead_frame, one_pass;
     int contiguous=NO, return_flag=0, loop_count;
-    WW_PTR wwptr, wwptrx, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
-    char *aa, *bb, *solo_gen_file_info(), *getenv();
-    char mess[512], *get_tagged_string();
+    WW_PTR wwptr, wwptrx;
+    struct solo_perusal_info *spi;
+    struct dd_general_info *dgi;
+    char *aa, *bb;
+    char mess[512];
     int original_sweep_count, original_sweep_set_count, sset;
     int frame_list[SOLO_MAX_WINDOWS], frame_count=0;
     int checked_off[SOLO_MAX_WINDOWS];
-    long time_now();
-    double d_mddir_file_info_v3(), t1, t2, t3, t4, dd_ts_start();
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+    double t1, t2, t3, t4;
+    struct dd_input_sweepfiles_v3 *dis;
     struct unique_sweepfile_info_v3 *usi;
-    struct dd_input_filters *difs, *dd_return_difs_ptr();
+    struct dd_input_filters *difs;
     struct ts_linked_frames *tsLink0, *tsLink, *tsl;
     struct times_que *tq;
-    DD_TIME dts, *d_unstamp_time();
-    double d_time_stamp();
-    char *dts_print();
+    DD_TIME dts;
     struct solo_list_mgmt *slm;
-    struct solo_perusal_info *solo_return_winfo_ptr();
 
 
     if(solo_halt_flag()) {
@@ -770,7 +718,7 @@ int tsDisplay(int click_frme, int command)
 }
 /* c------------------------------------------------------------------------ */
 
-void ts_ray_clone(char *aa, char *cc, int y_count, int frame_width, int nlines, int top_down, int right_left)
+void ts_ray_clone(unsigned char *aa, unsigned char *cc, int y_count, int frame_width, int nlines, int top_down, int right_left)
 {
     /* copies a vertical line of data from left to right and bottom up
      * "aa" points to the bottom pixel of the vertical line to be cloned
@@ -778,7 +726,7 @@ void ts_ray_clone(char *aa, char *cc, int y_count, int frame_width, int nlines, 
      *     the cloning is to begin
      */
     int nn, fw, rl;
-    char *bb, *dd;
+    unsigned char *bb, *dd;
     /*
      * 
      */
@@ -797,15 +745,15 @@ void sp_tsYpixel_info(struct ts_linked_frames *tsLink, int top_down)
 {
     int ymax, ncells;
     struct ts_linked_frames *tsl=tsLink;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    double d, d0, d1, rmin, gs, rcp_gs, sp_meters_per_pixel();
-    double rloc, rctr, rbottom, ppm, mpp, rtop, dd_altitude();
+    struct dd_general_info *dgi;
+    double d, d0, d1, rmin, gs, rcp_gs;
+    double rloc, rctr, rbottom, ppm, mpp, rtop;
     char mess[256];
 
     /* first pretend that (0,0) is in the lower left corner and
      * we are plotting increasing range from bottom to top
      */
-    dgi = dd_window_dgi(tsl->lead_sweep->window_num, "UNKNOWN");
+    dgi = dd_window_dgi(tsl->lead_sweep->window_num);
     ncells = tsl->wwptr->number_cells;
     gs = tsl->wwptr->uniform_cell_spacing;
     rmin = tsl->wwptr->uniform_cell_one;

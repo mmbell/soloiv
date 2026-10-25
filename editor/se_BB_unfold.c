@@ -12,8 +12,9 @@ static char vcid[] = "$Id$";
 # include <ui.h>
 # include <ui_error.h>
 # include <stdio.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -108,11 +109,11 @@ int se_ac_surface_tweak(int arg, struct ui_command *cmds)
     double range_val, min_range, max_range, alt, range1;
     double ground_intersect, footprint, surf_shift, fudge=1.;
     double d, elev, tan_elev, half_vbw, min_grad = .08;	/* dBz/meter */
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     struct platform_i *asib;
     struct radar_angles *ra;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
 
     seds = return_sed_stuff();	/* solo editing struct */
@@ -240,13 +241,12 @@ se_BB_ac_unfold (	/* #BB-unfolding# */
     static short last_good_v0;
     float nyqv, scale, bias, rcp_qsize, rcp_nyqi;
     double u, v, w, insitu_wind, folds;
-    double dd_azimuth_angle(), dd_elevation_angle(), dazm, dele;
+    double dazm, dele;
     static struct running_avg_que *raq0, *raq1;
-    struct running_avg_que *se_return_ravgs();
     struct que_val *qv0, *qv1;
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
 
     seds = return_sed_stuff();	/* solo editing struct */
@@ -401,7 +401,7 @@ int se_BB_setup(int arg, struct ui_command *cmds)
      */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
     int ii, nn, mark;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
 
@@ -440,10 +440,10 @@ int se_remove_ac_motion(int arg, struct ui_command *cmds) /* #remove-aircraft-mo
     char *name;
     short *ss, *tt, *zz, *bnd, vx, bad;
     float nyqv, scale, bias, rcp_nyqi, ac_vel;
-    double d, dd_ac_vel();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    double d;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
 
     seds = return_sed_stuff();	/* solo editing struct */
@@ -513,10 +513,9 @@ int se_remove_storm_motion(int arg, struct ui_command *cmds) /* #remove-storm-mo
     short *ss, *tt, *zz, *bnd, vx, bad;
     float speed, wind, scale, bias;
     double d, az, cosEl, rcp_cosEl, theta, cosTheta, adjust, scaled_adjust;
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    double d_angdiff();
+    struct solo_edit_stuff *seds;
 
 
     seds = return_sed_stuff();	/* solo editing struct */

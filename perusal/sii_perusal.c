@@ -20,8 +20,9 @@ static char vcid[] = "$Id$";
 # include <dd_files.h>
 # include <sed_shared_structs.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include "radar_io.h"
 
 # include <stdarg.h>
@@ -47,66 +48,8 @@ static double nex_tol=.2;
 # define HIGH_PRF 0
 # define LOW_PRF 1
 
-/* Sherries routines */
-void sp_change_cursor();
-
-/* external routines */
-int tsDisplay();		/* color_bscan.c */
-int solo_halt_flag();		/* ddb_common.c */
-void solo_clear_halt_flag();	/* ddb_common.c */
-void solo_set_halt_flag();	/* ddb_common.c */
-void solo_set_busy_signal();	/* sp_basics.c */
-void solo_cpy_sweep_info();	/* sp_accepts.c */
-void dd_copy_pisp();		/* ddb_common.c */
-void init_xyraster();		/* sp_xyraster.c */
-void solo_ww_top_line();	/* sp_basics.c */
-void solo_cell_lut();		/* sp_dorade.c */
-void solo_clear_busy_signal();	/* sp_basics.c */
-int ray_raster_setup();		/* sp_xyraster.c */
-void solo_color_cells();	/* sp_dorade.c */
-void xx_inner_loop();		/* sp_xyraster.c */
-void yy_inner_loop();		/* sp_xyraster.c */
-void solo_set_halt_flag();	/* sp_basics.c */
-int solo_read_open();		/* sp_basics.c */
-void solo_def_params();		/* solo_io.c */
-void solo_subscribe_palette();	/* sp_pals.c */
-int solo_hardware_color_table(); /* sp_colors.c */
-int solo_palette_color_numbers(); /* sp_pals.c */
-void solo_data_color_lut();	/* sp_colors.c */
-int solo_color_check();		/* sp_colors.c */
-int solo_pixelate_color();	/* sp_colors.c */
-void solo_message();		/* solo.c */
-void solo_palette_message();	/* sp_pals.c */
-void sp_xyz_to_rtheta_screen (); /* sp_clkd.c */
-void sp_rtheta_screen_to_xyz();	/* sp_clkd.c */
-void yes_exit();		/* solo.c */
-int solo_busy();		/* sp_basics.c */
-
-
-/* internal routines */
-int displayq();
-void sp_nex_sweep_set();
-int sp_data_loop();
-int sp_diag_flag();
-void sp_set_diag_flag();
-void sp_replot_all();
-void sp_batch_plots();
-int sp_batch_mode();
-int solo_worksheet();
-int solo_nab_next_file();
-int sp_nab_fixed_angle_from_fn();
-int solo_parameter_setup();
-void sp_landmark_offsets();
-void sp_align_center();
-void mouse_control_case();
 
 /* c------------------------------------------------------------------------ */
-
-void sii_xfer_images ();
-void sii_reset_reconfig_flags (guint frame_num);
-void sii_update_frame_info (guint frame_num);
-guint sii_frame_sync_num (guint frame_num);
-guint sii_config_sync_num (guint frame_num);
 
 /* c------------------------------------------------------------------------ */
 
@@ -114,8 +57,6 @@ int displayq(int click_frme, int command)
 {
     static int plot_count=0;
     static int no_access_count = 0;
-    long mddir_file_info_v3();
-    double d_mddir_file_info_v3();
     struct linked_frames *flink0, *flink, *flinkx, *last_flink;
     struct linked_frames *dz_sweeps[SOLO_MAX_WINDOWS];
     struct linked_frames *ve_sweeps[SOLO_MAX_WINDOWS];
@@ -136,13 +77,12 @@ int displayq(int click_frme, int command)
     int double_break, triple_break;
     int new_worksheet=YES, ve_next, dz_only, ve_only, newer_sweeps, low_prf;
     /* c...mark */
-    WW_PTR wwptr, wwptrc, wwptrx, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    struct dd_general_info *dgi, *dd_window_dgi();
-    int solo_busy();
-    char *aa, *solo_gen_file_info(), *getenv();
-    char mess[256], *get_tagged_string();
-    double d, dfxd0, dfxd1, dfxd2, d0, d2, fabs();
+    WW_PTR wwptr, wwptrc, wwptrx;
+    struct solo_perusal_info *spi;
+    struct dd_general_info *dgi;
+    char *aa;
+    char mess[256];
+    double d, dfxd0, dfxd1, dfxd2, d0, d2;
     double tstamp0, tstamp1, tstamp2, d_sweepfile_time_stamp;
     char file_info[88], file_name[88], str[256], *sptrs[32];
     int tvn, return_flag = 0, nt;
@@ -151,9 +91,6 @@ int displayq(int click_frme, int command)
 /*
  * forward declarations
  */
-    void sp_nex_sweep_set ();
-    void sp_landmark_offsets ();
-    void sp_align_center ();
 
 #ifdef DEBUG_FUNCTIONS
     fprintf(stderr, "-->> Entering displayq\n");
@@ -356,7 +293,7 @@ int displayq(int click_frme, int command)
 		replot = original_replot;
 
 		wwptr = solo_return_wwptr(lead_frame);
-		dgi = dd_window_dgi(wwptr->window_num, "");
+		dgi = dd_window_dgi(wwptr->window_num);
 
 		if(strncmp(dgi->dds->vold->proj_name, "NEXRAD", 6))
 		      break;
@@ -682,10 +619,10 @@ int sp_data_loop(struct linked_frames *flink0)
     double d, angle0, angle1, prev_angle1, sector;
     double ang_fill;
     static float max_sector=4., ang0=220, ang1=250;
-    struct dd_ray_sector *ddrc, *dd_ray_coverage();
-    WW_PTR wwptr, solo_return_wwptr();
-    struct xyras *rxy, *return_xyras();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct dd_ray_sector *ddrc;
+    WW_PTR wwptr;
+    struct xyras *rxy;
+    struct dd_general_info *dgi;
     guint frame_sync_nums[SOLO_MAX_WINDOWS];
 
 
@@ -695,7 +632,7 @@ int sp_data_loop(struct linked_frames *flink0)
 
     wwptr = solo_return_wwptr(lead_frame);
     ang_fill = wwptr->view->angular_fill_pct * .01;
-    dgi = dd_window_dgi(lead_frame, "UNKNOWN");
+    dgi = dd_window_dgi(lead_frame);
     prev_angle1 = EMPTY_FLAG;
     
     flink = flink0;
@@ -822,8 +759,7 @@ void sp_set_diag_flag(int flag)
 void sp_replot_all(void)
 {
     int ii, jj, nn, ww;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    int displayq();
+    struct solo_perusal_info *spi;
 
     solo_worksheet();
     spi = solo_return_winfo_ptr();
@@ -838,14 +774,12 @@ void sp_replot_all(void)
 int solo_worksheet(void)
 {
 
-  void sp_do_lock_color(int frame);
-
     int ww, ii, jj, kk, mm, n, nus=0, nun=0, checked_off[SOLO_MAX_WINDOWS]
 	  , unlink[SOLO_MAX_WINDOWS], lock_num;
     int locks_changed=NO, current_frame_count;
     long *lock_list, *sweep_links;
-    WW_PTR wwptr, wwptrx, wwptrc, solo_return_wwptr(), last_wwptr, lead_sweep;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptr, wwptrx, wwptrc, last_wwptr, lead_sweep;
+    struct solo_perusal_info *spi;
     char mess[256];
 
 #ifdef DEBUG_FUNCTIONS
@@ -995,19 +929,14 @@ int solo_worksheet(void)
 
 int solo_nab_next_file(int frme, int file_action, int version, int sweep_skip, int replot)
 {
-    WW_PTR wwptr, solo_return_wwptr(), wwptrx;
-    long mddir_file_info_v3(), time_now();
-    double d_mddir_file_info_v3();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    WW_PTR wwptr, wwptrx;
+    struct dd_general_info *dgi;
     struct ts_sweep_info *tssi;
-    char *a, mne[16], mess[256], *solo_gen_file_info(), *dd_scan_mode_mne();
-    double dd_latitude(), dd_longitude(), dd_altitude(), dd_earthr();
-    double dd_heading(), dd_roll(), dd_pitch(), dd_drift(), dd_tilt_angle();
+    char *a, mne[16], mess[256];
     double diff;
     int ii, jj, n, rnx, vv, mark, filter_set = 0, vn, vn_ref, nsms, frame_num;
     int within_volume_step = NO;
     struct solo_list_mgmt *slm;
-    struct solo_perusal_info *solo_return_winfo_ptr();
     const char *smptr;
     float fxd, ffxd, tol;
     char str[256];
@@ -1080,7 +1009,7 @@ int solo_nab_next_file(int frme, int file_action, int version, int sweep_skip, i
      * filters and TIME_NEAREST jumps fall through to normal file navigation. */
     if ((file_action == FORWARD || file_action == BACKWARD)
 	&& !swpfi_time_sync && !filter_set) {
-      struct dd_general_info *cdgi = dd_window_dgi(frme, "");
+      struct dd_general_info *cdgi = dd_window_dgi(frme);
       int nsw = cdgi ? rio_volume_nsweeps(cdgi) : 0;
       if (nsw > 1) {
 	int cur = rio_current_sweep(cdgi);
@@ -1169,7 +1098,7 @@ int solo_nab_next_file(int frme, int file_action, int version, int sweep_skip, i
 	/* problems with the open */
 	return(NO);
     }
-    dgi = dd_window_dgi(frme, "");
+    dgi = dd_window_dgi(frme);
     slash_path(dgi->directory_name, wwptr->sweep->directory_name);
     dgi->in_swp_fid = wwptr->file_id;
     strcpy(dgi->sweep_file_name, wwptr->sweep->file_name);
@@ -1244,17 +1173,16 @@ int sp_nab_fixed_angle_from_fn(char *fn, double *fxd)
 int solo_parameter_setup(int frme)
 {
     int ii, ww, pnum, ok=YES, np, nf;
-    char *a, *solo_gen_file_info(), *str_terminate(), pname[12], mess[256];
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptr, wwptrc, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
-    struct solo_palette_ptr
-	  *pal=NULL, *solo_get_palette();
+    char *a, pname[12], mess[256];
+    struct dd_general_info *dgi;
+    WW_PTR wwptr, wwptrc;
+    struct solo_perusal_info *spi;
+    struct solo_palette_ptr *pal=NULL;
     double d, dinc;
 
     wwptr = solo_return_wwptr(frme);
     ww = wwptr->lead_sweep->window_num;
-    dgi = dd_window_dgi(ww, "");
+    dgi = dd_window_dgi(ww);
 
     pnum = dd_ndx_name(dgi, wwptr->parameter->parameter_name);
     /* The bounds test must come BEFORE parm[] is indexed. dd_ndx_name returns
@@ -1326,8 +1254,8 @@ void sp_landmark_offsets(int frme)
     int ii, nn, ww;
     struct point_in_space pisp, radar, *landmark;
     struct landmark_info *lmi;
-    WW_PTR wwptr, wwptrx, solo_return_wwptr();
-    double d, pxm, sp_meters_per_pixel();
+    WW_PTR wwptr, wwptrx;
+    double d, pxm;
 
     wwptr = solo_return_wwptr(frme);
     pxm = wwptr->view->magnification/sp_meters_per_pixel();
@@ -1366,7 +1294,7 @@ void sp_align_center(int frme)
 {
     struct frame_ctr_info *fci;
     struct point_in_space pisp, *radar, *center;
-    WW_PTR wwptr, wwptrx, wwptrf, solo_return_wwptr();
+    WW_PTR wwptr, wwptrx, wwptrf;
 
     wwptr = solo_return_wwptr(frme);
 

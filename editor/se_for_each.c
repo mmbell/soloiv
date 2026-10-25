@@ -13,8 +13,9 @@ static char vcid[] = "$Id$";
 # include <seds.h>
 # include <ui.h>
 # include <ui_error.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <dd_math.h>
 # include <glib.h>
 
@@ -34,8 +35,6 @@ extern GString *gs_complaints;
  *  
  */
 
-int se_establish_field();	/* se_catch_all.c */
-int dd_get_scan_mode();		/* ../translate/ddb_common.c */
 
 /* c------------------------------------------------------------------------ */
 
@@ -58,8 +57,8 @@ se_header_value (	/* #header-value# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *name, *s_val;
     float f_val, diff, cdiff, *fptr, *cfptr, rng;
@@ -190,7 +189,7 @@ se_rewrite (	/* #rewrite# */
    * is taking place
    */
 
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     if(seds->finish_up) {
@@ -208,8 +207,8 @@ se_remove_field (	/* #ignore-field# */
 )	
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct dd_general_info *dgi, *dd_window_dgi();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct dd_general_info *dgi;
+    struct solo_edit_stuff *seds;
     char *name;
     int fn;
 
@@ -238,8 +237,8 @@ int se_cpy_field(int arg, struct ui_command *cmds)
      * #shift-field#
      */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     char *src_name, *dst_name;
     struct dds_structs *dds;
     int ii, jj, nn, fn, fns, fnd, size=0, mark, ns, nd, nc, bad, rescale=NO;
@@ -399,8 +398,8 @@ int se_funfold(int arg, struct ui_command *cmds) /* #forced-unfolding# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *name;
     float ctr, nyqv, rcp_nyqi;
@@ -477,8 +476,8 @@ int se_hard_zap(int arg, struct ui_command *cmds) /* #unconditional-delete# */
 {
     int below;			
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *dst_name;
 
@@ -537,8 +536,8 @@ int se_threshold_field(int arg, struct ui_command *cmds) /* #threshold# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *thr_name, *dst_name, *where;
     float what, what2;
@@ -656,8 +655,8 @@ int se_threshold_field(int arg, struct ui_command *cmds) /* #threshold# */
 int se_radial_shear(int arg, struct ui_command *cmds) /* #radial-shear# */
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     char *add_name, *src_name, *dst_name;
     struct dds_structs *dds;
     int ii, jj, fn, fns, fnd, size=0, mark, ns, nd, nc, bad;

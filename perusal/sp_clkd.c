@@ -24,44 +24,11 @@ static char vcid[] = "$Id$";
 # include <dd_files.h>
 # include <sed_shared_structs.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include "soloii.h"
 # include "sii_externals.h"
-
-
-/* external functions */
-void print_fieldvalues();
-void dd_clear_pisp(struct point_in_space *pisp);
-void dd_copy_pisp();		/* ddb_common.c */
-void dd_razel_to_xyz();		/* ddb_common.c */
-void dd_latlon_shift();		/* ddb_common.c */
-void dd_latlon_relative();	/* ddb_common.c */
-void dd_range_gate();		/* ddb_common.c */
-int dd_givfld();		/* ddb_common.c */
-void dd_rng_info();		/* ddb_common.c */
-void solo_set_busy_signal();	/* sp_basics.c */
-void solo_cpy_sweep_info();	/* sp_accepts.c */
-double sp_meters_per_pixel();	/* sp_xyraster.c */
-void solo_message();		/* solo.c */
-int solo_nab_next_file();	/* solo_perusal.c */
-void sp_copy_tsri();		/* sp_basics.c */
-void sxm_set_click_frame();	/* sxm_examine.c */
-void solo_clear_busy_signal();	/* sp_basics.c */
-
-
-/* internal functions */
-void solo_new_list_field_vals();
-void solo_put_field_vals();
-void sp_sweep_file_check();
-void sp_ts_seek_field_vals();
-int sp_ts_ray_list();
-void sp_ts_data_click();
-void sp_locate_this_point();
-void sp_rtheta_screen_to_xyz ();
-void sp_seek_field_vals ();
-void sp_xyz_to_rtheta_screen ();
-void sii_exam_click_in_data (guint frame_num);
 
 
 /* c------------------------------------------------------------------------ */
@@ -70,17 +37,17 @@ void solo_new_list_field_vals(int frme)
 {
     static int count=0;
     long *boom=NULL;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     struct solo_field_vals *sfv;
     struct point_in_space *pisp, radar, clicked;
     struct solo_list_mgmt *slm;
     char str[256];
-    double sin(), cos(), dd_earth_radius(), dlat, dlon, dalt, daz, del;
-    double fabs(), drng, drng1, drng2, drng3;
+    double dlat, dlon, dalt, daz, del;
+    double drng, drng1, drng2, drng3;
     double d, x, y, z;
     int ii, jj, kk, hilite=YES, mark, ctr_val, entry_num=0, ts;
-    char *aa, *bb, *dts_print(), tmp_str[32];
-    DD_TIME dts, *d_unstamp_time();
+    char *aa, *bb, tmp_str[32];
+    DD_TIME dts;
 
     count++;
     wwptr = solo_return_wwptr(frme);
@@ -170,10 +137,6 @@ void solo_put_field_vals(struct dd_general_info *dgi, int param_num, double angl
 {
     long *boom=NULL;
     struct radar_angles *ra=dgi->dds->ra;
-    double sin(), cos(), dd_earthr();
-    double dd_rotation_angle(), dd_tilt_angle(), dd_azimuth_angle()
-	  , dd_elevation_angle(), dd_nav_tilt_angle();
-    double dd_latitude(), dd_longitude(), dd_altitude();
     int gg, i, j, n, nc, gate, pn=param_num, five=5, mark;
     float rng, cell_val, f_bad, f_data[7], f_rngs[7];
     float r, max_r, min_r, delta_r;
@@ -232,8 +195,8 @@ void sp_sweep_file_check(char *dir, char *file)
      * have changed since the last access
      */
     int ii, ww;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    WW_PTR wwptr;
+    struct solo_perusal_info *spi;
     
     spi = solo_return_winfo_ptr();
 
@@ -260,16 +223,15 @@ void sp_ts_seek_field_vals(int frme)
     int ii, jj, kk, ll, nn, ww, state, ray_num, top_down;
     int file_action=TIME_NEAREST, version=LATEST_VERSION;
     int sweep_skip=1, replot=YES;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptr, wwptrx, solo_return_wwptr();
+    struct dd_general_info *dgi;
+    WW_PTR wwptr, wwptrx;
     struct solo_field_vals *sfv;
-    struct rot_table_entry *entry1, *dd_return_rotang1();
+    struct rot_table_entry *entry1;
     struct rot_ang_table *rat;
     struct ts_ray_table *tsrt;
     struct ts_ray_info *tsri, *tsri_right, *tsrix, **tlist;
     struct ts_sweep_info *tssi;
-    double angdiff(), fabs();
-    int indices[3], solo_busy(), in_sector();
+    int indices[3];
     float angles[3], angle_k, range, theta=0;
     char str[256], *aa, mess[512];
 
@@ -285,7 +247,7 @@ void sp_ts_seek_field_vals(int frme)
     }
     tlist = tsrt->tsri_list;
 
-    dgi = dd_window_dgi(wwptr->window_num, "");
+    dgi = dd_window_dgi(wwptr->window_num);
     rat = dgi->source_rat;	/* rotation angle table */
     if(!rat)
 	  return;		/* bad lead sweep info...probably */
@@ -390,9 +352,9 @@ int sp_ts_ray_list(int frme, int xpos, int nr)
     int nurl=0, nurr=0, nrhalf;
     int last_sweep_num=-1;
     double d, scale, range, height;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptrx, wwptr, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct dd_general_info *dgi;
+    WW_PTR wwptrx, wwptr;
+    struct solo_perusal_info *spi;
     struct ts_ray_table *tsrt;
     struct ts_sweep_info *tssi;
     struct ts_ray_info *tsri, *tsri_right, *tsrix, **tlist;
@@ -487,9 +449,9 @@ void sp_ts_data_click(int frme, int xpos, int ypos)
     int ii, mm, nn, ww, width, x_pxl, checked_off[SOLO_MAX_WINDOWS];
     int last_sweep_num=-1, nr;
     double d, scale, range, height;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptrx, wwptr, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct dd_general_info *dgi;
+    WW_PTR wwptrx, wwptr;
+    struct solo_perusal_info *spi;
     struct ts_ray_table *tsrt;
     struct ts_sweep_info *tssi;
     struct ts_ray_info *tsri, *tsrix, *tsri_click, *tsri_right;
@@ -571,15 +533,14 @@ void sp_data_click(int frme, double x, double y)
      */
     int ii, jj, kk, ll, nn, ww, state;
     long *sweep_list;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptrx, wwptr, solo_return_wwptr();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct dd_general_info *dgi;
+    WW_PTR wwptrx, wwptr;
+    struct solo_perusal_info *spi;
     struct solo_field_vals *sfv;
-    struct rot_table_entry *entry1, *dd_return_rotang1();
+    struct rot_table_entry *entry1;
     struct rot_ang_table *rat;
     double d, range, theta;
-    double sp_meters_per_pixel(), angdiff();
-    int indices[3], solo_busy();
+    int indices[3];
     float angles[3], angle_k;
     struct point_in_space radarx, radar, pisp;
 
@@ -665,17 +626,13 @@ void sp_locate_this_point(struct solo_click_info *sci, struct bnd_point_mgmt *bp
     int kk = -1;
     int file_action=TIME_NEAREST, version=LATEST_VERSION;
     int sweep_skip=1, replot=YES;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptrld, wwptr, solo_return_wwptr();
+    struct dd_general_info *dgi;
+    WW_PTR wwptrld, wwptr;
     struct ts_ray_info *tsri;
     struct ts_sweep_info *tssi;
     struct ts_ray_table *tsrt;
     double theta, range, x, y, scale;
-    double dd_rotation_angle(), dd_tilt_angle(), dd_azimuth_angle()
-	  , dd_elevation_angle(), dd_earthr(), dd_nav_tilt_angle();
-    double dd_latitude(), dd_longitude(), dd_altitude();
-    double dd_heading(), dd_roll(), dd_pitch(), dd_drift();
-    struct rot_table_entry *entry1 = NULL, *dd_return_rotang1();
+    struct rot_table_entry *entry1 = NULL;
     struct rot_ang_table *rat = NULL;
     struct point_in_space *pisp=bpm->pisp;
     char str[256];
@@ -685,7 +642,7 @@ void sp_locate_this_point(struct solo_click_info *sci, struct bnd_point_mgmt *bp
     wwptr = solo_return_wwptr(frme);
     wwptrld = wwptr->lead_sweep;
     ww = wwptrld->window_num;
-    dgi = dd_window_dgi(ww, "");
+    dgi = dd_window_dgi(ww);
     /* rat/entry1 are deliberately NOT captured here. Both branches below can
      * call dd_absorb_header_info / solo_nab_next_file, and both of those free
      * dgi->source_rat and build a new one, so anything captured now would be
@@ -822,9 +779,8 @@ void sp_rtheta_screen_to_xyz(int frme, struct point_in_space *radar, struct poin
      * and pisp->rotation_angle are relative to the radar
      */
     double d, r, rxy, rota, tilt, H, x, y, z, az;
-    double sqrt(), atan2(), fmod(), sin(), cos(), fabs();
     double sinH, cosH;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
 
@@ -873,13 +829,12 @@ void sp_seek_field_vals(int frme)
     int ii, jj, kk, ll, nn, ww, state;
     int file_action=TIME_NEAREST, version=LATEST_VERSION;
     int sweep_skip=1, replot=YES;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptr, solo_return_wwptr();
+    struct dd_general_info *dgi;
+    WW_PTR wwptr;
     struct solo_field_vals *sfv;
-    struct rot_table_entry *entry1, *dd_return_rotang1();
+    struct rot_table_entry *entry1;
     struct rot_ang_table *rat;
-    double angdiff(), fabs();
-    int indices[3], solo_busy();
+    int indices[3];
     float angles[3], angle_k, range, theta;
 
 
@@ -887,7 +842,7 @@ void sp_seek_field_vals(int frme)
     range = wwptr->clicked_range;
     theta = wwptr->clicked_angle;
 
-    dgi = dd_window_dgi(wwptr->lead_sweep->window_num, "");
+    dgi = dd_window_dgi(wwptr->lead_sweep->window_num);
     if(wwptr->lead_sweep->sweep_file_modified) {
 	ww = wwptr->lead_sweep->window_num;
 	solo_nab_next_file(ww, file_action, version, sweep_skip, replot);
@@ -955,9 +910,8 @@ void sp_xyz_to_rtheta_screen(int frme, struct point_in_space *radar, struct poin
      */
     double tol = 1.e-4;
     double d, r, rxy, rxz, rota, tilt, H, x, y, z;
-    double sqrt(), atan2(), fmod(), asin(), sin(), cos(), fabs();
     double sinH, cosH, cosT, sinT;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
     tilt = RADIANS(radar->tilt);

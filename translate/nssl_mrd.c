@@ -21,18 +21,14 @@ static int options = 0;
 
 # include "dd_files.h"
 # include "input_sweepfiles.h"
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <math.h>
+# include <s2_protos.h>
 
 extern int LittleEndian;
 static struct dd_input_sweepfiles_v3 *dis;
 static struct dd_input_filters *difs;
 static struct dd_stats *dd_stats;
 
-void produce_nssl_mrd();
-int dd_mrd_init();
-void mrdp_write();
-int mrd_find_param();
 
 
 /* c------------------------------------------------------------------------ */
@@ -42,7 +38,7 @@ void dd_mrd_conv(void)
     static int count=0;
     int ii, rn, flush=NO;
     struct unique_sweepfile_info_v3 *usi;
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct dd_general_info *dgi;
     
     if((ii=dd_mrd_init()) == END_OF_TIME_SPAN ) {
 	return;
@@ -88,9 +84,6 @@ void dd_mrd_conv(void)
 int dd_mrd_init(void)
 {
     int ii, ok;
-    struct dd_input_filters *dd_return_difs_ptr();
-    struct dd_stats *dd_return_stats_ptr();
-    struct dd_input_sweepfiles_v3 *dd_setup_sweepfile_structs_v3();
     struct unique_sweepfile_info_v3 *usi;
 
     /* do all the necessary initialization including
@@ -134,11 +127,10 @@ void produce_nssl_mrd(struct dd_general_info *dgi, int flush)
     struct mrd_record *this, *that, *last;
     struct mrd_head *mrdh;
     struct mrd_head2 *mrdh2;
-    char *a, *id, *sfx, *get_tagged_string(), *dir, str[256];
-    char name[12], *str_terminate();
+    char *a, *id, *sfx, *dir, str[256];
+    char name[12];
     short bad;
-    double d, sqrt(), ns, ew, fmod(), fabs(), atan2(), atof();
-    double dd_ac_vel();
+    double d, ns, ew;
     float x, y, r, gs, rcp_scale, bias, maxr;
     int g, i, j, k, l, m, n, mark, ng, bc=0, gc=0, fgg=0;
     register short val;
@@ -506,7 +498,7 @@ void mrdp_write(struct mrd_production *mrdp, int header_only)
 int mrd_find_param(struct dd_general_info *dgi, int find)
 {
     struct dds_structs *dds=dgi->dds;
-    char pname[12], *str_terminate(), string_space[256], *str_ptrs[32];
+    char pname[12], string_space[256], *str_ptrs[32];
     int ii, jj, nt;
 
     if(find == FIND_VEL) {

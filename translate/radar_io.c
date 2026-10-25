@@ -22,6 +22,7 @@
 #include "dd_files.h"
 #include "dd_time.h"
 #include "radar_io.h"
+#include <s2_protos.h>         /* the rest of the s2 library */
 
 /* DORADE scan-mode codes (see translate/uf_fmt.h). */
 #define RIO_DM_CAL 0
@@ -43,15 +44,6 @@
 #define RIO_AXIS_Y_PRIME 4
 #define RIO_AXIS_X_PRIME 5
 #define RIO_AXIS_IS_VERTICAL(a) ((a) == RIO_AXIS_Z || (a) == RIO_AXIS_Z_PRIME)
-
-/* From the rest of the s2 library (K&R prototypes). */
-extern void   dd_alloc_data_field();
-extern int    dd_return_id_num();
-extern double d_time_stamp();
-extern void   str_terminate();
-extern void   dd_radar_angles();    /* (asib, cfac, ra, dgi) — Testud georef */
-extern double dd_rotation_angle();   /* (dgi) — scan-mode-aware beam angle    */
-extern void   dd_set_uniform_cells(); /* (dds) — build range->cell LUT         */
 
 /* ------------------------------------------------------------------ *
  *  Per-DGI Radx state (stashed in dgi->gpptr7)                        *

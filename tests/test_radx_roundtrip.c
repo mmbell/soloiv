@@ -22,9 +22,10 @@
 #include "dd_defines.h"
 #include "radar_io.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-struct dd_general_info *dd_window_dgi();
-int dd_givfld();
 
 #define CFRAD_FILE "cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
 #define NFLAG 20
@@ -63,7 +64,7 @@ static void roundtrip_action(GtkWidget *main_window, gpointer user_data)
     g_assert_nonnull(tmpdir);
 
     /* --- read + edit + write --- */
-    dw = dd_window_dgi(4, "");
+    dw = dd_window_dgi(4);
     g_strlcpy(dw->directory_name, "./", sizeof(dw->directory_name));
     g_strlcpy(dw->sweep_file_name, CFRAD_FILE, sizeof(dw->sweep_file_name));
     dw->source_fmt = CFRADIAL_FMT;
@@ -89,7 +90,7 @@ static void roundtrip_action(GtkWidget *main_window, gpointer user_data)
     g_message("Round-trip wrote %s/%s", tmpdir, written);
 
     /* --- reopen the written file and verify --- */
-    dr = dd_window_dgi(5, "");
+    dr = dd_window_dgi(5);
     g_strlcpy(dr->directory_name, tmpdir, sizeof(dr->directory_name));
     if (dr->directory_name[strlen(dr->directory_name) - 1] != '/')
         g_strlcat(dr->directory_name, "/", sizeof(dr->directory_name));

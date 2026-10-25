@@ -6,8 +6,7 @@ static char vcid[] = "$Id$";
 
 # include <dorade_headers.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 # define PMODE 0666
 
 struct gecho_control_struct {
@@ -38,7 +37,6 @@ static float earth_radius=6366.8056, min_rot_angle=100.;
 static float max_rot_angle=260., reasonable_gecho=10.;
 static int min_gates=11, min_gatex;
 
-void dd_gecho_intxn();
 
 
 /* c------------------------------------------------------------------------ */
@@ -46,11 +44,9 @@ void dd_gecho_intxn();
 void dd_gecho(DGI_PTR dgi)
 {
     int i, jj, mark, rn=dgi->radar_num;
-    char *a, *get_tagged_string(),  str[256], name[12], *str_terminate();
+    char *a,  str[256], name[12];
     int nt;
     char string_space[256], *str_ptrs[32];
-    double atof();
-    void dd_gecho_intxn ();
 
     if(!local_gecho_flag)
 	  return;
@@ -229,7 +225,7 @@ void dd_gecho_intxn(DGI_PTR dgi, int fid, double min_rot_angle, double max_rot_a
     float ncp[MAXCVGATES];
     double d;
     double d2, dH=0, dP=0, dt, cosP, sinP, cosH, sinH;
-    double cosPHI, cosLAM, sinPHI, sinLAM, angdiff();
+    double cosPHI, cosLAM, sinPHI, sinLAM;
     double u, v, w, insitu_wind;
 
     int i, j, n, nx, nc, g1, g2, gx, ng, mark, ndx, slen;

@@ -30,7 +30,9 @@ static char vcid[] = "$Id$";
 # include "sigh.h"
 # include <time.h>
 # include <sys/time.h>
-# include <function_decl.h>
+# include <math.h>
+# include <stdint.h>
+# include <s2_protos.h>
 
 # define TIMEX 724000000
 
@@ -42,23 +44,8 @@ static struct sigmet_useful_items *sui;
 static struct dd_input_filters *difs;
 static struct dd_stats *dd_stats=NULL;
 
-short sig_swap2();
-long sig_swap4();
 
-void sigmet_dd_conv();
-void sigmet_ini();
-void sigmet_nab_data();
-void sigmet_nab_info();
-int sigmet_next_ray();
-int sigmet_select_ray();
-void sigmet_print_stat_line();
-int ingest_ingest_headers();
-void grab_summary_header();
-int sig_read();
 
-int wsrqc_correct();
-int fb_read();
-int dd_src_fid();
 
 
 /* c------------------------------------------------------------------------ */
@@ -106,10 +93,7 @@ void sigmet_dd_conv(void)
 void sigmet_ini(void)
 {
     int i, n, mark;
-    char *a, *get_tagged_string();
-    struct generic_radar_info *return_gri_ptr();
-    struct dd_input_filters *dd_return_difs_ptr();
-    struct dd_stats *dd_return_stats_ptr();
+    char *a;
     struct sig_rec_struct *rsq, *last_rsq;
 
     difs = dd_return_difs_ptr();
@@ -244,9 +228,8 @@ void sigmet_nab_info(void)
     struct ray_header *rh;
     struct extended_header_v1 *eh;
     static int nab_num=0, trip=0;
-    double sigmet_time_stamp(), fabs(), fmod(), sin(), cos();
     float a1, a2;
-    double d, angdiff(), fmod();
+    double d;
     DD_TIME *dts=gri->dts;
 
     
@@ -616,7 +599,6 @@ void sigmet_print_stat_line(int count)
     time_t i;
     double d;
     DD_TIME *dts=gri->dts;
-    char *dts_print();
     
     d_unstamp_time(dts);
     d = gri->time;
@@ -645,7 +627,6 @@ int ingest_ingest_headers(char *tbuf)
     short *ss;
     struct ingest_data_header *idh;
     DD_TIME *dts=gri->dts;
-    double d_time_stamp();
     /*
      * c...mark
      * X2 and X4 are macros that swap the bytes using
@@ -842,7 +823,7 @@ void grab_summary_header(char *buf)
     static int count=0;
     long int li;
     float f, r;
-    double d, log10();
+    double d;
     
     count++;
 
@@ -978,9 +959,10 @@ int sig_read(int fid, char *buf, int size)
 
 short 
 sig_swap2 (		/* swap integer*2 */
-    twob *ov
+    void *vp
 )
 {
+    twob *ov = vp;
     union {
 	short newval;
 	char nv[2];
@@ -996,7 +978,7 @@ sig_swap4 (		/* swap integer*4 */
 )
 {
     union {
-	long newval;
+	int32_t newval;
 	char nv[4];
     }u;
     u.nv[3] = ov->one; u.nv[2] = ov->two;

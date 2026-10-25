@@ -16,8 +16,9 @@ static char vcid[] = "$Id$";
 # include <dorade_headers.h>
 # include <dd_general_info.h>
 # include <sed_shared_structs.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 
 /*
  * 
@@ -30,18 +31,6 @@ static char vcid[] = "$Id$";
  * 
  */
 
-/* external functions */
-void solo_add_list_entry();	/* dorade_share.c */
-void solo_message();		/* solo.c */
-
-/* internal functions */
-int solo_absorb_color_table();
-void solo_color_bar_pixels();
-int solo_color_check();
-void solo_data_color_lut();
-int solo_hardware_color_table();
-int solo_pixelate_color();
-
 
 /* c------------------------------------------------------------------------ */
 
@@ -52,12 +41,12 @@ int solo_absorb_color_table(int frme, char *dir, char *file)
      */
     int i, j, n;
     FILE *stream;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     struct solo_list_mgmt *lm;
     float red, green, blue, rnum, rden, gnum, gden, bnum, bden;
-    char *aa, *a, *b, *c, str[256], *dd_whiteout();
+    char *aa, *a, *b, *c, str[256];
     char mess[512];
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     struct solo_list_mgmt *slm;
 
     slash_path(str, dir);
@@ -132,7 +121,7 @@ void solo_color_bar_pixels(int frme, int xlen, int ylen, char *buf)
     /* generate pixel values in the color bar image
      */
     int i, j, k, n;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     double f_inc, f_min, f_max, f_val;
     char *b=buf;
 
@@ -165,7 +154,7 @@ void xsolo_color_bar_pixels(XImage *cb_image, int height, int frme)
      */
     int i, j, k;
     int width = cb_image->width;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     double f_inc, f_min, f_max, f_val;
 
     wwptr = solo_return_wwptr(frme);
@@ -198,7 +187,7 @@ int solo_color_check(char *theColorName, XColor *theHardwareColor)
     char mess[256];
     XColor theRGBColor;
     int theStatus;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     struct solo_list_mgmt *slm;
 
     spi = solo_return_winfo_ptr();
@@ -225,9 +214,9 @@ int xsolo_hardware_color_table(int frme, char *directory, char *filename)
     int ii, jj, nc, ok=YES;
     struct solo_list_mgmt *lm;
     XColor xc;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     struct solo_list_mgmt *slm;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr(frme);
     spi = solo_return_winfo_ptr();
@@ -302,7 +291,7 @@ int solo_pixelate_color(XColor *theHardwareColor, char *theColorName)
 {
     char mess[256];
     int theStatus, mark;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
     struct solo_list_mgmt *slm;
 
     spi = solo_return_winfo_ptr();

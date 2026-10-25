@@ -10,6 +10,8 @@
 # include <solo_editor_structs.h>
 # include <sed_shared_structs.h>
 # include <seds.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
 
 /* Examine Menu Actions  */
 
@@ -139,28 +141,6 @@ static ExamData *xmdata;
 static GSList *radio_group = NULL;
 
 /* c---------------------------------------------------------------------- */
-
-void sii_exam_return_click_indices (guint frame_num, gint *list_index
-				    , gint *char_index);
-
-void sii_exam_menubar( GtkWidget  *window, GtkWidget **menubar
-		       , guint frame_num);
-void sii_exam_menubar2( GtkWidget  *window, GtkWidget **menubar
-		       , guint frame_num);
-void sii_exam_widget( guint frame_num );
-void sii_exam_finalize_radio_state(void);
-
-void show_exam_widget (GtkWidget *text, gpointer data );
-
-void sp_cell_range_info (int frame_num, gfloat *r0, gfloat *gs, gint *ncells);
-
-char *solo_list_entry(struct solo_list_mgmt *which, int entry_num);
-
-struct solo_click_info *clear_click_info();
-
-void sxm_process_click(struct solo_click_info *sci);
-
-gfloat sp_nyquist_vel (int frame_num);
 
 /* c---------------------------------------------------------------------- */
 /* c---------------------------------------------------------------------- */
@@ -297,7 +277,7 @@ void se_refresh_examine_list(int frame_num, struct solo_list_mgmt  *slm)
 void se_update_exam_widgets (gint frame_num)
 {
    ExamData *   xmd = (ExamData *)frame_configs[frame_num]->exam_data;
-   struct solo_edit_stuff *seds, *return_sed_stuff();
+   struct solo_edit_stuff *seds;
    gfloat ff;
    guint wid;
 
@@ -360,7 +340,7 @@ void se_refresh_examine_widgets (int frame_num, struct solo_list_mgmt  *slm)
    WW_PTR wwptr = solo_return_wwptr (frame_num);
    GtkWidget *widget;
    gfloat ff, r0, gs, nyq_vel;
-   struct solo_edit_stuff *seds, *return_sed_stuff();
+   struct solo_edit_stuff *seds;
 
    sp_cell_range_info (frame_num, &r0, &gs, &ncells);
    nyq_vel = sp_nyquist_vel (frame_num);
@@ -632,7 +612,7 @@ void sii_exam_menu_cb ( GtkWidget *w, gpointer   data )
    struct solo_click_info *sci = clear_click_info();
    WW_PTR wwptr;
    gint x, y;
-   struct solo_edit_stuff *seds, *return_sed_stuff();
+   struct solo_edit_stuff *seds;
 
 
 

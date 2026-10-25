@@ -5,6 +5,7 @@
 # include "sii_utils.h"
 # include "sii_overlays.h"
 # include <stdio.h>
+# include <s2_protos.h>
 static GString *dbgs = NULL;
 static gint nlines = 0;
 
@@ -162,7 +163,7 @@ void sii_zap_quick_message (GtkWidget *w, gpointer data )
 
 /* c---------------------------------------------------------------------- */
 
-void sii_message (const gchar *message )
+void sii_message (const char *message )
 {
   GtkWidget *window;
   GtkWidget *vbox;

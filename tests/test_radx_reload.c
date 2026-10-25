@@ -23,9 +23,10 @@
 #include "dd_defines.h"
 #include "radar_io.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-struct dd_general_info *dd_window_dgi();
-int dd_givfld();
 
 #define CFRAD_FILE "cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
 
@@ -50,7 +51,7 @@ static gboolean find_nc(const char *dir, char *out, gsize cap)
 static void write_copy(int win, const char *srcdir, const char *srcfile,
                        const char *dstdir)
 {
-    struct dd_general_info *dw = dd_window_dgi(win, "");
+    struct dd_general_info *dw = dd_window_dgi(win);
     int nrays, r;
     g_strlcpy(dw->directory_name, srcdir, sizeof(dw->directory_name));
     g_strlcpy(dw->sweep_file_name, srcfile, sizeof(dw->sweep_file_name));
@@ -84,7 +85,7 @@ static void reload_action(GtkWidget *main_window, gpointer user_data)
     g_assert_true(find_nc(tmpdir, written, sizeof(written)));
 
     /* 2. open the copy (this primes the read cache for that path) */
-    dr = dd_window_dgi(3, "");
+    dr = dd_window_dgi(3);
     g_strlcpy(dr->directory_name, copydir, sizeof(dr->directory_name));
     g_strlcpy(dr->sweep_file_name, written, sizeof(dr->sweep_file_name));
     dr->source_fmt = CFRADIAL_FMT;
@@ -102,7 +103,7 @@ static void reload_action(GtkWidget *main_window, gpointer user_data)
     bad0 = (int) dr->dds->parm[0]->bad_data;
 
     /* 3. overwrite that same file on disk: field 0 -> all bad, every ray */
-    de = dd_window_dgi(4, "");
+    de = dd_window_dgi(4);
     g_strlcpy(de->directory_name, copydir, sizeof(de->directory_name));
     g_strlcpy(de->sweep_file_name, written, sizeof(de->sweep_file_name));
     de->source_fmt = CFRADIAL_FMT;

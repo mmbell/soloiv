@@ -10,8 +10,9 @@ static char vcid[] = "$Id$";
 # include "solo_editor_structs.h"
 # include <ui.h>
 # include <ui_error.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -25,7 +26,6 @@ extern GString *gs_complaints;
  * 
  */
 
-void se_do_clear_bad_flags_array();
 
 /* c------------------------------------------------------------------------ */
 
@@ -37,8 +37,8 @@ se_assert_bad_flags (	/* #assert-bad-flags# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *dst_name;
 
@@ -102,8 +102,8 @@ se_flagged_add (	/* #flagged-add# */
      */
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *name, *where;
     float f_const;
@@ -177,8 +177,8 @@ int se_bad_flags_logic(int arg, struct ui_command *cmds)
      */
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *name, *where;
     float f_thr1=0, f_thr2=0;
@@ -335,7 +335,7 @@ int se_clear_bad_flags(int arg, struct ui_command *cmds)
    */
   int nn;
   unsigned short *flag;
-  struct solo_edit_stuff *seds, *return_sed_stuff();
+  struct solo_edit_stuff *seds;
 
 
     seds = return_sed_stuff();
@@ -367,8 +367,8 @@ se_copy_bad_flags (	/* #copy-bad-flags# */
      */
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *name, *where;
 
@@ -426,7 +426,7 @@ se_copy_bad_flags (	/* #copy-bad-flags# */
 
 void se_do_clear_bad_flags_array(int nn)
 {
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     memset(seds->bad_flag_mask_array, 0, (nn > 0 ? nn : seds->max_gates) *
@@ -442,8 +442,8 @@ se_set_bad_flags (	/* #set-bad-flags# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *name, *dst_name, *where;
     float f_thr1, f_thr2;

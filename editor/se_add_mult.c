@@ -10,8 +10,9 @@ static char vcid[] = "$Id$";
 # include "solo_editor_structs.h"
 # include <ui.h>
 # include <ui_error.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <dd_math.h>
 # include <glib.h>
 
@@ -26,7 +27,6 @@ extern GString *gs_complaints;
  * 
  */
 
-int se_establish_field();	/* se_catch_all.c */
 static char mess[256];
 
 /* c------------------------------------------------------------------------ */
@@ -39,8 +39,8 @@ se_absolute_value ( /* #absolute-value# */
 {
     int below;
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     struct dds_structs *dds;
     char *name;
 
@@ -100,8 +100,8 @@ se_assign_value (		/* #assign-value# */
 )	
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     char *name;
     struct dds_structs *dds;
     static int count=0;
@@ -177,8 +177,8 @@ se_add_const (	/* #add-value# */
 )	
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     char *add_name, *src_name, *dst_name;
     struct dds_structs *dds;
     static int count=0;
@@ -243,8 +243,8 @@ int se_add_fields(int arg, struct ui_command *cmds)
      * #merge-fields#
      */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     char *add_name, *src_name, *dst_name;
     struct dds_structs *dds;
     static int count=0;
@@ -475,8 +475,8 @@ int se_mult_const(int arg, struct ui_command *cmds)
     * #exponentiate#
     */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     char *add_name, *src_name, *dst_name;
     struct dds_structs *dds;
     int ii, jj, fn, fns, fnd, size=0, mark, ns, nd, nc, bad, dst_bad;
@@ -607,8 +607,8 @@ int se_mangle_field(int arg, struct ui_command *cmds)
      * 
      */
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    struct solo_edit_stuff *seds;
+    struct dd_general_info *dgi;
     char *src_name, *dst_name;
     struct dds_structs *dds;
     int ii, jj, fn, fns, fnd, size=0, mark, ns, nd, nc, bad, rescale=NO;

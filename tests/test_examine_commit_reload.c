@@ -31,14 +31,12 @@
 #include "solo_editor_structs.h"
 #include "seds.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define FIXTURE "cfrad2.20220907_125318.857_to_20220907_125322.837_N42RF-TM_AIR.nc"
 
-WW_PTR solo_return_wwptr();
-void show_exam_widget(GtkWidget *text, gpointer data);
-void sxm_process_click(struct solo_click_info *sci);
-int solo_busy();
-void solo_clear_busy_signal();
 
 static char *g_tmpdir;
 

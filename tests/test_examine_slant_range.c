@@ -25,14 +25,14 @@
 #include "dd_defines.h"
 #include "solo_window_structs.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define TILT_DEG   20.0f
 #define LAST_GATE  46950.0f     /* metres, as in the reported volume */
 #define GATE_SPACING 75.0f
 
-struct dd_general_info *dd_window_dgi();
-WW_PTR solo_return_wwptr();
-void solo_new_list_field_vals();
 
 static void slant_action(GtkWidget *main_window, gpointer user_data)
 {
@@ -50,7 +50,7 @@ static void slant_action(GtkWidget *main_window, gpointer user_data)
 
     wwptr = solo_return_wwptr(0);
     g_assert_nonnull(wwptr);
-    dgi = dd_window_dgi(wwptr->lead_sweep->window_num, "");
+    dgi = dd_window_dgi(wwptr->lead_sweep->window_num);
     g_assert_nonnull(dgi);
     g_assert_cmpint(dgi->dds->radd->scan_mode, ==, AIR);
     g_assert_false(wwptr->view->type_of_plot & SOLO_TIME_SERIES);

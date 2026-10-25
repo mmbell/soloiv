@@ -15,6 +15,9 @@
 # include <dd_general_info.h>
 # include <dd_defines.h>
 # include <glib/gstdio.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include "radar_io.h"
 
 # ifndef ETERNITY
 # define DAY_ZERO 0
@@ -181,9 +184,9 @@ static gboolean se_undo_copy_file (const char *src, const char *dst)
 /* Build the on-disk path of the sweep file the given frame is editing. */
 static gboolean se_undo_frame_path (guint frame_num, char *out, gsize cap)
 {
-  struct dd_general_info *dgi, *dd_window_dgi();
+  struct dd_general_info *dgi;
 
-  dgi = dd_window_dgi (frame_num, "");
+  dgi = dd_window_dgi (frame_num);
   if (!dgi || !dgi->sweep_file_name[0])
     return FALSE;
   g_snprintf (out, cap, "%s%s", dgi->directory_name, dgi->sweep_file_name);
@@ -261,13 +264,11 @@ gboolean se_undo_push (guint frame_num)
  * frame. Dropping a cache that was not stale is harmless -- the next read just
  * re-opens the file. */
 /* Non-static: exercised directly by tests, as se_undo_push is. */
-void se_invalidate_read_caches (guint frame_num)
+void se_invalidate_read_caches (unsigned int frame_num)
 {
-  struct dd_general_info *dgi, *dd_window_dgi();
-  struct solo_edit_stuff *seds, *return_sed_stuff();
-  void rio_invalidate_read();
-  int rio_is_managed();
-  WW_PTR wwptr, solo_return_wwptr();
+  struct dd_general_info *dgi;
+  struct solo_edit_stuff *seds;
+  WW_PTR wwptr;
   int ii, wins[SOLO_TOTAL_WINDOWS + 2], nwins = 0;
 
   wwptr = solo_return_wwptr (frame_num);
@@ -286,7 +287,7 @@ void se_invalidate_read_caches (guint frame_num)
   for (ii = 0; ii < nwins; ii++) {
     if (wins[ii] < 0 || wins[ii] >= MAX_SENSORS)
       continue;
-    dgi = dd_window_dgi (wins[ii], "");
+    dgi = dd_window_dgi (wins[ii]);
     if (dgi && rio_is_managed (dgi))
       { rio_invalidate_read (dgi); }
   }
@@ -302,15 +303,11 @@ void se_invalidate_read_caches (guint frame_num)
  *
  * Returns TRUE if the frame was moved. */
 /* Non-static: exercised directly by tests, as se_undo_push is. */
-gboolean se_point_frame_at_written (guint frame_num)
+int se_point_frame_at_written (unsigned int frame_num)
 {
-  struct dd_general_info *dgi, *dd_window_dgi();
-  struct solo_edit_stuff *seds, *return_sed_stuff();
-  const char *rio_last_written_path();
-  int rio_is_managed();
-  struct dd_file_name_v3 **mddir_return_swp_list_v3();
-  double ddfnp_list_entry();
-  WW_PTR wwptr, solo_return_wwptr();
+  struct dd_general_info *dgi;
+  struct solo_edit_stuff *seds;
+  WW_PTR wwptr;
   const char *written, *base;
   char info[128], fname[128];
   int ii, nswps = 0, ver = 0;
@@ -319,7 +316,7 @@ gboolean se_point_frame_at_written (guint frame_num)
   seds = return_sed_stuff ();
   if (!seds)
     return FALSE;
-  dgi = dd_window_dgi (seds->se_frame, "");   /* the edit writes through this */
+  dgi = dd_window_dgi (seds->se_frame);   /* the edit writes through this */
   if (!dgi || !rio_is_managed (dgi))
     return FALSE;
 
@@ -355,7 +352,7 @@ gboolean se_point_frame_at_written (guint frame_num)
     wwptr->sweep->version_num = ver;
     wwptr->sweep->changed = YES;
     /* The written file holds exactly the one edited sweep. */
-    { struct dd_general_info *fdgi = dd_window_dgi (frame_num, "");
+    { struct dd_general_info *fdgi = dd_window_dgi (frame_num);
       if (fdgi) fdgi->rio_req_sweep = 0; }
     return TRUE;
   }
@@ -392,45 +389,10 @@ gboolean se_undo_pop_restore (void)
 
 /* c---------------------------------------------------------------------- */
 
-void main_edit_widget( guint frame_num );
 static GSList *radio_group = NULL;
 
-void sii_edit_menubar2( GtkWidget  *window,
-                    GtkWidget **menubar, guint frame_num );
-void sii_edit_menubar( GtkWidget  *window,
-                    GtkWidget **menubar, guint frame_num );
-
-void edit_files_widget (guint frame_num );
-
-void show_edit_files_widget (guint frame_num );
-const gchar *sii_return_swpfi_dir (guint frame_num);
-const gchar *sii_return_swpfi_radar (guint frame_num);
-const GString *sii_return_edit_cmd_files (guint frame_num, const char *dir);
-const GString *sii_return_edit_bnd_files (guint frame_num, const char *dir);
-const GString *sii_return_llb_bnd_files (guint frame_num, const char *dir);
-
-const struct solo_list_mgmt *sii_return_swpfi_radar_list (guint frame_num);
-double sii_return_swpfi_time_stamp (guint frame_num);
 struct solo_list_mgmt *slm;
-const char *sii_string_from_dtime (double dtime);
-double sii_return_swpfi_time_stamp (guint frame_num);
-double sii_nearest_file_time (int frame_num, double target_time);
-void sii_zap_quick_message (GtkWidget *w, gpointer data );
 static void edit_help_widget (gchar *words);
-double sii_dtime_from_string (char *tstr);
-void sii_edit_eg_split (guint frame_num, const gchar **eg, int nlines);
-struct solo_edit_stuff *return_sed_stuff();
-char *solo_list_entry (struct solo_list_mgmt  *slm, int jj);
-
-void put_edit_cmds_help (gchar *name, GString *words);
-
-void sii_cmds_help_event (GtkGestureClick *gesture, int n_press,
-			  double x, double y, gpointer data );
-gboolean set_edit_help_items( gpointer a_str, gpointer words, gpointer data );
-void edit_cmds_help_widget (guint frame_num );
-void show_edit_cmd_help_widget (guint frame_num);
-void sii_edit_reset_times (guint frame_num);
-char *absorb_zmap_bnd (char *, int, int *);
 
 
 /* c---------------------------------------------------------------------- */
@@ -439,9 +401,9 @@ char *absorb_zmap_bnd (char *, int, int *);
 
 void sii_edit_zap_last_bnd_point(void)
 {
-  struct solo_edit_stuff *seds, *return_sed_stuff();
+  struct solo_edit_stuff *seds;
   struct one_boundary *ob;
-  struct boundary_stuff *sebs, *return_se_bnd_struct();
+  struct boundary_stuff *sebs;
 
   seds = return_sed_stuff();
   sebs = return_se_bnd_struct();
@@ -469,7 +431,7 @@ void sii_edit_return_start_stop (guint frame_num, gdouble *stt, gdouble *stp)
 void sii_edit_reset_times (guint frame_num)
 {
    EditData *edd = (EditData *)frame_configs[frame_num]->edit_data;
-   WW_PTR wwptr, solo_return_wwptr();
+   WW_PTR wwptr;
    const char *cc;
 
    if (!edd)
@@ -507,11 +469,11 @@ void sii_edit_menu_cb ( GtkWidget *w, gpointer data )
    struct ui_command *cmds=NULL;
    int time_series=NO, automatic, down;
    gdouble dtime, d_ctr, t1, t2;
-   struct solo_edit_stuff *seds, *return_sed_stuff();
+   struct solo_edit_stuff *seds;
    struct one_boundary *ob;
-   struct boundary_stuff *sebs, *return_se_bnd_struct();
+   struct boundary_stuff *sebs;
    struct swp_file_input_control *sfic;
-   WW_PTR wwptr, solo_return_wwptr();
+   WW_PTR wwptr;
    GtkTextBuffer *buffer;
    gboolean did_snapshot = FALSE;
 
@@ -1066,7 +1028,7 @@ void show_edit_files_widget (guint frame_num)
 
 void sii_edit_click_in_data (gint frame_num)
 {
-  struct boundary_stuff *sebs, *return_se_bnd_struct();
+  struct boundary_stuff *sebs;
   GtkWidget *widget;
   struct solo_click_info sci;
   WW_PTR wwptr = solo_return_wwptr(frame_num);
@@ -1222,8 +1184,8 @@ void edit_file_text_event_cb (GtkGestureClick *gesture, int n_press,
   gint start, end;
   gboolean ok;
   static GString *gs = NULL;
-  struct sed_command_files *scf, *se_return_cmd_files_struct();
-  struct solo_list_mgmt *slm, *se_update_list();
+  struct sed_command_files *scf;
+  struct solo_list_mgmt *slm;
   GtkTextBuffer *buffer;
   GtkWidget *text;
 

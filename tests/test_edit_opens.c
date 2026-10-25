@@ -15,8 +15,10 @@
 
 #include "sii_log_handler.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-void show_edit_widget(GtkWidget *text, gpointer data);
 
 typedef struct {
     guint baseline;

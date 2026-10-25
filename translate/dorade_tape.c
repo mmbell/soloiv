@@ -19,8 +19,7 @@ static char vcid[] = "$Id$";
 # define K32 32768
 # endif
 # include "input_limits.h"
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 
 struct dd_sweep_list_entries {
     double start_time;
@@ -71,8 +70,8 @@ static struct dd_input_filters *difs;
 static int null_dev=NO;
 
 
-static struct dd_sweep_list_entries *dd_sweep_listit();
-static void dd_tape_dump();
+static struct dd_sweep_list_entries *dd_sweep_listit(DGI_PTR dgi, struct prev_swps *swp_que, struct dd_sweep_list_entries *this, int *sweep_count);
+static void dd_tape_dump(struct dd_sweep_list_entries *top, int sweep_count, int out_fid, int remove_them, int io_type, int vol_num, struct dd_sweep_list_entries **swp_list);
 
 
 /* c------------------------------------------------------------------------ */
@@ -83,9 +82,7 @@ static struct dd_sweep_list_entries *dd_sweep_listit(DGI_PTR dgi, struct prev_sw
      * this sweep should have been written out at this point
      */
     /* c...mark */
-    int mark, ii, rn, dd_min_rays_per_sweep();
-    char *dts_print();
-    DD_TIME *d_unstamp_time();
+    int mark, ii, rn;
 
     if(swp_que->num_rays >= dd_min_rays_per_sweep() && !swp_que->listed
        && !dgi->ignore_this_sweep) {
@@ -162,12 +159,10 @@ void dd_tape(DGI_PTR dgi, int flush)
     static struct dd_sweep_list_entries *top=NULL
 	  , *this=NULL, *next=NULL, *last, **swp_list=NULL;
 
-    struct dd_general_info *dgii, *dd_get_structs();
-    struct dd_sweep_list_entries *dd_sweep_listit();
-    struct dd_input_filters *dd_return_difs_ptr();
-    int i=0, n, rn, dump_em=NO, mark, radar_num = -1, nt, dd_tokens();
-    double d, et, atof();
-    char *a, *get_tagged_string(), *dfn, str[256], *dd_radar_name();
+    struct dd_general_info *dgii;
+    int i=0, n, rn, dump_em=NO, mark, radar_num = -1, nt;
+    double d, et;
+    char *a, *dfn, str[256];
 
 
     if(!produce_dorade)
@@ -433,8 +428,7 @@ static void dd_tape_dump(struct dd_sweep_list_entries *top, int sweep_count, int
     static double f_bytes=0, fbytes_trip=FILE_RESET_INTERVAL;
     static DD_TIME *dts;
 
-    DGI_PTR dgi, dd_get_structs();
-    DD_TIME *d_unstamp_time();
+    DGI_PTR dgi;
     struct dd_sweep_list_entries *this, *that, *last, *dsle[MAX_SENSORS];
     struct dd_sweep_list_entries **swp_list_ptr=swp_list;
     struct volume_d *vold;
@@ -445,17 +439,17 @@ static void dd_tape_dump(struct dd_sweep_list_entries *top, int sweep_count, int
     struct cell_d *celv;
     struct generic_descriptor *gd;
     struct ray_i *ryib;
-    struct comment_d *comm, *dd_return_comment();
+    struct comment_d *comm;
 
-    double d, d_time_stamp(), keep_time, dorade_time_stamp();
+    double d, keep_time;
     int real_sweep_count=0;
     int radar_count=0,_fid, swp_fid, ryib_ndx, itsa_ryib, vsize;
     int size_gd=sizeof(struct generic_descriptor), mark, keep_count, flen;
     int i, j=BLOCK_SIZE, kk, n, nn, ncopy, pn, qdat_data_offs, gdsos;
     int rn, sn, snn, rsize=0, slen, npd;
-    long cdl;
-    char *a, *sb, *tb, *dd_find_desc(), *dts_print(), *first_id;
-    char str[256], *strrchr(), *dd_radar_name(), *str_terminate();
+    int32_t cdl;
+    char *a, *sb, *tb, *first_id;
+    char str[256];
     DD_TIME ddts;
 
 
@@ -657,7 +651,7 @@ static void dd_tape_dump(struct dd_sweep_list_entries *top, int sweep_count, int
 		gd = (struct generic_descriptor *)a;
 		memcpy(vtbuf+vsize, a, gd->sizeof_struct);
 		if(LittleEndian){
-		   comm = (struct comment_d *)vtbuf+vsize;
+		   comm = (struct comment_d *)(vtbuf+vsize);
 		   cdl = comm->comment_des_length;
 		   swack4(&cdl, &comm->comment_des_length);
 		}

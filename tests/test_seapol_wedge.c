@@ -22,10 +22,10 @@
 #include "dorade_headers.h"
 #include "dd_defines.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-struct dd_general_info *dd_window_dgi();
-int dd_absorb_ray_info();
-int dd_absorb_header_info();
 
 static void seapol_action(GtkWidget *main_window, gpointer user_data)
 {
@@ -39,7 +39,7 @@ static void seapol_action(GtkWidget *main_window, gpointer user_data)
 
     test_app_runner_pump(20);
 
-    dgi = dd_window_dgi(0, "");
+    dgi = dd_window_dgi(0);
     g_assert_nonnull(dgi);
     g_assert_cmpint(dgi->source_fmt, ==, CFRADIAL_FMT);
 

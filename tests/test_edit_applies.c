@@ -32,13 +32,12 @@
 #include "solo_editor_structs.h"
 #include "ui.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define CFRAD_FILE "cf2/cfrad2.20140703_215739.317_to_20140703_215757.406_KLTX_SUR.nc"
 
-struct dd_general_info *dd_window_dgi();
-struct solo_edit_stuff *return_sed_stuff();
-int dd_givfld();
-int se_hard_zap();
 
 /* First present field index after `after`, or -1. */
 static int first_present(struct dd_general_info *dgi, int after)
@@ -72,7 +71,7 @@ static void edit_applies_action(GtkWidget *main_window, gpointer user_data)
     (void)user_data;
 
     /* --- read the sweep --- */
-    dgi = dd_window_dgi(win, "");
+    dgi = dd_window_dgi(win);
     g_strlcpy(dgi->directory_name, "./", sizeof(dgi->directory_name));
     g_strlcpy(dgi->sweep_file_name, CFRAD_FILE, sizeof(dgi->sweep_file_name));
     dgi->source_fmt = CFRADIAL_FMT;

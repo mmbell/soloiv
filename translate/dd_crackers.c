@@ -12,6 +12,7 @@ static char vcid[] = "$Id$";
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+# include <s2_protos.h>
 
 # ifndef CRAK_LST_INC
 # define CRAK_LST_INC
@@ -34,20 +35,9 @@ static char vcid[] = "$Id$";
 
 extern int LittleEndian;
 
-void nex_crack_rda();
-void nex_crack_drdh();
-void nex_crack_nmh();
-void piraq_crack_header();
-void piraq_crack_radar();
-void crackers();
-void piraq_crackers();
-void swack_short();
-void swack_long();
-void swack_double();
-
 /* c------------------------------------------------------------------------ */
 
-void nssl_crack_head(char *srs, char *dst, int limit)
+void nssl_crack_head(void *srs, void *dst, int limit)
 {
    int sizeof_struct=250;
    int item_count=38;
@@ -93,12 +83,12 @@ void nssl_crack_head(char *srs, char *dst, int limit)
       {   90,    2,    2,   80,   80,    1,   90},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_mrd_head
+   crackers(srs, dst, item_count, ndx_count, crk_mrd_head[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void nssl_crack_head2(char *srs, char *dst, int limit)
+void nssl_crack_head2(void *srs, void *dst, int limit)
 {
    int sizeof_struct=160;
    int item_count=40;
@@ -146,12 +136,12 @@ void nssl_crack_head2(char *srs, char *dst, int limit)
       {  156,    3,    4,    1,    1,    1,  156},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_mrd_head2
+   crackers(srs, dst, item_count, ndx_count, crk_mrd_head2[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void se_crack_bdhd(char *srs, char *dst, int limit)
+void se_crack_bdhd(void *srs, void *dst, int limit)
 {
    int sizeof_struct=76;
    int item_count=14;
@@ -173,12 +163,12 @@ void se_crack_bdhd(char *srs, char *dst, int limit)
       {   72,    3,    4,    1,    1,    1,   72},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_boundary_header
+   crackers(srs, dst, item_count, ndx_count, crk_boundary_header[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void se_crack_pisp(char *srs, char *dst, int limit)
+void se_crack_pisp(void *srs, void *dst, int limit)
 {
    int sizeof_struct=128;
    int item_count=24;
@@ -210,12 +200,12 @@ void se_crack_pisp(char *srs, char *dst, int limit)
       {  112,    1,    1,   16,   16,    1,  112},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_point_in_space
+   crackers(srs, dst, item_count, ndx_count, crk_point_in_space[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sxmn(char *srs, char *dst, int limit)
+void sp_crack_sxmn(void *srs, void *dst, int limit)
 {
    int sizeof_struct=220;
    int item_count=21;
@@ -244,12 +234,12 @@ void sp_crack_sxmn(char *srs, char *dst, int limit)
       {  216,    3,    4,    1,    1,    1,  216},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_examine_info
+   crackers(srs, dst, item_count, ndx_count, crk_solo_examine_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_slmk0(char *srs, char *dst, int limit, int swap_em)
+void sp_crack_slmk0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=56;
    int item_count=9;
@@ -266,12 +256,12 @@ void sp_crack_slmk0(char *srs, char *dst, int limit, int swap_em)
       {   52,    3,    4,    1,    1,    1,   52},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_landmark_info
+   crackers(srs, dst, item_count, ndx_count, crk_landmark_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_slmk(char *srs, char *dst, int limit)
+void sp_crack_slmk(void *srs, void *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=9;
@@ -288,12 +278,12 @@ void sp_crack_slmk(char *srs, char *dst, int limit)
       {   76,    3,    4,    1,    1,    1,   76},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_landmark_info
+   crackers(srs, dst, item_count, ndx_count, crk_landmark_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sctr0(char *srs, char *dst, int limit, int swap_em)
+void sp_crack_sctr0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=56;
    int item_count=9;
@@ -310,12 +300,12 @@ void sp_crack_sctr0(char *srs, char *dst, int limit, int swap_em)
       {   52,    3,    4,    1,    1,    1,   52},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_frame_ctr_info
+   crackers(srs, dst, item_count, ndx_count, crk_frame_ctr_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sctr(char *srs, char *dst, int limit)
+void sp_crack_sctr(void *srs, void *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=9;
@@ -332,12 +322,12 @@ void sp_crack_sctr(char *srs, char *dst, int limit)
       {   76,    3,    4,    1,    1,    1,   76},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_frame_ctr_info
+   crackers(srs, dst, item_count, ndx_count, crk_frame_ctr_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sptl0(char *srs, char *dst, int limit, int swap_em)
+void sp_crack_sptl0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=48;
    int item_count=7;
@@ -352,12 +342,12 @@ void sp_crack_sptl0(char *srs, char *dst, int limit, int swap_em)
       {   24,    3,    4,    6,    6,    1,   24},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_plot_lock
+   crackers(srs, dst, item_count, ndx_count, crk_solo_plot_lock[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_sptl(char *srs, char *dst, int limit)
+void sp_crack_sptl(void *srs, void *dst, int limit)
 {
    int sizeof_struct=72;
    int item_count=7;
@@ -372,12 +362,12 @@ void sp_crack_sptl(char *srs, char *dst, int limit)
       {   24,    3,    4,   12,   12,    1,   24},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_plot_lock
+   crackers(srs, dst, item_count, ndx_count, crk_solo_plot_lock[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfi0(char *srs, char *dst, int limit, int swap_em)
+void sp_crack_ssfi0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=400;
    int item_count=25;
@@ -410,12 +400,12 @@ void sp_crack_ssfi0(char *srs, char *dst, int limit, int swap_em)
       {  392,    5,    8,    1,    1,    1,  392},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_sweep_file
+   crackers(srs, dst, item_count, ndx_count, crk_solo_sweep_file[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfi(char *srs, char *dst, int limit)
+void sp_crack_ssfi(void *srs, void *dst, int limit)
 {
    int sizeof_struct=424;
    int item_count=25;
@@ -448,12 +438,12 @@ void sp_crack_ssfi(char *srs, char *dst, int limit)
       {  416,    5,    8,    1,    1,    1,  416},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_sweep_file
+   crackers(srs, dst, item_count, ndx_count, crk_solo_sweep_file[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfiLE(char *srs, char *dst, int limit)
+void sp_crack_ssfiLE(void *srs, void *dst, int limit)
 {
    int sizeof_struct=400;
    int item_count=25;
@@ -486,12 +476,12 @@ void sp_crack_ssfiLE(char *srs, char *dst, int limit)
       {  392,    5,    8,    1,    1,    1,  392},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_sweep_file
+   crackers(srs, dst, item_count, ndx_count, crk_solo_sweep_file[0]
 	    , sparc_ndx, offs_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_ssfiLE0(char *srs, char *dst, int limit)
+void sp_crack_ssfiLE0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=400;
    int item_count=25;
@@ -524,12 +514,12 @@ void sp_crack_ssfiLE0(char *srs, char *dst, int limit)
       {  392,    5,    8,    1,    1,    1,  392},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_sweep_file
+   crackers(srs, dst, item_count, ndx_count, crk_solo_sweep_file[0]
 	    , sparc_ndx, offs_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_spmi0(char *srs, char *dst, int limit, int swap_em)
+void sp_crack_spmi0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=9;
@@ -546,12 +536,12 @@ void sp_crack_spmi0(char *srs, char *dst, int limit, int swap_em)
       {   64,    1,    1,   16,   16,    1,   64},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_parameter_info
+   crackers(srs, dst, item_count, ndx_count, crk_solo_parameter_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_spmi(char *srs, char *dst, int limit)
+void sp_crack_spmi(void *srs, void *dst, int limit)
 {
   int sizeof_struct=104;
   int item_count=9;
@@ -568,12 +558,12 @@ void sp_crack_spmi(char *srs, char *dst, int limit)
       {   88,    1,    1,   16,   16,    1,   88},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_parameter_info
+   crackers(srs, dst, item_count, ndx_count, crk_solo_parameter_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_spal(char *srs, char *dst, int limit)
+void sp_crack_spal(void *srs, void *dst, int limit)
 {
    int sizeof_struct=796;
    int item_count=26;
@@ -607,12 +597,12 @@ void sp_crack_spal(char *srs, char *dst, int limit)
       {  748,    1,    1,   48,   48,    1,  748},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_palette
+   crackers(srs, dst, item_count, ndx_count, crk_solo_palette[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_swvi0(char *srs, char *dst, int limit, int swap_em)
+void sp_crack_swvi0(void *srs, void *dst, int limit)
 {
    int sizeof_struct=220;
    int item_count=39;
@@ -659,12 +649,12 @@ void sp_crack_swvi0(char *srs, char *dst, int limit, int swap_em)
       {  216,    4,    4,    1,    1,    1,  216},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_view_info
+   crackers(srs, dst, item_count, ndx_count, crk_solo_view_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void sp_crack_swvi(char *srs, char *dst, int limit)
+void sp_crack_swvi(void *srs, void *dst, int limit)
 {
    int sizeof_struct=244;
    int item_count=39;
@@ -711,12 +701,12 @@ void sp_crack_swvi(char *srs, char *dst, int limit)
       {  240,    4,    4,    1,    1,    1,  240},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_solo_view_info
+   crackers(srs, dst, item_count, ndx_count, crk_solo_view_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_rktb(char *srs, char *dst, int limit)
+void ddin_crack_rktb(void *srs, void *dst, int limit)
 {
    int sizeof_struct=28;
    int item_count=7;
@@ -731,14 +721,14 @@ void ddin_crack_rktb(char *srs, char *dst, int limit)
       {   24,    3,    4,    1,    1,    1,   24},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_rot_ang_table
+   crackers(srs, dst, item_count, ndx_count, crk_rot_ang_table[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
 /* LE swap for super swib aligned on 8-byte boundaries - as for SPARC */
 
-void ddin_crack_sswbLE_aligned8(char *srs, char *dst, int limit)
+void ddin_crack_sswbLE_aligned8(void *srs, void *dst, int limit)
 {
    int sizeof_struct=196;
    int item_count=17;
@@ -763,14 +753,14 @@ void ddin_crack_sswbLE_aligned8(char *srs, char *dst, int limit)
       {  100,    3,    4,   24,   24,    1,  104},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_super_SWIB
+   crackers(srs, dst, item_count, ndx_count, crk_super_SWIB[0]
 	    , sparc_ndx, offs_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
 /* swap for super swib aligned on 8-byte boundaries - as for SPARC */
 
-void ddin_crack_sswb_aligned8(char *srs, char *dst, int limit)
+void ddin_crack_sswb_aligned8(void *srs, void *dst, int limit)
 {
    int sizeof_struct=196;
    int item_count=17;
@@ -795,13 +785,13 @@ void ddin_crack_sswb_aligned8(char *srs, char *dst, int limit)
       {  100,    3,    4,   24,   24,    1,  104},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_super_SWIB
+   crackers(srs, dst, item_count, ndx_count, crk_super_SWIB[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 
 /* LE swap for super swib not aligned on 8-byte boundaries - as for INTEL */
 
-void ddin_crack_sswbLE(char *srs, char *dst, int limit)
+void ddin_crack_sswbLE(void *srs, void *dst, int limit)
 {
    int sizeof_struct=196;
    int item_count=17;
@@ -826,13 +816,13 @@ void ddin_crack_sswbLE(char *srs, char *dst, int limit)
       {  100,    3,    4,   24,   24,    1,  100},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_super_SWIB
+   crackers(srs, dst, item_count, ndx_count, crk_super_SWIB[0]
 	    , sparc_ndx, offs_ndx, limit);
 }
 
 /* swap for super swib not aligned on 8-byte boundaries - as for INTEL */
 
-void ddin_crack_sswb(char *srs, char *dst, int limit)
+void ddin_crack_sswb(void *srs, void *dst, int limit)
 {
    int sizeof_struct=196;
    int item_count=17;
@@ -857,13 +847,13 @@ void ddin_crack_sswb(char *srs, char *dst, int limit)
       {  100,    3,    4,   24,   24,    1,  100},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_super_SWIB
+   crackers(srs, dst, item_count, ndx_count, crk_super_SWIB[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 
 /* c------------------------------------------------------------------------ */
 
-void eld_crack_cspd(char *srs, char *dst, int limit)
+void eld_crack_cspd(void *srs, void *dst, int limit)
 {
    int sizeof_struct=36;
    int item_count=6;
@@ -877,12 +867,12 @@ void eld_crack_cspd(char *srs, char *dst, int limit)
       {   24,    2,    2,    6,    6,    1,   24},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_cell_spacing_d
+   crackers(srs, dst, item_count, ndx_count, crk_cell_spacing_d[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void eld_crack_lidr(char *srs, char *dst, int limit)
+void eld_crack_lidr(void *srs, void *dst, int limit)
 {
 
    int sizeof_struct=148;
@@ -920,12 +910,12 @@ void eld_crack_lidr(char *srs, char *dst, int limit)
       {  104,    4,    4,    1,   11,    2,  104},
       {  108,    4,    4,   10,   10,    1,  108},
    };
-   crackers(srs, dst, item_count, ndx_count, crk_lidar_d
+   crackers(srs, dst, item_count, ndx_count, crk_lidar_d[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void eld_crack_frad(char *srs, char *dst, int limit)
+void eld_crack_frad(void *srs, void *dst, int limit)
 {
    int sizeof_struct=52;
    int item_count=14;
@@ -947,12 +937,12 @@ void eld_crack_frad(char *srs, char *dst, int limit)
       {   50,    2,    2,    1,    1,    1,   50},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_field_parameter_data
+   crackers(srs, dst, item_count, ndx_count, crk_field_parameter_data[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void eld_crack_ldat(char *srs, char *dst, int limit)
+void eld_crack_ldat(void *srs, void *dst, int limit)
 {
    int sizeof_struct=164;
    int item_count=14;
@@ -974,12 +964,12 @@ void eld_crack_ldat(char *srs, char *dst, int limit)
       {  162,    2,    2,    1,    1,    1,  162},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_lidar_parameter_data
+   crackers(srs, dst, item_count, ndx_count, crk_lidar_parameter_data[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void fof_crack_hsk(char *srs, char *dst, int limit)
+void fof_crack_hsk(void *srs, void *dst, int limit)
 {
    int sizeof_struct=512;
    int item_count=116;
@@ -1103,12 +1093,12 @@ void fof_crack_hsk(char *srs, char *dst, int limit)
       {  496,    2,    2,    8,    8,    1,  496},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_rsf_house
+   crackers(srs, dst, item_count, ndx_count, crk_rsf_house[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_vold(char *srs, char *dst, int limit)
+void ddin_crack_vold(void *srs, void *dst, int limit)
 {
    int sizeof_struct=72;
    int item_count=18;
@@ -1134,12 +1124,12 @@ void ddin_crack_vold(char *srs, char *dst, int limit)
       {   70,    2,    2,    1,    1,    1,   70},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_volume_d
+   crackers(srs, dst, item_count, ndx_count, crk_volume_d[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_cfac(char *srs, char *dst, int limit)
+void ddin_crack_cfac(void *srs, void *dst, int limit)
 {
    int sizeof_struct=72;
    int item_count=18;
@@ -1165,12 +1155,12 @@ void ddin_crack_cfac(char *srs, char *dst, int limit)
       {   68,    4,    4,    1,    1,    1,   68},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_correction_d
+   crackers(srs, dst, item_count, ndx_count, crk_correction_d[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_celv(char *srs, char *dst, int limit)
+void ddin_crack_celv(void *srs, void *dst, int limit)
 {
    int sizeof_struct=16;
    int item_count=4;
@@ -1182,12 +1172,12 @@ void ddin_crack_celv(char *srs, char *dst, int limit)
       {   12,    4,    4,    1,    1,    1,   12},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_cell_d
+   crackers(srs, dst, item_count, ndx_count, crk_cell_d[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_radd(char *srs, char *dst, int limit)
+void ddin_crack_radd(void *srs, void *dst, int limit)
 {
    int sizeof_struct=300;
    int item_count=53;
@@ -1248,12 +1238,12 @@ void ddin_crack_radd(char *srs, char *dst, int limit)
       {  280,    1,    1,   20,   20,    1,  280},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_radar_d 
+   crackers(srs, dst, item_count, ndx_count, crk_radar_d[0] 
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_frib(char *srs, char *dst, int limit)
+void ddin_crack_frib(void *srs, void *dst, int limit)
 {
 
    int sizeof_struct=264;
@@ -1295,12 +1285,12 @@ void ddin_crack_frib(char *srs, char *dst, int limit)
       {  184,    1,    1,   80,   80,    1,  184},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_field_radar_i
+   crackers(srs, dst, item_count, ndx_count, crk_field_radar_i[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_parm(char *srs, char *dst, int limit)
+void ddin_crack_parm(void *srs, void *dst, int limit)
 {
    int sizeof_struct=216;
    int item_count=30;
@@ -1338,12 +1328,12 @@ void ddin_crack_parm(char *srs, char *dst, int limit)
       {  212,    4,    4,    1,    1,    1,  212},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_parameter_d
+   crackers(srs, dst, item_count, ndx_count, crk_parameter_d[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_swib(char *srs, char *dst, int limit)
+void ddin_crack_swib(void *srs, void *dst, int limit)
 {
    int sizeof_struct=40;
    int item_count=9;
@@ -1360,12 +1350,12 @@ void ddin_crack_swib(char *srs, char *dst, int limit)
       {   36,    3,    4,    1,    1,    1,   36},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_sweepinfo_d
+   crackers(srs, dst, item_count, ndx_count, crk_sweepinfo_d[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_asib(char *srs, char *dst, int limit)
+void ddin_crack_asib(void *srs, void *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=20;
@@ -1393,12 +1383,12 @@ void ddin_crack_asib(char *srs, char *dst, int limit)
       {   76,    4,    4,    1,    1,    1,   76},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_platform_i
+   crackers(srs, dst, item_count, ndx_count, crk_platform_i[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_ryib(char *srs, char *dst, int limit)
+void ddin_crack_ryib(void *srs, void *dst, int limit)
 {
    int sizeof_struct=44;
    int item_count=13;
@@ -1419,12 +1409,12 @@ void ddin_crack_ryib(char *srs, char *dst, int limit)
       {   40,    3,    4,    1,    1,    1,   40},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_ray_i
+   crackers(srs, dst, item_count, ndx_count, crk_ray_i[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void ddin_crack_qdat(char *srs, char *dst, int limit)
+void ddin_crack_qdat(void *srs, void *dst, int limit)
 {
    int sizeof_struct=56;
    int item_count=8;
@@ -1440,12 +1430,12 @@ void ddin_crack_qdat(char *srs, char *dst, int limit)
       {   40,    4,    4,    4,    4,    1,   40},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_qparamdata_d
+   crackers(srs, dst, item_count, ndx_count, crk_qparamdata_d[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void tdwr_crack_cbdh(char *srs, char *dst, int limit)
+void tdwr_crack_cbdh(void *srs, void *dst, int limit)
 {
    int sizeof_struct=52;
    int item_count=20;
@@ -1473,12 +1463,12 @@ void tdwr_crack_cbdh(char *srs, char *dst, int limit)
       {   50,    2,    2,    1,    1,    1,   50},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_cbd_header
+   crackers(srs, dst, item_count, ndx_count, crk_cbd_header[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_crack_hrh(char *srs, char *dst, int limit)
+void hrd_crack_hrh(void *srs, void *dst, int limit)
 {
    int sizeof_struct=44;
    int item_count=25;
@@ -1511,12 +1501,12 @@ void hrd_crack_hrh(char *srs, char *dst, int limit)
       {   42,    2,    2,    1,    1,    1,   42},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_hrd_ray_header
+   crackers(srs, dst, item_count, ndx_count, crk_hrd_ray_header[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_crack_hdrh(char *srs, char *dst, int limit)
+void hrd_crack_hdrh(void *srs, void *dst, int limit)
 {
    int sizeof_struct=10;
    int item_count=6;
@@ -1530,12 +1520,12 @@ void hrd_crack_hdrh(char *srs, char *dst, int limit)
       {    9,    1,    1,    1,    1,    1,    9},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_hrd_data_rec_header
+   crackers(srs, dst, item_count, ndx_count, crk_hrd_data_rec_header[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_crack_radar(char *srs, char *dst, int limit)
+void hrd_crack_radar(void *srs, void *dst, int limit)
 {
    int sizeof_struct=600;
    int item_count=300;
@@ -1843,12 +1833,12 @@ void hrd_crack_radar(char *srs, char *dst, int limit)
       {  598,    2,    2,    1,    1,    1,  598},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_hrd_radar_info
+   crackers(srs, dst, item_count, ndx_count, crk_hrd_radar_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void hrd_crack_header(char *srs, char *dst, int limit)
+void hrd_crack_header(void *srs, void *dst, int limit)
 {
    int sizeof_struct=200;
    int item_count=73;
@@ -1929,12 +1919,12 @@ void hrd_crack_header(char *srs, char *dst, int limit)
       {  198,    2,    2,    1,    1,    1,  198},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_hrd_header
+   crackers(srs, dst, item_count, ndx_count, crk_hrd_header[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_loc_use_ncar(char *srs, char *dst, int limit)
+void uf_crack_loc_use_ncar(void *srs, void *dst, int limit)
 {
    int sizeof_struct=40;
    int item_count=19;
@@ -1961,12 +1951,12 @@ void uf_crack_loc_use_ncar(char *srs, char *dst, int limit)
       {   38,    2,    2,    1,    1,    1,   38},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_uf_loc_use_ncar
+   crackers(srs, dst, item_count, ndx_count, crk_uf_loc_use_ncar[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_loc_use_ucla(char *srs, char *dst, int limit)
+void uf_crack_loc_use_ucla(void *srs, void *dst, int limit)
 {
    int sizeof_struct=50;
    int item_count=18;
@@ -1992,12 +1982,12 @@ void uf_crack_loc_use_ucla(char *srs, char *dst, int limit)
       {   48,    2,    2,    1,    1,    1,   48},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_uf_loc_use_ucla
+   crackers(srs, dst, item_count, ndx_count, crk_uf_loc_use_ucla[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_fhed(char *srs, char *dst, int limit)
+void uf_crack_fhed(void *srs, void *dst, int limit)
 {
    int sizeof_struct=64;
    int item_count=32;
@@ -2037,12 +2027,12 @@ void uf_crack_fhed(char *srs, char *dst, int limit)
       {   62,    2,    2,    1,    1,    1,   62},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_uf_fld_hed
+   crackers(srs, dst, item_count, ndx_count, crk_uf_fld_hed[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_opt(char *srs, char *dst, int limit)
+void uf_crack_opt(void *srs, void *dst, int limit)
 {
    int sizeof_struct=32;
    int item_count=10;
@@ -2060,12 +2050,12 @@ void uf_crack_opt(char *srs, char *dst, int limit)
       {   30,    2,    2,    1,    1,    1,   30},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_uf_opt
+   crackers(srs, dst, item_count, ndx_count, crk_uf_opt[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void uf_crack_man(char *srs, char *dst, int limit)
+void uf_crack_man(void *srs, void *dst, int limit)
 {
    int sizeof_struct=92;
    int item_count=37;
@@ -2109,12 +2099,12 @@ void uf_crack_man(char *srs, char *dst, int limit)
       {   88,    2,    2,    1,    2,    2,   88},
       {   90,    2,    2,    1,    1,    1,   90},
    };
-   crackers(srs, dst, item_count, ndx_count, crk_uf_man
+   crackers(srs, dst, item_count, ndx_count, crk_uf_man[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void nex_crack_drdh(char *srs, char *dst, int limit)
+void nex_crack_drdh(void *srs, void *dst, int limit)
 {
    int dst_ndx = sparc_ndx;
    int sizeof_struct=100;
@@ -2170,12 +2160,12 @@ void nex_crack_drdh(char *srs, char *dst, int limit)
       {   96,    2,    2,    1,    1,    1,   96},
       {   98,    2,    2,    1,    1,    1,   98},
    };
-   crackers(srs, dst, item_count, ndx_count, crk_drdh
+   crackers(srs, dst, item_count, ndx_count, crk_drdh[0]
 	    , offs_ndx, dst_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void nex_crack_nmh(char *srs, char *dst, int limit)
+void nex_crack_nmh(void *srs, void *dst, int limit)
 {
    int sizeof_struct=16;
    int item_count=8;
@@ -2191,12 +2181,12 @@ void nex_crack_nmh(char *srs, char *dst, int limit)
       {   14,    2,    2,    1,    1,    1,   14},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_nexrad_message_header
+   crackers(srs, dst, item_count, ndx_count, crk_nexrad_message_header[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void nex_crack_rda(char *srs, char *dst, int limit)
+void nex_crack_rda(void *srs, void *dst, int limit)
 {
    int sizeof_struct=80;
    int item_count=27;
@@ -2231,12 +2221,12 @@ void nex_crack_rda(char *srs, char *dst, int limit)
       {   52,    2,    2,   14,   14,    1,   52},
    };
 
-   crackers(srs, dst, item_count, ndx_count, crk_rda_status_info
+   crackers(srs, dst, item_count, ndx_count, crk_rda_status_info[0]
 	    , offs_ndx, sparc_ndx, limit);
 }
 /* c------------------------------------------------------------------------ */
 
-void piraq_crack_header(char *srs, char *dst, int limit, int sparc_alignment)
+void piraq_crack_header(void *srs, void *dst, int limit, int sparc_alignment)
 {
    int mark=0;
    int srs_ndx = sparc_alignment ? sparc_ndx : offs_ndx;
@@ -2321,11 +2311,11 @@ void piraq_crack_header(char *srs, char *dst, int limit, int sparc_alignment)
    };
 # endif
    if(LittleEndian) {
-      piraq_crackers(srs, dst, item_count, ndx_count, crk_prq_ray_hdr
+      piraq_crackers(srs, dst, item_count, ndx_count, crk_prq_ray_hdr[0]
 		     , srs_ndx, dst_ndx, limit);
    }
    else {
-      crackers(srs, dst, item_count, ndx_count, crk_prq_ray_hdr
+      crackers(srs, dst, item_count, ndx_count, crk_prq_ray_hdr[0]
 	       , srs_ndx, dst_ndx, limit);
    }
 }
@@ -2333,7 +2323,7 @@ void piraq_crack_header(char *srs, char *dst, int limit, int sparc_alignment)
 # endif
 /* c------------------------------------------------------------------------ */
 
-void piraq_crack_radar(char *srs, char *dst, int limit, int sparc_alignment)
+void piraq_crack_radar(void *srs, void *dst, int limit, int sparc_alignment)
 {
    /*
    int srs_ndx = sparc_alignment ? sparc_ndx : offs_ndx;
@@ -2459,7 +2449,7 @@ void piraq_crack_radar(char *srs, char *dst, int limit, int sparc_alignment)
 # endif
 
    if(LittleEndian) {
-      piraq_crackers(srs, dst, item_count, ndx_count, crk_prq_radar_hdr
+      piraq_crackers(srs, dst, item_count, ndx_count, crk_prq_radar_hdr[0]
 		     , srs_ndx, dst_ndx, limit);
    }
    else {
@@ -2575,8 +2565,10 @@ void piraq_crackers(char *srs, char *dst, int item_count, int ndx_cnt, int *tbl,
 }
 /* c------------------------------------------------------------------------ */
 
-void swack_short(char *ss, char *tt, int nn)
+void swack_short(void *src, void *dst, int nn)
 {
+   char *ss=src, *tt=dst;
+
    for(; nn--;) {
       *tt++ = *(ss+1);
       *tt++ = *ss;
@@ -2585,15 +2577,19 @@ void swack_short(char *ss, char *tt, int nn)
 }
 /* c------------------------------------------------------------------------ */
 
-void swack2(char *ss, char *tt)
+void swack2(void *src, void *dst)
 {
+   char *ss=src, *tt=dst;
+
    *tt++ = *(ss+1);
    *tt = *ss;
 }
 /* c------------------------------------------------------------------------ */
 
-void swack_long(char *ss, char *tt, int nn)
+void swack_long(void *src, void *dst, int nn)
 {
+   char *ss=src, *tt=dst;
+
    for(; nn--;) {
       *tt++ = *(ss+3);
       *tt++ = *(ss+2);
@@ -2604,8 +2600,10 @@ void swack_long(char *ss, char *tt, int nn)
 }
 /* c------------------------------------------------------------------------ */
 
-void swack4(char *ss, char *tt)
+void swack4(void *src, void *dst)
 {
+   char *ss=src, *tt=dst;
+
    *tt++ = *(ss+3);
    *tt++ = *(ss+2);
    *tt++ = *(ss+1);
@@ -2613,8 +2611,10 @@ void swack4(char *ss, char *tt)
 }
 /* c------------------------------------------------------------------------ */
 
-void swack_double(char *ss, char *tt, int nn)
+void swack_double(void *src, void *dst, int nn)
 {
+   char *ss=src, *tt=dst;
+
    for(; nn--;) {
       *tt++ = *(ss+7);
       *tt++ = *(ss+6);

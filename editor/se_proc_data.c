@@ -12,8 +12,9 @@ static char vcid[] = "$Id$";
 # include <ui.h>
 # include <ui_error.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -45,56 +46,6 @@ typedef enum {
  * se_set_sfic_from_frame is in sp_basics.c (update_sfic)
  */
 
-int se_dump_sfic_widget();
-void se_dump_sed_files_widget();
-void se_refresh_sed_files_widget();
-void se_refresh_sfic_widget();
-
-
-/* external routines */
-void se_set_sfic_from_frame();	/* sp_basics.c */
-void dd_new_vol();		/* dd_swp_files.c */
-int ddswp_last_ray();		/* swp_file_acc.c */
-void sp_sweep_file_check();	/* sp_clkd.c */
-int se_free_raqs();		/* dorade_share.c */
-int se_malloc_flagged_arrays();	/* se_utils.c */
-void ddir_rescan_urgent();	/* dd_files.c */
-int se_sizeof_bnd_set();	/* se_bnd.c */
-void se_pack_bnd_set();		/* se_bnd.c */
-int se_compare_bnds();		/* se_bnd.c */
-void se_clr_all_bnds();		/* se_bnd.c */
-void se_append_string();	/* se_utils.c */
-int ddir_files_v3();		/* dd_files.c */
-void se_fix_comment();		/* se_utils.c */
-void se_push_spair_string();	/* se_utils.c */
-int se_radar_inside_bnd();	/* se_bnd.c */
-void se_shift_bnd();		/* se_bnd.c */
-void se_ts_find_intxns();	/* se_bnd.c */
-int xse_find_intxns();		/* se_bnd.c */
-int xse_num_segments();		/* se_bnd.c */
-void se_nab_segment();		/* se_bnd.c */
-void se_push_all_ssms();	/* se_utils.c */
-int se_absorb_strings();	/* se_utils.c */
-int solo_halt_flag();		/* sp_basics.c */
-void solo_clear_halt_flag();	/* sp_basics.c */
-
-
-/* internal routines */
-void se_cull_setup_input();
-void dd_edd();
-void se_edit_summary();
-int se_gen_sweep_list();
-int se_process_data();
-int se_really_readin_cmds();
-void se_setup_input_cmds();
-void se_shift_setup_inputs();
-void se_tack_on_cmds();
-double ts_pointing_angle();
-void se_write_sed_cmds();
-struct ui_cmd_mgmt *se_malloc_ucm();
-struct ui_cmd_mgmt *ok_cmd( char * line, struct ui_cmd_mgmt *the_ucm );
-int sii_cmd_tmplt_tokens (struct ui_cmd_mgmt *the_ucm);
-
 
 /* c------------------------------------------------------------------------ */
 
@@ -116,10 +67,10 @@ void se_cull_setup_input(struct solo_str_mgmt **top_ssm)
 {  
     /* routine to cull setup-input commands from a list of commands
      */
-    struct sed_command_files *scf, *se_return_cmd_files_struct();
-    struct solo_str_mgmt *ssmx, *next=(*top_ssm), *se_pull_ssm_string();
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct sed_command_files *scf;
+    struct solo_str_mgmt *ssmx, *next=(*top_ssm);
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
     char *a;
     
     seds = return_sed_stuff();
@@ -157,27 +108,25 @@ void dd_edd(int time_series, int automatic, int down, double d_ctr)
    int boundary_exists, not_aligned, shift_bnd, old_usi_swp_count=-1;
    int new_bnd, size, airborne, stopped = NO;
    struct bnd_point_mgmt *bpm;
-   long time_now();
    static int count=0;
    static char *cptrs[32], *deep6=0;
-   char *aa, *bbuf, *return_dd_open_info(), *getenv();
+   char *aa, *bbuf;
    float r1, r2, rr, ff;
    static float anga=58., angb=63., angc=118., angd=123.;
    double range1, range2, drr, dalt;
    double d, rota, rotl;
    unsigned short *bnd;
    
-   struct one_boundary *ob, *se_return_current_bnd();
+   struct one_boundary *ob;
    struct solo_str_mgmt *ssm;
-   struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
-   struct boundary_stuff *sebs, *return_se_bnd_struct();
+   struct dd_input_sweepfiles_v3 *dis;
+   struct boundary_stuff *sebs;
    
    struct unique_sweepfile_info_v3 *usi;
-   struct dd_general_info *dgi, *dd_window_dgi();
+   struct dd_general_info *dgi;
    struct cell_d *celv;
    static struct point_in_space *radar=NULL;
-   struct point_in_space *solo_malloc_pisp();
-   struct solo_edit_stuff *seds, *return_sed_stuff();
+   struct solo_edit_stuff *seds;
    
    if(!radar) radar = solo_malloc_pisp();
    sebs = return_se_bnd_struct();
@@ -186,7 +135,7 @@ void dd_edd(int time_series, int automatic, int down, double d_ctr)
    dis->editing = YES;
    usi = dis->usi_top;
    dd_output_flag(YES);
-   dgi = dd_window_dgi(usi->radar_num, "UNK");
+   dgi = dd_window_dgi(usi->radar_num);
    celv = dgi->dds->celvc;
    dgi->compression_scheme = HRD_COMPRESSION;
    dgi->disk_output = YES;
@@ -511,12 +460,12 @@ void se_edit_summary(void)
     /* saves the all the current editor commands 
      */
     int ii, nn, mark;
-    char *dts_print(), str[88];
-    DD_TIME dts, *d_unstamp_time();
-    long tn, time_now();
-    struct solo_str_mgmt *ssm, *ssmx, *se_clone_ssm(), *se_pop_spair_string();
+    char str[88];
+    DD_TIME dts;
+    long tn;
+    struct solo_str_mgmt *ssm, *ssmx;
     FILE *stream;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
     char *a;
 
     seds = return_sed_stuff();
@@ -564,13 +513,13 @@ void se_edit_summary(void)
 int se_gen_sweep_list(void)
 {
     int ii,jj, nn, mark, rn;
-    char str[64], *a, *mddir_radar_name_v3();
-    struct solo_str_mgmt *ssm , *se_remove_ssm_string();
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+    char str[64], *a;
+    struct solo_str_mgmt *ssm;
+    struct dd_input_sweepfiles_v3 *dis;
     struct unique_sweepfile_info_v3 *usi;
 
     struct swp_file_input_control *sfic;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     if(!seds->radar_stack)
@@ -663,7 +612,7 @@ int se_interpret_commands (struct solo_str_mgmt *first_ssm
   static char *buf = NULL;
   static int buf_size = 0;
   static struct ui_command *cmd, *cmds;
-  struct solo_edit_stuff *seds, *return_sed_stuff();
+  struct solo_edit_stuff *seds;
   struct solo_str_mgmt *ssm;
   struct ui_cmd_mgmt *ucm = first_ucm, *prev_ucm;
   char *aa, *bb, *cc, str[512], *lines[64], *sptrs[32];
@@ -722,7 +671,7 @@ int se_text_to_ssms (char *txt, struct solo_str_mgmt **top_ssm)
 {
   static char *buf = NULL;
   static int buf_size = 0;
-  struct solo_str_mgmt *ssm, *se_pop_spair_string();
+  struct solo_str_mgmt *ssm;
   int ii, nc=0, nn, nt;
   char *aa, *lines[128], str[256], *sptrs[66];
  
@@ -902,7 +851,7 @@ int se_perform_cmds (struct ui_cmd_mgmt *the_ucm, int num_cmds)
   
   struct ui_cmd_mgmt *ucm = the_ucm;
   int nn = num_cmds;
-  struct solo_edit_stuff *seds, *return_sed_stuff();
+  struct solo_edit_stuff *seds;
 
   seds = return_sed_stuff();
   if (num_cmds < 1)
@@ -923,13 +872,11 @@ int se_process_data(int arg, struct ui_command *cmds, int time_series, int autom
     int ii, jj, nn, mark, ncmds, item_num, nc;
     int oto_count, fer_count;
     short yy, mon, dd, hh, mm, ss, ms;
-    double d, d_time_stamp();
+    double d;
     DD_TIME dts;
-    char *a, *get_tagged_string(), str[88], *se_unquote_string(), *fgetz();
-    struct solo_str_mgmt *ssm, *ssmx, *ssmy, *ssm_fer, *se_pop_spair_string()
-	  , *se_bracket_procedure();
-    struct solo_str_mgmt *se_clone_ssm();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    char *a, str[88];
+    struct solo_str_mgmt *ssm, *ssmx, *ssmy, *ssm_fer;
+    struct solo_edit_stuff *seds;
     FILE *stream;
     struct ui_cmd_mgmt *ucm;
 
@@ -1025,14 +972,13 @@ int se_really_readin_cmds(void)
 {
     int ii, nn, mark, ncmds, item_num;
     short yy, mon, dd, hh, mm, ss, ms;
-    double d, d_time_stamp();
+    double d;
     DD_TIME dts;
-    char *a, *get_tagged_string(), str[256], *se_unquote_string(), *fgetz();
-    struct sed_command_files *scf, *se_return_cmd_files_struct();
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_str_mgmt *ssmx, *se_bracket_procedure()
-	  , *se_remove_ssm_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    char *a, str[256];
+    struct sed_command_files *scf;
+    struct solo_str_mgmt *ssm;
+    struct solo_str_mgmt *ssmx;
+    struct solo_edit_stuff *seds;
     FILE *stream;
 
     seds = return_sed_stuff();
@@ -1067,14 +1013,13 @@ void se_setup_input_cmds(void)
      * input control commands from it
      */
     int ii, nn, nt, mark, ncmds, item_num;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string(), *se_remove_ssm_string();
-    struct solo_str_mgmt *ssmx, *ssmy, *ssmz, *se_bracket_procedure();
-    struct solo_str_mgmt *se_clone_ssm();
+    struct solo_str_mgmt *ssm;
+    struct solo_str_mgmt *ssmx, *ssmy, *ssmz;
     struct swp_file_input_control * sfic;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    char *a, *b, *c, *e, str[88], *sptrs[16], *dd_whiteout(), *dd_delimit();
-    char *dts_print(), *dq="\"";
-    DD_TIME dts, *d_unstamp_time();
+    struct solo_edit_stuff *seds;
+    char *a, *b, *c, *e, str[88], *sptrs[16];
+    char *dq="\"";
+    DD_TIME dts;
 
     seds = return_sed_stuff();
     sfic = seds->sfic;
@@ -1195,7 +1140,7 @@ void se_shift_setup_inputs(struct solo_str_mgmt *ssm)
      */
     int ii, nn=MAX_SETUP_INPUTS, mark;
     struct solo_str_mgmt **ssmptr;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     ssmptr = &seds->setup_inputs[--nn];
@@ -1217,7 +1162,7 @@ void se_tack_on_cmds(char **where, int *how_much)
     char *a, *b, *c;
     struct generic_descriptor *gd;
     struct solo_str_mgmt *ssm;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
 				/* add up the number of chars to be appended */
@@ -1262,7 +1207,7 @@ void se_tack_on_cmds(char **where, int *how_much)
 }
 /* c------------------------------------------------------------------------ */
 
-double ts_pointing_angle(struct dd_general_info *dgi, int wn)
+double ts_pointing_angle(struct dd_general_info *dgi)
 {
     double d_rot;
 
@@ -1286,21 +1231,20 @@ double ts_pointing_angle(struct dd_general_info *dgi, int wn)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_write_sed_cmds(void)
+int se_write_sed_cmds(int arg, struct ui_command *cmds)
 {
     /* saves the editor commands before beginning a pass through
      * the data
      */
     int ii, nn, mark;
-    char *a, *b, *c, *dts_print(), str[256], radar_name[12];
-    char *dd_whiteout(), *dd_delimit();
-    DD_TIME dts, *d_unstamp_time();
-    long tn, time_now();
+    char *a, *b, *c, str[256], radar_name[12];
+    DD_TIME dts;
+    long tn;
     struct solo_str_mgmt *ssm;
     FILE *stream;
-    struct sed_command_files *scf, *se_return_cmd_files_struct();
-    struct swp_file_input_control *sfic, *return_swp_fi_in_cntrl();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct sed_command_files *scf;
+    struct swp_file_input_control *sfic;
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     sfic = return_swp_fi_in_cntrl();
@@ -1340,7 +1284,7 @@ void se_write_sed_cmds(void)
 
     if(!(stream = fopen(str, "w"))) {
 	g_string_append_printf (gs_complaints,"Unable to save editor commands to %s\n", str);
-	return;
+	return(1);
     }
 
     ssm = seds->edit_summary;
@@ -1352,7 +1296,7 @@ void se_write_sed_cmds(void)
 	}
     }
     fclose(stream);
-    return;
+    return(1);
 }
 /* c------------------------------------------------------------------------ */
 

@@ -91,8 +91,7 @@ static char vcid[] = "$Id$";
 # include "dd_io_structs.h"
 # include "generic_radar_info.h"
 # include "input_limits.h"
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 # ifndef K64
 # define K64 65536
 # endif
@@ -115,10 +114,6 @@ static int num_io_structs=0;
 static struct input_read_info *read_io_list[MAX_OPENED_FILES];
 static char naught='\0';
 
-void dd_reset_ios();
-int dd_phys_read();
-int dd_really_skip_recs();
-char * solo_list_entry();
 
 
 /* c------------------------------------------------------------------------ */
@@ -151,7 +146,8 @@ QuickSleep (int ms)
 int ffb_skip_one_fwd (FILE *strm)
 {
    int ii, jj;
-   long nab0, nab, size_read, offset;
+   int32_t nab0, nab;		/* fortran record length word */
+   long size_read, offset;
 
    size_read = fread((void *)&nab0, 1, sizeof(nab), strm );
    if (feof (strm) || size_read < sizeof (nab)) {
@@ -176,7 +172,8 @@ int ffb_skip_one_fwd (FILE *strm)
 int ffb_skip_one_bkw (FILE *strm)
 {
    int ii, jj;
-   long nab0, nab, size_read, offset;
+   int32_t nab0, nab;		/* fortran record length word */
+   long size_read, offset;
 
    jj = fseek( strm, -sizeof(nab), SEEK_CUR );
    size_read = fread((void *)&nab0, 1, sizeof(nab), strm );
@@ -204,7 +201,8 @@ int ffb_read(FILE *fin, char *buf, int count)
 {
     /* fortran-binary read routine
      */
-    long int size_rec=0, rlen1, rlen2=0, nab;
+    int32_t size_rec=0, nab;	/* fortran record length word */
+    long int rlen1, rlen2=0;
     size_t len_read, len2;
 
     /* read the record size */
@@ -252,7 +250,6 @@ cdcode ( /* try to decode the string */
     float *rval
 )
 {
-    int okint(), okreal(), oketype();
 
     if( okint( s, n, ival ))
 	 {
@@ -331,7 +328,7 @@ xctypeu16 (	/* type as 16 bit integers */
 
 void 
 ctypeu16 (	/* type as 16 bit integers */
-    unsigned char *a,
+    void *a,
     int m,
     int n
 )
@@ -339,7 +336,9 @@ ctypeu16 (	/* type as 16 bit integers */
     int ii=m/2, s=0, nn=(n+1)/2;
     int jj = m;
     short ival;
-    unsigned char *bb = a + m;
+    unsigned char *bb = a;
+
+    bb += m;
     
     for(; nn-- > 0; ii++, bb += 2, jj += 2) {
 	if( s == 0 ) {
@@ -449,7 +448,7 @@ slm_xctypeu16 (	/* type as 16 bit integers */
 
 void 
 Xctypeu16 (	/* type as 16 bit integers */
-    unsigned char *a,
+    void *a,
     int m,
     int n
 )
@@ -457,7 +456,9 @@ Xctypeu16 (	/* type as 16 bit integers */
     int ii=m/2, s=0, nn=(n+1)/2;
     int jj = m;
     short ival;
-    unsigned char *bb = a + m;
+    unsigned char *bb = a;
+
+    bb += m;
     
     for(; nn-- > 0; ii++, bb += 2, jj += 2) {
 	if( s == 0 ) {
@@ -484,7 +485,7 @@ int dd_crack_datime(char *datime, int nc, DD_TIME *dts)
     int yy, mon, dd, hh=0, mm=0, ss=0, ms=0;
     int ii, nn;
     char str[32], *aa, *bb, *cc;
-    double d, atof();
+    double d;
 
 
     strncpy(str, datime, nc);
@@ -587,7 +588,7 @@ char *dd_est_src_dev_names_list(char *id, struct solo_list_mgmt *slm, char *src_
      */
     int ii, mm, nn = slm->num_entries, size;
     struct source_devs_mgmt *sdm;
-    char *aa, *bb, *dlims=", \t\n", *strtok(), str[256];
+    char *aa, *bb, *dlims=", \t\n", str[256];
 
     sdm = (struct source_devs_mgmt *)malloc(sizeof(struct source_devs_mgmt));
     memset(sdm, 0, sizeof(struct source_devs_mgmt));
@@ -628,7 +629,7 @@ char *dd_establish_source_dev_names(char *id, char *names)
      */
     int ii, nn;
     struct source_devs_mgmt *sdm;
-    char *aa, *dlims=", \t\n", *strtok();
+    char *aa, *dlims=", \t\n";
 
     sdm = (struct source_devs_mgmt *)malloc(sizeof(struct source_devs_mgmt));
     memset(sdm, 0, sizeof(struct source_devs_mgmt));
@@ -761,8 +762,8 @@ void dd_input_read_close(struct input_read_info *iri)
 int dd_input_read_open(struct input_read_info *iri, char *dev_name)
 {
     int ii;
-    long *lp, keep, keep2;
-    char *aa=dev_name, *bb, *cc, *get_tagged_string();
+    int32_t *lp, keep, keep2;	/* fortran record length words */
+    char *aa=dev_name, *bb, *cc;
     fpos_t fpos;
 
     dd_reset_ios(iri, 1);
@@ -823,11 +824,11 @@ int dd_input_read_open(struct input_read_info *iri, char *dev_name)
 	       swack4(iri->top->buf, lp);
 	    }
 	    else {
-	       lp = (long *)iri->top->buf;
+	       lp = (int32_t *)iri->top->buf;
 	    }
 	    if(*lp > 0 && *lp <= K64-8 && *lp <= iri->sizeof_file) {
 		/* this might be FB_IO */
-		aa = iri->top->buf + *lp +sizeof(long);
+		aa = iri->top->buf + *lp +sizeof(int32_t);
 		if(LittleEndian) {
 		   swack4(aa, &keep);
 		}
@@ -1178,7 +1179,6 @@ struct io_packet *dd_return_current_packet(struct input_read_info *iri)
 struct input_read_info *dd_return_ios(int index, int fmt)
 {
     int ii;
-    struct input_read_info *dd_init_io_structs();
 
     if(index < 0 || index >= MAX_OPENED_FILES) {
 	return NULL;
@@ -1577,10 +1577,7 @@ oketype ( /* determine if string is real number */
 )
 {
     int d, i, ival;
-    int okint();
-    int okreal();
     float tenx=1.0;
-    double rpow();
 
     *val = 0;
 
@@ -1659,7 +1656,6 @@ okreal ( /* determine if string is real number */
 {
     int d, i, ival;
     float frak=1.0;
-    int okint();
 
     *val = 0;
     for( d=0; d < n && s[d] != '.'; d++ )
@@ -1725,8 +1721,8 @@ void gri_interest(struct generic_radar_info *gri, int verbose, char *preamble, c
     int ii, jj, nn;
     int ac_mode = gri->scan_mode == AIR ||
 	gri->radar_type == AIR_NOSE || gri->radar_type == AIR_LF;
-    char str[256], *a, *dts_print(), *str_terminate();
-    char *dd_scan_mode_mne(), scan_mode[8];
+    char str[256], *a;
+    char scan_mode[8];
 
     if(verbose)
 	  printf("\n");
@@ -1788,7 +1784,7 @@ void gri_interest(struct generic_radar_info *gri, int verbose, char *preamble, c
 int gri_max_lines(void)
 {
     static int count=0;
-    char *a, *get_tagged_string();
+    char *a;
     int ii=0;
 
     if(!count++) {
@@ -1808,10 +1804,10 @@ int gri_nab_input_filters(double current_time, struct dd_input_filters *difs, in
     int nn, ival;
     float val;
     char str[256];
-    char *a, *dts_print();
+    char *a;
     DD_TIME dts, dtx;
     float fp;
-    double d, dd_relative_time();
+    double d;
     double t1, t2;
 
     /* c...mark */

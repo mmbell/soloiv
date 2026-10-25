@@ -73,7 +73,7 @@ struct ui_cmd_mgmt
   int max_token_size;
 
   int num_tokens;
-  int (*cmd_proc)();
+  int (*cmd_proc)(int arg, struct ui_command *cmds);
   int one_time_only;
   int xtra_tokens;
 

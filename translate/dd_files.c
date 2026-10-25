@@ -53,7 +53,7 @@ static char vcid[] = "$Id$";
 # include "radar_io.h"
 # include <dorade_share.h>
 # include "solo_utils.h"
-# include <function_decl.h>
+# include <s2_protos.h>
 
 # include <errno.h>
 
@@ -142,34 +142,6 @@ struct ddir_info {
 static char *ascii_file_type[MAX_FILE_TYPES];
 
 
-int      craack_ddfn();
-char *   ddfn_file_info_line();
-void     ddfn_file_name();
-void     ddfn_list_versions();
-struct dd_file_name_v3 *ddfn_pop_spair();
-void     ddfn_ptr_list();
-void     ddfn_push_spair();
-struct dd_file_name_v3 *ddfn_search();
-void     ddfn_sort_insert();
-double   ddfn_time();
-int      ddfnp_list();
-int      ddir_files_v3();
-int      ddir_radar_num_v3();
-void     ddir_rescan_urgent();
-double   d_mddir_file_info_v3();
-struct dd_file_name_v3 **mddir_entire_list_v3();
-long     mddir_file_info_v3();
-int      mddir_file_list_v3();
-int      mddir_gen_swp_list_v3();
-int      mddir_gen_swp_str_list_v3();
-int      mddir_num_radars_v3();
-char *   mddir_radar_name_v3();
-int      mddir_radar_num_v3();
-struct dd_file_name_v3 **mddir_return_swp_list_v3();
-double   ddfnp_list_entry();
-struct ddir_info_v3 *return_ddir();
-double   ddir_free();
-double d_time_stamp();
 
 
 /* c------------------------------------------------------------------------ */
@@ -369,7 +341,7 @@ struct dd_file_name_v3 *ddfn_search(int dir_num, int radar_num, double d_target_
 				 */
     char *deep6=NULL;
     struct dd_file_name_v3 *this, *last, *gt_node=NULL, *lt_node=NULL;
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
     struct dd_radar_name_info_v3 *rni;
 
     if(!(ddir = return_ddir(dir_num)))
@@ -552,7 +524,7 @@ int ddfnp_list(int dir_num, int radar_num, int list_type)
      */
     int ii, mark;
     struct dd_file_name_v3 *this;
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
     struct dd_radar_name_info_v3 *rni;
 
     if(!(ddir = return_ddir(dir_num)))
@@ -598,10 +570,10 @@ int ddir_files_v3(int dir_num, char *dir)
      */
     DIR *dir_ptr;
     struct dirent *dp;
-    struct dd_file_name_v3 *ddfn, *ddfn_pop_spair();
+    struct dd_file_name_v3 *ddfn;
     static int counth=0, count=0;
     int ii, rn, mark, file_count=0;
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
     struct dd_radar_name_info_v3 *rni;
     char currentDir[4096];
 
@@ -750,7 +722,7 @@ int ddir_files_v3(int dir_num, char *dir)
 int ddir_radar_num_v3(int dir_num, char *radar_name)
 {
     int ii, rn;
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(-1);
@@ -766,7 +738,7 @@ int ddir_radar_num_v3(int dir_num, char *radar_name)
 
 void ddir_rescan_urgent(int dir_num)
 {
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
     if(!(ddir = return_ddir(dir_num)))
 	  return;
     ddir->rescan_urgent = YES;
@@ -784,8 +756,8 @@ d_mddir_file_info_v3(int dir_num,
                      char *file_name)
 {
     int v;
-    struct dd_file_name_v3 *ddfn, *ddfn_search();
-    char *a, *ddfn_file_info_line();
+    struct dd_file_name_v3 *ddfn;
+    char *a;
     double dtime;
 
     if(version == LATEST_VERSION)
@@ -814,7 +786,7 @@ d_mddir_file_info_v3(int dir_num,
 struct dd_file_name_v3 **
 mddir_entire_list_v3(int dir_num, int radar_num, int *num_swps)
 {
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
 
     if(!(ddir = return_ddir(dir_num)) || radar_num >= ddir->num_radars ||
        radar_num < 0) {
@@ -838,7 +810,6 @@ mddir_file_info_v3(int dir_num,
                    char *info_line,
                    char *file_name)
 {
-    double d_mddir_file_info_v3();
 
     return((long)d_mddir_file_info_v3
 	   (dir_num, radar_num, (double)target_time, req_type, version
@@ -869,10 +840,10 @@ int mddir_gen_swp_str_list_v3(int dir_num,
     /* generate a list of file names or lines of file info
      */
     int ii, mm, nn, mark, num_sweeps;
-    char str[256], *aa, *ddfn_file_info_line();
+    char str[256], *aa;
     DD_TIME dts;
-    struct dd_file_name_v3 *ddfn, **ddfnp, **mddir_entire_list_v3();
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct dd_file_name_v3 *ddfn, **ddfnp;
+    struct ddir_info_v3 *ddir;
     struct dd_radar_name_info_v3 *rni;
 
     /* Empty the caller's list up front. Every early return below leaves the
@@ -906,7 +877,7 @@ int mddir_gen_swp_str_list_v3(int dir_num,
 
 int mddir_num_radars_v3(int dir_num)
 {
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(0);
@@ -917,7 +888,7 @@ int mddir_num_radars_v3(int dir_num)
 char *
 mddir_radar_name_v3(int dir_num, int radar_num)
 {
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(NULL);
@@ -933,7 +904,7 @@ mddir_radar_name_v3(int dir_num, int radar_num)
 int mddir_radar_num_v3(int dir_num, char *radar_name)
 {
     int ii, rn;
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
 
     if(!(ddir = return_ddir(dir_num)))
 	  return(-1);
@@ -950,7 +921,7 @@ int mddir_radar_num_v3(int dir_num, char *radar_name)
 struct dd_file_name_v3 **
 mddir_return_swp_list_v3(int dir_num, int radar_num, int *num_swps)
 {
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct ddir_info_v3 *ddir;
 
     if(!(ddir = return_ddir(dir_num)) || radar_num >= ddir->num_radars ||
        radar_num < 0) {
@@ -970,10 +941,10 @@ ddfnp_list_entry(int dir_num, int radar_num, int ent_num, int *version, char *li
     /* return the time stamp and the name from the sweep list
      */
     int ii, nn, mark;
-    struct dd_file_name_v3 *ddfn, **ddfnp, **mddir_entire_list_v3();
-    struct ddir_info_v3 *ddir, *return_ddir();
+    struct dd_file_name_v3 *ddfn, **ddfnp;
+    struct ddir_info_v3 *ddir;
     struct dd_radar_name_info_v3 *rni;
-    char *a, *ddfn_file_info_line();
+    char *a;
     double dtime;
 
     *file_name = '\0';

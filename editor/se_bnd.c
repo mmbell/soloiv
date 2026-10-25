@@ -59,8 +59,9 @@ static char vcid[] = "$Id$";
 # include <ui.h>
 # include <ui_error.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
+# include <soloedit_protos.h>
+# include <soloiv_core_protos.h>
 # include <glib.h>
 
 extern GString *gs_complaints;
@@ -71,71 +72,11 @@ static struct bnd_point_mgmt *bpm_spairs=NULL;
 
 /* c------------------------------------------------------------------------ */
 
-/* Sherrie's routines */
-void se_refresh_bnd_files_widget();
-void se_clear_segments();
-void se_erase_segments();
-void se_draw_segments();
-void se_dump_bnd_files_widget();
-
-/* external routines */
-void se_fix_comment();		/* se_utils.c */
-double sp_meters_per_pixel();	/* sp_xyraster.c */
-void sp_locate_this_point();	/* sp_clkd.c */
-void solo_message();		/* solo.c */
-int se_crack_ed_path_name();	/* se_utils.c */
-void solo_return_radar_name();	/* sp_basics.c */
-
-/* internal routines */
-struct boundary_stuff *return_se_bnd_struct();
-int xse_absorb_bnd();
-void xse_add_bnd_pt();
-void se_append_bpm();
-void se_ascii_bnd();
-void se_bnd_pt_atts();
-int xse_ccw();
-void se_clr_all_bnds();
-void se_clr_bnd();
-void se_clr_current_bnd();
-void se_cycle_bnd();
-void se_delete_bnd_pt();
-void se_draw_bnd();
-void se_erase_all_bnds();
-void se_ts_find_intxns();
-int se_merge_intxn();
-int xse_find_intxns();
-struct one_boundary *se_malloc_one_bnd();
-void se_mid_insert();
-void se_nab_segment();
-int xse_num_segments();
-int se_compare_bnds();
-void se_pack_bnd_set();
-struct bnd_point_mgmt *se_pop_bpms();
-void se_prev_bnd_set();
-void se_push_all_bpms();
-void se_push_bpm();
-int se_radar_inside_bnd();
-void se_redraw_all_bnds();
-struct one_boundary *se_return_next_bnd();
-void xse_save_bnd();
-int xse_set_intxn();
-void se_shift_bnd();
-int se_sizeof_bnd_set();
-void se_unpack_bnd_buf();
-void se_use_bnd();
-void xse_x_insert();
-void xse_y_insert();
-struct bnd_point_mgmt *se_zap_last_bpm();
-
-
-/* c------------------------------------------------------------------------ */
-
 struct boundary_stuff *return_se_bnd_struct(void)
 {
     /* return the solo editor boundary struct
      */
     int ii, nn, mark;
-    struct point_in_space *solo_malloc_pisp();
 
     if(!sebs) {
 	sebs = (struct boundary_stuff *)malloc(sizeof(struct boundary_stuff));
@@ -164,8 +105,8 @@ int xse_absorb_bnd(void)
 {
     int ii, nn, mark, len, lenx, count=0;
     FILE *stream;
-    WW_PTR wwptr, solo_return_wwptr();
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    WW_PTR wwptr;
+    struct boundary_stuff *sebs;
     char *a, *b, *c, *e, str[256], mess[512], *buf;
     double d;
 
@@ -214,12 +155,12 @@ void xse_add_bnd_pt(struct solo_click_info *sci, struct one_boundary *ob)
     /* add a point to the boundary based on the x & y coordinates
      * in the click struct
      */
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
-    struct point_in_space *pisp, *solo_return_radar_pisp();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct boundary_stuff *sebs;
+    struct point_in_space *pisp;
+    struct solo_edit_stuff *seds;
 
-    struct bnd_point_mgmt *bpm, *se_pop_bpms();
-    double d, sqrt(), fabs();
+    struct bnd_point_mgmt *bpm;
+    double d;
     double x = sci->x, y = sci->y;
 
     seds = return_sed_stuff();
@@ -415,10 +356,10 @@ int se_ccw(long x0, long y0, long x1, long y1)
 void se_clr_all_bnds(void)
 {
     int ww;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_edit_stuff *seds;
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     seds = return_sed_stuff();
@@ -439,7 +380,7 @@ void se_clr_all_bnds(void)
 
 void se_clr_bnd(struct one_boundary *ob)
 {
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     se_push_all_bpms(&ob->top_bpm);
     ob->bh->force_inside_outside = 
@@ -450,7 +391,7 @@ void se_clr_bnd(struct one_boundary *ob)
 
 void se_clr_current_bnd(void)
 {
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
     int erase, ww;
 
@@ -483,9 +424,9 @@ void se_cycle_bnd(void)
      * boundary.
      */
     int ii, nn, ww, mark;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct one_boundary *ob, *ob_next;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     sebs = return_se_bnd_struct();
@@ -540,7 +481,7 @@ void se_delete_bnd_pt(struct bnd_point_mgmt *bpm)
      * remember to recalculate mins, maxs, slopes and deltas
      */
     struct one_boundary *ob;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct bnd_point_mgmt *bpmx;
 
     sebs = return_se_bnd_struct();
@@ -587,13 +528,12 @@ void se_draw_bnd_for_frame(int frame_num, struct bnd_point_mgmt *bpm, int num, i
    */
   int ii, mm, nn, mark, right_left, width, height;
   struct bnd_point_mgmt *bpmx;
-  struct boundary_stuff *sebs, *return_se_bnd_struct();
-  struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+  struct boundary_stuff *sebs;
+  struct solo_perusal_info *spi;
   struct point_in_space radar, *current_radar, *boundary_radar;
-  WW_PTR wwptr, solo_return_wwptr();
+  WW_PTR wwptr;
   double x, y, z, costilt, untilt, tiltfactor, current_tilt;
   double d, v_scale, h_scale, ta, time_span, top_edge;
-  double sp_meters_per_pixel();
 
   spi = solo_return_winfo_ptr();
   sebs = return_se_bnd_struct();
@@ -707,13 +647,12 @@ void se_draw_bnd(struct bnd_point_mgmt *bpm, int num, int erase)
      */
     int ii, mm, nn, ww, mark, right_left, width, height;
     struct bnd_point_mgmt *bpmx;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct boundary_stuff *sebs;
+    struct solo_perusal_info *spi;
     struct point_in_space radar, *current_radar, *boundary_radar;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     double x, y, z, costilt, untilt, tiltfactor, current_tilt;
     double d, v_scale, h_scale, ta, time_span, top_edge;
-    double sp_meters_per_pixel();
 
     spi = solo_return_winfo_ptr();
     sebs = return_se_bnd_struct();
@@ -824,12 +763,12 @@ void se_draw_bnd(struct bnd_point_mgmt *bpm, int num, int erase)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_erase_all_bnds()
+void se_erase_all_bnds(void)
 {
     int ii, nn, ww, mark;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     sebs = return_se_bnd_struct();
@@ -954,7 +893,7 @@ int xse_find_intxns(double angle, double range, struct one_boundary *ob)
      * intersect the current ray
      */
     struct bnd_point_mgmt *bpm, *bpmx;
-    double theta = RADIANS(CART_ANGLE(angle)), cos(), sin();
+    double theta = RADIANS(CART_ANGLE(angle));
     double slope=0, xx, yy;
     long x, y;
     int ii, mm, nn, nx=0, mark;
@@ -1034,7 +973,7 @@ int xse_find_intxns(double angle, double range, struct one_boundary *ob)
 }
 /* c------------------------------------------------------------------------ */
 
-struct one_boundary *se_malloc_one_bnd()
+struct one_boundary *se_malloc_one_bnd(void)
 {
     struct one_boundary *ob;
     ob = (struct one_boundary *)malloc
@@ -1207,10 +1146,9 @@ void se_pack_bnd_set(char *buf)
 {
     int size=0;
     struct one_boundary *ob;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct boundary_header *bh;
     struct bnd_point_mgmt *bpm;
-    long time_now();
     char *bb = buf;
 
     if(!(buf))
@@ -1258,10 +1196,10 @@ void se_pack_bnd_set(char *buf)
 }
 /* c------------------------------------------------------------------------ */
 
-struct bnd_point_mgmt *se_pop_bpms()
+struct bnd_point_mgmt *se_pop_bpms(void)
 {
     struct bnd_point_mgmt *bpm=bpm_spairs;
-    struct point_in_space *pisp, *solo_malloc_pisp();
+    struct point_in_space *pisp;
 
     if(!bpm_spairs) {
 	bpm = (struct bnd_point_mgmt *)malloc(sizeof(struct bnd_point_mgmt));
@@ -1282,11 +1220,11 @@ struct bnd_point_mgmt *se_pop_bpms()
 }
 /* c------------------------------------------------------------------------ */
 
-void se_prev_bnd_set()
+void se_prev_bnd_set(void)
 {
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
     struct prev_bnd_sets *pbs;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
 
     seds = return_sed_stuff();
     if(!seds->last_pbs)
@@ -1331,7 +1269,7 @@ int se_radar_inside_bnd(struct one_boundary *ob)
     /* determine if the radar is inside or outside the boundary
      */
     struct bnd_point_mgmt *bpm, *bpmx;
-    double dd, sqrt(), atan2(), fmod();
+    double dd;
     double r, x, y, theta;
     int ii, mm = ob->num_points-1, nn, mark, inside_count=0;
 
@@ -1386,12 +1324,12 @@ int se_radar_inside_bnd(struct one_boundary *ob)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_redraw_all_bnds()
+void se_redraw_all_bnds(void)
 {
     int ii, nn, ww, mark;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     sebs = return_se_bnd_struct();
@@ -1416,9 +1354,9 @@ void se_redraw_all_bnds()
 void se_redraw_all_bnds_for_frame(int frame_num)
 {
     int ii, nn, ww, mark;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
-    struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+    struct solo_perusal_info *spi;
 
     spi = solo_return_winfo_ptr();
     sebs = return_se_bnd_struct();
@@ -1441,11 +1379,11 @@ void se_redraw_all_bnds_for_frame(int frame_num)
 }
 /* c------------------------------------------------------------------------ */
 
-struct one_boundary *se_return_next_bnd()
+struct one_boundary *se_return_next_bnd(void)
 {
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct one_boundary *ob;
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     sebs = return_se_bnd_struct();
 
@@ -1463,16 +1401,16 @@ struct one_boundary *se_return_next_bnd()
 }
 /* c------------------------------------------------------------------------ */
 
-void xse_save_bnd ()
+void xse_save_bnd (void)
 {
     int ii, bn, nn, mark, total_points, size, bnd_loop;
     FILE *stream, *ASCIIstream;
     struct point_in_space *pisp;
     struct boundary_header *bh;
     struct bnd_point_mgmt *bpm;
-    WW_PTR wwptr, solo_return_wwptr();
+    WW_PTR wwptr;
     struct one_boundary *ob;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     char *a, *bb, str[256], mess[512], **buf, *bbuf;
 
     sebs = return_se_bnd_struct();
@@ -1583,7 +1521,7 @@ xse_set_intxn(x, y, slope, bpm, ob)
      * x,y values because the boundary may be for another radar
      */
     struct bnd_point_mgmt *bpmx;
-    double dd, xx, yy, sqrt();
+    double dd, xx, yy;
 
     /*
      * first compute the x coordinate of the intersection
@@ -1673,7 +1611,7 @@ int xse_set_intxn(double x,
      * x,y values because the boundary may be for another radar
      */
     struct bnd_point_mgmt *bpmx;
-    double dd, xx, yy, sqrt();
+    double dd, xx, yy;
 
     /*
      * first compute the x coordinate of the intersection
@@ -1808,13 +1746,13 @@ void se_shift_bnd(struct one_boundary *ob,
 }
 /* c------------------------------------------------------------------------ */
 
-int se_sizeof_bnd_set()
+int se_sizeof_bnd_set(void)
 {
     /* determine you much space this boundary will occupy
      */
     int size=0;
     struct one_boundary *ob;
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct bnd_point_mgmt *bpm;
 
     sebs = return_se_bnd_struct();
@@ -1838,13 +1776,12 @@ void se_unpack_bnd_buf(char *buf, int size)
 {
     int len, gottaSwap=NO;
     unsigned int gdsos;
-    struct solo_click_info *sci, *clear_click_info();
+    struct solo_click_info *sci;
     struct point_in_space *pisp;
     struct boundary_header *bh;
     struct bnd_point_mgmt *bpm;
     struct one_boundary *ob, *obnx, *ob_last;
-    struct one_boundary *se_malloc_one_bnd();
-    struct boundary_stuff *sebs, *return_se_bnd_struct();
+    struct boundary_stuff *sebs;
     struct generic_descriptor *gd;
     char *cc=buf, *ee=buf+size;
     static char *pisp_swap=NULL;
@@ -1919,14 +1856,14 @@ void se_unpack_bnd_buf(char *buf, int size)
 }
 /* c------------------------------------------------------------------------ */
 
-void se_use_bnd(int arg, struct ui_command *cmds)
+int se_use_bnd(int arg, struct ui_command *cmds)
 {
     struct ui_command *cmdq=cmds+1; /* point to the first argument */
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_edit_stuff *seds;
 
     seds = return_sed_stuff();
     if(seds->finish_up)
-	  return;
+	  return(1);
     if(strncmp(cmds->uc_text, "dont", 4) == 0) {
 	seds->use_boundary = NO;
 	seds->boundary_mask = seds->all_ones_array;
@@ -1935,7 +1872,7 @@ void se_use_bnd(int arg, struct ui_command *cmds)
 	seds->boundary_mask = seds->boundary_mask_array;
 	seds->use_boundary = YES;
     }
-    return;
+    return(1);
 }  
 /* c------------------------------------------------------------------------ */
 
@@ -2100,8 +2037,8 @@ char * absorb_zmap_bnd(char *ifile, int skip, int *nbytes)
     struct boundary_header *bh;
     struct point_in_space origin, pisp, p1;
     int spisp = sizeof( struct point_in_space );
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptr, solo_return_wwptr();
+    struct dd_general_info *dgi;
+    WW_PTR wwptr;
 
     wwptr = solo_return_wwptr( 0 );
     memcpy( &origin, wwptr->radar_location
@@ -2110,7 +2047,7 @@ char * absorb_zmap_bnd(char *ifile, int skip, int *nbytes)
 	    , sizeof( struct point_in_space ) );
     memcpy( &pisp, wwptr->radar_location
 	    , sizeof( struct point_in_space ) );
-    dgi = dd_window_dgi( 0, "" );
+    dgi = dd_window_dgi( 0 );
     strcpy( str, ifile );
 
     if(!(fs = fopen(str, "r"))) {
@@ -2269,7 +2206,7 @@ int se_rain_gauge_info(double dlat, double dlon)
   int ii, jj, kk, mark, num_pts = 0, num_hits = 0;
   struct point_in_space p0, p1;
   struct zmap_points * zmpc, *zzmpc[200], *ztmp;
-  struct solo_edit_stuff *seds, *return_sed_stuff();
+  struct solo_edit_stuff *seds;
   double min_radius = 15;	/* km. */
   double min_val;
 
@@ -2460,16 +2397,16 @@ int list_zmap_values(char *fname, int frame)
     char mess[256], *aa;
     float rng, cell_val, val, bad;
     struct point_in_space origin, pisp, p1;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    WW_PTR wwptr, solo_return_wwptr();
+    struct dd_general_info *dgi;
+    WW_PTR wwptr;
     double x, y, theta, correlation, ratio;
     double sumx=0, sumxx=0, sumy=0, sumyy=0, sumxy=0, dnum, dnom;
     double sumRatios = 0, ratio2;
-    struct rot_table_entry *entry1, *dd_return_rotang1();
+    struct rot_table_entry *entry1;
     struct rot_ang_table *rat;
     struct zmap_points * zmpc;
-    struct solo_str_mgmt *ssm, *se_pop_spair_string();
-    struct solo_edit_stuff *seds, *return_sed_stuff();
+    struct solo_str_mgmt *ssm;
+    struct solo_edit_stuff *seds;
     DD_TIME dts;
 
 
@@ -2477,7 +2414,7 @@ int list_zmap_values(char *fname, int frame)
     se_push_all_ssms(&seds->h_output);
 
     wwptr = solo_return_wwptr( frame )->lead_sweep;
-    dgi = dd_window_dgi( wwptr->window_num, "" );
+    dgi = dd_window_dgi( wwptr->window_num );
     rat = dgi->source_rat;	/* rotation angle table */
     entry1 = dd_return_rotang1( rat );
     memcpy( &p1, wwptr->radar_location

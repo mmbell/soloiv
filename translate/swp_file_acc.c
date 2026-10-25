@@ -36,8 +36,7 @@ static char vcid[] = "$Id$";
 # include "input_limits.h"
 # include <input_sweepfiles.h>
 # include "dd_stats.h"
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 # include <stdlib.h>
 # include "FieldRadar.h"
 # include "radar_io.h"
@@ -69,13 +68,6 @@ static int _note_printed = 0;
 
 /* prototypes */
 
-int dd_absorb_rotang_info();
-int dd_absorb_seds();
-void ddswp_stuff_ray();
-void ddswp_stuff_sweep();
-void dd_update_ray_info();
-void dd_update_sweep_info();
-int ddswp_new_sweep_v3();
 int dd_create_dynamic_rotang_info(DGI_PTR dgi);
 int dd_read_ray_for_dynamic_angle_table(DGI_PTR dgi, int rayNum);
 void dd_print_angle_table(const struct rot_ang_table *rat, FILE *out);
@@ -88,15 +80,15 @@ int dd_absorb_header_info(DGI_PTR dgi)
     int iret = 0;
     short ns;
     int gotta_cfac = NO, gotta_celv = NO;
-    char *aa, *at, *bb, str[256], *str_terminate(), *getenv(), radar_name[16];
+    char *aa, *at, *bb, str[256], radar_name[16];
     char *deep6=0, *cfac_id;
     struct generic_descriptor *gd;
     DDS_PTR dds=dgi->dds;
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
-    unsigned long gdsos;
+    struct dd_input_sweepfiles_v3 *dis;
+    uint32_t gdsos;		/* 32-bit, like the sizeof_struct it is swapped from */
     float *fp, rr, gs;
     CELLSPACINGFP * csfd;
-    struct cfac_wrap *cfw, *ddswp_nab_cfacs ();
+    struct cfac_wrap *cfw;
     XTRA_STUFF *xstf;
     struct field_radar_i *frib = 0;
 
@@ -129,7 +121,7 @@ int dd_absorb_header_info(DGI_PTR dgi)
     for(;;) {
 	loop_count++;
 	gd = (struct generic_descriptor *)dgi->in_next_block;
-	gdsos = (unsigned long)gd->sizeof_struct;
+	gdsos = (uint32_t)gd->sizeof_struct;
 
 	if(gdsos > MAX_REC_SIZE) {
 	   gottaSwap = YES;
@@ -422,11 +414,10 @@ int dd_absorb_ray_info(DGI_PTR dgi)
     int broken = NO, gottaSwap=NO, ds, clip_cell;
     char *a, *aa, *b;
     short *ss;
-    double dorade_time_stamp();
     static int count=0, doodah=110, rec_count=0, loop_count = 0;
     static int rec_trip=12, gd_ptr=-1, disk_offset= -1;
     static char *gd_list[22], *last_block=NULL, *last_last_block=NULL;
-    struct dd_input_filters *difs, *dd_return_difs_ptr();
+    struct dd_input_filters *difs;
     struct paramdata_d *rdat;
     struct qparamdata_d *qdat;
     struct ray_i *ryib;
@@ -435,9 +426,9 @@ int dd_absorb_ray_info(DGI_PTR dgi)
     XTRA_STUFF *xstfo;
     DDS_PTR dds=dgi->dds;
     struct radar_angles *ra=dds->ra;
-    DD_TIME *dts=dds->dts, *d_unstamp_time();
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
-    unsigned long gdsos;
+    DD_TIME *dts=dds->dts;
+    struct dd_input_sweepfiles_v3 *dis;
+    uint32_t gdsos;		/* 32-bit, like the sizeof_struct it is swapped from */
 # ifndef notyet
    PIRAQX *prqx;
 # endif
@@ -479,7 +470,7 @@ int dd_absorb_ray_info(DGI_PTR dgi)
 	gd = (struct generic_descriptor *)dgi->in_next_block;
 
 	if(dgi->buf_bytes_left >= sizeof(struct generic_descriptor)) {
-	   gdsos = (unsigned long)gd->sizeof_struct;
+	   gdsos = (uint32_t)gd->sizeof_struct;
 
 	   if(gdsos > MAX_REC_SIZE) {
 	      gottaSwap = YES;
@@ -535,7 +526,7 @@ int dd_absorb_ray_info(DGI_PTR dgi)
 	    dis->MB += BYTES_TO_MB(len);
 	    dis->rec_count++;
 	    gd = (struct generic_descriptor *)dgi->in_next_block;
-	    gdsos = (unsigned long)gd->sizeof_struct;
+	    gdsos = (uint32_t)gd->sizeof_struct;
 
 	    if(gdsos > MAX_REC_SIZE) {
 	       gottaSwap = YES;
@@ -598,7 +589,7 @@ int dd_absorb_ray_info(DGI_PTR dgi)
 		b = dds->qdat_ptrs[pn];
 		if(gottaSwap) {
 		   n = dd_hrd16LE_uncompressx
-		     ((short *)a, (short *)b, (int)dds->parm[pn]->bad_data
+		     ((unsigned short *)a, (unsigned short *)b, (int)dds->parm[pn]->bad_data
 		      , &final_bad_count, dds->celv->number_cells);
 		}
 		else {
@@ -813,7 +804,8 @@ int dd_absorb_seds(DGI_PTR dgi, int gottaSwap)
 {
     /* absorb the editing summary */
     int ii, nn;
-    long disk_offset, gdsos;
+    long disk_offset;
+    int32_t gdsos;
     struct generic_descriptor *gd;
     DDS_PTR dds=dgi->dds;
 
@@ -883,11 +875,10 @@ struct dd_input_sweepfiles_v3 *dd_setup_sweepfile_structs_v3(int *ok)
     int ii, jj, kk, nn, nt, mark, drn, rn;
     int old_num_radars;
     char *a, *radar_names, *str_ptrs[32], name_list[256];
-    char *b, *c, *mddir_radar_name_v3();
-    struct dd_input_filters *difs, *dd_return_difs_ptr();
-    struct dd_input_sweepfiles_v3 *dis_v3, *dd_return_sweepfile_structs_v3();
+    char *b, *c;
+    struct dd_input_filters *difs;
+    struct dd_input_sweepfiles_v3 *dis_v3;
     struct unique_sweepfile_info_v3 *usi, *usi_last, *usix;
-    char *get_tagged_string();
     double upper, lower;
     struct cfac_wrap *cfw;
 
@@ -1016,10 +1007,10 @@ int dd_sweepfile_list_v3(struct unique_sweepfile_info_v3 *usi, double start_time
      * create a list of time stamps of sweep files
      * for the requested time intervals
      */
-    struct dd_file_name_v3 *fn, *last, **mddir_return_swp_list_v3(), **swps;
-    double d, t1, ddfn_time();
+    struct dd_file_name_v3 *fn, *last, **swps;
+    double d, t1;
     int ii, jj, kk, num_swps;
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+    struct dd_input_sweepfiles_v3 *dis;
 
     usi->swp_list = swps = 
 	  mddir_return_swp_list_v3(usi->dir_num, usi->ddir_radar_num
@@ -1084,7 +1075,7 @@ int dd_sweepfile_list_v3(struct unique_sweepfile_info_v3 *usi, double start_time
 
 double dd_ts_start(int frme, int radar_num, double start, int *version, char *info, char *name)
 {
-    double d_time, d_mddir_file_info_v3();
+    double d_time;
 
     if(start < (d_time = d_mddir_file_info_v3
 	  (frme, radar_num, start
@@ -1108,7 +1099,7 @@ void dd_update_ray_info(DGI_PTR dgi)
     struct sweepinfo_d *swib=dgi->dds->swib;
     struct ray_i *ryib=dgi->dds->ryib;
     struct platform_i *asib=dgi->dds->asib;
-    double d, dd_rotation_angle();
+    double d;
 
     dgi->swp_que->num_rays++;
     prs = dgi->ray_que = dgi->ray_que->next;
@@ -1123,7 +1114,7 @@ void dd_update_ray_info(DGI_PTR dgi)
 void dd_update_sweep_info(DGI_PTR dgi)
 {
     struct prev_swps *pss;
-    DD_TIME *dts=dgi->dds->dts, *d_unstamp_time();
+    DD_TIME *dts=dgi->dds->dts;
 
     dgi->sweep_time_stamp = dgi->time;
     dgi->sweep_count++;
@@ -1153,10 +1144,10 @@ int ddswp_last_ray(struct unique_sweepfile_info_v3 *usi)
 int ddswp_new_sweep_v3(struct unique_sweepfile_info_v3 *usi)
 {
     int ii, nn, ierr=0;
-    char str[256], *str_terminate();
-    struct dd_general_info *dgi, *dd_window_dgi();
+    char str[256];
+    struct dd_general_info *dgi;
     struct dd_file_name_v3 *ddfn;
-    struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+    struct dd_input_sweepfiles_v3 *dis;
 
 
 
@@ -1218,10 +1209,10 @@ int ddswp_new_sweep_v3(struct unique_sweepfile_info_v3 *usi)
 struct cfac_wrap *ddswp_nab_cfacs(char *radar_name)
 {
    struct correction_d cfacx, *cfac;
-   struct cfac_wrap *cfw = 0, *first_cfac = 0, *dd_absorb_cfacs();
+   struct cfac_wrap *cfw = 0, *first_cfac = 0;
    char *aa, *bb, *cc=0, *ee = 0;
    int kk, mark;
-   struct dd_input_sweepfiles_v3 *dis, *dd_return_sweepfile_structs_v3();
+   struct dd_input_sweepfiles_v3 *dis;
   
    dis = dd_return_sweepfile_structs_v3();
    
@@ -1275,8 +1266,8 @@ int ddswp_next_ray_v3(struct unique_sweepfile_info_v3 *usi)
      */
     int ii, nn, mark;
     static int count=0, doodah=33;
-    struct dd_general_info *dgi, *dd_window_dgi();
-    struct dd_stats *dd_stats, *dd_return_stats_ptr();
+    struct dd_general_info *dgi;
+    struct dd_stats *dd_stats;
 
     /*
      * absorb the next ray
@@ -1322,15 +1313,14 @@ void ddswp_stuff_ray(DGI_PTR dgi)
      */
     int mark;
     static int count=0, trip=123;
-    double d, fmod();
+    double d;
 
-    struct dd_input_filters *difs, *dd_return_difs_ptr();
+    struct dd_input_filters *difs;
     DDS_PTR dds=dgi->dds;
     struct radar_d *radd=dds->radd;
     struct sweepinfo_d *swib=dds->swib;
     struct ray_i *ryib=dds->ryib;
     struct platform_i *asib=dds->asib;
-    double dd_rotation_angle();
 
     count++;
     difs = dd_return_difs_ptr();
@@ -1372,7 +1362,6 @@ void ddswp_stuff_sweep(DGI_PTR dgi)
 {
     DDS_PTR dds=dgi->dds;
     struct sweepinfo_d *swib=dds->swib;
-    double dd_rotation_angle();
     
 
     dd_update_sweep_info(dgi);
@@ -1533,8 +1522,7 @@ int dd_read_ray_for_dynamic_angle_table(DGI_PTR dgi, int rayNum)
   struct qparamdata_d *qdat;
   struct generic_descriptor *gd;
   DDS_PTR dds=dgi->dds;
-  DD_TIME *d_unstamp_time();
-  unsigned long gdsos;
+  uint32_t gdsos;		/* 32-bit, like the sizeof_struct it is swapped from */
   
   count++;
   if( count >= doodah ) {
@@ -1549,7 +1537,7 @@ int dd_read_ray_for_dynamic_angle_table(DGI_PTR dgi, int rayNum)
     gd = (struct generic_descriptor *)_in_next_block;
     
     if(_buf_bytes_left >= sizeof(struct generic_descriptor)) {
-      gdsos = (unsigned long)gd->sizeof_struct;
+      gdsos = (uint32_t)gd->sizeof_struct;
       if(gdsos > MAX_REC_SIZE) {
         gottaSwap = YES;
         swack4(&gd->sizeof_struct, &gdsos);
@@ -1596,7 +1584,7 @@ int dd_read_ray_for_dynamic_angle_table(DGI_PTR dgi, int rayNum)
       }
       
       gd = (struct generic_descriptor *)_in_next_block;
-      gdsos = (unsigned long)gd->sizeof_struct;
+      gdsos = (uint32_t)gd->sizeof_struct;
       
       if(gdsos > MAX_REC_SIZE) {
         gottaSwap = YES;

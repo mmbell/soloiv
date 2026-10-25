@@ -35,8 +35,7 @@ static char vcid[] = "$Id$";
 # include "time_dependent_fixes.h"
 # include <dorade_headers.h>
 # include <dd_math.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <s2_protos.h>
 
 # ifndef A_SPECKLE
 # define            A_SPECKLE 3
@@ -146,27 +145,15 @@ struct fix_vortex_vels {
 };
 
 
-void dd_BB_unfold();
-void dd_denotch();
-int dd_despeckle();
-int dd_fix_vortex_vels();
-int dd_gp_threshold();
-int dd_legal_pname();
-void dd_lidar_db();
-int dd_new_param();
-void dd_nix_air_motion();
-void dd_pct_stats();
-int dd_thr_parms();
-int dder_lidar_opts();
 
-static int get_kdp();
-static struct lidar_parameters * malloc_lidar_parm();
-static struct der_pair * malloc_der_pair();
-static int setup_der_pairs();
-static int setup_der_alts();
-static int thr_ldr();
-static int zdr_prime();
-static void dd_add_bias();
+static int get_kdp(DGI_PTR dgi, int fn);
+static struct lidar_parameters *malloc_lidar_parm(void);
+static struct der_pair *malloc_der_pair(void);
+static int setup_der_pairs(char *list, struct der_pair **der_list);
+static int setup_der_alts(char *list);
+static int thr_ldr(DGI_PTR dgi, int fn, double threshold);
+static int zdr_prime(DGI_PTR dgi, int fn);
+static void dd_add_bias(DGI_PTR dgi, int fn, double add_bias);
 
 
 
@@ -181,16 +168,13 @@ void dd_derived_fields(DGI_PTR dgi)
     DDS_PTR dds=dgi->dds;
     int dn, fns, fnd, ii, n, nt, mark, kill_count;
     char *a, *aa, *b, *z, *sname, *dname;
-    char *get_tagged_string(), *str_terminate();
     struct radar_angles *ra=dds->ra;
     struct platform_i *asib=dds->asib;
     struct prev_rays *prs=dgi->ray_que;
     double d, vert;
     double d2, dH=0, dP=0, dt, cosP, sinP, cosH, sinH;
-    double cosPHI, cosLAM, sinPHI, sinLAM, angdiff(), dd_ac_vel();
+    double cosPHI, cosLAM, sinPHI, sinLAM;
     float ac_vel;
-    struct dd_input_filters *dd_return_difs_ptr();
-    struct dd_stats *dd_return_stats_ptr();
     struct ve_que_val *this, *last;
     struct time_dependent_fixes *fx;
     struct lidar_parameters *lps;
@@ -876,7 +860,6 @@ void dd_BB_unfold(DGI_PTR dgi, int fn, double ac_vel, int qsize, double f_fold_s
     double folds, rcp_nyqi, rcp_qsize=1./(float)qsize, u, v, w, elev;
     double insitu_wind;
     double d;
-    double dd_earthr(), dd_latitude();
 
     static int count=0, trip=123;
     static short last_good_v0[MAX_SENSORS];
@@ -2090,7 +2073,7 @@ int dd_new_param(DGI_PTR dgi, char *srs_name, char *dst_name)
     DDS_PTR dds=dgi->dds;
     int ii, fn, fns, fnd, size=0, mark;
     int ns=strlen(srs_name), ndst=strlen(dst_name);
-    char *a=NULL, *b=NULL, *cc, *str_terminate(), tmp_name[16], dname[16];
+    char *a=NULL, *b=NULL, *cc, tmp_name[16], dname[16];
     /*
      * find the source field
      */
@@ -2252,10 +2235,10 @@ void dd_pct_stats(DGI_PTR dgi)
 # define      BETWEEN 2
 # define       BEYOND 3
 
-    int ii, gg, ng, nt, fn, dd_tokens(), scaled_below, scaled_above, mis;
+    int ii, gg, ng, nt, fn, scaled_below, scaled_above, mis;
     DDS_PTR dds=dgi->dds;
     static int pct_stats_flag=YES, count=0, which;
-    char *a, *b, *get_tagged_string(), string_space[256], *str_ptrs[32];
+    char *a, *b, string_space[256], *str_ptrs[32];
     static char parameter_name[12];
     static float  below=0, above=25.;
     short *ss;
@@ -2370,7 +2353,7 @@ int dd_thr_parms(char *a, char *name, float *val)
      * this routines assumes it's ok to put nulls in the source string
      */
     char string_space[256], *str_ptrs[32];
-    double d, atof();
+    double d;
     int ii, nt;
 
     strcpy(string_space, a);

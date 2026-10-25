@@ -26,7 +26,7 @@ static char vcid[] = "$Id$";
 # include <dd_math.h>
 # include "eldh.h"
 # include "gpro_data.h"
-# include <function_decl.h>
+# include <s2_protos.h>
 
 # ifdef NETCDF
 # include <netcdf.h>
@@ -139,27 +139,6 @@ static struct nc_ac_info *nai=NULL;
 static char *ac_var_tags[MAX_NC_NDX];
 static char ac_var_names[MAX_NC_NDX][16];
 
-char *eld_nimbus_fix_asib();
-void ac_nc_nab_this_time_step();
-void ac_nc_apply_fixes();
-int ac_nc_find_tag();
-int ac_nc_init();
-void eld_gpro_fix_asib();
-void gpro_assemble_vals();
-void setup_ltvi();
-int gpro_mount_raw();
-void gp_header();
-int is_gp_var();
-int len_arg();
-int gp_get_line();
-void gp_date();
-float gp_time();
-char *gp_arg_ptr();
-double gpro_decode();
-char *gpro_next_rec();
-void gpro_position_err();
-struct ads_raw_data_que *gpro_sync();
-struct ads_raw_data_que *gpro_initialize();
 
 
 
@@ -176,8 +155,8 @@ char *eld_nimbus_fix_asib(DD_TIME *dts, struct platform_i *asib, int options, in
 
     static int catch=999999, count=0, gap_count=0, unSync=0;
     int ii, mark, ndx;
-    DD_TIME dtx, *d_unstamp_time();
-    char *aa, *dts_print(), mess[256];
+    DD_TIME dtx;
+    char *aa, mess[256];
     double max_delta = 1.0001;
     void *vp;
     struct ac_vals *acv;
@@ -428,8 +407,8 @@ int ac_nc_init(void)
     int ii, jj, kk, nn, ndx, nt;
     long ll;
     float f;
-    char *aa, *bb, *cc, *tag, *get_tagged_string(), name[256];
-    char *getenv(), var_name[16], string_space[256], *str_ptrs[66];
+    char *aa, *bb, *cc, *tag, name[256];
+    char var_name[16], string_space[256], *str_ptrs[66];
     static int dims[] = {0, 0, 0, 0}, ndims, natts;
     const long *coords;
     nc_type data_type;
@@ -697,8 +676,8 @@ int main(void) {
     int i, j, k, n, fid, mark, status, count=0, trip=1234;
     int ads_max_eofs=2, doit=NO, loopcount;
     double d, time;
-    char buf[32768], *gpro_next_rec();
-    char *a, *getenv();
+    char buf[32768];
+    char *a;
     char *fn="/scr/steam/oye/rf27b.tape";
     float pct;
     struct ads_raw_data_que *rdq;
@@ -811,12 +790,10 @@ int main(void) {
 void eld_gpro_fix_asib(DD_TIME *dts, struct platform_i *asib, int options)
 {
     static int count=0, trip_count=500;
-    char *get_tagged_string(), *gpro_next_rec();
     struct ads_raw_data_que *rdq;
-    struct ads_raw_data_que *gpro_sync();
     float delta;
     int i, status, mark;
-    double palt_corr, d, d_time_stamp();
+    double palt_corr, d;
 
     if(!ads_merge)
 	  return;
@@ -888,7 +865,7 @@ void eld_gpro_fix_asib(DD_TIME *dts, struct platform_i *asib, int options)
 void gpro_assemble_vals(struct ads_raw_data_que *rdq, struct ads_data *adsd, double pct)
 {
     int hr, min, sec;
-    double d, track, gpro_decode(), d_time_stamp();
+    double d, track;
     /*
      * assemble the requested values for the sample
      * this involves reading the records that will bracket the time
@@ -974,10 +951,9 @@ void gpro_assemble_vals(struct ads_raw_data_que *rdq, struct ads_data *adsd, dou
 void setup_ltvi(void)
 {
 
-    char *a, *gp_arg_ptr();
-    char *get_tagged_string();
+    char *a;
     int i, j, m, n, count=0, its=GOOD, first_time, mark;
-    double d, atof(), d_time_stamp();
+    double d;
     
     struct letvar_info *ltvi, *ltvi_last;
     struct ads_raw_data_que *rdq, *last_rdq;
@@ -1201,7 +1177,7 @@ void setup_ltvi(void)
 int gpro_mount_raw(void)
 {
     int n;
-    char *a, *b, *c, *dd_whiteout(), *dd_delimit(), str[256];
+    char *a, *b, *c, str[256];
 
     a = dd_whiteout(next_raw_tape);
     if(!strlen(a))
@@ -1226,10 +1202,9 @@ int gpro_mount_raw(void)
 
 void gp_header(char *buf)
 {
-    char *a, *s=buf, *gp_arg_ptr();
+    char *a, *s=buf;
     char tmp[88];
-    int i, m, n, gp_get_line(), len_arg(), count=0;
-    float gp_time();
+    int i, m, n, count=0;
     /*
      * load in the header and establish pointers to critical info
      * 
@@ -1489,7 +1464,7 @@ char *gpro_next_rec(struct ads_raw_data_que *rdq, int *status)
      */
     int i, m, n=0, mark;
     static int lrec_num=0, count=0, trip=10;
-    double d, gpro_decode(), d_time_stamp();
+    double d;
 
     count++;
     *status = n =
@@ -1548,7 +1523,6 @@ struct ads_raw_data_que *gpro_sync(double time)
     static int count=0, trip=100, no_count=0, keep_trying=YES, sync_count=0;
     int where=AFTER, status, mark;
     DD_TIME dts;
-    char str[32], *dts_print();
     
     if(keep_trying) {
 	for(;;) {
@@ -1565,7 +1539,7 @@ struct ads_raw_data_que *gpro_sync(double time)
 			dts.time_stamp = time;
 			d_unstamp_time(&dts);
 			printf("  ADS at %.2f sync'd with %.2f  %s\n"
-			       , this->time, time, dts_print(&dts, str));
+			       , this->time, time, dts_print(&dts));
 		    }
 		    return(this);
 		}
@@ -1602,7 +1576,7 @@ struct ads_raw_data_que *gpro_sync(double time)
     if(!(no_count++ % 1500)) {
 	dts.time_stamp = time;
 	d_unstamp_time(&dts);
-	printf("  No ADS sync for time: %s\n", dts_print(&dts, str));
+	printf("  No ADS sync for time: %s\n", dts_print(&dts));
     }
     return(NULL);
 }
@@ -1610,7 +1584,6 @@ struct ads_raw_data_que *gpro_sync(double time)
 
 struct ads_raw_data_que *gpro_initialize(struct ads_data **adsd_at)
 {
-    char *get_tagged_string();
 
 
     if(!hbuf) {

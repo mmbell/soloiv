@@ -8,6 +8,7 @@
 # include "help_param.h"
 # include <math.h>
 # include <stdio.h>
+# include <s2_protos.h>
 
 
 static gchar *param_names = NULL;
@@ -174,6 +175,12 @@ typedef struct {
 
 } SiiPalette;
 
+/* these take SiiPalette, which is private to this file */
+SiiPalette *sii_malloc_palette(void);
+void sii_palette_prepend_usual_param(SiiPalette *pal, const gchar *name);
+void sii_palette_remove_usual_param(SiiPalette *palx, const gchar *name);
+SiiPalette *sii_set_palette(const gchar *name);
+
 /* c---------------------------------------------------------------------- */
 
 typedef struct {
@@ -229,195 +236,13 @@ static gboolean its_changed = FALSE;
 /* c---------------------------------------------------------------------- */
 /* c---------------------------------------------------------------------- */
 
-GtkWidget *
-sii_filesel (gint which_but, gchar * dirroot);
-
-void 
-param_entry_widget( guint frame_num, const gchar *prompt, const gchar * dirroot);
-
 static void
 param_list_widget( guint frame_num, guint widget_id
 		  , guint menu_wid);
-void
-param_text_event_cb(GtkGestureClick *gesture, int n_press,
-		     double x, double y, gpointer data);
-
-const gchar *
-set_cb_labeling_info (guint frame_num, gdouble *relative_locs);
-
-void
-set_color_bar (guint frame_num, guint font_height);
 
 static void
 show_param_generic_list_widget (guint frame_num
 				      , guint menu_wid );
-void
-show_param_widget (GtkWidget *text, gpointer data );
-
-GdkRGBA *
-sii_annotation_color (guint frame_num, gint exposed);
-
-GdkRGBA *
-sii_background_color (guint frame_num, gint exposed);
-
-GdkRGBA *
-sii_boundary_color (guint frame_num, gint exposed);
-
-gboolean
-sii_color_tables_lister ( gpointer name, gpointer value, gpointer data );
-
-void
-sii_colorize_image (guint frame_num);
-
-gboolean
-sii_colors_lister ( gpointer name, gpointer value, gpointer data );
-
-void
-sii_ctr_inc_from_min_max (guint ncolors, gfloat *ctr, gfloat *inc,
-			  gfloat *min, gfloat *max );
-gchar *
-sii_default_palettes_list();
-
-void
-sii_do_annotation (guint frame_num, gint exposed, gboolean blow_up, cairo_t *cr);
-
-void
-sii_double_colorize_image (guint frame_num);
-
-void
-sii_get_clip_rectangle (guint frame_num, Rectangle *clip
-			, gboolean blow_up);
-gint
-sii_get_ctr_and_inc (guint frame_num, float *ctr, float *inc);
-
-gint
-sii_get_emph_min_max (guint frame_num, float *zmin, float *zmax);
-
-GdkRGBA *
-sii_grid_color (guint frame_num, gint exposed);
-
-void
-sii_initialize_parameter (guint frame_num, gchar *name);
-
-SiiPalette *
-sii_malloc_palette();
-
-void
-sii_min_max_from_ctr_inc (guint ncolors, gfloat *ctr, gfloat *inc,
-			  gfloat *min, gfloat *max );
-SiiLinkedList *
-sii_new_palette_for_param (const gchar *p_name, const gchar *name);
-
-gchar *
-sii_new_palettes_list ();
-
-gchar *
-sii_new_color_tables_list ();
-
-gchar *
-sii_new_colors_list ();
-
-SiiLinkedList *
-sii_palette_for_param (const gchar *name);
-
-void
-sii_palette_prepend_usual_param ( SiiPalette *pal, const gchar *name);
-
-void 
-sii_palette_remove_usual_param ( SiiPalette *palx, const gchar *name);
-
-SiiLinkedList *
-sii_palette_seek (const gchar *p_name);
-
-void
-sii_param_dup_entries (guint frame_num);
-
-void
-sii_param_dup_opal (struct solo_palette *opal);
-
-void
-sii_param_dup_orig (guint frame_num);
-
-void
-sii_param_dup_pal (gpointer sii_pal, gpointer old_pal);
-
-void
-sii_param_check_changes (guint frame_num);
-
-void
-sii_param_entry_info( GtkWidget *w, guint wid, guint frame_num
-		     , guint num_values );
-void
-sii_param_entry_paste_cb ( GtkWidget *w, gpointer   data );
-
-gchar *
-sii_param_fix_color (gchar *old_color);
-
-void
-sii_param_menu_cb ( GtkWidget *w, gpointer   data );
-
-void
-sii_param_menubar2( GtkWidget  *window, GtkWidget **menubar
-		       , guint frame_num);
-
-const gchar *
-sii_param_palette_name (guint frame_num);
-
-void 
-sii_param_process_changes (guint frame_num);
-
-void
-sii_param_reset_changes (guint frame_num);
-
-void
-sii_param_set_plot_field (int frame_num, char *fname);
-
-void
-sii_param_toggle_field (guint frame_num);
-
-void
-sii_param_widget( guint frame_num );
-
-void
-sii_redisplay_list (guint frame_num, guint widget_id);
-
-void
-sii_reset_image (guint frame_num);
-
-void
-sii_set_entries_from_palette (guint frame_num, const gchar *name, 
-        const gchar *p_name);
-
-SiiPalette *
-sii_set_palette (const gchar *name);
-
-gboolean
-sii_set_param_info (guint frame_num);
-
-gchar *
-sii_set_param_names_list(guint frame_num, GString *gs_list, guint count);
-
-void
-solo_get_palette(char *name, int frame_num);
-
-int
-solo_hardware_color_table(gint frame_num);
-
-int
-solo_palette_color_numbers(int frame_num);
-
-SiiLinkedList *
-sii_solo_palette_stack ();
-
-void
-sii_update_param_widget (guint frame_num);
-
-
-/* external routines */
-
-struct solo_perusal_info *
-solo_return_winfo_ptr();
-void solo_sort_slm_entries ();
 
 /* c...mark */
 
@@ -447,10 +272,6 @@ void param_set_cb_loc (int frame_num, int loc)
 }
 
 /* c---------------------------------------------------------------------- */
-
-void 
-sii_param_colors_filesel (const gchar *str, GtkWidget *fs);
-int sii_initialize_cb (GtkWidget *w, gpointer data);
 
 void 
 sii_param_colors_filesel (const gchar *str, GtkWidget *fs )
@@ -2637,6 +2458,17 @@ void sii_param_menu_cb ( GtkWidget *w, gpointer   data )
 
 /* c---------------------------------------------------------------------- */
 
+/* GSimpleAction "activate" handler for the menubar items; the task
+ * number is in the user data, and there is no widget to pass on */
+static void
+sii_param_menu_action_cb (GSimpleAction *action, GVariant *parameter,
+			  gpointer data)
+{
+   sii_param_menu_cb (NULL, data);
+}
+
+/* c---------------------------------------------------------------------- */
+
 void sii_param_menubar2( GtkWidget  *window, GtkWidget **menubar
 		       , guint frame_num)
 {
@@ -2659,7 +2491,7 @@ void sii_param_menubar2( GtkWidget  *window, GtkWidget **menubar
      action = g_simple_action_new (action_name, NULL); \
      g_object_set_data (G_OBJECT (action), "widget_id", GUINT_TO_POINTER(wid)); \
      g_object_set_data (G_OBJECT (action), "frame_num", GUINT_TO_POINTER(frame_num)); \
-     g_signal_connect (action, "activate", G_CALLBACK (sii_param_menu_cb), GUINT_TO_POINTER(nn)); \
+     g_signal_connect (action, "activate", G_CALLBACK (sii_param_menu_action_cb), GUINT_TO_POINTER(nn)); \
      g_action_map_add_action (G_ACTION_MAP (actions), G_ACTION (action)); \
      { gchar detailed[80]; g_snprintf (detailed, sizeof(detailed), "param.%s", action_name); \
        g_menu_append (menu, label, detailed); } \
@@ -3727,7 +3559,7 @@ solo_get_palette(char *name, int frame_num)
 int solo_hardware_color_table(gint frame_num)
 {
   int jj, kk, mm, nc=0, nn, ndx = 0, start, end, cmax;
-  struct solo_perusal_info *spi, *solo_return_winfo_ptr();
+  struct solo_perusal_info *spi;
   WW_PTR wwptr;
   struct solo_list_mgmt *lm;
   SiiPalette *pal;
@@ -3925,7 +3757,7 @@ int solo_palette_color_numbers(int frame_num)
    */
   gint kk, ok=YES, nc, mm, nn, ct_ndx;
   gboolean ok2;
-  WW_PTR wwptr, solo_return_wwptr();
+  WW_PTR wwptr;
   SiiPalette *pal;
   gchar mess[256];
   GdkRGBA *gcolor;
@@ -4089,7 +3921,7 @@ int solo_palette_color_numbers(int frame_num)
 
 SiiLinkedList *sii_solo_palette_stack(void)
 {
-    struct solo_palette s_pal, *solo_malloc_old_palette();
+    struct solo_palette s_pal;
     SiiPalette *pal;
     SiiLinkedList *item = palette_stack, *item2;
     SiiLinkedList *sps = solo_palette_stack;
@@ -4129,8 +3961,6 @@ void sii_update_param_widget (guint frame_num)
    LinksInfo *li;
    GtkWidget *entry, *check_item;
    guint wid, jj;
-   char *solo_list_entry (struct solo_list_mgmt *slm, int jj);
-   void solo_gen_parameter_list (guint frme);
    gchar *p_name, *name;
    WW_PTR wwptr = solo_return_wwptr(frame_num);
    struct solo_list_mgmt *slm;

@@ -4,10 +4,12 @@
 #include "test_app_runner.h"
 
 #include <string.h>
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 /* Provided by perusal/soloii.c. GTK4 has no public widget→action_group
  * lookup, so we go through this getter rather than try to introspect. */
-GActionGroup *soloiv_get_main_menu_actions(void);
 
 /* Action signatures we know about. The main menu uses three patterns:
  *   - parameterless          (e.g. "quit", "help_about")

@@ -7,8 +7,8 @@ static char vcid[] = "$Id$";
 # include "dd_stats.h"
 # include <time.h>
 # include <sys/time.h>
-# include <function_decl.h>
-# include <dgi_func_decl.h>
+# include <math.h>
+# include <s2_protos.h>
 # include "piraq.h"
 
 # define READ_AND_WRITE_ACCESS 2
@@ -112,31 +112,8 @@ static struct catalog_info *ci[MAX_SENSORS];
 static char *source_tape_id=NULL;
 
 # ifdef obsolete
-double dd_rotation_angle();
-double dd_tilt_angle();
-double dd_elevation_angle();
-double dd_azimuth_angle();
-double dd_drift();
-double dd_heading();
-double dd_pitch();
-double dd_roll();
-double dd_altitude();
-double dd_altitude_agl();
-double dd_latitude();
-double dd_longitude();
 # endif
 
-void cat_volume();
-void cat_sweep();
-char *cat_time();
-char *cat_date();
-void cat_cat_att();
-void cat_cat_att_args();
-char *reverse_string();
-char *c_deblank();
-void ddcat_close();
-int ddcat_open();
-void ddcat_write();
 
 
 /* c------------------------------------------------------------------------ */
@@ -182,9 +159,8 @@ void dd_catalog(struct dd_general_info *dgi, time_t ignored_time, int flush)
     int rn=dgi->radar_num;
     static int count=0;
     int i, j, new_vol, new_swp, mark;
-    double d, fabs(), sin(), cos(), angdiff();
-    char *a, *b, *strstr();
-    char *dd_radar_name(), *get_tagged_string();
+    double d;
+    char *a, *b;
     float rotang;
 
     time_t current_time=dgi->time;
@@ -193,7 +169,6 @@ void dd_catalog(struct dd_general_info *dgi, time_t ignored_time, int flush)
     struct sweepinfo_d *swib=dds->swib;
     struct platform_i *asib=dds->asib;
     struct catalog_info *cii;
-    struct dd_stats *dd_return_stats_ptr();
 
 
     count++;
@@ -375,29 +350,27 @@ void dd_catalog(struct dd_general_info *dgi, time_t ignored_time, int flush)
 void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t current_time, int finish)
 {
     int i, n;
-    double d, fabs();
+    double d;
     char arglist[MAX_ARG_COUNT][MAX_ARG_SIZE], *arg;
     char *arg_ptr[MAX_ARG_COUNT];
     char str[256], *arg1=arglist[0];
     float f, gs, gate_spacing[MAX_RANGE_SEGMENTS];
     int num_gates[MAX_RANGE_SEGMENTS];
     short date_time[6];
-    time_t t, todays_date();
+    time_t t;
 
     struct dds_structs *dds=dgi->dds;
     struct volume_d *vold=dds->vold;
     struct radar_d *radd=dds->radd;
     struct cell_d *celv=dds->celv;
-    char *c_deblank(), *reverse_string();
-    char *cat_date(), *cat_time();
     char *cat=cii->vol_txt_ptr;
     HEADERV *dwel;
 
     
     if( finish == YES ) {
 	str[0] = '\0';
-	cat_cat_att( "Stop_date", 1, cat_date(cii->stop_time, arglist), str );
-	cat_cat_att( "Stop_time", 1, cat_time(cii->stop_time, arglist), str );
+	cat_cat_att( "Stop_date", 1, cat_date(cii->stop_time, arg1), str );
+	cat_cat_att( "Stop_time", 1, cat_time(cii->stop_time, arg1), str );
 	strncpy( cii->vol_stop_time, str, strlen(str));
 	ddcat_write(cii, cii->vol_txt_ptr, cii->vol_txt_size
 		     , DDCAT_NUVOL_REWRITE);
@@ -408,35 +381,35 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
     cii->vol_rec_mark = cii->prev_rec_count;
 
     *cii->vol_txt_ptr = 0;
-    cat_cat_att( VOLUME, 0, arglist, cat );
+    cat_cat_att( VOLUME, 0, arg1, cat );
 
     sprintf(arg1, "%d", vold->volume_num );
-    cat_cat_att( "Number", 1, arglist, cat );
+    cat_cat_att( "Number", 1, arg1, cat );
 
     if(source_tape_id) {
 	cat_cat_att( "Source_tape_id", 1, source_tape_id, cat );
     }
 
     sprintf(arg1, "%.2f", (float)cii->prev_MB_count);
-    cat_cat_att( "MB_to_Vol", 1, arglist, cat );
+    cat_cat_att( "MB_to_Vol", 1, arg1, cat );
 
     sprintf(arg1, "%ld", (long)current_time );
-    cat_cat_att( "Unix_time_stamp", 1, arglist, cat );
+    cat_cat_att( "Unix_time_stamp", 1, arg1, cat );
 
-    cat_cat_att( "Start_date", 1, cat_date(current_time, arglist), cat );
-    cat_cat_att( "Start_time", 1, cat_time(current_time, arglist), cat );
+    cat_cat_att( "Start_date", 1, cat_date(current_time, arg1), cat );
+    cat_cat_att( "Start_time", 1, cat_time(current_time, arg1), cat );
 
     cii->vol_stop_time = (cat += strlen(cat));
-    cat_cat_att( "Stop_date", 1, cat_date(current_time, arglist), cat );
-    cat_cat_att( "Stop_time", 1, cat_time(current_time, arglist), cat );
+    cat_cat_att( "Stop_date", 1, cat_date(current_time, arg1), cat );
+    cat_cat_att( "Stop_time", 1, cat_time(current_time, arg1), cat );
 
     t = todays_date(date_time);
-    cat_cat_att( "Production_date", 1, cat_date(t, arglist), cat );
-    cat_cat_att( "Production_time", 1, cat_time(t, arglist), cat );
+    cat_cat_att( "Production_date", 1, cat_date(t, arg1), cat );
+    cat_cat_att( "Production_time", 1, cat_time(t, arg1), cat );
     
 
-    c_deblank(vold->proj_name, 20, arglist);
-    cat_cat_att( "Project", 1, arglist, cat );
+    c_deblank(vold->proj_name, 20, arg1);
+    cat_cat_att( "Project", 1, arg1, cat );
 
     arg = "/RTF/ATD/NCAR/UCAR/NSF";
     cat_cat_att( "Facility", 1, arg, cat );
@@ -447,18 +420,18 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
     if( dgi->source_fmt == APIRAQ_FMT ) {
       dwel = (HEADERV *)dgi->gpptr2;
       sprintf(arg1, "%d", dwel->clutterfilter );
-      cat_cat_att( "Piraq_clutter_filter", 1, arglist, cat );
+      cat_cat_att( "Piraq_clutter_filter", 1, arg1, cat );
     }
 
-    c_deblank(vold->flight_num, 8, arglist);
-    cat_cat_att( "Flight/IOP_number", 1, arglist, cat );
+    c_deblank(vold->flight_num, 8, arg1);
+    cat_cat_att( "Flight/IOP_number", 1, arg1, cat );
 
     /* Begin sensor specific attributes
      */
-    cat_cat_att( SENSOR, 0, arglist, cat );
+    cat_cat_att( SENSOR, 0, arg1, cat );
 
-    c_deblank(dds->radd->radar_name, 8, arglist);
-    cat_cat_att( "Name", 1, arglist, cat );
+    c_deblank(dds->radd->radar_name, 8, arg1);
+    cat_cat_att( "Name", 1, arg1, cat );
 
     cii->radar_type = radd->radar_type;
 
@@ -499,31 +472,31 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
     cat_cat_att( "Scan_mode", 1, arg, cat );
 
     sprintf(arg1, "%.3e", radd->radar_const);
-    cat_cat_att( "Radar_constant", 1, arglist, cat );
+    cat_cat_att( "Radar_constant", 1, arg1, cat );
 
     sprintf(arg1, "%.3e", radd->peak_power);
-    cat_cat_att( "Peak_power", 1, arglist, cat );
+    cat_cat_att( "Peak_power", 1, arg1, cat );
 
     sprintf(arg1, "%.3e", radd->noise_power);
-    cat_cat_att( "Noise_power", 1, arglist, cat );
+    cat_cat_att( "Noise_power", 1, arg1, cat );
 
     sprintf(arg1, "%.3e", radd->receiver_gain);
-    cat_cat_att( "Receiver_gain", 1, arglist, cat );
+    cat_cat_att( "Receiver_gain", 1, arg1, cat );
 
     sprintf(arg1, "%.3e", radd->antenna_gain);
-    cat_cat_att( "Antenna_gain", 1, arglist, cat );
+    cat_cat_att( "Antenna_gain", 1, arg1, cat );
 
     sprintf(arg1, "%.3e", radd->system_gain);
-    cat_cat_att( "System_gain", 1, arglist, cat );
+    cat_cat_att( "System_gain", 1, arg1, cat );
 
     sprintf(arg1, "%.2f", radd->horz_beam_width);
-    cat_cat_att( "Horz_beam_width_(deg)", 1, arglist, cat );
+    cat_cat_att( "Horz_beam_width_(deg)", 1, arg1, cat );
 
     sprintf(arg1, "%.2f", radd->vert_beam_width);
-    cat_cat_att( "Vert_beam_width_(deg)", 1, arglist, cat );
+    cat_cat_att( "Vert_beam_width_(deg)", 1, arg1, cat );
 
     sprintf(arg1, "%.2f", radd->req_rotat_vel);
-    cat_cat_att( "Rotational_velocity_(deg/sec)", 1, arglist, cat );
+    cat_cat_att( "Rotational_velocity_(deg/sec)", 1, arg1, cat );
 
     cat += strlen(cat);
 
@@ -576,7 +549,7 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
     /* Summarize the range/gate spacing info
      */
 
-    cat_cat_att( RANGE_INFO, 0, arglist, cat );
+    cat_cat_att( RANGE_INFO, 0, arg1, cat );
     gate_spacing[0] = gs = celv->dist_cells[1] - celv->dist_cells[0];
     num_gates[0] = 2;
 
@@ -597,15 +570,15 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
     }
     n++;
     sprintf(arg1, "%d", n );
-    cat_cat_att( "Num_segments", 1, arglist, cat );
+    cat_cat_att( "Num_segments", 1, arg1, cat );
 
     sprintf(arg1, "%.1f", celv->dist_cells[0]
 	    +dds->cfac->range_delay_corr);
-    cat_cat_att( "Range_gate1_center", 1, arglist, cat );
+    cat_cat_att( "Range_gate1_center", 1, arg1, cat );
 
     sprintf(arg1, "%.1f", celv->dist_cells[celv->number_cells-1]
 	    +dds->cfac->range_delay_corr);
-    cat_cat_att( "Max_range", 1, arglist, cat );
+    cat_cat_att( "Max_range", 1, arg1, cat );
 
     arg_ptr[0] = arglist[0];
     arg_ptr[1] = arglist[1];
@@ -615,7 +588,7 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
 	sprintf( arglist[1], "%.1f", gate_spacing[i]);
 	cat_cat_att_args( "Segment_pair", 2, arg_ptr, cat );
     }
-    cat_cat_att(reverse_string( RANGE_INFO, arglist), 0, arglist, cat );
+    cat_cat_att(reverse_string( RANGE_INFO, arg1), 0, arg1, cat );
 
 
     /* create a list of the parameters present in this volume
@@ -625,22 +598,22 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
 	cat_cat_att( "Raw_fields_present", 1, arg, cat );
     }
     sprintf(arg1, "%d", dgi->num_parms );
-    cat_cat_att( "Param_count", 1, arglist, cat );
+    cat_cat_att( "Param_count", 1, arg1, cat );
 
     for(i=0; i < dgi->num_parms; i++ ) {
-	cat_cat_att( PARAMETER, 0, arglist, cat );
+	cat_cat_att( PARAMETER, 0, arg1, cat );
 
-	c_deblank( dds->parm[i]->parameter_name, 8, arglist);
-	cat_cat_att( "Name", 1, arglist, cat );
+	c_deblank( dds->parm[i]->parameter_name, 8, arg1);
+	cat_cat_att( "Name", 1, arg1, cat );
 
-	c_deblank( dds->parm[i]->param_description, 39, arglist);
-	cat_cat_att( "Description", 1, arglist, cat );
+	c_deblank( dds->parm[i]->param_description, 39, arg1);
+	cat_cat_att( "Description", 1, arg1, cat );
 
-	c_deblank( dds->parm[i]->param_units, 8, arglist);
-	cat_cat_att( "Units", 1, arglist, cat );
+	c_deblank( dds->parm[i]->param_units, 8, arg1);
+	cat_cat_att( "Units", 1, arg1, cat );
 
 	sprintf(arg1, "%.3f", dds->parm[i]->recvr_bandwidth);
-	cat_cat_att( "Receiver_bandwidth_(mhz)", 1, arglist, cat );
+	cat_cat_att( "Receiver_bandwidth_(mhz)", 1, arg1, cat );
 
 	switch (dds->parm[i]->polarization) {
 
@@ -663,7 +636,7 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
 	cat_cat_att( "Polarization", 1, arg, cat );
 
 	sprintf(arg1, "%d", dds->parm[i]->num_samples );
-	cat_cat_att( "Num_samples", 1, arglist, cat );
+	cat_cat_att( "Num_samples", 1, arg1, cat );
 
 	switch (dds->parm[i]->binary_format) {
 
@@ -689,12 +662,12 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
 	cat_cat_att( "Binary_format", 1, arg, cat );
 
 	sprintf(arg1, "%.3e", dds->parm[i]->parameter_scale);
-	cat_cat_att( "Param_scale", 1, arglist, cat );
+	cat_cat_att( "Param_scale", 1, arg1, cat );
 
 	sprintf(arg1, "%.3e", dds->parm[i]->parameter_bias);
-	cat_cat_att( "Param_bias", 1, arglist, cat );
+	cat_cat_att( "Param_bias", 1, arg1, cat );
 
-	cat_cat_att(reverse_string( PARAMETER, arglist), 0, arglist, cat );
+	cat_cat_att(reverse_string( PARAMETER, arg1), 0, arg1, cat );
 	cat += strlen(cat);
     }
 
@@ -751,27 +724,27 @@ void cat_volume(struct dd_general_info *dgi, struct catalog_info *cii, time_t cu
 
     cat += strlen(cat);
     sprintf(arg1, "%.4f", dd_longitude(dgi));
-    cat_cat_att( "Radar_longitude", 1, arglist, cat );
+    cat_cat_att( "Radar_longitude", 1, arg1, cat );
 
     sprintf(arg1, "%.4f", dd_latitude(dgi));
-    cat_cat_att( "Radar_latitude", 1, arglist, cat );
+    cat_cat_att( "Radar_latitude", 1, arg1, cat );
 
     sprintf(arg1, "%.4f", dd_altitude(dgi));
-    cat_cat_att( "Radar_altitude", 1, arglist, cat );
+    cat_cat_att( "Radar_altitude", 1, arg1, cat );
 
     sprintf(arg1, "%.2f", radd->eff_unamb_vel );
-    cat_cat_att( "Unambiguous_velocity_(m/s)", 1, arglist, cat );
+    cat_cat_att( "Unambiguous_velocity_(m/s)", 1, arg1, cat );
 
     sprintf(arg1, "%.3f", radd->eff_unamb_range);
-    cat_cat_att( "Unambiguous_range_(km)", 1, arglist, cat );
+    cat_cat_att( "Unambiguous_range_(km)", 1, arg1, cat );
 
 
-    cat_cat_att(reverse_string(SENSOR,arglist), 0, arglist, cat );
+    cat_cat_att(reverse_string(SENSOR,arg1), 0, arg1, cat );
 
     /* End sensor specific attributes
      */
 
-    cat_cat_att(reverse_string(VOLUME,arglist), 0, arglist, cat );
+    cat_cat_att(reverse_string(VOLUME,arg1), 0, arg1, cat );
     cat += strlen(cat);
 
     cii->vol_txt_size = strlen(cii->vol_txt_ptr);
@@ -785,15 +758,14 @@ void cat_sweep(struct dd_general_info *dgi, struct catalog_info *cii, time_t cur
 {
     int i, n, nc, llen, max_llen=77;
     float e, f;
-    double d, atan2(), fmod(), sqrt();
+    double d;
     char arglist[MAX_ARG_COUNT][MAX_ARG_SIZE], *aa;
     char *arg1 = arglist[0];
 
     struct dds_structs *dds=dgi->dds;
     struct sweepinfo_d *swib=dds->swib;
     struct platform_i *asib=dds->asib;
-    char *mark_char, *c_deblank(), *reverse_string();
-    char *cat_date(), *cat_time();
+    char *mark_char;
     char *cat;
 
 
@@ -801,73 +773,73 @@ void cat_sweep(struct dd_general_info *dgi, struct catalog_info *cii, time_t cur
 	mark_char = cat = cii->swp_txt_ptr +cii->swp_txt_size;
 
 	sprintf(arg1, "%.1f", cii->f_fixed_angle );
-	cat_cat_att( "Fixed_angle", 1, arglist, cat );
+	cat_cat_att( "Fixed_angle", 1, arg1, cat );
 
-	cat_cat_att( "Stop_date", 1, cat_date(cii->stop_time, arglist), cat );
-	cat_cat_att( "Stop_time", 1, cat_time(cii->stop_time, arglist), cat );
+	cat_cat_att( "Stop_date", 1, cat_date(cii->stop_time, arg1), cat );
+	cat_cat_att( "Stop_time", 1, cat_time(cii->stop_time, arg1), cat );
 
 	sprintf(arg1, "%.1f", cii->f_swp_stop_angle );
-	cat_cat_att( "Stop_angle", 1, arglist, cat );
+	cat_cat_att( "Stop_angle", 1, arg1, cat );
 
 	f = cii->avg_rota_count > 1
 	      ? cii->f_delta_angles/(float)(cii->avg_rota_count-1) : 0;
 	sprintf(arg1, "%.2f", f );
-	cat_cat_att( "Average_delta_rotation", 1, arglist, cat );
+	cat_cat_att( "Average_delta_rotation", 1, arg1, cat );
 
 	f = cii->tot_cells > 0 ? (float)cii->num_good_cells/cii->tot_cells : 0;
 	sprintf(arg1, "%.2f", f*100.);
-	cat_cat_att( "Percent_good_cells", 1, arglist, cat );
+	cat_cat_att( "Percent_good_cells", 1, arg1, cat );
 
 	sprintf(arg1, "%d", cii->rays_per_volume );
-	cat_cat_att( "Num_rays", 1, arglist, cat );
+	cat_cat_att( "Num_rays", 1, arg1, cat );
 
 	sprintf(arg1, "%.2f", (float)cii->prev_MB_count);
-	cat_cat_att( "MB_sofar", 1, arglist, cat );
+	cat_cat_att( "MB_sofar", 1, arg1, cat );
 
 	sprintf(arg1, "%d", cii->prev_rec_count-cii->vol_rec_mark);
-	cat_cat_att( "Recs_sofar", 1, arglist, cat );
+	cat_cat_att( "Recs_sofar", 1, arg1, cat );
 
 	if( cii->radar_type != GROUND ) {
 	    cat += strlen(cat);
 
 	    sprintf(arg1, "%.3f", cii->f_stop_latitude );
-	    cat_cat_att( "Stop_latitude", 1, arglist, cat );
+	    cat_cat_att( "Stop_latitude", 1, arg1, cat );
 
 	    sprintf(arg1, "%.3f", cii->f_stop_longitude );
-	    cat_cat_att( "Stop_longitude", 1, arglist, cat );
+	    cat_cat_att( "Stop_longitude", 1, arg1, cat );
 
 	    sprintf(arg1, "%.3f", cii->f_stop_altitude);
-	    cat_cat_att( "Stop_altitude_(km)", 1, arglist, cat );
+	    cat_cat_att( "Stop_altitude_(km)", 1, arg1, cat );
 
 	    sprintf(arg1, "%.1f", cii->f_stop_EW_wind );
-	    cat_cat_att( "Stop_EW_wind_(m/s)", 1, arglist, cat );
+	    cat_cat_att( "Stop_EW_wind_(m/s)", 1, arg1, cat );
 
 	    sprintf(arg1, "%.1f", cii->f_stop_NS_wind );
-	    cat_cat_att( "Stop_NS_wind_(m/s)", 1, arglist, cat );
+	    cat_cat_att( "Stop_NS_wind_(m/s)", 1, arg1, cat );
 
 	    if(cii->num_rays > 0) {
 		
 		e = cii->f_ns_velocity/(float)cii->num_rays;
 		f = cii->f_ew_velocity/(float)cii->num_rays;
 		sprintf(arg1, "%.0f", sqrt((double)(e*e+f*f)));
-		cat_cat_att( "Average_ground_speed_(m/s)", 1, arglist, cat );
+		cat_cat_att( "Average_ground_speed_(m/s)", 1, arg1, cat );
 	    }
 	    d = 360.+90. -DEGREES(atan2(cii->d_sin_heading
 			      , cii->d_cos_heading));
 	    sprintf(arg1, "%.0f", fmod(d,(double)360.));
-	    cat_cat_att( "Average_heading_(deg)", 1, arglist, cat );
+	    cat_cat_att( "Average_heading_(deg)", 1, arg1, cat );
 	    
 	    d = DEGREES(atan2(cii->d_sin_drift, cii->d_cos_drift));
 	    sprintf(arg1, "%.1f", d );
-	    cat_cat_att( "Average_drift_(deg)", 1, arglist, cat );
+	    cat_cat_att( "Average_drift_(deg)", 1, arg1, cat );
 
 	    d = DEGREES(atan2(cii->d_sin_pitch, cii->d_cos_pitch));
 	    sprintf(arg1, "%.1f", d );
-	    cat_cat_att( "Average_pitch_(deg)", 1, arglist, cat );
+	    cat_cat_att( "Average_pitch_(deg)", 1, arg1, cat );
 
 	    d = DEGREES(atan2(cii->d_sin_roll, cii->d_cos_roll));
 	    sprintf(arg1, "%.1f", d);
-	    cat_cat_att( "Average_roll_(deg)", 1, arglist, cat );
+	    cat_cat_att( "Average_roll_(deg)", 1, arg1, cat );
 	}
 
 	if(cmt->sizeof_comments) { /* dump out the comments */
@@ -880,7 +852,7 @@ void cat_sweep(struct dd_general_info *dgi, struct catalog_info *cii, time_t cur
 	    cmt->sizeof_comments = 0;
 	    cmt->at = cmt->buf;
 	}
-	cat_cat_att(reverse_string(SCAN,arglist), 0, arglist, cat );
+	cat_cat_att(reverse_string(SCAN,arg1), 0, arg1, cat );
 	n = strlen(mark_char);
 	cii->swp_txt_size += n;
 	mark_char = cat += strlen(cat);
@@ -894,58 +866,58 @@ void cat_sweep(struct dd_general_info *dgi, struct catalog_info *cii, time_t cur
     mark_char = cat = cii->swp_txt_ptr;
     cii->swp_txt_size = 0;
     *cii->swp_txt_ptr = 0;
-    cat_cat_att(SCAN, 0, arglist, cat );
+    cat_cat_att(SCAN, 0, arg1, cat );
 
     sprintf(arg1, "%d", swib->sweep_num );
-    cat_cat_att( "Number", 1, arglist, cat );
+    cat_cat_att( "Number", 1, arg1, cat );
 
-    cat_cat_att( "Start_date", 1, cat_date(current_time, arglist), cat );
-    cat_cat_att( "Start_time", 1, cat_time(current_time, arglist), cat );
+    cat_cat_att( "Start_date", 1, cat_date(current_time, arg1), cat );
+    cat_cat_att( "Start_time", 1, cat_time(current_time, arg1), cat );
 # ifdef obsolete
     sprintf(arg1, "%.1f", swib->fixed_angle );
-    cat_cat_att( "Fixed_angle", 1, arglist, cat );
+    cat_cat_att( "Fixed_angle", 1, arg1, cat );
 # endif
     sprintf(arg1, "%.1f", swib->start_angle );
-    cat_cat_att( "Start_angle", 1, arglist, cat );
+    cat_cat_att( "Start_angle", 1, arg1, cat );
 
     sprintf(arg1, "%.2f", dds->radd->eff_unamb_vel );
-    cat_cat_att( "Unambiguous_velocity_(m/s)", 1, arglist, cat );
+    cat_cat_att( "Unambiguous_velocity_(m/s)", 1, arg1, cat );
 
     if( cii->radar_type != GROUND ) {
 	sprintf(arg1, "%.3f", dd_latitude(dgi));
-	cat_cat_att( "Start_latitude", 1, arglist, cat );
+	cat_cat_att( "Start_latitude", 1, arg1, cat );
 
 	sprintf(arg1, "%.3f", dd_longitude(dgi));
-	cat_cat_att( "Start_longitude", 1, arglist, cat );
+	cat_cat_att( "Start_longitude", 1, arg1, cat );
 
 	sprintf(arg1, "%.3f", dd_altitude(dgi));
-	cat_cat_att( "Start_altitude_(km)", 1, arglist, cat );
+	cat_cat_att( "Start_altitude_(km)", 1, arg1, cat );
 
 	sprintf(arg1, "%.3f", dd_altitude_agl(dgi));
-	cat_cat_att( "Start_altitude_agl(km)", 1, arglist, cat );
+	cat_cat_att( "Start_altitude_agl(km)", 1, arg1, cat );
 
 	sprintf(arg1, "%.1f", dd_heading(dgi));
-	cat_cat_att( "Start_heading_(deg)", 1, arglist, cat );
+	cat_cat_att( "Start_heading_(deg)", 1, arg1, cat );
 
 	e = asib->ew_velocity;
 	f = asib->ns_velocity;
 	sprintf(arg1, "%.0f", sqrt((double)(e*e+f*f)));
-	cat_cat_att( "Start_ground_speed_(m/s)", 1, arglist, cat );
+	cat_cat_att( "Start_ground_speed_(m/s)", 1, arg1, cat );
 
 	sprintf(arg1, "%.1f", dd_roll(dgi) );
-	cat_cat_att( "Start_roll", 1, arglist, cat );
+	cat_cat_att( "Start_roll", 1, arg1, cat );
 
 	sprintf(arg1, "%.1f", dd_pitch(dgi) );
-	cat_cat_att( "Start_pitch", 1, arglist, cat );
+	cat_cat_att( "Start_pitch", 1, arg1, cat );
 
 	sprintf(arg1, "%.1f", dd_drift(dgi) );
-	cat_cat_att( "Start_drift", 1, arglist, cat );
+	cat_cat_att( "Start_drift", 1, arg1, cat );
 
 	sprintf(arg1, "%.1f", asib->ew_horiz_wind );
-	cat_cat_att( "EW_horiz_wind_(m/s)", 1, arglist, cat );
+	cat_cat_att( "EW_horiz_wind_(m/s)", 1, arg1, cat );
 
 	sprintf(arg1, "%.1f", asib->ns_horiz_wind );
-	cat_cat_att( "NS_horiz_wind_(m/s)", 1, arglist, cat );
+	cat_cat_att( "NS_horiz_wind_(m/s)", 1, arg1, cat );
     }
     cat += strlen(cat);
     cii->swp_txt_size = strlen(cii->swp_txt_ptr);

@@ -23,6 +23,11 @@ target_include_directories(soloiv_test_support PUBLIC
     ${GTK4_INCLUDE_DIRS}
 )
 
+# Same missing-prototype errors as the libraries (SOLOIV_PROTO_FLAGS is set
+# in perusal/CMakeLists.txt); tests include the protos headers rather than
+# declaring production functions locally.
+target_compile_options(soloiv_test_support PRIVATE ${SOLOIV_PROTO_FLAGS})
+
 target_link_directories(soloiv_test_support PUBLIC ${GTK4_LIBRARY_DIRS})
 
 target_link_libraries(soloiv_test_support PUBLIC
@@ -43,10 +48,7 @@ target_compile_definitions(soloiv_test_support PUBLIC
 function(soloiv_add_test name)
     add_executable(${name} ${name}.c)
     target_link_libraries(${name} PRIVATE soloiv_test_support)
-    target_compile_options(${name} PRIVATE
-        -Wno-implicit-function-declaration
-        -Wno-implicit-int
-    )
+    target_compile_options(${name} PRIVATE ${SOLOIV_PROTO_FLAGS})
     add_test(NAME ${name} COMMAND ${name})
 
     # NOTE: We deliberately do NOT set G_DEBUG=fatal-criticals here. The

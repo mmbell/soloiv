@@ -41,6 +41,9 @@
 #include "soloii.h"
 #include "xyraster.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define GATE_SPACING 100.0f     /* metres */
 
@@ -48,16 +51,6 @@
 #define COLOR_LAST   2          /* the last cell */
 #define COLOR_STALE  3          /* cell_colors past number_cells */
 
-struct dd_general_info *dd_window_dgi();
-WW_PTR solo_return_wwptr();
-struct xyras *return_xyras();
-void solo_cell_lut();
-void solo_color_cells();
-void init_xyraster();
-int ray_raster_setup();
-void xx_inner_loop();
-void yy_inner_loop();
-double sp_meters_per_pixel();
 
 static void raster_action(GtkWidget *main_window, gpointer user_data)
 {
@@ -78,7 +71,7 @@ static void raster_action(GtkWidget *main_window, gpointer user_data)
 
     wwptr = solo_return_wwptr(0);
     g_assert_nonnull(wwptr);
-    dgi = dd_window_dgi(wwptr->lead_sweep->window_num, "");
+    dgi = dd_window_dgi(wwptr->lead_sweep->window_num);
     g_assert_nonnull(dgi);
     g_assert_nonnull(wwptr->image);
 

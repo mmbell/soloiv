@@ -18,9 +18,10 @@
 
 #include <gtk/gtk.h>
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
-extern gint  sii_font_string_width();
-extern void *sii_font_new();      /* (const char *, int, gboolean) -> SiiFont* */
 
 static void font_cache_action(GtkWidget *main_window, gpointer user_data)
 {

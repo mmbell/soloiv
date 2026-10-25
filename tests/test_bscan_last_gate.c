@@ -41,6 +41,9 @@
 #include "sii_enums.h"
 #include "dd_math.h"
 #include "test_app_runner.h"
+#include "soloiv_core_gtk_protos.h"
+#include "s2_protos.h"
+#include "soloedit_protos.h"
 
 #define GATE_SPACING 100.0f     /* metres */
 #define FIRST_RANGE  250.0f     /* metres; > gs/2 so it stays the first cell */
@@ -51,13 +54,6 @@
 #define COLOR_ODD    4
 #define COLOR_STALE  5          /* cell_colors past number_cells */
 
-struct dd_general_info *dd_window_dgi();
-WW_PTR solo_return_wwptr();
-void solo_cell_lut();
-void solo_color_cells();
-void sp_ts_column();
-double sp_meters_per_pixel();
-double dd_altitude();
 
 static int cell_color(int k, int nc)
 {
@@ -86,7 +82,7 @@ static void bscan_action(GtkWidget *main_window, gpointer user_data)
 
     wwptr = solo_return_wwptr(0);
     g_assert_nonnull(wwptr);
-    dgi = dd_window_dgi(wwptr->lead_sweep->window_num, "");
+    dgi = dd_window_dgi(wwptr->lead_sweep->window_num);
     g_assert_nonnull(dgi);
 
     w = wwptr->view->width_in_pix;
