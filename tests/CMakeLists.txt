@@ -91,6 +91,12 @@ soloiv_add_test(test_font_cache)
 soloiv_add_test(test_xfer_area_clip)
 set_tests_properties(test_xfer_area_clip PROPERTIES WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 
+# Window drag-resize: the settled table allocation is divided across the
+# layout, each frame keeps its center and magnification and is replotted
+# once; rapid allocations debounce to one replot; menus still work after.
+soloiv_add_test(test_drag_resize)
+set_tests_properties(test_drag_resize PROPERTIES WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+
 # The histogram text output builds its scale and bar lines in fixed char[88]
 # buffers; a zero/tiny range used to loop forever past the end, and huge
 # values overran it. Pure editor-code test (no GUI): a hang is a failure.
