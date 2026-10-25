@@ -84,6 +84,8 @@ void sii_check_def_widget_sizes(void);
 void sii_init_frame_configs(void);
 void sii_reset_config_cells(void);
 void sii_new_frames(void);
+void sii_apply_table_allocation(int width, int height);
+void sii_schedule_table_allocation(int width, int height);
 
 /* sii_edit_widgets.c */
 void se_invalidate_read_caches(unsigned int frame_num);

@@ -114,176 +114,44 @@ void sii_blow_up_draw_func (GtkDrawingArea *area, cairo_t *cr,
 
 /* c---------------------------------------------------------------------- */
 
-/* GTK4: frame expose -> draw function for GtkDrawingArea */
+/* GTK4: frame expose -> draw function for GtkDrawingArea
+ *
+ * Paints the frame's last image; plotting never happens here (it runs
+ * from sii_apply_table_allocation once an allocation settles, or from the
+ * code that changed the data). While the window is being dragged the
+ * widget can be larger than the image: the uncovered part gets the
+ * background color, and the image copy is clamped to the image.
+ */
 void sii_frame_draw_func(GtkDrawingArea *area, cairo_t *cr,
 			 int width, int height, gpointer data)
 {
 			/* c...expose */
-   GtkWidget *frame = GTK_WIDGET(area);
    guint frame_num = GPOINTER_TO_UINT (data); /* frame number */
    SiiFrameConfig *sfc;
-   guint ix=0, iy=0, ncols, nrows, cn, mm, nn, jj, ndx;
-   gint mark;
-   sii_table_parameters *stp;
-   gboolean reconfigured, uncovered, totally_exposed, second_expose;
-   static gboolean new_frames = FALSE;
    GdkRectangle area_rect;
-   gchar mess[256];
-   static GString *gs=NULL;
+   GdkRGBA *bg;
 
-
-   if(!gs)
-     { gs = g_string_new (""); }
-   g_string_truncate (gs, 0);
-   g_string_append (gs, "XPZ");
+   if (frame_num >= (guint)sii_return_frame_count ())
+     { return; }
 
    sfc = frame_configs[frame_num];
    ++sfc->expose_count;
 
-   /* GTK4: use alloc_width/alloc_height instead of widget->allocation */
-   gint alloc_w = sfc->alloc_width;
-   gint alloc_h = sfc->alloc_height;
-
-   /* In GTK4 draw function, width/height are the widget dimensions.
-    * The "exposed area" is the full widget. */
    area_rect.x = 0;
    area_rect.y = 0;
    area_rect.width = width;
    area_rect.height = height;
-
-   reconfigured = sfc->colorize_count == 0;
-   if (reconfigured)
-     { g_string_append (gs, " REC"); }
-
-   uncovered = alloc_w != width ||
-     alloc_h != height;
-   if (uncovered)
-     { g_string_append (gs, " UNC"); }
-
-   totally_exposed = alloc_w == width &&
-     alloc_h == height;
-   if (totally_exposed)
-     { g_string_append (gs, " TOT"); }
-
    sfc->most_recent_expose = area_rect;
 
-   g_string_append_printf
-     (gs, " frm:%d frm:%dx%d  gtk:%dx%d  ec:%d cc:%d nf:%d lc:%d"
-      , frame_num
-      , sfc->width, sfc->height
-      , alloc_w
-      , alloc_h
-      , sfc->expose_count
-      , sfc->reconfig_count
-      , sfc->new_frame_count
-      , sfc->local_reconfig
-      );
-# ifdef obsolete
-     g_string_append_printf
-       (gs, "\n  x:%d y:%d %dx%d"
-	, area_rect.x, area_rect.y
-	, area_rect.width, area_rect.height
-	);
-# endif
-   second_expose = sfc->config_sync_num == sfc->expose_sync_num;
-  sfc->expose_sync_num = sfc->config_sync_num;
-
-   if (reconfigured && sfc->reconfig_count) {
-     /* first draw after frame creation - data not plotted yet, skip */
-     mark = 0;
+   if (width > (gint)sfc->width || height > (gint)sfc->height) {
+     bg = sii_background_color (frame_num, FALSE);
+     if (bg)
+       { gdk_cairo_set_source_rgba (cr, bg); }
+     else
+       { cairo_set_source_rgb (cr, 0., 0., 0.); }
+     cairo_paint (cr);
    }
-   else if (uncovered || (!sfc->reconfig_count && totally_exposed) || reconfigured) {
-     sii_really_xfer_images_cairo (cr, frame_num, &area_rect, FALSE);
-   }
-
-   /* the reconfig_count is reset once it's been plotted by sii_displayq() */
-
-   while (sfc->reconfig_count) {
-
-      if (!sfc->local_reconfig && (sfc->reconfig_flag & FrameDragResize)) {
-	 /*
-	  * This requires no reconfiguration other than increasing
-	  * the image size if the frame is bigger
-	  *
-	  */
-	 if (!second_expose) {
-	    ndx = sfc->cfg_que_ndx;
-	    stp = &sfc->tbl_parms;
-	    mm = stp->right_attach - stp->left_attach;
-	    nn = stp->bottom_attach - stp->top_attach;
-	    sfc->width = sfc->cfg_width[ndx];
-	    sfc->height = sfc->cfg_height[ndx];
-	    sii_check_image_size (frame_num);
-	    if (mm == 1) {
-	       sii_table_widget_width = sfc->width;
-	    }
-	    if (nn == 1) {
-	       sii_table_widget_height = sfc->height;
-	    }
-	    sii_check_def_widget_sizes ();
-
-	    sfc->sync_num = sfc->config_sync_num;
-	    g_string_append (gs, " X0");
-	    sii_plot_data2 (frame_num, REPLOT_THIS_FRAME);
-	 }
-	 else
-	   { g_string_append (gs, " X1"); }
-	 break;
-      }
-
-     if (sfc->local_reconfig && sfc->expose_count == sfc->reconfig_count)
-       {
-	 /* reconfig_count == 1 for first time through
-	  * other local reconfigs emit two exposes
-	  * one for the new drawable and one for the config
-	  */
-	 sfc->width = alloc_w;
-	 sfc->height = alloc_h;
-	 sfc->data_width = alloc_w;
-	 sfc->data_height = alloc_h;
-	 sfc->local_reconfig = FALSE;
-	 g_string_append (gs, " X2");
-	 sfc->sync_num = sfc->config_sync_num;
-	 sii_plot_data (frame_num, REPLOT_THIS_FRAME);
-	 break;
-       }
-
-     if (sfc->expose_count == 1)
-       {
-	 /* We've rebuilt the tables and this is the last expose,
-	  * now plot the data
-	  */
-	 g_string_append (gs, " X3");
-	 sfc->sync_num = sfc->config_sync_num;
-	 sii_plot_data (frame_num, REPLOT_THIS_FRAME);
-	 break;
-       }
-
-# ifdef config_debug
-     g_string_append (gs, " X4");
-# endif
-     break;
-   }
-# ifdef config_debug
-   /*
-   printf ("%s\n", gs->str);
-    */
-   sii_append_debug_stuff (gs->str);
-# endif
-
-   /* If displayq never ran (no reconfig event in GTK4), trigger initial plot.
-    * Then render with the now-valid color table and image data.
-    */
-   if (!sfc->colorize_count && !sfc->reconfig_count) {
-     sfc->width = width;
-     sfc->height = height;
-     sfc->data_width = width;
-     sfc->data_height = height;
-     sii_check_image_size (frame_num);
-     sii_plot_data (frame_num, REPLOT_THIS_FRAME);
-     sii_really_xfer_images_cairo (cr, frame_num, &area_rect, FALSE);
-   }
-
+   sii_really_xfer_images_cairo (cr, frame_num, &area_rect, FALSE);
 }
 
 /* c---------------------------------------------------------------------- */
@@ -316,52 +184,29 @@ void sii_blow_up_resize_cb(GtkDrawingArea *frame, int width, int height,
 
 /* c---------------------------------------------------------------------- */
 
-/* GTK4: frame configure -> resize signal */
+/* GTK4: frame configure -> resize signal
+ *
+ * Runs during size allocation, so it only records the new size and
+ * restarts the settle timeout (see sii_schedule_table_allocation).
+ */
 void sii_frame_resize_cb(GtkDrawingArea *frame, int width, int height,
 			 gpointer data)
 {
-			/* c...config */
-  guint frame_num = GPOINTER_TO_UINT (data), mark, ndx;
-  gchar *bb, mess[256];
-  gdouble d;
+  guint frame_num = GPOINTER_TO_UINT (data);
   SiiFrameConfig *sfc;
 
-  strcpy (mess, " ");
+  if (frame_num >= (guint)sii_return_frame_count ())
+    { return; }
   sfc = frame_configs[frame_num];
-  sfc->config_sync_num = sii_inc_master_seq_num ();
-  ++sfc->reconfig_count;
-  sfc->colorize_count = 0;
+  if (sfc->frame != GTK_WIDGET (frame) || !main_table)
+    { return; }
 
-  ndx = (sfc->cfg_que_ndx +1) % CFG_QUE_SIZE;
-  sfc->cfg_que_ndx = ndx;
-  /* GTK4: width/height passed as parameters to resize callback */
-  sfc->cfg_width[ndx] = width;
-  sfc->cfg_height[ndx] = height;
-  /* Also update alloc_width/alloc_height */
   sfc->alloc_width = width;
   sfc->alloc_height = height;
-  if (!sfc->local_reconfig) {
-     sfc->reconfig_flag |= FrameDragResize;
-     ++sfc->drag_resize_count;
-  }
 
-# ifdef config_debug
-  snprintf (mess, sizeof(mess), "CFG frm:%d %dx%d gtk:%dx%d  ec:%d cc:%d nf:%d"
-	     , frame_num
-	     , sfc->width
-	     , sfc->height
-	     , width
-	     , height
-	     , sfc->expose_count
-	     , sfc->reconfig_count
-	     , sfc->new_frame_count
-	     );
-  sii_append_debug_stuff (mess);
-  /*
-  printf ("%s\n", mess);
-   */
-# endif
-  sfc->expose_count = 0;
+  /* the table has its new allocation before its children get theirs */
+  sii_schedule_table_allocation (gtk_widget_get_width (main_table),
+				 gtk_widget_get_height (main_table));
 }
 
 /* c---------------------------------------------------------------------- */

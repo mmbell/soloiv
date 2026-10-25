@@ -248,6 +248,7 @@ typedef struct {		/* frame info */
   gint prev_expose_num;
   gint new_frame_count;
   gint colorize_count;
+  guint plot_request_count;	/* displayq requests via sii_plot_data2 */
   gint max_lbl_wdt;
   gint big_max_lbl_wdt;
   gint points_in_bnd;

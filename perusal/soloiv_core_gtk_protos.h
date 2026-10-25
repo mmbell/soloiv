@@ -39,6 +39,7 @@ void put_ascii_color_table(const gchar *name, gchar *table);
 
 /* sii_config_stuff.c */
 gboolean sii_set_config(void);
+gboolean sii_table_settle_cb(gpointer data);
 
 /* sii_callbacks.c */
 void center_frame_cb(GtkWidget *w, gpointer data);

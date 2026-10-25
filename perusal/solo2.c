@@ -2174,6 +2174,7 @@ void sii_plot_data2 (guint frame_num, guint plot_function)
     case REPLOT_THIS_FRAME:
     case FORWARD_FOREVER:
     case FORWARD_ONCE:
+     ++frame_configs[frame_num]->plot_request_count;
      displayq (frame_num, plot_function);
      break;
 
