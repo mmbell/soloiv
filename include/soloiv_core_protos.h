@@ -263,6 +263,7 @@ void slm_list_ui(struct solo_list_mgmt *slm);
 
 /* sp_save_frms.c */
 int solo_absorb_window_info(const char *dir, const char *fname, int ignore_swpfi_info);
+long sp_wds_record_len(const char *c, const char *e, int *swapped);
 void solo_save_window_info(const char *dir, const char *a_comment);
 
 /* sp_dorade.c */
