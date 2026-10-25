@@ -97,6 +97,19 @@ set_tests_properties(test_xfer_area_clip PROPERTIES WORKING_DIRECTORY ${FIXTURES
 soloiv_add_test(test_drag_resize)
 set_tests_properties(test_drag_resize PROPERTIES WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
 
+# Window-state files: save -> disturb -> absorb round-trips the layout,
+# fields, magnification, center and frame size, and replots once. The
+# --corrupt run absorbs damaged files (bad record sizes, truncation, bad
+# window numbers, view offsets, layout and extras, legacy short SCTB
+# records): no out-of-bounds reads (debug-asan), broken files rejected.
+soloiv_add_test(test_window_file_roundtrip)
+set_tests_properties(test_window_file_roundtrip PROPERTIES WORKING_DIRECTORY ${FIXTURES}/ground/cf2)
+add_test(NAME test_window_file_corrupt COMMAND test_window_file_roundtrip --corrupt)
+set_tests_properties(test_window_file_corrupt PROPERTIES
+    TIMEOUT 60
+    WORKING_DIRECTORY ${FIXTURES}/ground/cf2
+)
+
 # The histogram text output builds its scale and bar lines in fixed char[88]
 # buffers; a zero/tiny range used to loop forever past the end, and huge
 # values overran it. Pure editor-code test (no GUI): a hang is a failure.
