@@ -41,6 +41,67 @@ static FILE *histo_stream;
 static FILE *x_y_stream;
 static double areaXval;
 
+# define SE_HISTO_COLS 50	/* width of the bars and the scale */
+# define SE_HISTO_TICKS 6	/* scale ticks, one every 10 columns */
+
+/* c------------------------------------------------------------------------ */
+
+/* Length of the bar for val on a scale of SE_HISTO_COLS columns starting
+ * at min with inc per column. Never negative, never wider than the scale,
+ * whatever the increment.
+ */
+static int se_histo_bar_len(float val, float min, float inc)
+{
+    float d = (val -min)/inc;
+
+    if(!(d > 0))		/* also catches a NaN */
+	  return(0);
+    if(d > SE_HISTO_COLS)
+	  return(SE_HISTO_COLS);
+    return((int)d);
+}
+/* c------------------------------------------------------------------------ */
+
+/* Copy s into the line buffer at offset at, if all of it fits ahead of the
+ * newline and the terminator. Returns 0 if it does not fit.
+ */
+static int se_histo_put(char *buf, size_t size, long at, const char *s)
+{
+    size_t len = strlen(s);
+
+    if(at < 0 || (size_t)at +len > size -2)
+	  return(0);
+    memcpy(buf +at, s, len);
+    return(1);
+}
+/* c------------------------------------------------------------------------ */
+
+/* End the line in the buffer at offset at, or as near the end of it as
+ * there is room for the newline and the terminator.
+ */
+static void se_histo_eol(char *buf, size_t size, long at)
+{
+    if(at < 0)
+	  at = 0;
+    if((size_t)at > size -2)
+	  at = size -2;
+    buf[at++] = '\n';
+    buf[at] = '\0';
+}
+/* c------------------------------------------------------------------------ */
+
+/* Append a bar of nn H's at offset at in the buffer, clipped to fit, and
+ * end the line.
+ */
+static void se_histo_bar(char *buf, size_t size, long at, int nn)
+{
+    if(at < 0)
+	  at = 0;
+    if((size_t)at > size -2)
+	  at = size -2;
+    for(; nn-- > 0 && (size_t)at < size -2; buf[at++] = 'H');
+    se_histo_eol(buf, size, at);
+}
 
 /* c------------------------------------------------------------------------ */
 
@@ -87,7 +148,7 @@ int se_histo_output(void)
 
 void se_histo_fin_irreg_areas(void)
 {
-    int ii, nn, mark, min, max;
+    int ii, kk, nn, mark, min, max;
     float f, f_val, f_sum=0, rcp_inc, f_min, f_max, f_mode, f_median;
     float f_mean, f_sdev, f_sum2, f_inc;
     double d;
@@ -155,25 +216,30 @@ void se_histo_fin_irreg_areas(void)
 	    "Histogram area: %8.1f sq.km.\n", f_sum);
     se_append_string(&seds->h_output, ssm);
     
-    f_inc = (f_max -f_min)/50.;
+    f_inc = (f_max -f_min)/SE_HISTO_COLS;
+    if(!(f_inc > 0)) {		/* all the areas are the same */
+	f_inc = 1./SE_HISTO_COLS;
+    }
     rcp_inc = 1./f_inc;;
     snprintf(str, sizeof(str), "%7.1f to %7.1f ", f_min, f_max); e = str +strlen(str);
 
     memset(str, ' ', sizeof(str));
-    for(f_val=f_min,c=e-8; f_val <= f_max; f_val += 10*f_inc, c+=10) {
-	snprintf(number, sizeof(number), "%9.1f", f_val);
-	strncpy(c, number, strlen(number));
+    for(kk=0; kk < SE_HISTO_TICKS; kk++) {
+	snprintf(number, sizeof(number), "%9.1f", f_min +kk*10*f_inc);
+	if(!se_histo_put(str, sizeof(str), (e-8-str) +10*kk, number))
+	      break;
     }
-    *c++ = '\n'; *c++ = '\0';
+    se_histo_eol(str, sizeof(str), (e-8-str) +10*SE_HISTO_TICKS);
     ssm = se_pop_spair_string();
     strcpy(ssm->at, str);
     se_append_string(&seds->h_output, ssm);
 
     memset(str, ' ', sizeof(str));
-    for(f_val=f_min,c=e; f_val <= f_max; f_val += 10*f_inc, c+=10) {
-	*c = '|';
+    for(kk=0; kk < SE_HISTO_TICKS; kk++) {
+	if(!se_histo_put(str, sizeof(str), (e-str) +10*kk, "|"))
+	      break;
     }
-    *c++ = '\n'; *c++ = '\0';
+    se_histo_eol(str, sizeof(str), (e-str) +10*SE_HISTO_TICKS);
     ssm = se_pop_spair_string();
     strcpy(ssm->at, str);
     se_append_string(&seds->h_output, ssm);
@@ -183,14 +249,13 @@ void se_histo_fin_irreg_areas(void)
     for(; pair; pair=pair->next) {
 	ssm = se_pop_spair_string();
 	c = ssm->at;
-	nn = (pair->f_sum -f_min)/f_inc;
-	snprintf(c, SE_MAX_STRING, "%7.1f to %7.1f ", pair->f_low, pair->f_high); 
+	nn = se_histo_bar_len(pair->f_sum, f_min, f_inc);
+	snprintf(c, SE_MAX_STRING, "%7.1f to %7.1f ", pair->f_low, pair->f_high);
 	c += strlen(c);
 
 	if( nn <= 0  && f_sum )
 	    { nn = 1; }
-	for(; nn--; *c++ = H);
-	*c++ = '\n'; *c++ = '\0';
+	se_histo_bar(ssm->at, SE_MAX_STRING, c -ssm->at, nn);
 	se_append_string(&seds->h_output, ssm);
     }
     return;
@@ -199,7 +264,7 @@ void se_histo_fin_irreg_areas(void)
 
 void se_histo_fin_irreg_counts(void)
 {
-    int ii, kk, mm, nn=0, mark, min, max, med;
+    int ii, kk, mm, nn=0, mark, min, max, med, step;
     float f, f_val, f_sum, ff_sum, f_inc, rcp_inc, f_mode, f_mean, f_sdev;
     float f_median;
     double d;
@@ -244,28 +309,34 @@ void se_histo_fin_irreg_counts(void)
 	"  Mode: %8.2f\n", f_mode);
     se_append_string(&seds->h_output, ssm);
 
-    f_inc = (max -min)/50.;
-    if(f_inc < 1./50.) {
-	f_inc = 1./50.;
+    f_inc = (max -min)/(double)SE_HISTO_COLS;
+    if(f_inc < 1./SE_HISTO_COLS) {
+	f_inc = 1./SE_HISTO_COLS;
+    }
+    step = 10*f_inc+.5;		/* counts between ticks, at least one */
+    if(step < 1) {
+	step = 1;
     }
     rcp_inc = 1./f_inc;
     snprintf(str, sizeof(str), "%8.2f to %8.2f", f_inc, f_inc); e = str +strlen(str);
 
     memset(str, ' ', sizeof(str));
-    for(ii=min,c=e-6; ii <= max; ii += 10*f_inc+.5, c+=10) {
-	snprintf(number, sizeof(number), "%7d", ii);
-	strncpy(c, number, strlen(number));
+    for(kk=0; kk < SE_HISTO_TICKS && min +(long)kk*step <= max; kk++) {
+	snprintf(number, sizeof(number), "%7d", (int)(min +kk*step));
+	if(!se_histo_put(str, sizeof(str), (e-6-str) +10*kk, number))
+	      break;
     }
-    *c++ = '\n'; *c++ = '\0';
+    se_histo_eol(str, sizeof(str), (e-6-str) +10*kk);
     ssm = se_pop_spair_string();
     strcpy(ssm->at, str);
     se_append_string(&seds->h_output, ssm);
 
     memset(str, ' ', sizeof(str));
-    for(ii=min,c=e+1; ii <= max; ii += 10*f_inc +.5, c+=10) {
-	*c = '|';
+    for(kk=0; kk < SE_HISTO_TICKS && min +(long)kk*step <= max; kk++) {
+	if(!se_histo_put(str, sizeof(str), (e+1-str) +10*kk, "|"))
+	      break;
     }
-    *c++ = '\n'; *c++ = '\0';
+    se_histo_eol(str, sizeof(str), (e+1-str) +10*kk);
     ssm = se_pop_spair_string();
     strcpy(ssm->at, str);
     se_append_string(&seds->h_output, ssm);
@@ -274,13 +345,12 @@ void se_histo_fin_irreg_counts(void)
     for(; pair; pair=pair->next) {
 	ssm = se_pop_spair_string();
 	c = ssm->at;
-	nn = (pair->sum -min)/f_inc;
-	snprintf(c, SE_MAX_STRING, "%8.2f to %8.2f ", pair->f_low, pair->f_high); 
+	nn = se_histo_bar_len(pair->sum, min, f_inc);
+	snprintf(c, SE_MAX_STRING, "%8.2f to %8.2f ", pair->f_low, pair->f_high);
 	c += strlen(c);
-	if( nn <= 0 && pair->sum > 0 ) 
+	if( nn <= 0 && pair->sum > 0 )
 	    { nn = 1; }
-	for(; nn--; *c++ = H);
-	*c++ = '\n'; *c++ = '\0';
+	se_histo_bar(ssm->at, SE_MAX_STRING, c -ssm->at, nn);
 	se_append_string(&seds->h_output, ssm);
     }
     return;
@@ -289,7 +359,7 @@ void se_histo_fin_irreg_counts(void)
 
 void se_histo_fin_areas(char *name)
 {
-    int ii, nn, mark, min, max;
+    int ii, kk, nn, mark, min, max;
     float f, f_val, f_sum, rcp_inc, f_min, f_max, f_mode, f_median;
     float f_mean, f_sdev, f_sum2, f_inc;
     DD_TIME dts;
@@ -424,25 +494,30 @@ void se_histo_fin_areas(char *name)
 	    , f_sum * SQM2KM, areaXval * .001 * 1.e-6 );
     se_append_string(&seds->h_output, ssm);
     
-    f_inc = (f_max -f_min)/50.;
+    f_inc = (f_max -f_min)/SE_HISTO_COLS;
+    if(!(f_inc > 0)) {		/* all the areas are the same: 1 sq.km. scale */
+	f_inc = 1./(SQM2KM*SE_HISTO_COLS);
+    }
     rcp_inc = 1./f_inc;;
     snprintf(str, sizeof(str), "%7.1f ", f_val); e = str +strlen(str);
 
     memset(str, ' ', sizeof(str));
-    for(f_val=f_min,c=e-8; f_val <= f_max; f_val += 10*f_inc, c+=10) {
-	snprintf(number, sizeof(number), "%9.1f", f_val*SQM2KM);
-	strncpy(c, number, strlen(number));
+    for(kk=0; kk < SE_HISTO_TICKS; kk++) {
+	snprintf(number, sizeof(number), "%9.1f", (f_min +kk*10*f_inc)*SQM2KM);
+	if(!se_histo_put(str, sizeof(str), (e-8-str) +10*kk, number))
+	      break;
     }
-    *c++ = '\n'; *c++ = '\0';
+    se_histo_eol(str, sizeof(str), (e-8-str) +10*SE_HISTO_TICKS);
     ssm = se_pop_spair_string();
     strcpy(ssm->at, str);
     se_append_string(&seds->h_output, ssm);
 
     memset(str, ' ', sizeof(str));
-    for(f_val=f_min,c=e; f_val <= f_max; f_val += 10*f_inc, c+=10) {
-	*c = '|';
+    for(kk=0; kk < SE_HISTO_TICKS; kk++) {
+	if(!se_histo_put(str, sizeof(str), (e-str) +10*kk, "|"))
+	      break;
     }
-    *c++ = '\n'; *c++ = '\0';
+    se_histo_eol(str, sizeof(str), (e-str) +10*SE_HISTO_TICKS);
     ssm = se_pop_spair_string();
     strcpy(ssm->at, str);
     se_append_string(&seds->h_output, ssm);
@@ -450,12 +525,11 @@ void se_histo_fin_areas(char *name)
     f_val = seds->histo_low + 0.5 * seds->histo_increment;
 
     for(ii=0; ii < seds->histo_num_bins; ii++, f_val+=seds->histo_increment) {
-	nn = (*(seds->areas_array+ii) -f_min)/f_inc;
+	nn = se_histo_bar_len(*(seds->areas_array+ii), f_min, f_inc);
 	snprintf(str, sizeof(str), "%7.1f ", f_val); c = str +strlen(str);
 	if( nn <= 0 && *(seds->areas_array+ii) > 0 )
 	    { nn = 1; }
-	for(; nn--; *c++ = H);
-	*c++ = '\n'; *c++ = '\0';
+	se_histo_bar(str, sizeof(str), c -str, nn);
 	ssm = se_pop_spair_string();
 	strcpy(ssm->at, str);
 	se_append_string(&seds->h_output, ssm);
@@ -466,7 +540,7 @@ void se_histo_fin_areas(char *name)
 
 void se_histo_fin_counts(void)
 {
-    int ii, kk, mm, nn=0, mark, min, max, med;
+    int ii, kk, mm, nn=0, mark, min, max, med, step;
     float f, f_val, f_sum, ff_sum, f_inc, rcp_inc, f_mode, f_mean, f_sdev;
     float f_median;
     DD_TIME dts;
@@ -588,36 +662,44 @@ void se_histo_fin_counts(void)
     se_append_string(&seds->h_output, ssm);
 
     f_val = seds->histo_low + 0.5 * seds->histo_increment;
-    f_inc = (max -min)/50.;
+    f_inc = (max -min)/(double)SE_HISTO_COLS;
+    if(f_inc < 1./SE_HISTO_COLS) {
+	f_inc = 1./SE_HISTO_COLS;
+    }
+    step = 10*f_inc+.5;		/* counts between ticks, at least one */
+    if(step < 1) {
+	step = 1;
+    }
     rcp_inc = 1./f_inc;;
     snprintf(str, sizeof(str), "%8.2f ", f_val); e = str +strlen(str);
 
     memset(str, ' ', sizeof(str));
-    for(ii=min,c=e-5; ii <= max; ii += 10*f_inc+.5, c+=10) {
-	snprintf(number, sizeof(number), "%7d", ii);
-	strncpy(c, number, strlen(number));
+    for(kk=0; kk < SE_HISTO_TICKS && min +(long)kk*step <= max; kk++) {
+	snprintf(number, sizeof(number), "%7d", (int)(min +kk*step));
+	if(!se_histo_put(str, sizeof(str), (e-5-str) +10*kk, number))
+	      break;
     }
-    *c++ = '\n'; *c++ = '\0';
+    se_histo_eol(str, sizeof(str), (e-5-str) +10*kk);
     ssm = se_pop_spair_string();
     strcpy(ssm->at, str);
     se_append_string(&seds->h_output, ssm);
 
     memset(str, ' ', sizeof(str));
-    for(ii=min,c=e; ii <= max; ii += 10*f_inc +.5, c+=10) {
-	*c = '|';
+    for(kk=0; kk < SE_HISTO_TICKS && min +(long)kk*step <= max; kk++) {
+	if(!se_histo_put(str, sizeof(str), (e-str) +10*kk, "|"))
+	      break;
     }
-    *c++ = '\n'; *c++ = '\0';
+    se_histo_eol(str, sizeof(str), (e-str) +10*kk);
     ssm = se_pop_spair_string();
     strcpy(ssm->at, str);
     se_append_string(&seds->h_output, ssm);
 
     for(ii=0; ii < seds->histo_num_bins; ii++, f_val+=seds->histo_increment) {
-	nn = (*(seds->counts_array+ii) -min)/f_inc;
+	nn = se_histo_bar_len(*(seds->counts_array+ii), min, f_inc);
 	snprintf(str, sizeof(str), "%8.2f ", f_val); c = str +strlen(str);
 	if( nn <= 0 && *(seds->counts_array+ii) > 0 )
 	    { nn = 1; }
-	for(; nn--; *c++ = H);
-	*c++ = '\n'; *c++ = '\0';
+	se_histo_bar(str, sizeof(str), c -str, nn);
 	ssm = se_pop_spair_string();
 	strcpy(ssm->at, str);
 	se_append_string(&seds->h_output, ssm);
