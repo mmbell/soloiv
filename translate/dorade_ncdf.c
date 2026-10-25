@@ -1079,7 +1079,8 @@ strcat( str, "defined in segments of constant cell spacing");
     ii = nc_put_var_double( ncid, ncp->id_alt, &d );
   }
    if (dds->frib) { 
-      strncpy (str, dds->frib->file_name, sizeof (dds->frib->file_name));
+      snprintf (str, sizeof (str), "%.*s"
+                , (int)sizeof (dds->frib->file_name), dds->frib->file_name);
       ii = nc_put_var_text( ncid, frib_name_id, str );
    }
   f = swib->fixed_angle;

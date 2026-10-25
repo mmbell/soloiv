@@ -503,12 +503,12 @@ int pui_next_block(void)
       if((illegal_header_count++ % 3) == 0 ) {
 	snprintf(mess, sizeof(mess), 
 		"Illegal header id: %2x %2x %2x %2x %2x %2x rlen: %d  sizeof_read:  %ld %d"
-		, (int)gh->desc[0] & 0xff
-		, (int)gh->desc[1] & 0xff
-		, (int)gh->desc[2] & 0xff
-		, (int)gh->desc[3] & 0xff
-		, (int)gh->desc[4] & 0xff
-		, (int)gh->desc[5] & 0xff
+		, (int)aa[0] & 0xff
+		, (int)aa[1] & 0xff
+		, (int)aa[2] & 0xff
+		, (int)aa[3] & 0xff
+		, (int)aa[4] & 0xff
+		, (int)aa[5] & 0xff
 		, recordlen
 		, irq->top->sizeof_read
 		, illegal_header_count
