@@ -42,7 +42,80 @@ struct solo_sii_extras {
     long window_num;
     char attributes[256];
 };
-static struct solo_sii_extras *siiex, *sse = NULL;
+static struct solo_sii_extras *sse = NULL;
+
+/* Each record is copied into a scratch buffer this much bigger than the
+ * largest record, zero filled, so the fixed-size copies out of it stay in
+ * bounds even when the file holds an older, smaller struct.
+ */
+# define SP_REC_SLACK 4096
+# define SP_MAX_TOKENS 160	/* > tokens in a 256-char string */
+# define SCTB_LEGACY_HDR 8	/* header size the old SCTB writer counted */
+# define SP_MAX_CELL_PIX 4096	/* sane upper bound on a saved cell size */
+
+/* c------------------------------------------------------------------------ */
+
+static int sp_wds_sctb_next_ok (const char *c, const char *e)
+{
+    /* color tables are written last, one after the other */
+    return c == e || (c < e && e - c >= 4 && !strncmp (c, "SCTB", 4));
+}
+
+/* c------------------------------------------------------------------------ */
+
+long sp_wds_record_len (const char *c, const char *e, int *swapped)
+{
+    /* Length of the window-state record at c in a buffer ending at e,
+     * or 0 unless it is a sane record lying wholly inside [c, e).
+     * *swapped is set if the size only makes sense byte swapped.
+     */
+    struct solo_ctbl_header hdr;
+    unsigned char *a, *b;
+    size_t left, legacy;
+    long sos, alt;
+    int ii;
+
+    *swapped = NO;
+    if (!c || !e || c >= e)
+      { return 0; }
+    left = (size_t)(e - c);
+    if (left < sizeof (hdr))
+      { return 0; }
+    memcpy (&hdr, c, sizeof (hdr));
+    for (ii = 0; ii < 4; ii++) {
+	if (!isupper ((unsigned char)hdr.name_struct[ii]))
+	  { return 0; }
+    }
+    sos = hdr.sizeof_struct;
+
+    if (sos <= 0 || sos > MAX_REC_SIZE) {
+	a = (unsigned char *)&sos;
+	b = (unsigned char *)&alt;
+	for (ii = 0; ii < (int)sizeof (sos); ii++)
+	  { b[ii] = a[sizeof (sos) -1 -ii]; }
+	if (alt > 0 && alt <= MAX_REC_SIZE)
+	  { *swapped = YES; }
+	return 0;
+    }
+    if (strncmp (hdr.name_struct, "SCTB", 4)) {
+	if (sos < (long)sizeof (struct solo_generic_window_struct) ||
+	    (size_t)sos > left)
+	  { return 0; }
+	return sos;
+    }
+    /* Color tables. Older writers counted an 8-byte header although they
+     * wrote sizeof (hdr) bytes of it, so their records run longer than
+     * they say; accept either as long as the next record lines up.
+     */
+    if ((size_t)sos >= sizeof (hdr) && (size_t)sos <= left &&
+	sp_wds_sctb_next_ok (c + sos, e))
+      { return sos; }
+    legacy = (size_t)sos + sizeof (hdr) - SCTB_LEGACY_HDR;
+    if (legacy >= sizeof (hdr) && legacy <= left &&
+	sp_wds_sctb_next_ok (c + legacy, e))
+      { return (long)legacy; }
+    return 0;
+}
 
 /* c------------------------------------------------------------------------ */
 
@@ -54,8 +127,11 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
     unsigned long gdsos, ppsos, gww;
     size_t len, lenx;
     FILE *stream;
-    char *a, *b, *c, *buf, *e, str[256], mess[512], atts[256], *sptrs[32];
-    char *cbuf, *aa, *bb, *cc;
+    char *a, *b, *c, *buf, *e, str[256], mess[512], atts[256];
+    char *sptrs[SP_MAX_TOKENS], *cbuf, *aa, *bb, *cc, *at, *rec;
+    long step, po;
+    int swapped;
+    struct solo_sii_extras sxtr;
     struct solo_generic_window_struct *gws, gwx;
     struct point_in_space pisp;
     struct solo_view_info view;
@@ -65,7 +141,7 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
     SiiFrameConfig *sfc;
     sii_table_parameters stp;
     gchar *png_dir;
-    char *aptrs[16];
+    char *aptrs[SP_MAX_TOKENS];
     int na, nt, nc, h_frames, v_frames, solo_width=372;
     int h_default, v_default;
     double d;
@@ -86,7 +162,6 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 
 
     spi = solo_return_winfo_ptr();
-    for(kk=0; kk < SOLO_MAX_WINDOWS; spi->active_windows[kk++] = NO);
 
     slash_path(str, dir);
     if(strncmp("wds", fname, 3)) {
@@ -104,58 +179,74 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 	return(-1);
     }
     ii = fseek(stream, 0L, (int)2); /* at end of file */
-    len = ftell(stream);	/* how big is the file */
+    lenx = ftell(stream);	/* how big is the file */
     rewind(stream);
-        
-    c = buf = (char *)malloc(len);
-    memset (c, 0, len);
-    if((lenx = fread(buf, sizeof(char), len, stream)) < len) {
-	mark = 0;
-	/* complain */
+
+    if (ii || (long)lenx <= 0 ||
+	!(buf = (char *)malloc(lenx))) {
+	snprintf(mess, sizeof(mess), "Unable to read frame state file %s\n", str);
+	sii_message(mess);
+	fclose(stream);
+	return(-1);
     }
+    len = fread(buf, sizeof(char), lenx, stream);
     fclose(stream);
-    e = c+len;
-    sii_reset_config_cells ();
+    e = buf +len;
     gws = &gwx;
 
-    /* count the number of frames
+    /* Check the whole chain of records before changing anything, and
+     * count the number of frames.
      */
-    for(c = buf;;) {
-	memcpy (&gwx, c, sizeof (struct solo_generic_window_struct));
-	gdsos = gws->sizeof_struct;
-	gww = gws->window_num;
-
-	if(gdsos > MAX_REC_SIZE) {
-	   gottaSwap = YES;
-	   swack4(&gws->sizeof_struct, &gdsos);
-	   swack4(&gws->window_num, &gww);
+    for(at = buf; at < e; at += step) {
+	step = sp_wds_record_len (at, e, &swapped);
+	if (!step) {
+	    if (swapped)
+	      { snprintf(mess, sizeof(mess)
+		  , "**** %s is byte swapped; it can not be read here ****\n"
+		  , fname); }
+	    else
+	      { snprintf(mess, sizeof(mess)
+		  , "**** %s: bad record at byte %ld; not restored ****\n"
+		  , fname, (long)(at - buf)); }
+	    sii_message(mess);
+	    free(buf);
+	    return(-1);
 	}
-	if(!strncmp(c, "SSFI", 4)) { /* sweep file info */
+	if(strncmp(at, "SPAL", 4) && strncmp(at, "SCTB", 4)) {
+	    memcpy (&gwx, at, sizeof (struct solo_generic_window_struct));
+	    if (gwx.window_num < 0 || gwx.window_num >= SOLO_MAX_WINDOWS) {
+		snprintf(mess, sizeof(mess)
+		  , "**** %s: bad window number %ld at byte %ld; not restored ****\n"
+		  , fname, gwx.window_num, (long)(at - buf));
+		sii_message(mess);
+		free(buf);
+		return(-1);
+	    }
+	}
+	if(!strncmp(at, "SSFI", 4)) { /* sweep file info */
 	    frame_count++;
 	}
-	c += gdsos; 
-	if(c >= e) {
-	    break;
-	}
-	if(count > 1000) {
-	    mark = 0;
-	    break;
-	}
     }
+
+    if (!(rec = (char *)malloc(MAX_REC_SIZE +SP_REC_SLACK))) {
+	free(buf);
+	return(-1);
+    }
+    for(kk=0; kk < SOLO_MAX_WINDOWS; spi->active_windows[kk++] = NO);
+    sii_reset_config_cells ();
 
     /* read in window info
      */
-    for(c = buf;;) {
+    for(at = buf; at < e; at += step) {
 	count++;
+	step = sp_wds_record_len (at, e, &swapped);
+	/* work on a zero-padded copy of the record */
+	memcpy (rec, at, step);
+	memset (rec +step, 0, MAX_REC_SIZE +SP_REC_SLACK -step);
+	c = rec;
 	memcpy (&gwx, c, sizeof (struct solo_generic_window_struct));
 	gdsos = gws->sizeof_struct;
 	gww = gws->window_num;
-
-	if(gdsos > MAX_REC_SIZE) {
-	   gottaSwap = YES;
-	   swack4(&gws->sizeof_struct, &gdsos);
-	   swack4(&gws->window_num, &gww);
-	}
 
 	if(!strncmp(c, "SPAL", 4)) { /* color palette info */
 	    pcount++;
@@ -163,7 +254,7 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 	       sp_crack_spal(c, &spal, (int)0);
 	    }
 	    else {
-	       memcpy(&spal, c, gdsos);
+	       memcpy(&spal, c, MIN (gdsos, sizeof (spal)));
 	    }
 	    /* turn the old style palette into an sii palette
 	     *
@@ -171,14 +262,20 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 	    sii_param_dup_opal (&spal);
 	}
 	else if(!strncmp(c, "SCTB", 4)) { /* ascii color table */
-	  nn = gdsos -8;
+	  /* the text follows the header; step, not gdsos, is the true
+	   * length of an old-style record */
+	  nn = step -sizeof (struct solo_ctbl_header);
 	  cbuf = (char *)malloc (nn+1);
-	  memcpy (cbuf, c+8, nn);
-	  strncpy (str, c+8, 80);
+	  memcpy (cbuf, c +sizeof (struct solo_ctbl_header), nn);
+	  strncpy (str, c +sizeof (struct solo_ctbl_header), 80);
 	  cbuf[nn] = str[80] = '\0';
 	  nt = dd_tokens (str, sptrs); /* color table name is second token */
-	  put_ascii_color_table (sptrs[1], cbuf);
-	  sii_new_color_tables_list ();
+	  if (nt > 1) {
+	     put_ascii_color_table (sptrs[1], cbuf);
+	     sii_new_color_tables_list ();
+	  }
+	  else
+	    { free (cbuf); }
 	}
 	else if(!strncmp(c, "SSFI", 4)) { /* sweep file info */
 	  if(!ignore_swpfi_info) {
@@ -295,13 +392,22 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 	    wwptr->view->sizeof_struct = sizeof(struct solo_view_info);
 	    wwptr->view->changed = YES;
 
-	    b = c +wwptr->view->offset_to_pisps;
+	    /* the points follow the view struct, inside the record */
+	    po = wwptr->view->offset_to_pisps;
+	    b = c +po;
 	    for(ii=0; ii < wwptr->view->num_pisps; ii++) {
+		if (po < 0 || po +(long)sizeof (pisp.name_struct)
+		    +(long)sizeof (pisp.sizeof_struct) > (long)gdsos)
+		  { break; }
 	        memcpy (&pisp, b, sizeof (pisp));
 		ppsos = pisp.sizeof_struct;
 		if( gottaSwap ) {
 		   swack4(&pisp.sizeof_struct, &ppsos);
 		}
+		if (pisp.sizeof_struct <= 0 || po +(long)ppsos > (long)gdsos)
+		  { break; }
+		pisp.id[sizeof (pisp.id) -1] = '\0';
+		ppsos = MIN (ppsos, sizeof (pisp));
 		if(strstr(pisp.id, "SOL_RAD_LOC")) {
 		    a = (char *)wwptr->radar_location;
 		}
@@ -322,7 +428,8 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 		      memcpy(a, b, ppsos);
 		   }
 		}
-		b += ppsos;
+		b += pisp.sizeof_struct;
+		po += pisp.sizeof_struct;
 	    }
 	    /* extract and setup the configuration info
 	     */
@@ -332,18 +439,34 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 	      stp.right_attach =  nn % 10; nn /= 10;
 	      stp.left_attach =   nn % 10; nn /= 10;
 	    
-	      mm = stp.right_attach - stp.left_attach;
-	      nn = stp.bottom_attach - stp.top_attach;
-
-	      if (gww == 0) {
-		sii_table_widget_width = wwptr->view->width_in_pix/mm;
-		sii_table_widget_height = wwptr->view->height_in_pix/nn;
+	      if (nn || stp.left_attach >= stp.right_attach ||
+		  stp.right_attach > maxConfigCols ||
+		  stp.top_attach >= stp.bottom_attach ||
+		  stp.bottom_attach > maxConfigRows) {
+		 snprintf(mess, sizeof(mess)
+		   , "Frame %ld: bad layout %ld ignored\n", (long)gww +1
+		   , wwptr->view->frame_config);
+		 sii_message(mess);
 	      }
-	      ii = stp.top_attach * maxConfigCols;
-	      for (; nn--; ii += maxConfigCols) {
-		jj = ii +stp.left_attach;
-		kk = jj +mm;
-		for (; jj < kk ; config_cells[jj++]->frame_num = gww+1);
+	      else {
+		 mm = stp.right_attach - stp.left_attach;
+		 nn = stp.bottom_attach - stp.top_attach;
+
+		 if (gww == 0 && wwptr->view->width_in_pix > 0 &&
+		     wwptr->view->height_in_pix > 0 &&
+		     wwptr->view->width_in_pix/mm <= SP_MAX_CELL_PIX &&
+		     wwptr->view->height_in_pix/nn <= SP_MAX_CELL_PIX) {
+		    /* the saved cell size; sii_new_frames() asks for it */
+		    sii_table_widget_width = wwptr->view->width_in_pix/mm;
+		    sii_table_widget_height = wwptr->view->height_in_pix/nn;
+		    sii_check_def_widget_sizes ();
+		 }
+		 ii = stp.top_attach * maxConfigCols;
+		 for (; nn--; ii += maxConfigCols) {
+		    jj = ii +stp.left_attach;
+		    kk = jj +mm;
+		    for (; jj < kk ; config_cells[jj++]->frame_num = gww+1);
+		 }
 	      }
 	    }
 	    else if (!new_config)
@@ -414,8 +537,9 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 	}
 	else if(!strncmp(c, "SXTR", 4)) { /* new sii options */
 	    wwptr = solo_return_wwptr(gww);
-	    siiex = (struct solo_sii_extras*)c;
-	    memcpy (atts, siiex->attributes, sizeof (siiex->attributes));
+	    memcpy (&sxtr, c, sizeof (sxtr));
+	    memcpy (atts, sxtr.attributes, sizeof (sxtr.attributes));
+	    atts[sizeof (atts) -1] = '\0';
 	    na = dd_tokenz (atts, sptrs, ";");	/* pointers to attributes */
 
 	    for (ii = 0; ii < na; ii++) {
@@ -426,13 +550,15 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 	       else if (strstr (a, "SWPFLT")) { /* swpfi filter */
 		  wwptr->swpfi_filter_set = gww +1;
 		  nt = dd_tokenz (a, aptrs, ": \t\n,");
-		  jj = sscanf (aptrs[1], "%f", &wwptr->filter_fxd_ang);
-		  jj = sscanf (aptrs[2], "%f", &wwptr->filter_tolerance);
+		  if (nt > 1)
+		    { jj = sscanf (aptrs[1], "%f", &wwptr->filter_fxd_ang); }
+		  if (nt > 2)
+		    { jj = sscanf (aptrs[2], "%f", &wwptr->filter_tolerance); }
 		  b = wwptr->filter_scan_modes;
 		  *b = '\0';
 		  for (kk=3; kk < nt; kk++) {
-		     strcat (b, aptrs[kk]);
-		     strcat (b, ",");
+		     g_strlcat (b, aptrs[kk], sizeof (wwptr->filter_scan_modes));
+		     g_strlcat (b, ",", sizeof (wwptr->filter_scan_modes));
 		  }
 	       }
 	       else if (strstr (a, "CB_LOC")) { /* color bar location */
@@ -454,16 +580,8 @@ int solo_absorb_window_info (const char *dir, const char *fname, int ignore_swpf
 	else {
 	    mark = 0;
 	}
-
-	c += gdsos; memcpy (str, c, 255); str[255] = '\0';
-	if(c >= e) {
-	    break;
-	}
-	if(count > 1000) {
-	    mark = 0;
-	    break;
-	}
     }
+    free(rec);
     free(buf);
 
     /* setup the from the old configuration if config_count > 0

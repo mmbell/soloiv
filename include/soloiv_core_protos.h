@@ -79,11 +79,12 @@ void sii_set_default_colors(void);
 void set_all_X_named_colors(void);
 
 /* sii_config_stuff.c */
-void sii_check_for_illegal_shrink(void);
 void sii_check_def_widget_sizes(void);
 void sii_init_frame_configs(void);
 void sii_reset_config_cells(void);
 void sii_new_frames(void);
+void sii_apply_table_allocation(int width, int height);
+void sii_schedule_table_allocation(int width, int height);
 
 /* sii_edit_widgets.c */
 void se_invalidate_read_caches(unsigned int frame_num);
@@ -124,8 +125,6 @@ int sii_png_image(char *fname);
 
 /* solo2.c */
 void sii_png_image_prep(char *dir);
-void sii_reset_reconfig_flags(int frame_num);
-void sii_reset_reconfig_count(int frame_num);
 int d_inSector(double ang, double ang1, double ang2);
 int se_dump_sfic_widget(struct swp_file_input_control *sfic, int frame_num);
 void sii_check_colors(void);
@@ -144,7 +143,6 @@ void se_clear_segments(int frame_num);
 void se_erase_segments(int frame_num, int num_points, struct bnd_point_mgmt *bpm);
 void se_draw_segments(int frame_num, int num_points, struct bnd_point_mgmt *bpm);
 void sp_do_lock_color(int frame);
-void sii_recalc_default_frame(void);
 void uii_printf(char *message, ...);
 void solo_message(char *message, ...);
 void solo_def_params(struct dd_general_info *dgi, int *list, int num_parms);
@@ -265,6 +263,7 @@ void slm_list_ui(struct solo_list_mgmt *slm);
 
 /* sp_save_frms.c */
 int solo_absorb_window_info(const char *dir, const char *fname, int ignore_swpfi_info);
+long sp_wds_record_len(const char *c, const char *e, int *swapped);
 void solo_save_window_info(const char *dir, const char *a_comment);
 
 /* sp_dorade.c */

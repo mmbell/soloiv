@@ -2,6 +2,7 @@
 
 # include "soloii.h"
 # include "sii_externals.h"
+# include <sii_enums.h>
 
 static gchar *def_param_names[] =
 { "DZ", "VE", "NCP", "SW", "DM", "ZDR", "LDR", "PHIDP", "RHOHV", "DX",
@@ -10,27 +11,6 @@ static gchar *def_param_names[] =
 /* c---------------------------------------------------------------------- */
 
 /* c---------------------------------------------------------------------- */
-
-/* c---------------------------------------------------------------------- */
-
-void sii_check_for_illegal_shrink(void)
-{
-  SiiFrameConfig *sfc = frame_configs[0];
-  sii_table_parameters *stp;
-  gint jj, mm;
-  gdouble d;
-
-  for (jj=0; jj < sii_return_frame_count(); jj++) {
-    if (frame_configs[jj]->reconfig_count)
-      { return; }
-    /* don't do anything in the middle of a reconfig */
-  }
-  stp = &sfc->tbl_parms;
-  mm = stp->right_attach - stp->left_attach;
-  d = (gdouble)sfc->width/mm;
-  if (d < sii_table_widget_width)
-    { sii_new_frames (); }
-}
 
 /* c---------------------------------------------------------------------- */
 
@@ -108,6 +88,159 @@ void sii_reset_config_cells(void)
 
 /* c---------------------------------------------------------------------- */
 
+/*
+ * Drag-resize.
+ *
+ * The frames expand to fill the window, so dragging its edge changes the
+ * allocation of the frame table. Each drawing area's "resize" handler only
+ * records the table's new size here and (re)starts one debounce timeout;
+ * when the allocation has settled sii_apply_table_allocation() divides it
+ * across the layout and replots each frame once. Nothing is plotted or
+ * rebuilt from the resize or draw callbacks themselves.
+ *
+ * After sii_new_frames() the new frames have not been plotted yet; their
+ * first allocation settles from an idle instead of the timeout.
+ */
+# define TABLE_SETTLE_MS 150
+
+static guint table_settle_source = 0;
+static gint pending_table_width = 0;
+static gint pending_table_height = 0;
+static gint applied_table_width = 0;
+static gint applied_table_height = 0;
+static gboolean frames_need_plot = FALSE;
+
+/* c---------------------------------------------------------------------- */
+
+void sii_apply_table_allocation(int width, int height)
+{
+  SiiFrameConfig *sfc, *sfc0 = frame_configs[0];
+  sii_table_parameters *stp;
+  guint fn, mm, nn, ncols, nrows, cell_w, cell_h;
+
+  if (width <= 0 || height <= 0 || !sii_frame_count || !sfc0)
+    { return; }
+
+  applied_table_width = width;
+  applied_table_height = height;
+
+  ncols = (sfc0->ncols) ? sfc0->ncols : 1;
+  nrows = (sfc0->nrows) ? sfc0->nrows : 1;
+
+  /* cell size: a multiple of 4, no smaller than the default minimum */
+  cell_w = ((guint)width / ncols / 4) * 4;
+  cell_h = ((guint)height / nrows / 4) * 4;
+  if (cell_w < DEFAULT_WIDTH)
+    { cell_w = DEFAULT_WIDTH; }
+  if (cell_h < DEFAULT_HEIGHT)
+    { cell_h = DEFAULT_HEIGHT; }
+
+  if (!frames_need_plot && cell_w == sii_table_widget_width &&
+      cell_h == sii_table_widget_height)
+    { return; }
+
+  frames_need_plot = FALSE;
+  sii_table_widget_width = cell_w;
+  sii_table_widget_height = cell_h;
+
+  /* Resize every frame in place before plotting any of them. The view's
+   * center and magnification are untouched, so each frame shows more or
+   * less area at the same scale. */
+  for (fn = 0; fn < sii_frame_count; fn++) {
+    sfc = frame_configs[fn];
+    stp = &sfc->tbl_parms;
+    mm = stp->right_attach - stp->left_attach;
+    nn = stp->bottom_attach - stp->top_attach;
+
+    sfc->width = sfc->data_width = mm * cell_w;
+    sfc->height = sfc->data_height = nn * cell_h;
+    sfc->config_sync_num = sii_inc_master_seq_num ();
+    sii_check_image_size (fn);
+    sfc->colorize_count = 0;
+    sii_update_frame_info (fn);
+  }
+
+  for (fn = 0; fn < sii_frame_count; fn++) {
+    sii_plot_data2 (fn, REPLOT_THIS_FRAME);
+    if (frame_configs[fn]->frame)
+      { gtk_widget_queue_draw (frame_configs[fn]->frame); }
+  }
+}
+
+/* c---------------------------------------------------------------------- */
+
+gboolean sii_table_settle_cb(gpointer data)
+{
+  table_settle_source = 0;
+
+  if (solo_busy ()) {		/* a plot is under way; try again later */
+    table_settle_source =
+      g_timeout_add (TABLE_SETTLE_MS, sii_table_settle_cb, NULL);
+    return G_SOURCE_REMOVE;
+  }
+  sii_apply_table_allocation (pending_table_width, pending_table_height);
+  return G_SOURCE_REMOVE;
+}
+
+/* c---------------------------------------------------------------------- */
+
+void sii_schedule_table_allocation(int width, int height)
+{
+  if (width <= 0 || height <= 0)
+    { return; }
+
+  pending_table_width = width;
+  pending_table_height = height;
+
+  if (table_settle_source) {
+    g_source_remove (table_settle_source);
+    table_settle_source = 0;
+  }
+  /* Back at the size already applied (or re-allocated at the same size,
+   * e.g. after the window's default size was set to fit): nothing to do. */
+  if (!frames_need_plot && width == applied_table_width &&
+      height == applied_table_height)
+    { return; }
+
+  if (frames_need_plot)
+    { table_settle_source = g_idle_add (sii_table_settle_cb, NULL); }
+  else
+    { table_settle_source =
+	g_timeout_add (TABLE_SETTLE_MS, sii_table_settle_cb, NULL); }
+}
+
+/* c---------------------------------------------------------------------- */
+
+/* Ask for a window size that fits a width x height frame table. GTK4 on a
+ * mapped, resizable window honors a new default size (it resizes the
+ * window, growing or shrinking it), which is how the Zoom, Shape and
+ * layout menus resize the window. */
+
+static void sii_fit_window_to_table (gint width, gint height)
+{
+  GtkWidget *child;
+  gint min, nat, chrome = 0;
+
+  if (!main_window || !main_vbox)
+    { return; }
+
+  /* everything stacked above/below the frame table (the menubar) */
+  for (child = gtk_widget_get_first_child (main_vbox); child;
+       child = gtk_widget_get_next_sibling (child)) {
+    if (child == main_event_box || !gtk_widget_get_visible (child))
+      { continue; }
+    gtk_widget_measure (child, GTK_ORIENTATION_VERTICAL, -1,
+			&min, &nat, NULL, NULL);
+    chrome += nat;
+  }
+  if (gtk_window_is_maximized (GTK_WINDOW (main_window)))
+    { gtk_window_unmaximize (GTK_WINDOW (main_window)); }
+  gtk_window_set_default_size (GTK_WINDOW (main_window),
+			       width, height + chrome);
+}
+
+/* c---------------------------------------------------------------------- */
+
 void sii_new_frames(void)
 {
    int fn, jj, kk, mm, nn, width, height;
@@ -139,8 +272,6 @@ void sii_new_frames(void)
   for (fn=0; fn < sii_frame_count; fn++ ) {
 
     sfc = frame_configs[fn];
-    sfc->local_reconfig = TRUE;
-    sfc->drag_resize_count = 0;
     ++sfc->new_frame_count;
 
     sfc->frame = gtk_drawing_area_new ();
@@ -158,19 +289,20 @@ void sii_new_frames(void)
     sfc->height = sfc->data_height = height;
     sii_check_image_size (fn);
 
-    gtk_widget_set_size_request (frame, width, height);
+    /* Only a minimum size: the frames expand to fill the window, and the
+     * settled allocation sets their real size (sii_apply_table_allocation). */
+    gtk_widget_set_size_request (frame, mm * DEFAULT_WIDTH,
+				 nn * DEFAULT_HEIGHT);
+    gtk_widget_set_hexpand (frame, TRUE);
+    gtk_widget_set_vexpand (frame, TRUE);
 
     /* --- Draw function --- */
     gtk_drawing_area_set_draw_func (GTK_DRAWING_AREA (frame),
 				    sii_frame_draw_func, GINT_TO_POINTER(fn), NULL);
 
-    /* NOTE: GtkDrawingArea has a "resize" signal that ought to feed
-     * sii_frame_resize_cb so that drag-resize updates the cached image
-     * dimensions. Connecting it triggers a re-entrant repaint via
-     * sii_plot_data2 inside snapshot, which crashes GTK's CSS pipeline.
-     * Until that is properly sequenced, we leave resize unhooked and
-     * disable window resize (see sii_set_main_window_resizable below)
-     * — users use the Zoom menu to change size. */
+    /* --- Allocation changes: record and debounce, never plot here --- */
+    g_signal_connect (frame, "resize",
+		      G_CALLBACK (sii_frame_resize_cb), GINT_TO_POINTER(fn));
 
     /* --- GtkGestureClick for button press --- */
     gesture = gtk_gesture_click_new ();
@@ -211,11 +343,17 @@ void sii_new_frames(void)
 
   }
    gtk_widget_set_visible (main_table, TRUE);
-   gtk_widget_set_visible (main_window, TRUE);
 
-   /* Reset window default size so it can shrink on zoom-out */
-   gtk_window_set_default_size (GTK_WINDOW (main_window), 1, 1);
-   nn = 0;
+   /* The new frames are plotted once their first allocation settles. */
+   frames_need_plot = TRUE;
+   applied_table_width = applied_table_height = 0;
+   if (table_settle_source) {
+      g_source_remove (table_settle_source);
+      table_settle_source = 0;
+   }
+   sii_fit_window_to_table (MAX (sfc0->ncols, 1) * sii_table_widget_width,
+			    MAX (sfc0->nrows, 1) * sii_table_widget_height);
+   gtk_widget_set_visible (main_window, TRUE);
 }
 
 /* c---------------------------------------------------------------------- */
@@ -300,8 +438,6 @@ gboolean sii_set_config(void)
 	frame_configs[jj]->tbl_parms = tbl_parms[jj];
 	frame_configs[jj]->ncols = ncols;
 	frame_configs[jj]->nrows = nrows;
-	frame_configs[jj]->local_reconfig = TRUE;
-	frame_configs[jj]->reconfig_count = 0;
 
 	/* Fix this! */
 	frame_configs[jj]->lock_step = jj;

@@ -504,6 +504,14 @@ struct solo_generic_window_struct {
 
 typedef struct solo_generic_window_struct *GWS_PTR;
 
+/* Header of an ascii color table ("SCTB") record in a window-state file.
+ * The table's text follows the header and sizeof_struct counts both.
+ */
+struct solo_ctbl_header {
+    char name_struct[4];	/* "SCTB" */
+    long sizeof_struct;
+};
+
 /*
  * most of these descriptors here are meant to go in a
  * save solo window info file

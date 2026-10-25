@@ -27,7 +27,6 @@ typedef struct { gint x, y; } GdkPoint;
 # define maxConfigCols 4
 # define maxConfigCells maxConfigRows*maxConfigCols
 # define maxLinkSets 16
-# define CFG_QUE_SIZE 3
 
 # define GDK_COLOR_NORM 0xffff
 # define TASK_MODULO 100
@@ -97,9 +96,6 @@ typedef enum {				/* top level window ids for each frame */
 
 } sii_TopLevelWwindowIds;
 
-static const int FrameDragResize = 0x1;
-static const int FrameDragAdjust = 0x2;
-static const int FrameZoomResize = 0x4;
 static const int FrameNewConfig  = 0x8;
 static const int FrameReshape    = 0x10;
 
@@ -236,18 +232,17 @@ typedef struct {		/* frame info */
 
   gboolean blow_up;
   gboolean changed;
-  gboolean local_reconfig;
   guint width;
   guint height;
   guint data_width;
   guint data_height;
   guint lock_step;
   guint sync_num;
-  gint reconfig_count;
   gint expose_count;
   gint prev_expose_num;
   gint new_frame_count;
   gint colorize_count;
+  guint plot_request_count;	/* displayq requests via sii_plot_data2 */
   gint max_lbl_wdt;
   gint big_max_lbl_wdt;
   gint points_in_bnd;
@@ -318,16 +313,7 @@ typedef struct {		/* frame info */
   guint max_big_image_size;
   guint big_image_show_count;
 
-  guint cfg_que_ndx;
-  guint cfg_width[CFG_QUE_SIZE];
-  guint cfg_height[CFG_QUE_SIZE];
-
   guint config_sync_num;
-  guint drag_resize_count;
-  guint expose_sync_num;
-  gint reconfig_flag;
-  gint x_drag_ref;
-  gint y_drag_ref;
 
   /* Stored allocation info (replaces direct widget->allocation access) */
   gint alloc_width;

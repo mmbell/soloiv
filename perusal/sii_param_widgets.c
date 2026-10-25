@@ -450,20 +450,23 @@ int sii_param_dump_ctbls (FILE *stream)
   GSList *gsl = color_table_names;
   static GString *gs = NULL;
   gchar mess[256], *aa, *bb;
-  struct gen_dsc {
-    char name_struct[4];
-    long sizeof_struct;
-  };
-  struct gen_dsc gd;
+  struct solo_ctbl_header gd;
   size_t nn, len;
   
+  memset (&gd, 0, sizeof (gd));
   strncpy (gd.name_struct, "SCTB", 4);
 
   for(; gsl; gsl = gsl->next) {
     aa = (gchar *)gsl->data;
     bb = (gchar *)g_tree_lookup (ascii_color_tables, (gpointer)aa);
     len = strlen (bb);
-    gd.sizeof_struct = 8 + len;
+    /* the size counts the whole header (16 bytes on LP64), not 8 */
+    gd.sizeof_struct = sizeof (gd) + len;
+    if (gd.sizeof_struct > MAX_REC_SIZE) {
+	snprintf(mess, sizeof(mess), "Color table %s too big to save\n", aa);
+	solo_message(mess);
+	continue;
+    }
     if((nn = fwrite(&gd, sizeof(char), sizeof(gd), stream))
 	   < sizeof(gd))
       {

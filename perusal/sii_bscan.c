@@ -359,7 +359,6 @@ int sp_ts_data_loop(struct ts_linked_frames *tsLink0, struct unique_sweepfile_in
    for(tsl=tsLink0;  tsl;  tsl=tsl->next) {
       ww = tsl->wwptr->window_num;
       sii_xfer_images(ww, 0);	
-      sii_reset_reconfig_flags(ww);
    }
 
    return(0);
