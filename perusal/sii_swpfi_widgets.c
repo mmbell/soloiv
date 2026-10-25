@@ -221,7 +221,7 @@ gint sii_return_filter_info (gint frame_num, char *scan_modes
     { ok = 0; }
 
   if (!ok) {
-    sprintf (str, "Unusable swpfi filter info for frame %d", frame_num);
+    snprintf (str, sizeof(str), "Unusable swpfi filter info for frame %d", frame_num);
     sii_message (str);
   }
   return ok;

@@ -151,7 +151,7 @@ void sii_new_frames(void)
 
     width = mm * sii_table_widget_width;
     height = nn * sii_table_widget_height;
-    sprintf (str, "new_frame %d  %dx%d", fn, width, height );
+    snprintf (str, sizeof(str), "new_frame %d  %dx%d", fn, width, height );
     sii_append_debug_stuff (str);
 
     sfc->width = sfc->data_width = width;

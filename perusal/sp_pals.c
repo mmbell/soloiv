@@ -152,7 +152,7 @@ struct solo_palette_ptr *xsolo_get_palette(char *name, int frme)
 # endif
 	pal->user_ww[frme] = YES;
 	pal = solo_push_palette(pal);
-	sprintf(mess, "Generated palette for %s\n", name);
+	snprintf(mess, sizeof(mess), "Generated palette for %s\n", name);
 	solo_message(mess);
     }
     return(pal);
@@ -557,7 +557,7 @@ void solo_palette_message(int frme)
 
     wwptr = solo_return_wwptr(frme);
     half = (float)wwptr->palette->num_colors*.5*wwptr->palette->increment;
-    sprintf(wwptr->palette->message, "%ld Colors  %.2f < %.2f     "
+    snprintf(wwptr->palette->message, sizeof(wwptr->palette->message), "%ld Colors  %.2f < %.2f     "
 	    , wwptr->palette->num_colors
 	    , wwptr->palette->center-half+.001
 	    , wwptr->palette->center+half+.001

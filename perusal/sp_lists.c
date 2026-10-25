@@ -103,7 +103,7 @@ int solo_get_files(char *dir, struct solo_list_mgmt *lm)
     lm->num_entries = 0;
 
     if(!(dir_ptr = opendir(dir))) {
-	sprintf(mess, "Cannot open directory %s\n", dir);
+	snprintf(mess, sizeof(mess), "Cannot open directory %s\n", dir);
 	solo_message(mess);
 	return(-1);
     }

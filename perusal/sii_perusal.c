@@ -112,7 +112,7 @@ int displayq(int click_frme, int command)
 	return(ii);
     }
 
-    sprintf (mess, "Enter displayq(%d,%d)", click_frme, command);
+    snprintf (mess, sizeof(mess), "Enter displayq(%d,%d)", click_frme, command);
     sii_append_debug_stuff (mess);
     solo_set_busy_signal();
     sp_change_cursor(NO);
@@ -987,7 +987,7 @@ int solo_nab_next_file(int frme, int file_action, int version, int sweep_skip, i
 	ddir_rescan_urgent(frme);
     }
     if((n = mddir_file_list_v3(frme, wwptr->sweep->directory_name)) < 1 ) {
-	sprintf(mess, "Directory %s contains no sweep files\n"
+	snprintf(mess, sizeof(mess), "Directory %s contains no sweep files\n"
 		  , wwptr->sweep->directory_name);
 	g_message ("%s", mess);
 	return(NO);
@@ -995,7 +995,7 @@ int solo_nab_next_file(int frme, int file_action, int version, int sweep_skip, i
     if((wwptr->sweep->radar_num =
 	mddir_radar_num_v3(frme, wwptr->sweep->radar_name)) < 0)
 	  {
-	     sprintf(mess, "No sweep files for radar %s\n"
+	     snprintf(mess, sizeof(mess), "No sweep files for radar %s\n"
 		     , wwptr->sweep->radar_name);
 	     g_message ("%s", mess);
 	     return(NO);
@@ -1061,7 +1061,7 @@ int solo_nab_next_file(int frme, int file_action, int version, int sweep_skip, i
 	   wwptr->d_sweepfile_time_stamp) {
 				/* last sweep in the directory
 				 * for this radar */
-	  sprintf(mess, "Sweep list exhausted for frame: %d\n", frme);
+	  snprintf(mess, sizeof(mess), "Sweep list exhausted for frame: %d\n", frme);
 
 # ifdef fixme
 	  mark = sp_batch_mode();
@@ -1208,13 +1208,13 @@ int solo_parameter_setup(int frme)
 	  }
     if(pnum < 0 ) {
 	wwptr->parameter->changed = YES;
-	sprintf(mess, "Parameter %s does not exist in this sweep"
+	snprintf(mess, sizeof(mess), "Parameter %s does not exist in this sweep"
 		, wwptr->parameter->parameter_name);
 	g_message ("%s", mess);
 	if(dgi->num_parms < 1) {
 	    /* nothing to substitute, and the modulo below would divide by
 	     * zero */
-	    sprintf(mess, "Sweep has no fields; cannot plot\n");
+	    snprintf(mess, sizeof(mess), "Sweep has no fields; cannot plot\n");
 	    g_message ("%s", mess);
 	    return(NO);
 	}
@@ -1222,7 +1222,7 @@ int solo_parameter_setup(int frme)
 	str_terminate
 	      (wwptr->parameter->parameter_name
 	       , dgi->dds->parm[pnum]->parameter_name, 8);
-	sprintf(mess, "Substituting %s"
+	snprintf(mess, sizeof(mess), "Substituting %s"
 		, wwptr->parameter->parameter_name);
 	g_message ("%s", mess);
     }

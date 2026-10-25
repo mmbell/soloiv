@@ -218,7 +218,7 @@ void se_refresh_examine_list(int frame_num, struct solo_list_mgmt  *slm)
      { lim = slm->num_entries; }
    else {
       lim = xmd->max_possible_cells-8;
-      sprintf (str, "Max lines:%d Lines needed:%d"
+      snprintf (str, sizeof(str), "Max lines:%d Lines needed:%d"
 	       , xmd->max_possible_cells, slm->num_entries);
       sii_message (str);
    }
@@ -755,11 +755,11 @@ void sii_exam_menu_cb ( GtkWidget *w, gpointer   data )
 
       value = (nn +2) * xmd->label_height +1;
 
-      sprintf (str, "%d", nn);
+      snprintf (str, sizeof(str), "%d", nn);
       gtk_editable_set_text (GTK_EDITABLE (xmd->data_widget[EXAM_CELL]), str);
 
       ff = xmd->r0_km + nn * xmd->gs_km;
-      sprintf (str, "%.2f", ff);
+      snprintf (str, sizeof(str), "%.2f", ff);
       gtk_editable_set_text (GTK_EDITABLE (xmd->data_widget[EXAM_RANGE]), str);
 
       gtk_adjustment_set_value (adj, value);
@@ -1057,7 +1057,7 @@ void sii_exam_widget( guint frame_num )
   gtk_grid_attach (GTK_GRID (table), entry, 3, row, 1, 1);
 
   row++;
-  sprintf (str, "%.3f", xmdata->r0_km );
+  snprintf (str, sizeof(str), "%.3f", xmdata->r0_km );
   label = gtk_label_new ( " Range " );
   gtk_grid_attach (GTK_GRID (table), label, 0, row, 1, 1);
 
@@ -1270,7 +1270,7 @@ void sii_exam_widget( guint frame_num )
 
   for (mm=0; mm < nn; mm++ ) {
      ch = A + (mm % 26);
-     sprintf (str, "%3d.", mm);
+     snprintf (str, sizeof(str), "%3d.", mm);
      memset (str+strlen(str), ch, len-strlen(str));
 
      /* GTK4: GtkEventBox removed; any widget can receive events */

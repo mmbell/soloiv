@@ -542,7 +542,7 @@ gchar *sii_set_string_from_vals (GString *gs, guint nvals,
    gchar fmt[64], prec[16];
 
    g_string_truncate (gs, 0);
-   sprintf (prec, ".%df", precision);
+   snprintf (prec, sizeof(prec), ".%df", precision);
    strcpy (fmt, "%");
    strcat (fmt, prec);
    if (nvals > 1) {
@@ -565,7 +565,7 @@ void sii_bad_entry_message ( const gchar *ee, guint items )
    str[0] = '\0';
    if (ee && strlen (ee))
      { strcat( str, ee ); }
-   sprintf (str+strlen(str)
+   snprintf (str+strlen(str), sizeof(str)-strlen(str)
 	    , "\n Entry could not be interpreted. Requires %d item(s)"
 	    , items );
    sii_message (str);

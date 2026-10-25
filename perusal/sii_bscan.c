@@ -567,7 +567,7 @@ int tsDisplay(int click_frme, int command)
 	    if((nn = mddir_file_list_v3
 		(lead_frame, wwptrx->sweep->directory_name)) < 1 )
 	      {
-		 sprintf(mess, "Directory %s contains no sweep files\n"
+		 snprintf(mess, sizeof(mess), "Directory %s contains no sweep files\n"
 			 , wwptrx->sweep->directory_name);
 		 sii_message (mess);
 		 broke = YES;
@@ -577,7 +577,7 @@ int tsDisplay(int click_frme, int command)
 	    if((wwptrx->sweep->radar_num =
 		mddir_radar_num_v3(lead_frame, wwptrx->sweep->radar_name)) < 0)
 		  {
-		     sprintf(mess, "No sweep files for radar %s\n"
+		     snprintf(mess, sizeof(mess), "No sweep files for radar %s\n"
 			     , wwptrx->sweep->radar_name);
 		     sii_message (mess);
 		     broke = YES;
@@ -619,7 +619,7 @@ int tsDisplay(int click_frme, int command)
 	    nn = dd_sweepfile_list_v3(usi, wwptrx->sweep->start_time
 				      , wwptrx->sweep->stop_time);
 	    if(nn <= 0) {
-	       sprintf(mess,
+	       snprintf(mess, sizeof(mess),
 		       "Unable to produce sweep file list for radar: %s\nin %s\nFrom %s to %s"
 		       , wwptrx->sweep->radar_name
 		       , wwptrx->sweep->directory_name
@@ -641,7 +641,7 @@ int tsDisplay(int click_frme, int command)
 	    nn = dd_sweepfile_list_v3(usi, tsLink->sweep_start
 				      , wwptrx->sweep->stop_time);
 	    if(nn <= 0) {
-	      sprintf(mess,
+	      snprintf(mess, sizeof(mess),
 		      "Unable to produce sweep file list for radar: %s in %s From %s to %s"
 		      , wwptrx->sweep->radar_name
 		      , wwptrx->sweep->directory_name
@@ -663,7 +663,7 @@ int tsDisplay(int click_frme, int command)
 		break;
 	    }
 
-	    sprintf (mess, "plot: %s to %s  %.3f - %.3f\n"
+	    snprintf (mess, sizeof(mess), "plot: %s to %s  %.3f - %.3f\n"
 		     , wwptrx->lead_sweep->start_time_text
 		     , wwptrx->lead_sweep->stop_time_text
 		     , wwptrx->sweep->start_time
@@ -824,7 +824,7 @@ void sp_tsYpixel_info(struct ts_linked_frames *tsLink, int top_down)
     }
 
     if(tsl->py_count < 0 || tsl->py0 < 0 || tsl->py0 > ymax) {
-	sprintf (mess, "tsl->py_count < 0 : %d %.3f %.3f %.3f\n"
+	snprintf (mess, sizeof(mess), "tsl->py_count < 0 : %d %.3f %.3f %.3f\n"
 		  , tsl->py_count, dd_altitude(dgi)
 		  , rmin, rloc);
 	uii_printf (mess);

@@ -396,7 +396,7 @@ gboolean sii_param_absorb_ctbl (guint frame_num, const gchar *filename)
   gint ii, jj, nn, nt;
 
   if(!(stream = fopen(filename, "r"))) {
-    sprintf(mess, "Unable to open color table file %s\n", filename);
+    snprintf(mess, sizeof(mess), "Unable to open color table file %s\n", filename);
     sii_message(mess);
     return FALSE;
   }
@@ -467,14 +467,14 @@ int sii_param_dump_ctbls (FILE *stream)
     if((nn = fwrite(&gd, sizeof(char), sizeof(gd), stream))
 	   < sizeof(gd))
       {
-	sprintf(mess, "Problem writing color table: %s\n", aa);
+	snprintf(mess, sizeof(mess), "Problem writing color table: %s\n", aa);
 	solo_message(mess);
 	return 0;
       }
     if((nn = fwrite((void *)bb, sizeof(char), len, stream))
 	   < len)
       {
-	sprintf(mess, "Problem writing color table: %s\n", aa);
+	snprintf(mess, sizeof(mess), "Problem writing color table: %s\n", aa);
 	solo_message(mess);
 	return 0;
       }
@@ -3606,7 +3606,7 @@ int solo_hardware_color_table(gint frame_num)
   table = (gchar *)g_tree_lookup( ascii_color_tables
 				  , (gpointer)pal->color_table_name->str );
   if (!table) {
-    sprintf (mess, "Color table %s cannot be found"
+    snprintf (mess, sizeof(mess), "Color table %s cannot be found"
 	     , pal->color_table_name->str);
     sii_message (mess);
     return 0;
@@ -3698,7 +3698,7 @@ int solo_hardware_color_table(gint frame_num)
   }
 
   if (!ok) {
-    sprintf (mess, "Unable to allocate colors for %s"
+    snprintf (mess, sizeof(mess), "Unable to allocate colors for %s"
 	     , pal->color_table_name->str);
     sii_message (mess);
     return ok;
@@ -3910,7 +3910,7 @@ int solo_palette_color_numbers(int frame_num)
   }
 
   if (!ok) {
-    sprintf (mess+strlen(mess), "not useful color name(s) in frame %d"
+    snprintf (mess+strlen(mess), sizeof(mess)-strlen(mess), "not useful color name(s) in frame %d"
 	     , frame_num);
     sii_message (mess);
   }
