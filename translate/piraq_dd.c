@@ -440,7 +440,7 @@ int pui_next_block(void)
 	/*
 	 * see if there is another file to read
 	 */
-	if(aa = dd_next_source_dev_name("PRQ")) {
+	if((aa = dd_next_source_dev_name("PRQ"))) {
 	  current_file_name = aa;
 	  if((ii = dd_input_read_open(irq, aa)) <= 0) {
 	    return(size);
@@ -468,7 +468,7 @@ int pui_next_block(void)
 	  /*
 	   * see if there is another file to read
 	   */
-	  if(aa = dd_next_source_dev_name("PRQ")) {
+	  if((aa = dd_next_source_dev_name("PRQ"))) {
 	    current_file_name = aa;
 	    if((ii = dd_input_read_open(irq, aa)) <= 0) {
 	      return(size);
@@ -501,7 +501,7 @@ int pui_next_block(void)
 
     if (!(dwel_record || rhdr_record)) {
       if((illegal_header_count++ % 3) == 0 ) {
-	sprintf(mess, 
+	snprintf(mess, sizeof(mess), 
 		"Illegal header id: %2x %2x %2x %2x %2x %2x rlen: %d  sizeof_read:  %ld %d"
 		, (int)gh->desc[0] & 0xff
 		, (int)gh->desc[1] & 0xff
@@ -517,7 +517,7 @@ int pui_next_block(void)
 	printf("%s\n", mess);
       }
       if(((illegal_header_count-1) % 30) == 0 ) {
-	sprintf(mess,  "%s %s"
+	snprintf(mess, sizeof(mess),  "%s %s"
 		, current_file_name
 		, dts_print(d_unstamp_time(gri->dts))
 		);
@@ -536,7 +536,7 @@ int pui_next_block(void)
       }
       if(1) {
 	dd_input_read_close(irq);
-	if(aa = dd_next_source_dev_name("PRQ")) {
+	if((aa = dd_next_source_dev_name("PRQ"))) {
 	  if((ii = dd_input_read_open(irq, aa)) <= 0) {
 	    return(size);
 	  }
@@ -1236,20 +1236,20 @@ static void piraq_ini(void)
     asib = (struct platform_i *)malloc(sizeof(struct platform_i));
     memset(asib, 0, sizeof(struct platform_i));
 
-    if(aa=get_tagged_string("PROJECT_NAME")) {
+    if((aa=get_tagged_string("PROJECT_NAME"))) {
 	strcpy(gri->project_name, aa);
     }
     else {
 	strcpy(gri->project_name, "UNKNOWN");
     }
-    if(aa=get_tagged_string("SITE_NAME")) {
+    if((aa=get_tagged_string("SITE_NAME"))) {
 	strcpy(gri->site_name, aa);
     }
     else {
 	strcpy(gri->site_name, "UNKNOWN");
     }
 
-    if(aa=get_tagged_string("UNIFORM_CELL_SPACING")) {
+    if((aa=get_tagged_string("UNIFORM_CELL_SPACING"))) {
 	if(sscanf(aa, "%f", &f) > 0) {
 	    if(f > 0)
 		  pui->uniform_cell_spacing = f;
@@ -1257,104 +1257,104 @@ static void piraq_ini(void)
     }
     pui->latitude = pui->longitude = pui->altitude = EMPTY_FLAG;
 
-    if(aa=get_tagged_string("RADAR_LATITUDE")) {
+    if((aa=get_tagged_string("RADAR_LATITUDE"))) {
 	pui->latitude = 
 	      d = atof(aa);
     }
-    if(aa=get_tagged_string("RADAR_LONGITUDE")) {
+    if((aa=get_tagged_string("RADAR_LONGITUDE"))) {
 	pui->longitude = 
 	      d = atof(aa);
     }
-    if(aa=get_tagged_string("RADAR_ALTITUDE")) {
+    if((aa=get_tagged_string("RADAR_ALTITUDE"))) {
 	pui->altitude = 
 	      d = atof(aa);
     }
-    if(aa=get_tagged_string("IMPROVE_HZO_RCONST_CORR")) {
+    if((aa=get_tagged_string("IMPROVE_HZO_RCONST_CORR"))) {
 	Improve_rconst_corr = atof(aa);
     }
-    if(aa=get_tagged_string("RCONST_CORRECTION")) {
+    if((aa=get_tagged_string("RCONST_CORRECTION"))) {
 	pui->rconst_correction = atof(aa);
     }
     printf( "rconst correction: %.3f\n", pui->rconst_correction);
 
-    if(aa=get_tagged_string("ZDR_BIAS")) {
+    if((aa=get_tagged_string("ZDR_BIAS"))) {
 	pui->zdr_offset_corr = atof(aa);
     }
     printf( "zdr_offset_corr: %.3f\n", pui->zdr_offset_corr);
 
-    if(aa=get_tagged_string("LDR_BIAS")) {
+    if((aa=get_tagged_string("LDR_BIAS"))) {
 	pui->ldr_offset_corr = atof(aa);
     }
     printf( "ldr_offset_corr: %.3f\n", pui->ldr_offset_corr);
 
-    if(aa=get_tagged_string("RANGE_CORRECTION")) {
+    if((aa=get_tagged_string("RANGE_CORRECTION"))) {
 	pui->range_correction = atof(aa);
     }
     printf( "Range correction: %.3f meters\n", pui->range_correction);
 
-    if(aa=get_tagged_string("TIME_CORRECTION")) {
+    if((aa=get_tagged_string("TIME_CORRECTION"))) {
 	pui->time_correction = atof(aa);
     }
     printf( "Time correction: %.3f seconds\n", pui->time_correction);
 
-    if(aa=get_tagged_string("MIN_AZ_DIFF")) {
+    if((aa=get_tagged_string("MIN_AZ_DIFF"))) {
        d = atof(aa);
        if(d > .01) min_az_diff = d;
     }
     printf("Min. AZ diff: %.2f\n", min_az_diff);
 
-    if(aa=get_tagged_string("MIN_EL_DIFF")) {
+    if((aa=get_tagged_string("MIN_EL_DIFF"))) {
 	d = atof(aa);
 	if(d > .01) min_el_diff = d;
     }
     printf("  Min. EL diff: %.2f\n", min_el_diff);
 
-    if(aa=get_tagged_string("MIN_FXD_DIFF")) {
+    if((aa=get_tagged_string("MIN_FXD_DIFF"))) {
 	d = atof(aa);
 	if(d > .01) min_fxdang_diff = d;
     }
     printf("  Min. Fixed Angle diff: %.2f\n", min_el_diff);
 
-    if(aa=get_tagged_string("PPI_EL_TOL")) {
+    if((aa=get_tagged_string("PPI_EL_TOL"))) {
 	d = atof(aa);
 	if(d > .01) ppi_el_tol = d;
     }
     printf("  PPI elevation tolerance: %.2f\n", ppi_el_tol );
 
-    if(aa=get_tagged_string("RHI_AZ_TOL")) {
+    if((aa=get_tagged_string("RHI_AZ_TOL"))) {
 	d = atof(aa);
 	if(d > .01) rhi_az_tol = d;
     }
     printf("  RHI azimuth tolerance: %.2f\n", rhi_az_tol );
 
-    if(aa=get_tagged_string("MAX_RHI_DIFF")) {
+    if((aa=get_tagged_string("MAX_RHI_DIFF"))) {
 	d = atof(aa);
 	if(d > .01) max_rhi_diff = d;
     }
     printf("  Max RHI diff: %.2f\n", max_rhi_diff);
 	   
-    if(aa=get_tagged_string("NUM_AZ_DIFFS_AVGD")) {
+    if((aa=get_tagged_string("NUM_AZ_DIFFS_AVGD"))) {
        ii = atoi(aa);
        if(ii > 1) pui->num_az_diffs_avgd = ii;
     }
     printf("Num az diffs averaged: %d\n", pui->num_az_diffs_avgd);
 
-    if(aa=get_tagged_string("NUM_EL_DIFFS_AVGD")) {
+    if((aa=get_tagged_string("NUM_EL_DIFFS_AVGD"))) {
        ii = atoi(aa);
        if(ii > 1) pui->num_el_diffs_avgd = ii;
     }
     printf("Num el diffs averaged: %d\n", pui->num_el_diffs_avgd);
 
-    if(aa=get_tagged_string("NUM_SHORT_AVG")) {
+    if((aa=get_tagged_string("NUM_SHORT_AVG"))) {
        ii = atoi(aa);
        if(ii > 1) pui->short_rq_len = ii;
     }
     printf("Short que size: %d\n", pui->short_rq_len);
 
-    if(aa=get_tagged_string("RENAME")) {
+    if((aa=get_tagged_string("RENAME"))) {
 	piraq_name_aliases(aa, &top_ren);
     }
-    if(aa=get_tagged_string("PIRAQ_FORCE_POLYPP")) {
+    if((aa=get_tagged_string("PIRAQ_FORCE_POLYPP"))) {
        pui->options |= FORCE_POLYPP;
     }
     if( get_tagged_string("HRD_ASCII_TAPE") || 
@@ -1400,7 +1400,7 @@ static void piraq_ini(void)
 	  { pui->options |= DZ_TO_DBZ_FLAG; }
 	if(strstr(aa, "IGNORE_TRANS")) /*  */
 	  { pui->options |= IGNORE_TRANSITIONS; }
-	if(bb = strstr(aa, "HZO_IMP")) {
+	if((bb = strstr(aa, "HZO_IMP"))) {
 	  strcpy( str, bb );
 	  nt = dd_tokens( str, sptrs );
 	  nt = dd_tokenz( str, sptrs, ":" );
@@ -1460,7 +1460,7 @@ static void piraq_ini(void)
     pui->el_rs = init_run_sum( pui->num_el_diffs_avgd
 				    , pui->short_rq_len );
 
-    if(aa=get_tagged_string("VOLUME_HEADER")) {
+    if((aa=get_tagged_string("VOLUME_HEADER"))) {
 	/* nab a volume header from another file
 	 */
 	dd_input_read_open(irq, aa);
@@ -2080,13 +2080,13 @@ static void piraq_map_hdr(char *aa, int gotta_header)
       gri->dts->time_stamp = pui->time;
       strcpy (tstr2, dts_print( d_unstamp_time( gri->dts ))); 
 # ifdef obsolete
-      sprintf( message, "   **** Time glitch at: %s %s\n   %.4f %.4f %.4f %.4f"
+      snprintf(message, sizeof(message), "   **** Time glitch at: %s %s\n   %.4f %.4f %.4f %.4f"
 	       , tstr, tstr2
 	       , rq->last->last->last->time, rq->last->last->time
 	       , rq->last->time, pui->time
 	       );
 # else
-      sprintf( message, "   **** Time glitch at: %s %s", tstr, tstr2 );
+      snprintf(message, sizeof(message), "   **** Time glitch at: %s %s", tstr, tstr2 );
 # endif
        if((pui->time_glitch_count++ % 5 ) == 0 ) {
 	 dd_append_cat_comment( message );
@@ -2326,7 +2326,7 @@ static void piraq_header(void)
 
     if( pui->rhdr_count < 12 ) {
       strcpy(mess, "Gotta header! ");
-      sprintf(mess+strlen(mess)
+      snprintf(mess+strlen(mess), sizeof(mess) - strlen(mess)
 	      , "%s %s", dts_print(gri->dts), dd_stats_sprintf());
       printf("%s\n", mess);
       dd_append_cat_comment(mess);
@@ -3158,10 +3158,10 @@ Option = "
 	    if(skip_secs > 0)
 		 dtarget = gri->time + skip_secs; 
 	}
-	else if(skip_secs = dd_relative_time(str)) {
+	else if((skip_secs = dd_relative_time(str))) {
 	    dtarget = gri->time + skip_secs;
 	}
-	else if(kk = dd_crack_datime(str, nn, &dts)) {
+	else if((kk = dd_crack_datime(str, nn, &dts))) {
 	    if(!dts.year) dts.year = gri->dts->year;
 	    if(!dts.month) dts.month = gri->dts->month;
 	    if(!dts.day) dts.day = gri->dts->day;
@@ -3296,7 +3296,7 @@ int piraq_inventory(struct input_read_info *irq)
 	    if((nn=piraq_next_ray()) < 1) {
 		break;
 	    }
-	    sprintf(preamble, "%2d", irq->top->b_num);
+	    snprintf(preamble, sizeof(preamble), "%2d", irq->top->b_num);
 	    gri_interest(gri, 0, preamble, postamble);
 	}
 	if(nn < 1)
@@ -3323,10 +3323,10 @@ void piraq_dump_this_ray(struct solo_list_mgmt *slm)
     solo_reset_list_entries(slm);
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of data fields");
+    snprintf(aa, sizeof(str), "Contents of data fields");
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, "name ");
+    snprintf(aa, sizeof(str), "name ");
     nf = gri->num_fields_present > 8 ? 8 : gri->num_fields_present;
     cc = aa+strlen(aa);
 
@@ -3342,10 +3342,10 @@ void piraq_dump_this_ray(struct solo_list_mgmt *slm)
     solo_add_list_entry(slm, aa, strlen(aa));
 
     for(gg=0; gg < gri->num_bins; gg++) {
-	sprintf(aa, "%4d)", gg);
+	snprintf(aa, sizeof(str), "%4d)", gg);
 
 	for(ii=0; ii < nf; ii++) {
-	    sprintf(aa+strlen(aa), "%10.2f",
+	    snprintf(aa+strlen(aa), sizeof(str) - strlen(aa), "%10.2f",
 		    DD_UNSCALE(*(gri->scaled_data[ii]+gg), unscale[ii]
 			       , bias[ii]));
 	}
@@ -3376,86 +3376,86 @@ void piraq_print_hdr(HEADERV *hdr, struct solo_list_mgmt *slm, RADARV *rhdr)
     aa = str;
 
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of piraq ray header");
+    snprintf(aa, sizeof(str), "Contents of piraq ray header");
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, "desc[4]         %s", str_terminate(tmp,hdr->desc,4));
+    snprintf(aa, sizeof(str), "desc[4]         %s", str_terminate(tmp,hdr->desc,4));
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "recordlen       %d", hdr->recordlen      );
+    snprintf(aa, sizeof(str), "recordlen       %d", hdr->recordlen      );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "gates           %d", hdr->gates          );
+    snprintf(aa, sizeof(str), "gates           %d", hdr->gates          );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "hits            %d", hdr->hits           );
+    snprintf(aa, sizeof(str), "hits            %d", hdr->hits           );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "rcvr_pulsewidth %e", hdr->rcvr_pulsewidth);
+    snprintf(aa, sizeof(str), "rcvr_pulsewidth %e", hdr->rcvr_pulsewidth);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "prt             %e", hdr->prt            );
+    snprintf(aa, sizeof(str), "prt             %e", hdr->prt            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "delay           %e", hdr->delay          );
+    snprintf(aa, sizeof(str), "delay           %e", hdr->delay          );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "clutterfilter   %d", hdr->clutterfilter  );
+    snprintf(aa, sizeof(str), "clutterfilter   %d", hdr->clutterfilter  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "timeseries      %d", hdr->timeseries     );
+    snprintf(aa, sizeof(str), "timeseries      %d", hdr->timeseries     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "tsgate          %d", hdr->tsgate         );
+    snprintf(aa, sizeof(str), "tsgate          %d", hdr->tsgate         );
     solo_add_list_entry(slm, aa, strlen(aa));
     dts.time_stamp = pui->time;
-    sprintf(aa, "time            %d %s", hdr->time
+    snprintf(aa, sizeof(str), "time            %d %s", hdr->time
 	    , dts_print(d_unstamp_time(&dts))           );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "subsec          %d", hdr->subsec         );
+    snprintf(aa, sizeof(str), "subsec          %d", hdr->subsec         );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "az              %e", hdr->az             );
+    snprintf(aa, sizeof(str), "az              %e", hdr->az             );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "el              %e", hdr->el             );
+    snprintf(aa, sizeof(str), "el              %e", hdr->el             );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "radar_longitude %e", hdr->radar_longitude);
+    snprintf(aa, sizeof(str), "radar_longitude %e", hdr->radar_longitude);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "radar_lattitude %e", hdr->radar_lattitude);
+    snprintf(aa, sizeof(str), "radar_lattitude %e", hdr->radar_lattitude);
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "radar_altitude  %e", hdr->radar_altitude );
+    snprintf(aa, sizeof(str), "radar_altitude  %e", hdr->radar_altitude );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "ew_velocity     %e", hdr->ew_velocity    );
+    snprintf(aa, sizeof(str), "ew_velocity     %e", hdr->ew_velocity    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "ns_velocity     %e", hdr->ns_velocity    );
+    snprintf(aa, sizeof(str), "ns_velocity     %e", hdr->ns_velocity    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "vert_velocity   %e", hdr->vert_velocity  );
+    snprintf(aa, sizeof(str), "vert_velocity   %e", hdr->vert_velocity  );
     solo_add_list_entry(slm, aa, strlen(aa));
     if(rhdr->rev) {
-	sprintf(aa, "dataformat      %d", hdr->dataformat  );
+	snprintf(aa, sizeof(str), "dataformat      %d", hdr->dataformat  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "prt2            %e", hdr->prt2  );
+	snprintf(aa, sizeof(str), "prt2            %e", hdr->prt2  );
 	solo_add_list_entry(slm, aa, strlen(aa));
 # ifdef obsolete
-	sprintf(aa, "reserved[15]    %d", hdr->reserved       );
+	snprintf(aa, sizeof(str), "reserved[15]    %d", hdr->reserved       );
 	solo_add_list_entry(slm, aa, strlen(aa));
 # endif
     }
     if(pui->options & SPOL_FLAG ||pui->options & DOW_FLAG ) {
-	sprintf(aa, "fxd_angle       %e", hdr->fxd_angle  );
+	snprintf(aa, sizeof(str), "fxd_angle       %e", hdr->fxd_angle  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "scan_type       %d", hdr->scan_type  );
+	snprintf(aa, sizeof(str), "scan_type       %d", hdr->scan_type  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "scan_num        %d", hdr->scan_num  );
+	snprintf(aa, sizeof(str), "scan_num        %d", hdr->scan_num  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "vol_num         %d", hdr->vol_num  );
+	snprintf(aa, sizeof(str), "vol_num         %d", hdr->vol_num  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "ray_count       %d", hdr->ray_count  );
+	snprintf(aa, sizeof(str), "ray_count       %d", hdr->ray_count  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "transition       %d", hdr->transition  );
+	snprintf(aa, sizeof(str), "transition       %d", hdr->transition  );
 	solo_add_list_entry(slm, aa, strlen(aa));
 
-	sprintf(aa, "hxmit_power     %f", hdr->hxmit_power  );
+	snprintf(aa, sizeof(str), "hxmit_power     %f", hdr->hxmit_power  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "vxmit_power     %f", hdr->vxmit_power  );
+	snprintf(aa, sizeof(str), "vxmit_power     %f", hdr->vxmit_power  );
 	solo_add_list_entry(slm, aa, strlen(aa));
     }
     if( gri->radar_type == AIR_NOSE ) {
-	sprintf(aa, "yaw             %f", hdr->yaw  );
+	snprintf(aa, sizeof(str), "yaw             %f", hdr->yaw  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "pitch           %f", hdr->pitch  );
+	snprintf(aa, sizeof(str), "pitch           %f", hdr->pitch  );
 	solo_add_list_entry(slm, aa, strlen(aa));
-	sprintf(aa, "roll            %f", hdr->roll  );
+	snprintf(aa, sizeof(str), "roll            %f", hdr->roll  );
 	solo_add_list_entry(slm, aa, strlen(aa));
     }
 }
@@ -3468,70 +3468,70 @@ void piraq_print_rhdr(RADARV *rhdr, struct solo_list_mgmt *slm)
 
     aa = str;
     solo_add_list_entry(slm, " ", 1);
-    sprintf(aa, "Contents of piraq radar header");
+    snprintf(aa, sizeof(str), "Contents of piraq radar header");
     solo_add_list_entry(slm, aa, strlen(aa));
 
-    sprintf(aa, "desc[4]         %s", str_terminate(tmp, rhdr->desc, 4));
+    snprintf(aa, sizeof(str), "desc[4]         %s", str_terminate(tmp, rhdr->desc, 4));
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "recordlen       %d", rhdr->recordlen       );
+    snprintf(aa, sizeof(str), "recordlen       %d", rhdr->recordlen       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "rev             %d", rhdr->rev             );
+    snprintf(aa, sizeof(str), "rev             %d", rhdr->rev             );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "year            %d", rhdr->year            );
+    snprintf(aa, sizeof(str), "year            %d", rhdr->year            );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "radar_name[8]   %s", str_terminate(tmp,rhdr->radar_name,8));
+    snprintf(aa, sizeof(str), "radar_name[8]   %s", str_terminate(tmp,rhdr->radar_name,8));
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "polarization    %d", rhdr->polarization    );
+    snprintf(aa, sizeof(str), "polarization    %d", rhdr->polarization    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "test_pulse_pwr  %e", rhdr->test_pulse_pwr  );
+    snprintf(aa, sizeof(str), "test_pulse_pwr  %e", rhdr->test_pulse_pwr  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "test_pulse_frq  %e", rhdr->test_pulse_frq  );
+    snprintf(aa, sizeof(str), "test_pulse_frq  %e", rhdr->test_pulse_frq  );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "frequency       %e", rhdr->frequency       );
+    snprintf(aa, sizeof(str), "frequency       %e", rhdr->frequency       );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "peak_power      %e", rhdr->peak_power      );
+    snprintf(aa, sizeof(str), "peak_power      %e", rhdr->peak_power      );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "noise_figure    %e", rhdr->noise_figure    );
+    snprintf(aa, sizeof(str), "noise_figure    %e", rhdr->noise_figure    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "noise_power     %e", rhdr->noise_power     );
+    snprintf(aa, sizeof(str), "noise_power     %e", rhdr->noise_power     );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "receiver_gain   %e", rhdr->receiver_gain   );
+    snprintf(aa, sizeof(str), "receiver_gain   %e", rhdr->receiver_gain   );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "data_sys_sat    %e", rhdr->data_sys_sat    );
+    snprintf(aa, sizeof(str), "data_sys_sat    %e", rhdr->data_sys_sat    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "antenna_gain    %e", rhdr->antenna_gain    );
+    snprintf(aa, sizeof(str), "antenna_gain    %e", rhdr->antenna_gain    );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "horz_beam_width %e", rhdr->horz_beam_width );
+    snprintf(aa, sizeof(str), "horz_beam_width %e", rhdr->horz_beam_width );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "vert_beam_width %e", rhdr->vert_beam_width );
+    snprintf(aa, sizeof(str), "vert_beam_width %e", rhdr->vert_beam_width );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "xmit_pulsewidth %e", rhdr->xmit_pulsewidth );
+    snprintf(aa, sizeof(str), "xmit_pulsewidth %e", rhdr->xmit_pulsewidth );
     solo_add_list_entry(slm, aa, strlen(aa));
-    sprintf(aa, "rconst          %e", rhdr->rconst          );
+    snprintf(aa, sizeof(str), "rconst          %e", rhdr->rconst          );
     solo_add_list_entry(slm, aa, strlen(aa));
     if(rhdr->rev) {
-	sprintf(aa, "phaseoffset     %e", rhdr->phaseoffset  );
+	snprintf(aa, sizeof(str), "phaseoffset     %e", rhdr->phaseoffset  );
 	solo_add_list_entry(slm, aa, strlen(aa));
 	if(pui->options & SPOL_FLAG) {
-	   sprintf(aa, "vreceiver_gain  %e", rhdr->vreceiver_gain  );
+	   snprintf(aa, sizeof(str), "vreceiver_gain  %e", rhdr->vreceiver_gain  );
 	   solo_add_list_entry(slm, aa, strlen(aa));
-	   sprintf(aa, "vtest_pulse_pwr  %e", rhdr->vtest_pulse_pwr  );
+	   snprintf(aa, sizeof(str), "vtest_pulse_pwr  %e", rhdr->vtest_pulse_pwr  );
 	   solo_add_list_entry(slm, aa, strlen(aa));
-	   sprintf(aa, "vantenna_gain    %e", rhdr->vantenna_gain  );
+	   snprintf(aa, sizeof(str), "vantenna_gain    %e", rhdr->vantenna_gain  );
 	   solo_add_list_entry(slm, aa, strlen(aa));
-	   sprintf(aa, "vnoise_power     %e", rhdr->vnoise_power  );
+	   snprintf(aa, sizeof(str), "vnoise_power     %e", rhdr->vnoise_power  );
 	   solo_add_list_entry(slm, aa, strlen(aa));
-	   sprintf(aa, "zdr_fudge_factor %e", rhdr->zdr_fudge_factor  );
+	   snprintf(aa, sizeof(str), "zdr_fudge_factor %e", rhdr->zdr_fudge_factor  );
 	   solo_add_list_entry(slm, aa, strlen(aa));
 	}
 	for(ii=0; ii < ((pui->options & SPOL_FLAG) ? 4 : 9) ; ii++) {
-	    sprintf(aa, "misc[%02d]         %e", ii, rhdr->misc[ii]  );
+	    snprintf(aa, sizeof(str), "misc[%02d]         %e", ii, rhdr->misc[ii]  );
 	    solo_add_list_entry(slm, aa, strlen(aa));
 	}
-	sprintf(aa, "text[960]        "                        );
+	snprintf(aa, sizeof(str), "text[960]        "                        );
     }
     else {
-	sprintf(aa, "text[1000]        "                        );
+	snprintf(aa, sizeof(str), "text[1000]        "                        );
     }
     solo_add_list_entry(slm, aa, strlen(aa));
 
@@ -5864,7 +5864,7 @@ int piraq_ts_stats(void)
 
     if( !ray_count++ ) {
 	aa = message;
-	sprintf( aa, "/scr/hotlips/oye/spol/ts.txt" );
+	snprintf(aa, sizeof(message), "/scr/hotlips/oye/spol/ts.txt" );
 	/* open the ascii file */
 	ts_fid = fopen( message, "w" );
     }
@@ -5878,19 +5878,19 @@ int piraq_ts_stats(void)
 	 */
 	if( N > 0 ) {
 	    aa = message;
-	    sprintf( aa, "RC:%d total: %d prt: %.3f\n", ray_count, N, prev_prt );
+	    snprintf(aa, sizeof(message), "RC:%d total: %d prt: %.3f\n", ray_count, N, prev_prt );
 
 	    mean = sumhh/(float)N;
 	    sdev = sqrt((double)((N*sumSqhh - sumhh*sumhh)/(N*(N-1))));
-	    sprintf( aa, "hh:mean=%.3f sdev=%.3f \n", mean, sdev );
+	    snprintf(aa, sizeof(message), "hh:mean=%.3f sdev=%.3f \n", mean, sdev );
 
 	    mean = sumvv/(float)N;
 	    sdev = sqrt((double)((N*sumSqvv - sumvv*sumvv)/(N*(N-1))));
-	    sprintf( aa + strlen(aa), "vv:mean=%.3f sdev=%.3f \n", mean, sdev );
+	    snprintf(aa + strlen(aa), sizeof(message) - strlen(aa), "vv:mean=%.3f sdev=%.3f \n", mean, sdev );
 
 	    mean = sumvv/(float)N;
 	    sdev = sqrt((double)((N*sumSqvv - sumvv*sumvv)/(N*(N-1))));
-	    sprintf( aa + strlen(aa), "hv:mean=%.3f sdev=%.3f \n", mean, sdev );
+	    snprintf(aa + strlen(aa), sizeof(message) - strlen(aa), "hv:mean=%.3f sdev=%.3f \n", mean, sdev );
 	}
     }
 
@@ -5904,7 +5904,7 @@ int piraq_ts_stats(void)
     fpx = (float *)( pui->raw_data + hdr->gates * num_fields * sizeof(short) );
     N += hdr->hits;
     aa = message;
-    sprintf( aa
+    snprintf( aa, sizeof(message)
 	     , "beam: %d tsgate: %d hits: %d prt: %.4f az: %.2f el: %.2f %d \n"
 	     , ray_count, hdr->tsgate, hdr->hits, hdr->prt, hdr->az, hdr->el
 	     , len );
@@ -5917,7 +5917,7 @@ int piraq_ts_stats(void)
 
 	I = SX4F( *fpx++ );
 	Q = SX4F( *fpx++ );
-	sprintf( aa, " %4d %10.2f %10.2f ", ii, I, Q );
+	snprintf(aa, sizeof(message), " %4d %10.2f %10.2f ", ii, I, Q );
 	xx = sqrt( I*I + Q*Q );
 	sumhh += xx;
 	sumSqhh += xx*xx;
@@ -5925,7 +5925,7 @@ int piraq_ts_stats(void)
 	I = SX4F( *fpx++ );
 	Q = SX4F( *fpx++ );
 	aa += strlen(aa);
-	sprintf( aa, " %10.2f %10.2f ", I, Q );
+	snprintf(aa, sizeof(message) - (aa - message), " %10.2f %10.2f ", I, Q );
 	xx = sqrt( I*I + Q*Q );
 	sumvv += xx;
 	sumSqvv += xx*xx;
@@ -5934,7 +5934,7 @@ int piraq_ts_stats(void)
 	I = SX4F( *fpx++ );
 	Q = SX4F( *fpx++ );
 	aa += strlen(aa);
-	sprintf( aa, " %10.2f %10.2f ", I, Q );
+	snprintf(aa, sizeof(message) - (aa - message), " %10.2f %10.2f ", I, Q );
 	xx = sqrt( I*I + Q*Q );
 	sumhv += xx;
 	sumSqhv += xx*xx;

@@ -350,10 +350,10 @@ int hrd_merge_std(struct generic_radar_info *gri)
     if(!count++) {
 	hrd_std_init();
 
-	if(a=get_tagged_string("HRD_STD_TAPE")) {
+	if((a=get_tagged_string("HRD_STD_TAPE"))) {
 	    next_tape = a;
 	}
-	else if(a=get_tagged_string("HRD_ASCII_TAPE")) {
+	else if((a=get_tagged_string("HRD_ASCII_TAPE"))) {
 	    hs->hrd_ascii_tape = YES;
 	    next_tape = a;
 	}
@@ -859,7 +859,7 @@ void hrd_ac_update_std(struct generic_radar_info *gri)
 	d = 111000. * (t5s->next->gps_latitude_orig -t5s->gps_latitude_orig);
 	movement += SQ(d);
 
-	if(ok_movement = (movement > 2500. && movement < 40000)) {
+	if((ok_movement = (movement > 2500. && movement < 40000))) {
 	    /* equivalent to 50 m/s and 200 m/s squared
 	     * either not enough movement or more than possible
 	     */
@@ -1218,7 +1218,7 @@ int hrdstd_read(int fid, char *buf, int size, int io_type)
 				 * from a file so you can start somewhere
 				 * other than the beginning of the tape
 				 */
-	    if(a=getenv("HRDSTD_VOLUME_HEADER")) {
+	    if((a=getenv("HRDSTD_VOLUME_HEADER"))) {
 		std_fid = open(a, 0);
 	    }
 	    else

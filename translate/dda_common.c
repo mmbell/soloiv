@@ -173,7 +173,7 @@ char *dd_stats_sprintf(void)
 {
     static char stats[88];
 
-    sprintf(stats, " r:%d b:%d s:%d v:%d f:%d %.2f MB"
+    snprintf(stats, sizeof(stats), " r:%d b:%d s:%d v:%d f:%d %.2f MB"
 	    , dd_stats->rec_count
 	    , dd_stats->ray_count
 	    , dd_stats->sweep_count
@@ -309,12 +309,12 @@ int dd_min_rays_per_sweep(void)
     int ii;
 
     if(!Min_rays_per_sweep) {
-	if(aa=get_tagged_string("MIN_RAYS_PER_SWEEP")) {
+	if((aa=get_tagged_string("MIN_RAYS_PER_SWEEP"))) {
 	    ii = atoi(aa);
 	    if(ii > 0)
 		  Min_rays_per_sweep = ii;
 	}
-	else if(aa=getenv("MIN_RAYS_PER_SWEEP")) {
+	else if((aa=getenv("MIN_RAYS_PER_SWEEP"))) {
 	    ii = atoi(aa);
 	    if(ii > 0)
 		  Min_rays_per_sweep = ii;
@@ -333,7 +333,7 @@ int dd_max_rays_per_sweep(void)
     int ii;
 
     if(!Max_rays_per_sweep) {
-	if(aa=get_tagged_string("MAX_RAYS_PER_SWEEP")) {
+	if((aa=get_tagged_string("MAX_RAYS_PER_SWEEP"))) {
 	    ii = atoi(aa);
 	    if(ii > 0)
 		  Max_rays_per_sweep = ii;
@@ -352,7 +352,7 @@ int dd_max_sweeps_per_volume(void)
     int ii;
 
     if(!Max_sweeps_per_volume) {
-	if(aa=get_tagged_string("MAX_SWEEPS_PER_VOLUME")) {
+	if((aa=get_tagged_string("MAX_SWEEPS_PER_VOLUME"))) {
 	    ii = atoi(aa);
 	    if(ii > 0)
 		  Max_sweeps_per_volume = ii;
@@ -371,7 +371,7 @@ int dd_min_sweeps_per_volume(void)
     int ii;
 
     if(!Min_sweeps_per_volume) {
-	if(aa=get_tagged_string("MIN_SWEEPS_PER_VOLUME")) {
+	if((aa=get_tagged_string("MIN_SWEEPS_PER_VOLUME"))) {
 	    ii = atoi(aa);
 	    if(ii > 0)
 		  Min_sweeps_per_volume = ii;
@@ -531,7 +531,7 @@ int dd_open(char *dir, char *file_name)
 	mark = 0;
     }
 
-    if(a=strrchr(name, '/')) {
+    if((a=strrchr(name, '/'))) {
 	snprintf(dd_open_info, sizeof(dd_open_info), " file %s:%d \n", a, i );
     }
     else {
@@ -581,7 +581,7 @@ void dd_rename_swp_file(struct dd_general_info *dgi)
     vn = (dgi->prev_vol_num < 0) ? dgi->dds->vold->volume_num
       : dgi->prev_vol_num;
 
-    sprintf(bb, ".%.1f_%s_v%d"
+    snprintf(bb, sizeof(file_name) - (bb - file_name), ".%.1f_%s_v%d"
 	    , dgi->dds->swib->fixed_angle
 	    , scan_mode_mne
 	    , vn
@@ -714,8 +714,8 @@ struct time_dependent_fixes *dd_time_dependent_fixes(int *fx_count)
 
 	switch(arg_num) {
 	case 1:			/* start time */
-	    if(kk = dd_crack_datime
-	       (str_ptrs[ii], strlen(str_ptrs[ii]), &dts)) {
+	    if((kk = dd_crack_datime
+	       (str_ptrs[ii], strlen(str_ptrs[ii]), &dts))) {
 		fix->start_time = d_time_stamp(&dts);
 		arg_num++; ii++;
 	    }
@@ -727,8 +727,8 @@ struct time_dependent_fixes *dd_time_dependent_fixes(int *fx_count)
 	    break;
 
 	case 3:
-	    if(kk = dd_crack_datime
-	       (str_ptrs[ii], strlen(str_ptrs[ii]), &dts)) {
+	    if((kk = dd_crack_datime
+	       (str_ptrs[ii], strlen(str_ptrs[ii]), &dts))) {
 		fix->stop_time = d_time_stamp(&dts);
 		arg_num++; ii++;
 	    }
@@ -835,19 +835,19 @@ struct time_dependent_fixes *dd_time_dependent_fixes(int *fx_count)
 	for(fix=tdf; fix; fix = fix->next) {
 	    bb = cc = string_space;
 	    dts.time_stamp = fix->start_time;
-	    sprintf(bb, "From %s to ", dts_print(d_unstamp_time(&dts)));
+	    snprintf(bb, sizeof(string_space) - (bb - string_space), "From %s to ", dts_print(d_unstamp_time(&dts)));
 	    bb += strlen(bb);
 	    dts.time_stamp = fix->stop_time;
-	    sprintf(bb, "%s ", dts_print(d_unstamp_time(&dts)));
+	    snprintf(bb, sizeof(string_space) - (bb - string_space), "%s ", dts_print(d_unstamp_time(&dts)));
 	    bb += strlen(bb);
 
 	    switch(fix->typeof_fix) {
 
 	    case FIX_POINTING_ANGLE:
-		sprintf(bb, "Pointing angle: %.1f", fix->pointing_angle);
+		snprintf(bb, sizeof(string_space) - (bb - string_space), "Pointing angle: %.1f", fix->pointing_angle);
 		break;
 	    case FIX_CELL_SPACING:
-		sprintf(bb, "Cell spacing: %.2f", fix->cell_spacing);
+		snprintf(bb, sizeof(string_space) - (bb - string_space), "Cell spacing: %.2f", fix->cell_spacing);
 		break;
 	    }
 	    bb += strlen(bb);

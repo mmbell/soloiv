@@ -139,19 +139,19 @@ void sigmet_ini(void)
     gri->rcv_bandwidth = EMPTY_FLAG; /* MHz */
     gri->compression_scheme = NO_COMPRESSION;
 
-    if(a=get_tagged_string("PROJECT_NAME")) {
+    if((a=get_tagged_string("PROJECT_NAME"))) {
 	strcpy(gri->project_name, a);
     }
     else {
 	strcpy(gri->project_name, "UNKNOWN");
     }
-    if(a=get_tagged_string("SITE_NAME")) {
+    if((a=get_tagged_string("SITE_NAME"))) {
 	strcpy(gri->site_name, a);
     }
     else {
 	strcpy(gri->site_name, "UNKNOWN");
     }
-    if(a=get_tagged_string("RADAR_NAME")) {
+    if((a=get_tagged_string("RADAR_NAME"))) {
 	strcpy(gri->radar_name, a);
     }
     else {
@@ -509,7 +509,7 @@ int sigmet_next_ray(void)
 	/* count the number of eor flags
 	 */
 	eors = 0;
-	if(new_run = iter >= rlcount)
+	if((new_run = iter >= rlcount))
 	      for(usx=us; X2(*usx++) == SIGMET_END_OF_RAY; eors++);
 
 	if( eors ) {

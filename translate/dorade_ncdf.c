@@ -579,7 +579,7 @@ void produce_ncdf(struct dd_general_info *dgi, int finish)
 	 */
 	ncdf_output = NO;
 
-	if(aa = get_tagged_string("OUTPUT_FLAGS")) {
+	if((aa = get_tagged_string("OUTPUT_FLAGS"))) {
 	    if( strstr(aa,"NETCDF_DATA")) {
 		ncdf_output = YES;
 	    }
@@ -593,7 +593,7 @@ void produce_ncdf(struct dd_general_info *dgi, int finish)
 	nc_var_list = (char *)malloc (1024);
 	memset (nc_var_list, 0, 1024);
 
-	if( aa = getenv( "NETCDF_FIELDS" )) {
+	if( (aa = getenv( "NETCDF_FIELDS" ))) {
 	  strcpy( nc_var_list, aa );
 	  num_vars = dd_tokens( nc_var_list, nc_var_name );
 	  if( num_vars < 1 ) {
@@ -610,16 +610,16 @@ void produce_ncdf(struct dd_general_info *dgi, int finish)
 	memset((char *)ncs, 0, sizeof(struct ncdf_control_struct));
 	strcpy( ncs->prefix, "tmp_" );
 
-	if( aa = get_tagged_string("NC_DIR") ) {
+	if( (aa = get_tagged_string("NC_DIR")) ) {
 	  slash_path( ncs->dir_name, aa );
 	}
 	else {
 	  slash_path( ncs->dir_name, dgi->directory_name );
 	}
-	if( aa = get_tagged_string( "OPTIONS" )) {
+	if( (aa = get_tagged_string( "OPTIONS" ))) {
 	  mark = 0;
 	}
-	if( aa = get_tagged_string( "TEST_PULSE_RANGES" )) {
+	if( (aa = get_tagged_string( "TEST_PULSE_RANGES" ))) {
 	  strcpy( str, aa );
 	  nt = dd_tokens( str, sptrs );
 	  for( ii = 0; nt >= 2 && ii < 2; ii++ ) {
@@ -747,7 +747,7 @@ static void ncdf_init_sweep(struct dd_general_info *dgi, struct ncdf_production 
    if( dgi->new_vol ) {
      ncp->vol_count++;
      ncp->vol_start_time = (time_t)dts->time_stamp;
-     sprintf (ncp->vol_stt
+     snprintf (ncp->vol_stt, sizeof(ncp->vol_stt)
 	      , "%d%02d%02d %02d%02d%02d"
 	      , dts->year
 	      , dts->month
@@ -761,7 +761,7 @@ static void ncdf_init_sweep(struct dd_general_info *dgi, struct ncdf_production 
    ncp->ray_count = 0;
    dd_scan_mode_mne(radd->scan_mode, smode);
    
-   sprintf( ncp->filename
+   snprintf( ncp->filename, sizeof(ncp->filename)
 	   , "ncswp_%s_%d%02d%02d_%02d%02d%02d.%03d_u%d_s%d_%.1f_%s_.nc"
 	   , radar_name
 	   , dts->year

@@ -85,7 +85,7 @@ void produce_uf(struct dd_general_info *dgi)
 	if(dd_catalog_only_flag()) {
 	    return;
 	}
-	if(a=get_tagged_string("OUTPUT_FLAGS")) {
+	if((a=get_tagged_string("OUTPUT_FLAGS"))) {
 	    if(strstr(a,"UFDATA") || strstr(a,"UF_DATA")) {
 		UF_output = YES;
 	    }
@@ -129,7 +129,7 @@ void produce_uf(struct dd_general_info *dgi)
 		}
 	    }
 	}
-	else if( a=get_tagged_string("UF_DIRECTORY") ) {
+	else if( (a=get_tagged_string("UF_DIRECTORY")) ) {
 	    uod->dev_name = a;
 	}
 	else {
@@ -269,7 +269,7 @@ int ufp_check_media(struct uf_production *ufp)
 
 	if( ufp->prev_dev->io_type !=  FB_IO ) {
 	    /* issue an eject */
-	    sprintf( command, "mt -f %s offline",  ufp->prev_dev->dev_name );
+	    snprintf(command, sizeof(command), "mt -f %s offline",  ufp->prev_dev->dev_name );
 	    ii = system( command );
 	}
     }
@@ -394,7 +394,7 @@ void ufp_init(struct dd_general_info *dgi, struct uf_production *ufp)
     strncpy( man->radar, radd->radar_name, 8 );
 
     strncpy(man->site,"UNKNOWN ", 8);
-    if(a=get_tagged_string("SITE_NAME")) {
+    if((a=get_tagged_string("SITE_NAME"))) {
 	if((m=strlen(a)) > 8 ) m = 8;
 	strncpy( man->site, a, m );
 	for(; m < 8; man->site[m++]=' ');
@@ -406,7 +406,7 @@ void ufp_init(struct dd_general_info *dgi, struct uf_production *ufp)
 
 	if( n < 20 ) {
 	    for(ii=n,m=0; ii < 20 && vold->proj_name[ii++]; m++);
-	    if( m = m > 8 ? 8 : m ) {
+	    if( (m = m > 8 ? 8 : m) ) {
 		strncpy(man->site,vold->proj_name+n,m);
 		for(; m < 8; man->site[m++]=' ');
 	    }
