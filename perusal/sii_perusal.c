@@ -737,7 +737,6 @@ int sp_data_loop(struct linked_frames *flink0)
     for(flink=flink0;  flink;  flink=flink->next) {
 	ww = flink->wwptr->window_num;
 	sii_xfer_images (ww, NULL);
-	sii_reset_reconfig_flags(ww);
     }
 
     return(0);

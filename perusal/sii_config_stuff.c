@@ -14,27 +14,6 @@ static gchar *def_param_names[] =
 
 /* c---------------------------------------------------------------------- */
 
-void sii_check_for_illegal_shrink(void)
-{
-  SiiFrameConfig *sfc = frame_configs[0];
-  sii_table_parameters *stp;
-  gint jj, mm;
-  gdouble d;
-
-  for (jj=0; jj < sii_return_frame_count(); jj++) {
-    if (frame_configs[jj]->reconfig_count)
-      { return; }
-    /* don't do anything in the middle of a reconfig */
-  }
-  stp = &sfc->tbl_parms;
-  mm = stp->right_attach - stp->left_attach;
-  d = (gdouble)sfc->width/mm;
-  if (d < sii_table_widget_width)
-    { sii_new_frames (); }
-}
-
-/* c---------------------------------------------------------------------- */
-
 void sii_check_def_widget_sizes(void)
 {
   int nn;
@@ -293,8 +272,6 @@ void sii_new_frames(void)
   for (fn=0; fn < sii_frame_count; fn++ ) {
 
     sfc = frame_configs[fn];
-    sfc->local_reconfig = TRUE;
-    sfc->drag_resize_count = 0;
     ++sfc->new_frame_count;
 
     sfc->frame = gtk_drawing_area_new ();
@@ -461,8 +438,6 @@ gboolean sii_set_config(void)
 	frame_configs[jj]->tbl_parms = tbl_parms[jj];
 	frame_configs[jj]->ncols = ncols;
 	frame_configs[jj]->nrows = nrows;
-	frame_configs[jj]->local_reconfig = TRUE;
-	frame_configs[jj]->reconfig_count = 0;
 
 	/* Fix this! */
 	frame_configs[jj]->lock_step = jj;

@@ -866,7 +866,6 @@ void zoom_config_cb( GtkWidget *w, gpointer   data )
 {
    guint pct = GPOINTER_TO_UINT (data), mm, nn;
    gdouble factor, zoom;
-   gint jj;
 
 
    if (!pct) {
@@ -886,12 +885,6 @@ void zoom_config_cb( GtkWidget *w, gpointer   data )
    else
      { factor = 1. + pct * .01; }
 
-   for (jj=0; jj < sii_return_frame_count(); jj++) {
-      /*
-	frame_configs[jj]->local_reconfig = TRUE;
-	frame_configs[jj]->reconfig_count = 0;
-       */
-   }
    sii_table_widget_width = (guint)(factor * sii_table_widget_width +.5 );
    sii_table_widget_height =(guint)(factor * sii_table_widget_height +.5 );
 
@@ -903,7 +896,7 @@ void zoom_config_cb( GtkWidget *w, gpointer   data )
 
 void shape_cb( GtkWidget *w, gpointer   data )
 {
-   guint cfg = GPOINTER_TO_UINT (data), jj;
+   guint cfg = GPOINTER_TO_UINT (data);
    gdouble factor;
 
 # ifdef obsolete
@@ -936,12 +929,6 @@ void shape_cb( GtkWidget *w, gpointer   data )
        (guint)((gdouble)4./3. * sii_table_widget_width);
    }
 # endif
-   for (jj=0; jj < sii_return_frame_count(); jj++) {
-      /*
-	frame_configs[jj]->local_reconfig = TRUE;
-	frame_configs[jj]->reconfig_count = 0;
-       */
-   }
    sii_check_def_widget_sizes ();
    sii_new_frames ();
 }
