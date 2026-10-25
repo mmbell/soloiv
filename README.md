@@ -70,8 +70,13 @@ ctest --preset default
 ```
 The tests read only the committed fixtures in `tests/fixtures/`. Many start
 the real GTK app, so on a headless Linux machine run them under
-`xvfb-run -a` with `GTK_A11Y=none`. CI's plain (non-sanitizer) build uses
-`-DSOLOIV_WERROR=ON`, so any compiler warning fails it.
+`xvfb-run -a` with `GTK_A11Y=none`.
+
+Both presets set `SOLOIV_WERROR=ON`, so any compiler warning fails the
+build. A plain `cmake -B build` leaves it off, so a newer compiler's new
+warnings don't block an ordinary build. With GCC, configure `debug-asan` with
+`-DSOLOIV_WERROR=OFF`: GCC's sanitizer instrumentation produces
+false-positive warnings. CI does the same.
 
 GitHub Actions runs both presets on Ubuntu 24.04 for every pull request and
 every push to `main`; see [.github/workflows/ci.yml](.github/workflows/ci.yml).
